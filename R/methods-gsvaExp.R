@@ -63,7 +63,6 @@ setReplaceMethod('gsvaExp', c('SVPExperiment', 'missing'), function(x, e, withDi
 #' @export
 setReplaceMethod('gsvaExp', c('SVPExperiment', 'character'), function(x, e, withDimnames = TRUE, withColData = FALSE, ..., value){
     value <- .check_gsvaexp_columns(x, value, withDimnames=withDimnames, withColData=withColData)
-    print (value)
     .set_internal_character(x, e, value,
         getfun=int_colData,
         setfun=`int_colData<-`,
@@ -150,10 +149,13 @@ setMethod('gsvaExp', c('SVPExperiment', "missing"), function(x, e, withDimnames 
             namefun = gsvaExpNames,
             funstr = 'gsvaExp',
             withDimnames = withDimnames,
-            withColData = withColData
+            withColData = withColData,
+            withSpatialCoords = withSpatialCoords,
+            withImgData = withImgData,
+            ...
          )
-    y <- .get_sce(y)
-    y <- .fill_gsvaexps_info(y, x, withDimnames, withColData, withSpatialCoords, withImgData)
+    #y <- .get_sce(y)
+    #y <- .fill_gsvaexps_info(y, x, withDimnames, withColData, withSpatialCoords, withImgData)
     return(y)
 })
 

@@ -219,3 +219,10 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
     }
     return(out)
 }
+
+.sce_to_svpe <- function(sce, gsvaExps = list()){
+    svpe <- new('SVPExperiment', sce)
+    int_colData(svpe)[[.gsva_key]] <- new('DFrame', nrows=ncol(svpe))
+    gsvaExps(svpe) <- gsvaExps
+    return(svpe)
+}

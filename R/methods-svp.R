@@ -71,10 +71,10 @@ setMethod('svp', signature(data = 'SingleCellExperiment', gset.idx.list = 'GeneS
                        ssgsea.norm = gsva.ssgsea.norm,
                        BPPARAM = gsva.BPPARAM
                   )
-           x <- SingleCellSummarized(x)
+           x <- SingleCellExperiment(x)
            exp.nms <- paste0(ifelse(is.character(.assay), .assay, assayNames(data)[.assay]), ".", gsva.method)
            assayNames(x) <- exp.nms
-           data <- as(data, 'SVPExperiment')
+           data <- .sce_to_svpe(data)
            gsvaExp(data, exp.nms) <- x
            return(data)
 })
@@ -121,7 +121,7 @@ setMethod('svp', signature(data = 'SingleCellExperiment', gset.idx.list = 'list'
            x <- SingleCellExperiment(x)
            exp.nms <- paste0(ifelse(is.character(.assay), .assay, assayNames(data)[.assay]), ".", gsva.method)
            assayNames(x) <- exp.nms
-           data <- as(data, 'SVPExperiment')
+           data <- .sce_to_svpe(data)
            gsvaExp(data, exp.nms) <- x
            return(data) 
 })
