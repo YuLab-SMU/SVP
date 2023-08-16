@@ -1,0 +1,221 @@
+.gsva_key <- 'gsvaExps'
+
+#' @importFrom BiocGenerics updateObject 
+# refering to the internal functions of SingleCellExperiment
+.get_internal_all <- function(x, getfun, key, to.class='SimpleList'){
+    x <- updateObject(x)
+    as(getfun(x)[[key]], to.class)
+}
+
+.get_sce <- function(x){
+    x@sce
+}
+
+setMethod("length", "SCEByColumn", function(x) ncol(.get_sce(x)))
+
+#' @importFrom methods initialize
+setMethod("[", "SCEByColumn", function(x, i, j, ..., drop=FALSE) {
+    initialize(x, sce=.get_sce(x)[,i])
+})
+
+setReplaceMethod("[", "SCEByColumn", function(x, i, j, ..., value) {
+    left <- .get_sce(x)
+    left[,i] <- .get_sce(value)
+    initialize(x, sce=left)
+})
+
+setMethod("c", "SCEByColumn", function(x, ...) {
+    gathered <- lapply(list(x, ...), .get_sce)
+    initialize(x, sce=do.call(cbind, gathered))
+})
+
+setMethod("names", "SCEByColumn", function(x) colnames(.get_sce(x)))
+
+setReplaceMethod("names", "SCEByColumn", function(x, value) {
+    colnames(x@sce) <- value
+    x
+})
+
+#' @importFrom cli cli_abort
+.get_internal_missing <- function (x, basefun, namefun, funstr, ...){
+    if (!length(namefun(x)) > 0){
+        cli_abort(c(paste0("no available entries for '", funstr, "({.cls {as.character(class(x))}} ...)'")))
+    }
+    basefun(x, 1L, ...)
+}
+
+.get_internal_numeric <- function(x, index, getfun, key, funstr, substr){
+    x <- updateObject(x)
+    internals <- getfun(x)[[key]]
+    tryCatch({
+        internals[, index]
+    }, error = function(err) {
+        cli::cli_abort(c(paste0("invalid subscript '", substr, "' in '", funstr,
+             "({.cls {class(x)}}, type=\"numeric\", ...)':\n  ",
+            conditionMessage(err))))
+    })
+}
+
+.get_internal_character <- function (x, index, getfun, key, funstr, substr, namestr){
+    x <- updateObject(x)
+    internals <- getfun(x)[[key]]
+    tryCatch({
+        internals[, index]
+    }, error = function(err) {
+        cli::cli_abort(c(paste0("invalid subscript '", substr, "' in '", funstr,
+            "{.cls {class(x)}}, type=\"character\", ...)':\n  ",
+            "'", index, "' not in '", namestr, "{.cls {class(x)}}.")))
+    })
+}
+
+
+.set_internal_names <- function (x, value, getfun, setfun, key){
+    x <- updateObject(x)
+    tmp <- getfun(x)
+    value <- .clean_internal_names(value, N = ncol(tmp[[key]]),
+        msg = "value")
+    colnames(tmp[[key]]) <- value
+    setfun(x, tmp)
+}
+
+.unnamed.gsva <- 'unnamed.gsva'
+
+.clean_internal_names <- function(names, N, msg){
+    if (is.null(names) && N > 0){
+        cli::cli_warn(paste0("'", msg, "' is NULL, replacing with '", .unnamed.gsva,"'."))
+        names <- paste0(.unnamed.gsva, seq_len(N))
+    }else if (any(empty <- nchar(names) == 0)){
+        cli::cli_warn(paste0("'", msg, "' contains empty strings, replacing with '", .unnamed.gsva,"'."))
+        names[empty] <- paste0(.unnamed.gsva, seq_along(sum(empty)))
+    }
+    names
+}
+
+.set_internal_missing <- function(x, value, ..., basefun, namefun){
+    if (length(namefun(x))){
+        type <- 1L
+    }else{
+        type <- paste0(.unnamed.gsva, 1L)
+    }
+    basefun(x, type, ..., value = value)
+}
+
+SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
+
+.set_internal_character <- function (x, type, value, getfun, setfun, key, convertfun, xdimfun,
+    vdimfun, funstr, xdimstr, vdimstr, substr){
+    x <- updateObject(x)
+    if (!is.null(value)){
+        if (!is.null(convertfun)){
+            value <- convertfun(value)
+        }
+        if (!identical(vdimfun(value), xdimfun(x))) {
+            cli::cli_abort(c(paste0("invalid 'value' in '", funstr, "({.cls {class(x)}}, type=\"character\") <- value'.",
+                           "'value' should have number of ", vdimstr, " equal to '", xdimstr, "(x)'")))
+        }
+    }
+    internals <- getfun(x)
+    internals[[key]][[type]] <- value
+    setfun(x, internals)
+}
+
+.set_internal_numeric <- function (x, type, value, getfun, setfun, key, convertfun, xdimfun, vdimfun, funstr, xdimstr, vdimstr, substr){
+    x <- updateObject(x)
+    if (!is.null(value)){
+        if (!is.null(convertfun)) {
+            value <- convertfun(value)
+        }
+        if (!identical(vdimfun(value), xdimfun(x))) {
+            cli::cli_abort(paste0("invalid 'value' in '", funstr, "({.cls {class(x)}}, type=\"numeric\") <- value'.", 
+                           "'value' should have number of ", vdimstr, " equal to '", xdimstr, "(x)'"))
+        }
+    }
+    internals <- getfun(x)
+    if (type[1] > ncol(internals[[key]])){
+        cli::cli_abort(c(paste0("'", substr, "' out of bounds in '", funstr,"({.cls {class(x)}}, type='numeric'")))
+    }
+    internals[[key]][[type]] <- value
+    setfun(x, internals)
+}    
+
+.set_internal_all <- function(x, value, getfun, setfun, key, 
+                              convertfun, xdimfun, vdimfun, 
+                              funstr, xdimstr, vdimstr){
+    x <- updateObject(x)
+    if (length(value) == 0L) {
+        collected <- getfun(x)[, 0]
+    }
+    else {
+        original <- value
+        if (!is.null(convertfun)) {
+            value <- lapply(value, convertfun)
+        }
+        N <- vapply(value, vdimfun, 0L)
+        if (!all(N == xdimfun(x))) {
+            cli::cli_abort(c(paste0("invalid 'value' in '", funstr, "(", "{.cls {class(x)}} )<- value'.", 
+                             "each element of 'value' should have number of ", vdimstr, " equal to '", xdimstr, "(x)'")))
+            
+        }
+        names(value) <- .clean_internal_names(names(value), N = length(value),
+            msg = "names(value)")
+        collected <- do.call(DataFrame, c(lapply(value, I), list(row.names = NULL,
+            check.names = FALSE)))
+        if (is(original, "Annotated")) {
+            metadata(collected) <- metadata(original)
+        }
+        if (is(original, "Vector")) {
+            mcols(collected) <- mcols(original)
+        }
+    }
+    tmp <- getfun(x)
+    tmp[[key]] <- collected
+    setfun(x, tmp)
+}
+
+.check_gsvaexp_columns <- function(main, alt, withDimnames, withColData, fun = "gsvaExp", vname = "value"){
+    if (!is.null(alt)){
+        if (withDimnames) {
+            if (!identical(colnames(main), colnames(alt))) {
+                msg <- paste0("'colnames(", vname, ")' are not the same as 'colnames(x)' for '",
+                  fun, "<-'. This will be an error in the next release of Bioconductor.")
+                cli::cli_warn(msg)
+            }
+        }
+        if (withColData) {
+            main.cd <- colData(main)
+            ncd <- ncol(main.cd)
+            alt.cd <- colData(alt)
+            acd <- ncol(alt.cd)
+            keep <- seq_len(acd) <= ncd
+            if (acd < ncd || !identical(alt.cd[, keep, drop = FALSE], main.cd)){
+                cli::cli_warn(paste0("left-most columns of 'colData(", vname,
+                  ")' should be the same as 'colData(x)' when 'withColData=TRUE'"))
+            }else{
+                colData(alt) <- alt.cd[, !keep, drop = FALSE]
+            }
+        }
+    }
+    alt
+}    
+
+#' @importFrom SpatialExperiment spatialCoords imgData
+.fill_gsvaexps_info <- function(out, x, withDimnames, withColData, withSpatialCoords, withImgData){
+    if (withDimnames) {
+        colnames(out) <- colnames(x)
+    }
+    if (withColData) {
+        prep <- cbind(colData(x), colData(out))
+        rownames(prep) <- colnames(out)
+        colData(out) <- prep
+    }
+    if (inherits(x, 'SpatialExperiment')){
+        out <- as(out, 'SpatialExperiment')
+        if (withSpatialCoords){
+            spatialCoords(out) <- spatialCoords(x)
+        }
+        if (withImgData){
+            imgData(out) <- imgData(x)
+        }
+    }
+    return(out)
+}
