@@ -16,6 +16,7 @@ setMethod('gsva',signature(expr='dgTMatrix', gset.idx.list='GeneSetCollection'),
                    BPPARAM = SerialParam(progressbar=verbose),
                    ...){
     gset.idx.list <- GSEABase::geneIds(gset.idx.list)
+    method <- match.arg(method)
     params <- list(...)
     params$expr <- expr
     params$gset.idx.list <- gset.idx.list
@@ -51,6 +52,7 @@ setMethod('gsva', signature(expr = 'dgTMatrix', gset.idx.list = 'list'),
                    ...){
     expr <- as(expr, 'CsparseMatrix')
     params <- list(...)
+    method <- match.arg(method)
     params$expr <- expr
     params$gset.idx.list <- gset.idx.list
     params$method <- method

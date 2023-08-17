@@ -154,8 +154,6 @@ setMethod('gsvaExp', c('SVPExperiment', "missing"), function(x, e, withDimnames 
             withImgData = withImgData,
             ...
          )
-    #y <- .get_sce(y)
-    #y <- .fill_gsvaexps_info(y, x, withDimnames, withColData, withSpatialCoords, withImgData)
     return(y)
 })
 

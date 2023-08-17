@@ -6,59 +6,119 @@
 \alias{svp,SingleCellExperiment,GeneSetCollection}
 \alias{svp,SingleCellExperiment,list-method}
 \alias{svp,SingleCellExperiment,list}
+\alias{svp,SpatialExperiment,GeneSetCollection-method}
+\alias{svp,SpatialExperiment,GeneSetCollection}
+\alias{svp,SpatialExperiment,list-method}
+\alias{svp,SpatialExperiment,list}
 \title{svp}
 \usage{
 svp(
   data,
   gset.idx.list,
-  .assay,
+  assayName,
+  threads = 1L,
   gsva.method = c("gsva", "ssgsea", "zscore", "plage"),
   gsva.kcdf = c("Gaussian", "Poisson", "none"),
   gsva.abs.ranking = FALSE,
   gsva.min.sz = 1,
   gsva.max.sz = Inf,
-  gsva.parallel.sz = 1L,
   gsva.mx.diff = TRUE,
   gsva.tau = switch(gsva.method, gsva = 1, ssgsea = 0.25, NA),
   gsva.ssgsea.norm = TRUE,
   gsva.verbose = TRUE,
   gsva.BPPARAM = SerialParam(progressbar = gsva.verbose),
+  sv.X = NULL,
+  sv.n_neighbors = 10,
+  sv.order = "AMMD",
+  sv.verbose = FALSE,
   ...
 )
 
 \S4method{svp}{SingleCellExperiment,GeneSetCollection}(
   data,
   gset.idx.list,
-  .assay,
+  assayName,
+  threads = 1L,
   gsva.method = c("gsva", "ssgsea", "zscore", "plage"),
   gsva.kcdf = c("Gaussian", "Poisson", "none"),
   gsva.abs.ranking = FALSE,
   gsva.min.sz = 1,
   gsva.max.sz = Inf,
-  gsva.parallel.sz = 1L,
   gsva.mx.diff = TRUE,
   gsva.tau = switch(gsva.method, gsva = 1, ssgsea = 0.25, NA),
   gsva.ssgsea.norm = TRUE,
   gsva.verbose = TRUE,
   gsva.BPPARAM = SerialParam(progressbar = gsva.verbose),
+  sv.X = NULL,
+  sv.n_neighbors = 10,
+  sv.order = "AMMD",
+  sv.verbose = FALSE,
   ...
 )
 
 \S4method{svp}{SingleCellExperiment,list}(
   data,
   gset.idx.list,
-  .assay,
+  assayName,
+  threads = 1L,
   gsva.method = c("gsva", "ssgsea", "zscore", "plage"),
   gsva.kcdf = c("Gaussian", "Poisson", "none"),
   gsva.abs.ranking = FALSE,
   gsva.min.sz = 1,
   gsva.max.sz = Inf,
-  gsva.parallel.sz = 1L,
   gsva.mx.diff = TRUE,
   gsva.tau = switch(gsva.method, gsva = 1, ssgsea = 0.25, NA),
   gsva.ssgsea.norm = TRUE,
   gsva.verbose = TRUE,
   gsva.BPPARAM = SerialParam(progressbar = gsva.verbose),
+  sv.X = NULL,
+  sv.n_neighbors = 10,
+  sv.order = "AMMD",
+  sv.verbose = FALSE,
+  ...
+)
+
+\S4method{svp}{SpatialExperiment,GeneSetCollection}(
+  data,
+  gset.idx.list,
+  assayName,
+  threads = 1L,
+  gsva.method = c("gsva", "ssgsea", "zscore", "plage"),
+  gsva.kcdf = c("Gaussian", "Poisson", "none"),
+  gsva.abs.ranking = FALSE,
+  gsva.min.sz = 1,
+  gsva.max.sz = Inf,
+  gsva.mx.diff = TRUE,
+  gsva.tau = switch(gsva.method, gsva = 1, ssgsea = 0.25, NA),
+  gsva.ssgsea.norm = TRUE,
+  gsva.verbose = TRUE,
+  gsva.BPPARAM = SerialParam(progressbar = gsva.verbose),
+  sv.X = NULL,
+  sv.n_neighbors = 10,
+  sv.order = "AMMD",
+  sv.verbose = FALSE,
+  ...
+)
+
+\S4method{svp}{SpatialExperiment,list}(
+  data,
+  gset.idx.list,
+  assayName,
+  threads = 1L,
+  gsva.method = c("gsva", "ssgsea", "zscore", "plage"),
+  gsva.kcdf = c("Gaussian", "Poisson", "none"),
+  gsva.abs.ranking = FALSE,
+  gsva.min.sz = 1,
+  gsva.max.sz = Inf,
+  gsva.mx.diff = TRUE,
+  gsva.tau = switch(gsva.method, gsva = 1, ssgsea = 0.25, NA),
+  gsva.ssgsea.norm = TRUE,
+  gsva.verbose = TRUE,
+  gsva.BPPARAM = SerialParam(progressbar = gsva.verbose),
+  sv.X = NULL,
+  sv.n_neighbors = 10,
+  sv.order = "AMMD",
+  sv.verbose = FALSE,
   ...
 )
 }
@@ -67,7 +127,9 @@ svp(
 
 \item{gset.idx.list}{gene set list}
 
-\item{.assay}{the assay name of \code{SingleCellExperiment}}
+\item{assayName}{the assay name of \code{SingleCellExperiment}}
+
+\item{threads}{the thread number, default is 1.}
 
 \item{gsva.method}{the method of gsva}
 
@@ -79,8 +141,6 @@ svp(
 
 \item{gsva.max.sz}{integer the maximum gene set number}
 
-\item{gsva.parallel.sz}{the thread number}
-
 \item{gsva.mx.diff}{logical}
 
 \item{gsva.tau}{exponent defining the weight of the tail in the random walk}
@@ -90,6 +150,14 @@ svp(
 \item{gsva.verbose}{logical whether print the message of process in gsva}
 
 \item{gsva.BPPARAM}{An object of class \code{BiocParallelParam} specifiying parameters}
+
+\item{sv.X}{matrix default is NULL.}
+
+\item{sv.n_neighbors}{integer default is 10.}
+
+\item{sv.order}{character default is \code{AMMD}.}
+
+\item{sv.verbose}{logical}
 
 \item{...}{additional parameters}
 }

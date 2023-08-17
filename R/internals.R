@@ -208,14 +208,15 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
         rownames(prep) <- colnames(out)
         colData(out) <- prep
     }
-    if (inherits(x, 'SpatialExperiment')){
+    flag1 <- .check_element_obj(x, key = 'spatialCoords', basefun = int_colData, namefun = names) 
+    if (flag1 && withSpatialCoords){
         out <- as(out, 'SpatialExperiment')
-        if (withSpatialCoords){
-            spatialCoords(out) <- spatialCoords(x)
-        }
-        if (withImgData){
-            imgData(out) <- imgData(x)
-        }
+        spatialCoords(out) <- .extract_element_object(x, key = 'spatialCoords', basefun = int_colData, namefun = names)
+    }
+    flag2 <- .check_element_obj(x, key = 'imgData', basefun = int_metadata, namefun = names)
+    if (flag2 && withImgData){
+        out <- as(out, 'SpatialExperiment')
+        imgData(out) <- .extract_element_object(x, key = 'imgData', basefun = int_metadata, namefun = names)
     }
     return(out)
 }
@@ -225,4 +226,48 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
     int_colData(svpe)[[.gsva_key]] <- new('DFrame', nrows=ncol(svpe))
     gsvaExps(svpe) <- gsvaExps
     return(svpe)
+}
+
+#.check_element_obj(x, key='spatialCoords', basefun=int_colData, namefun = names)
+
+.check_element_obj <- function(x, key, basefun, namefun){
+    tmp <- .extract_element_object(x=x, basefun = basefun, namefun = namefun)
+    if (key %in% namefun(tmp)){
+        tmp <- tmp[[key]]
+        return(inherits(tmp,'matrix') && !all(is.na(tmp)))
+    }else{
+        return(FALSE)
+    }
+}
+
+.extract_element_object <- function(x, key, basefun, namefun){
+    tmp <- basefun(x)
+    if (!missing(key) && key %in% namefun(tmp)){
+        return(tmp[[key]])
+    }else{
+        return(tmp)
+    }
+}
+
+#' @importFrom rlang check_installed
+.run_sv <- function(x, svgfun, ...){
+    params <- list(...)
+    params <- c(list(x), params)
+    if (missing(svgfun)){
+        check_installed('nnSVG', "for svp().", action=BiocManager::install)
+        svgfun <- nnSVG::nnSVG
+        if ('threads' %in% names(params)){
+            names(params)[names(params)=='threads'] <- 'n_threads'
+        }
+        names(params) <- gsub('sv.', '', names(params))
+        res <- do.call(svgfun, params)
+        return(res)
+    }
+}
+
+.tidy_res.sv <- function(x, y){
+    x <- S4Vectors::merge(x, y, by = 0, all = TRUE)
+    rownames(x) <- x$Row.names
+    x$Row.names <- NULL
+    return(x)
 }
