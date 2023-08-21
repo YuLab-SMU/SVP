@@ -231,10 +231,11 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
 #.check_element_obj(x, key='spatialCoords', basefun=int_colData, namefun = names)
 
 .check_element_obj <- function(x, key, basefun, namefun){
-    tmp <- .extract_element_object(x=x, basefun = basefun, namefun = namefun)
+    #tmp <- .extract_element_object(x=x, basefun = basefun, namefun = namefun)
+    tmp <- basefun(x)
     if (key %in% namefun(tmp)){
         tmp <- tmp[[key]]
-        return(inherits(tmp,'matrix') && !all(is.na(tmp)))
+        return((inherits(tmp,'matrix') || inherits(tmp, 'DFrame')) && !all(is.na(tmp)))
     }else{
         return(FALSE)
     }

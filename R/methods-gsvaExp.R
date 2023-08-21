@@ -123,7 +123,7 @@ setReplaceMethod('gsvaExps', 'SVPExperiment', function(x, withDimnames=TRUE, wit
 #' @importFrom SingleCellExperiment int_colData
 #' @importFrom S4Vectors endoapply
 #' @export
-setMethod('gsvaExps', 'SVPExperiment', function(x, withDimnames=TRUE, withColData=TRUE, withSpatialCoords=FALSE, withImgData=FALSE, ...){
+setMethod('gsvaExps', 'SVPExperiment', function(x, withDimnames=TRUE, withColData=TRUE, withSpatialCoords=TRUE, withImgData=TRUE, ...){
     y <- .get_internal_all(x,
            getfun=int_colData,
            key=.gsva_key
@@ -143,7 +143,7 @@ setMethod('gsvaExps', 'SVPExperiment', function(x, withDimnames=TRUE, withColDat
 })
 
 #' @export
-setMethod('gsvaExp', c('SVPExperiment', "missing"), function(x, e, withDimnames = TRUE, withColData = TRUE, withSpatialCoords = FALSE, withImgData = FALSE, ...){
+setMethod('gsvaExp', c('SVPExperiment', "missing"), function(x, e, withDimnames = TRUE, withColData = TRUE, withSpatialCoords = TRUE, withImgData = TRUE, ...){
     y <- .get_internal_missing(x,
             basefun = gsvaExp,
             namefun = gsvaExpNames,
@@ -158,7 +158,7 @@ setMethod('gsvaExp', c('SVPExperiment', "missing"), function(x, e, withDimnames 
 })
 
 #' @export
-setMethod('gsvaExp', c('SVPExperiment', 'numeric'), function(x, e, withDimnames = TRUE, withColData = TRUE, withSpatialCoords = FALSE, withImgData = FALSE, ...){
+setMethod('gsvaExp', c('SVPExperiment', 'numeric'), function(x, e, withDimnames = TRUE, withColData = TRUE, withSpatialCoords = TRUE, withImgData = TRUE, ...){
     y <- .get_internal_numeric(
            x,
            index = e,
@@ -168,6 +168,7 @@ setMethod('gsvaExp', c('SVPExperiment', 'numeric'), function(x, e, withDimnames 
            substr = 'e'
          )
     y <- .get_sce(y)
+
     y <- .fill_gsvaexps_info(y, x, withDimnames, withColData, withSpatialCoords, withImgData)
     return(y)
 
@@ -175,7 +176,7 @@ setMethod('gsvaExp', c('SVPExperiment', 'numeric'), function(x, e, withDimnames 
 
 
 #' @export
-setMethod('gsvaExp', c('SVPExperiment', 'character'), function(x, e, withDimnames = TRUE, withColData = TRUE, withSpatialCoords = FALSE, withImgData = FALSE, ...){
+setMethod('gsvaExp', c('SVPExperiment', 'character'), function(x, e, withDimnames = TRUE, withColData = TRUE, withSpatialCoords = TRUE, withImgData = TRUE, ...){
     y <- .get_internal_character(
            x,
            index = e,
@@ -183,7 +184,7 @@ setMethod('gsvaExp', c('SVPExperiment', 'character'), function(x, e, withDimname
            key = .gsva_key,
            funstr = 'gsvaExp',
            substr = 'e',
-           namestr = gsvaExpNames,
+           namestr = 'gsvaExpNames'
          )
     y <- .get_sce(y)
     y <- .fill_gsvaexps_info(y, x, withDimnames, withColData, withSpatialCoords, withImgData)
