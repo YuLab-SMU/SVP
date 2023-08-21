@@ -8,6 +8,7 @@ Description: What the package does (one paragraph).
 Imports:
   methods,
   cli,
+  ggplot2,
   S4Vectors,
   GSEABase,
   GSVA,
