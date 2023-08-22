@@ -15,7 +15,8 @@ setGeneric('plot_point_features', function(x,
 #' @importFrom tidyr pivot_longer
 #' @importFrom tibble as_tibble
 #' @importFrom dplyr left_join
-#' @importFrom SummarizedExperiment rowData assayNames
+#' @importFrom SummarizedExperiment rowData assayNames colData
+#' @importFrom SingleCellExperiment reducedDim
 #' @export
 setMethod('plot_point_features', c('SingleCellExperiment'), 
           function(
@@ -84,7 +85,7 @@ setMethod('plot_point_features', c('SingleCellExperiment'),
         ylab(NULL) +
         xlab(NULL) +
         coords.obj +
-        scale_color_gradient(low='grey', high='blue')
+        scale_color_gradient2()
 
 })
 

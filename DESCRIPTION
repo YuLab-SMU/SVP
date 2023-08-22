@@ -8,6 +8,10 @@ Description: What the package does (one paragraph).
 Imports:
   methods,
   cli,
+  dplyr,
+  tidyr,
+  tibble,
+  rlang,
   ggplot2,
   S4Vectors,
   GSEABase,
@@ -15,6 +19,7 @@ Imports:
   SummarizedExperiment,
   SingleCellExperiment,
   SpatialExperiment,
+  BiocGenerics,
   BiocParallel
 License: GPL (>= 3)
 Encoding: UTF-8
