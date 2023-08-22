@@ -43,7 +43,9 @@ setGeneric('svp', function(data,
     standardGeneric('svp')
 )
 
+
 #' @rdname svp-methods
+#' @importFrom SummarizedExperiment rowData<- assayNames<-
 #' @aliases svp,SingleCellExperiment,GeneSetCollection
 #' @exportMethod svp
 setMethod('svp', signature(data = 'SingleCellExperiment', gset.idx.list = 'GeneSetCollection'),

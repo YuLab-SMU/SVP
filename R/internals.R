@@ -198,7 +198,7 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
     alt
 }    
 
-#' @importFrom SpatialExperiment spatialCoords imgData
+#' @importFrom SpatialExperiment spatialCoords imgData imgData<- spatialCoords<-
 .fill_gsvaexps_info <- function(out, x, withDimnames, withColData, withSpatialCoords, withImgData){
     if (withDimnames) {
         colnames(out) <- colnames(x)

@@ -78,7 +78,7 @@ setReplaceMethod('gsvaExp', c('SVPExperiment', 'character'), function(x, e, with
 })
 
 
-
+#' @importFrom SingleCellExperiment int_colData<-
 #' @export
 setReplaceMethod('gsvaExp', c('SVPExperiment', 'numeric'), function(x, e, withDimnames = TRUE, withColData = FALSE, ..., value){
     value <- .check_gsvaexp_columns(x, value, withDimnames=withDimnames, withColData=withColData)
