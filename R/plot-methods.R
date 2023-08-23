@@ -5,7 +5,11 @@ setGeneric('plot_point_features', function(x,
                                            reducedDim.type = NULL,
                                            dims = c(1, 2),
                                            mapping=NULL, 
-                                           ncol=3, 
+                                           ncol = 3, 
+                                           image.plot = TRUE,
+                                           image.rotate.degree = NULL,
+                                           image.mirror.axis = 'h',
+                                           remove.point = FALSE,
                                            ...)
   standardGeneric('plot_point_features')
 )
@@ -26,22 +30,22 @@ setMethod('plot_point_features', c('SingleCellExperiment'),
             reducedDim.type=NULL,
             dims = c(1, 2), 
             mapping = NULL, 
-            ncol = 3, 
+            ncol = 3,
+            image.plot = TRUE,
+            image.rotate.degree = NULL,
+            image.mirror.axis = 'h',
+            remove.point = FALSE,
             ...){
-    x1 <- x[features,]
-    x1 <- assay(x1, assayName)
-    if (is.numeric(assayName) || is.logical(assayName)){
-        assayName <- assayNames(x)[assayName]
-    }
-    x1 <- x1 |> as.matrix() |> 
-        tibble::as_tibble(rownames='.features') |>
-        tidyr::pivot_longer(cols=!".features", 
-                            names_to = '.samples', 
-                            values_to = assayName
-        )
-    flag1 <- .check_element_obj(x, key='spatialCoords', basefun = int_colData, namefun = names) 
-    if (flag1 && is.null(reducedDim.type)){
+
+    flag1 <- .check_element_obj(x, key='spatialCoords', basefun = int_colData, namefun = names)
+    flag2 <- .check_element_obj(x, key= 'imgData', basefun = int_metadata, namefun = names)
+
+    if (flag1 && is.null(reducedDim.type) && (!image.plot || !flag2)){
         coords <- .extract_element_object(x, key = 'spatialCoords', basefun = int_colData, namefun = names) 
+        coords.obj <- coord_fixed()
+    }else if (flag2 && image.plot && is.null(reducedDim.type)){
+        coords <- .extract_element_object(x, key = 'spatialCoords', basefun = int_colData, namefun = names)
+        coords <- .adjust_coords_by_image(coords, x, ...)
         coords.obj <- coord_fixed()
     }else{
         coords <- reducedDim(x, reducedDim.type)
@@ -55,22 +59,44 @@ setMethod('plot_point_features', c('SingleCellExperiment'),
         }
         coords.obj <- NULL
     }
+
     coords <- as.matrix(coords) |> 
               tibble::as_tibble(rownames = '.samples')
 
-    default_mapping <- aes_string(x=colnames(coords)[2], 
-                                  y = colnames(coords)[3], 
-                                  color= assayName)
-    
-    feature.da <- rowData(x) |> 
-                  as.matrix() |> 
+    feature.da <- rowData(x) |>
+                  as.matrix() |>
                   tibble::as_tibble(rownames='.features')
     sample.da <- colData(x) |>
                  as.matrix() |>
                  tibble::as_tibble(rownames = '.samples')
+
+    default_mapping <- aes_string(x=colnames(coords)[2], 
+                                  y = colnames(coords)[3])
+    
+    if (is.null(features) || missing(features)){
+        x1 <- coords
+    }else{
+        x1 <- x[features,]
+        if (missing(assayName)){assayName <- 1L}
+        x1 <- assay(x1, assayName)
+        if (is.numeric(assayName) || is.logical(assayName)){
+            assayName <- assayNames(x)[assayName]
+        }
+        x1 <- x1 |> as.matrix() |>
+            tibble::as_tibble(rownames='.features') |>
+            tidyr::pivot_longer(cols=!".features",
+                                names_to = '.samples',
+                                values_to = assayName
+            )
+
+        x1 <- x1 |>
+              dplyr::left_join(coords, by = '.samples') |>
+              dplyr::left_join(feature.da,  by = '.features')
+
+        default_mapping <- modifyList(default_mapping, aes_string(color = assayName))
+    }
+
     x1 <- x1 |>
-          dplyr::left_join(coords, by = '.samples') |> 
-          dplyr::left_join(feature.da, by = '.features') |>
           dplyr::left_join(sample.da, by = '.samples')
 
     if (!is.null(mapping)){
@@ -79,14 +105,30 @@ setMethod('plot_point_features', c('SingleCellExperiment'),
         mapping <- default_mapping
     }
 
-    ggplot(x1, mapping = mapping) +
-        geom_point() +
-        .feature_setting(features, ncol) +
-        ylab(NULL) +
-        xlab(NULL) +
-        coords.obj +
-        scale_color_gradient2()
+    p <- ggplot(x1, mapping = mapping) 
+    
+    if (flag2 && image.plot && is.null(reducedDim.type)){
+        annot.img <- .build_image_annotation(x, 
+                                             rotate.degree = image.rotate.degree, 
+                                             mirror.axis = image.mirror.axis, 
+                                             ...)
+        p <- p + annot.img
+    }
 
+    if (!remove.point || !(is.null(features) || missing(features))){
+        p <- p + geom_point()
+    }else{
+        p <- p + geom_blank()
+    }
+
+    p <- p + 
+        .feature_setting(features, ncol) +
+         ylab(NULL) +
+         xlab(NULL) +
+         coords.obj +
+         scale_color_gradient2()
+
+    return(p)
 })
 
 
@@ -100,6 +142,10 @@ setMethod('plot_point_features', 'SpatialExperiment',
             dims = c(1, 2),
             mapping = NULL,
             ncol = 3,
+            image.plot = TRUE,
+            image.rotate.degree = NULL,
+            image.mirror.axis = 'h',            
+            remove.point = FALSE,
             ...){
     callNextMethod()
 })

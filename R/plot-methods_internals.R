@@ -5,7 +5,9 @@
         res <- list(ggtitle(features),
             theme(plot.title=element_text(size=rel(1.5), face='bold'))
         )
-    } else {
+    }else if(missing(features) || is.null(features)){
+        res <- theme_bw2()
+    }else{
         res <- list(facet_wrap(~.features, ncol=ncol),
             theme_bw2()
         )
@@ -25,3 +27,30 @@ theme_bw2 <- function(...) {
       ) %+replace%
     theme(...)
 }
+
+.adjust_coords_by_image <- function(coords, x, ...){
+    coords <- SpatialExperiment::scaleFactors(x)[1] * coords
+    return(coords) 
+}
+
+
+.build_image_annotation <- function(x, rotate.degree = NULL, mirror.axis = NULL, ...){
+    img <- getImg(x)
+    if (!is.null(rotate.degree)){
+        img <- SpatialExperiment::rotateImg(img, rotate.degree)
+    }
+
+    if (!is.null(mirror.axis)){
+        img <- SpatialExperiment::mirrorImg(img, mirror.axis)
+    }
+    
+    annotation_custom(grob = grid::rasterGrob(imgRaster(img)), 
+                      xmin = 1, 
+                      ymin = 1, 
+                      xmax = dim(img)[2], 
+                      ymax = dim(img)[1]
+    )
+
+}
+
+
