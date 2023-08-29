@@ -1,7 +1,7 @@
 #' @export
 setGeneric('plot_point_features', function(x, 
                                            assayName, 
-                                           features, 
+                                           features = NULL, 
                                            reducedDim.type = NULL,
                                            dims = c(1, 2),
                                            mapping=NULL, 
@@ -26,7 +26,7 @@ setMethod('plot_point_features', c('SingleCellExperiment'),
           function(
             x, 
             assayName, 
-            features, 
+            features = NULL, 
             reducedDim.type=NULL,
             dims = c(1, 2), 
             mapping = NULL, 
@@ -77,6 +77,9 @@ setMethod('plot_point_features', c('SingleCellExperiment'),
         x1 <- coords
     }else{
         x1 <- x[features,]
+        if (is.numeric(features)){
+            features <- rownames(x1)
+        }
         if (missing(assayName)){assayName <- 1L}
         x1 <- assay(x1, assayName)
         if (is.numeric(assayName) || is.logical(assayName)){
@@ -137,7 +140,7 @@ setMethod('plot_point_features', 'SpatialExperiment',
           function(
             x,
             assayName,
-            features,
+            features = NULL,
             reducedDim.type=NULL,
             dims = c(1, 2),
             mapping = NULL,
