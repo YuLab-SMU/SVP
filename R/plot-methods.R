@@ -96,6 +96,8 @@ setMethod('plot_point_features', c('SingleCellExperiment'),
               dplyr::left_join(coords, by = '.samples') |>
               dplyr::left_join(feature.da,  by = '.features')
 
+        x1$`.features` <- factor(x1$`.features`, levels = features)
+
         default_mapping <- modifyList(default_mapping, aes_string(color = assayName))
     }
 
