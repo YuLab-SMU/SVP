@@ -9,7 +9,7 @@
 
 .cal_weights_rgb_spots <- function(x){
     y <- matrix(apply(x, 1, var), nrow = 1)
-    y <- t(y %*% x)
+    y <- t(y %*% x) / sum(y)
     colnames(y) <- 'weights.rbg.spots'
     return(y)
 }
@@ -40,11 +40,11 @@
 
 .generate_min_max <- function(x, step, img){
     if (inherits(img, 'raster')){
-        width <- dim(img)[1]
-        height <- dim(img)[2]
+        width <- dim(img)[2]
+        height <- dim(img)[1]
     }else if (inherits(img, 'numeric')){
-        width <- img[1]
-        height <- img[2]
+        width <- img[2]
+        height <- img[1]
     }
     min.x <- x - step
     max.x <- x + step

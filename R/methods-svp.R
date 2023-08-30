@@ -18,6 +18,11 @@
 #' @param sv.n_neighbors integer default is 10.
 #' @param sv.order character default is \code{AMMD}.
 #' @param sv.verbose logical
+#' @param sv.cor.method character, the method to calculate the correlation of between 
+#' the features and the color value for the RGB channels of histology image.
+#' @param sv.cor.padj.method character, the method of p.adjust for the correlation test
+#' @param sv.cor.image.beta integer, the square pixels to calculate the color value for
+#' the RGB channels of histology image, default 2, meaning 2 x 2 pixels square.
 #' @param ... additional parameters
 #' @importFrom BiocParallel SerialParam
 #' @export
@@ -38,7 +43,10 @@ setGeneric('svp', function(data,
                            sv.X = NULL,
                            sv.n_neighbors = 10,
                            sv.order = 'AMMD',
-                           sv.verbose = FALSE,                           
+                           sv.verbose = FALSE,
+                           sv.cor.method = c("pearson", "spearman", "kendall"),
+                           sv.cor.padj.method = 'fdr',
+                           sv.cor.image.beta = 2,
                            ...)
     standardGeneric('svp')
 )
@@ -68,6 +76,9 @@ setMethod('svp', signature(data = 'SingleCellExperiment', gset.idx.list = 'GeneS
            sv.n_neighbors = 10,
            sv.order = 'AMMD',
            sv.verbose = FALSE,           
+           sv.cor.method = c('pearson', 'spearman', 'kendall'),
+           sv.cor.padj.method = 'fdr',
+           sv.cor.image.beta = 2,
            ...){
            gsva.method <- match.arg(gsva.method)
            gsva.kcdf <- match.arg(gsva.kcdf)
@@ -89,7 +100,24 @@ setMethod('svp', signature(data = 'SingleCellExperiment', gset.idx.list = 'GeneS
            flag <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
            if(flag){
                specoords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
-               res.sv <- .run_sv(x, spatial_coords = specoords, sv.X, sv.order, sv.n_neighbors, sv.verbose, threads, ...)
+               res.sv <- .run_sv(x, spatial_coords = specoords, sv.X = sv.X, sv.order = sv.order,
+                                 sv.n_neighbors = sv.n_neighbors, 
+                                 sv.verbose = sv.verbose, 
+                                 threads, ...)
+               flag2 <- .check_element_obj(data, key = 'imgData', basefun = int_metadata, namefun = names)
+               if (flag2){
+                   sv.cor.method <- match.arg(sv.cor.method)
+                   img <- .extract_element_object(data, key = 'imgData', basefun = int_metadata, namefun = names)
+                   res.cor <- .cal_cor(x, img = img, coords = specoords,
+                                       cor.method = sv.cor.method,
+                                       beta = sv.cor.image.beta,
+                                       threads = threads,
+                                       p.adjust.method = sv.cor.padj.method,
+                                       ...)
+                   if (!is.null(res.cor)){
+                       res.sv <- cbind(res.sv, res.cor)
+                   }
+               } 
            }
 
            x <- SingleCellExperiment(x)
@@ -131,6 +159,9 @@ setMethod('svp', signature(data = 'SingleCellExperiment', gset.idx.list = 'list'
            sv.n_neighbors = 10,
            sv.order = 'AMMD',
            sv.verbose = FALSE,
+           sv.cor.method = c('pearson', 'spearman', 'kendall'),
+           sv.cor.padj.method = 'fdr',
+           sv.cor.image.beta = 2,
            ...){
            gsva.method <- match.arg(gsva.method)
            gsva.kcdf <- match.arg(gsva.kcdf)
@@ -156,6 +187,20 @@ setMethod('svp', signature(data = 'SingleCellExperiment', gset.idx.list = 'list'
                res.sv <- .run_sv(x, spatial_coords = specoords, sv.X = sv.X, sv.order = sv.order, 
                                  sv.n_neighbors = sv.n_neighbors, sv.verbose = sv.verbose, threads = threads, 
                                  ...)
+               flag2 <- .check_element_obj(data, key = 'imgData', basefun = int_metadata, namefun = names)
+               if (flag2){
+                   sv.cor.method <- match.arg(sv.cor.method)
+                   img <- .extract_element_object(data, key = 'imgData', basefun = int_metadata, namefun = names) 
+                   res.cor <- .cal_cor(x, img = img, coords = specoords, 
+                                       cor.method = sv.cor.method,
+                                       beta = sv.cor.image.beta, 
+                                       threads = threads, 
+                                       p.adjust.method = sv.cor.padj.method, 
+                                       ...)
+                   if (!is.null(res.cor)){
+                       res.sv <- cbind(res.sv, res.cor)
+                   }
+               }
            }
            x <- SingleCellExperiment(x)
            if(flag){
@@ -192,7 +237,10 @@ setMethod('svp', signature(data = 'SpatialExperiment', gset.idx.list = 'GeneSetC
            sv.X = NULL,
            sv.n_neighbors = 10,
            sv.order = 'AMMD',
-           sv.verbose = FALSE,           
+           sv.verbose = FALSE,
+           sv.cor.method = c('pearson', 'spearman', 'kendall'),
+           sv.cor.padj.method = 'fdr',
+           sv.cor.image.beta = 2, 
            ...){
            callNextMethod()
 })
@@ -219,7 +267,10 @@ setMethod('svp', signature(data = 'SpatialExperiment', gset.idx.list = 'list'),
            sv.X = NULL,
            sv.n_neighbors = 10,
            sv.order = 'AMMD',
-           sv.verbose = FALSE,           
+           sv.verbose = FALSE,
+           sv.cor.method = c('pearson', 'spearman', 'kendall'),
+           sv.cor.padj.method = 'fdr',
+           sv.cor.image.beta = 2,
            ...){
            callNextMethod()
 })

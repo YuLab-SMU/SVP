@@ -31,6 +31,9 @@ svp(
   sv.n_neighbors = 10,
   sv.order = "AMMD",
   sv.verbose = FALSE,
+  sv.cor.method = c("pearson", "spearman", "kendall"),
+  sv.cor.padj.method = "fdr",
+  sv.cor.image.beta = 2,
   ...
 )
 
@@ -53,6 +56,9 @@ svp(
   sv.n_neighbors = 10,
   sv.order = "AMMD",
   sv.verbose = FALSE,
+  sv.cor.method = c("pearson", "spearman", "kendall"),
+  sv.cor.padj.method = "fdr",
+  sv.cor.image.beta = 2,
   ...
 )
 
@@ -75,6 +81,9 @@ svp(
   sv.n_neighbors = 10,
   sv.order = "AMMD",
   sv.verbose = FALSE,
+  sv.cor.method = c("pearson", "spearman", "kendall"),
+  sv.cor.padj.method = "fdr",
+  sv.cor.image.beta = 2,
   ...
 )
 
@@ -97,6 +106,9 @@ svp(
   sv.n_neighbors = 10,
   sv.order = "AMMD",
   sv.verbose = FALSE,
+  sv.cor.method = c("pearson", "spearman", "kendall"),
+  sv.cor.padj.method = "fdr",
+  sv.cor.image.beta = 2,
   ...
 )
 
@@ -119,6 +131,9 @@ svp(
   sv.n_neighbors = 10,
   sv.order = "AMMD",
   sv.verbose = FALSE,
+  sv.cor.method = c("pearson", "spearman", "kendall"),
+  sv.cor.padj.method = "fdr",
+  sv.cor.image.beta = 2,
   ...
 )
 }
@@ -158,6 +173,14 @@ svp(
 \item{sv.order}{character default is \code{AMMD}.}
 
 \item{sv.verbose}{logical}
+
+\item{sv.cor.method}{character, the method to calculate the correlation of between
+the features and the color value for the RGB channels of histology image.}
+
+\item{sv.cor.padj.method}{character, the method of p.adjust for the correlation test}
+
+\item{sv.cor.image.beta}{integer, the square pixels to calculate the color value for
+the RGB channels of histology image, default 2, meaning 2 x 2 pixels square.}
 
 \item{...}{additional parameters}
 }
