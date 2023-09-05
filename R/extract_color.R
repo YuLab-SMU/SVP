@@ -3,13 +3,16 @@
     step <- round(beta/2)
     coords <- round(coords)
     img.rgb.m <- .extract.region(img.rgb, coords, step, img)
-    res <- .cal_weights_rgb_spots(img.rgb.m)
+    res <- .cal_weights_rgb_spots(img.rgb.m, coords, alpha)
     return(res)
 }
 
-.cal_weights_rgb_spots <- function(x){
+.cal_weights_rgb_spots <- function(x, coords, alpha){
     y <- matrix(apply(x, 1, var), nrow = 1)
     y <- t(y %*% x) / sum(y)
+    #y <- (y - mean(y)) / sd(y)
+    y <- 2 * (y - min(y))/(max(y) - min(y)) - 1
+    #y <- max(apply(coords,2,sd)) * alpha * y
     colnames(y) <- 'weights.rbg.spots'
     return(y)
 }
