@@ -1,13 +1,18 @@
 #' @importFrom BiocParallel bplapply MulticoreParam
 .cal_cor <- function(x, img, coords, beta = 2, cor.method = 'pearson', 
-                     BPPARAM = NULL, threads = 5, p.adjust.method = 'fdr', ...){
+                     BPPARAM = NULL, threads = 5, p.adjust.method = 'fdr', 
+                     index.image = 1, ...){
     if (is.null(BPPARAM)) {
         BPPARAM <- MulticoreParam(workers = threads)
     }
     if (nrow(img) == 0){
         return(NULL)
     }else{
-        coords <- coords * img[['scaleFactor']][1]
+        if (is.numeric(index.image)){
+            index.image <- unique(img$image_id)[index.image]
+        }
+        img <- img[img$image_id == index.image,]
+        coords <- coords * img[['scaleFactor']]
         img <- as.raster(img[['data']][[1]])
     }
     color.features <- .extract_color(img, beta = beta, coords)

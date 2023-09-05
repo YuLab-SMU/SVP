@@ -16,7 +16,7 @@ svp(
   data,
   gset.idx.list,
   assayName,
-  threads = 1L,
+  threads = 2L,
   gsva.method = c("gsva", "ssgsea", "zscore", "plage"),
   gsva.kcdf = c("Gaussian", "Poisson", "none"),
   gsva.abs.ranking = FALSE,
@@ -26,7 +26,7 @@ svp(
   gsva.tau = switch(gsva.method, gsva = 1, ssgsea = 0.25, NA),
   gsva.ssgsea.norm = TRUE,
   gsva.verbose = TRUE,
-  gsva.BPPARAM = SerialParam(progressbar = gsva.verbose),
+  gsva.BPPARAM = MulticoreParam(progressbar = gsva.verbose, workers = threads),
   sv.X = NULL,
   sv.n_neighbors = 10,
   sv.order = "AMMD",
@@ -41,7 +41,7 @@ svp(
   data,
   gset.idx.list,
   assayName,
-  threads = 1L,
+  threads = 2L,
   gsva.method = c("gsva", "ssgsea", "zscore", "plage"),
   gsva.kcdf = c("Gaussian", "Poisson", "none"),
   gsva.abs.ranking = FALSE,
@@ -51,7 +51,7 @@ svp(
   gsva.tau = switch(gsva.method, gsva = 1, ssgsea = 0.25, NA),
   gsva.ssgsea.norm = TRUE,
   gsva.verbose = TRUE,
-  gsva.BPPARAM = SerialParam(progressbar = gsva.verbose),
+  gsva.BPPARAM = MulticoreParam(progressbar = gsva.verbose, workers = threads),
   sv.X = NULL,
   sv.n_neighbors = 10,
   sv.order = "AMMD",
@@ -66,7 +66,7 @@ svp(
   data,
   gset.idx.list,
   assayName,
-  threads = 1L,
+  threads = 2L,
   gsva.method = c("gsva", "ssgsea", "zscore", "plage"),
   gsva.kcdf = c("Gaussian", "Poisson", "none"),
   gsva.abs.ranking = FALSE,
@@ -76,7 +76,7 @@ svp(
   gsva.tau = switch(gsva.method, gsva = 1, ssgsea = 0.25, NA),
   gsva.ssgsea.norm = TRUE,
   gsva.verbose = TRUE,
-  gsva.BPPARAM = SerialParam(progressbar = gsva.verbose),
+  gsva.BPPARAM = MulticoreParam(progressbar = gsva.verbose, workers = threads),
   sv.X = NULL,
   sv.n_neighbors = 10,
   sv.order = "AMMD",
@@ -91,7 +91,7 @@ svp(
   data,
   gset.idx.list,
   assayName,
-  threads = 1L,
+  threads = 2L,
   gsva.method = c("gsva", "ssgsea", "zscore", "plage"),
   gsva.kcdf = c("Gaussian", "Poisson", "none"),
   gsva.abs.ranking = FALSE,
@@ -101,7 +101,7 @@ svp(
   gsva.tau = switch(gsva.method, gsva = 1, ssgsea = 0.25, NA),
   gsva.ssgsea.norm = TRUE,
   gsva.verbose = TRUE,
-  gsva.BPPARAM = SerialParam(progressbar = gsva.verbose),
+  gsva.BPPARAM = MulticoreParam(progressbar = gsva.verbose, workers = threads),
   sv.X = NULL,
   sv.n_neighbors = 10,
   sv.order = "AMMD",
@@ -116,7 +116,7 @@ svp(
   data,
   gset.idx.list,
   assayName,
-  threads = 1L,
+  threads = 2L,
   gsva.method = c("gsva", "ssgsea", "zscore", "plage"),
   gsva.kcdf = c("Gaussian", "Poisson", "none"),
   gsva.abs.ranking = FALSE,
@@ -126,7 +126,7 @@ svp(
   gsva.tau = switch(gsva.method, gsva = 1, ssgsea = 0.25, NA),
   gsva.ssgsea.norm = TRUE,
   gsva.verbose = TRUE,
-  gsva.BPPARAM = SerialParam(progressbar = gsva.verbose),
+  gsva.BPPARAM = MulticoreParam(progressbar = gsva.verbose, workers = threads),
   sv.X = NULL,
   sv.n_neighbors = 10,
   sv.order = "AMMD",
@@ -144,7 +144,7 @@ svp(
 
 \item{assayName}{the assay name of \code{SingleCellExperiment}}
 
-\item{threads}{the thread number, default is 1.}
+\item{threads}{the thread number, default is 2.}
 
 \item{gsva.method}{the method of gsva}
 

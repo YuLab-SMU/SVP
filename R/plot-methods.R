@@ -131,7 +131,7 @@ setMethod('plot_point_features', c('SingleCellExperiment'),
          ylab(NULL) +
          xlab(NULL) +
          coords.obj +
-         scale_color_gradient2()
+         scale_color_gradient2(low = '#3A3A98', high = '#832424')
 
     return(p)
 })

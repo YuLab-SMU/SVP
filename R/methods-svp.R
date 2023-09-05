@@ -3,7 +3,7 @@
 #' @param data object
 #' @param gset.idx.list gene set list
 #' @param assayName the assay name of \code{SingleCellExperiment}
-#' @param threads the thread number, default is 1.
+#' @param threads the thread number, default is 2.
 #' @param gsva.method the method of gsva
 #' @param gsva.kcdf the method of kcdf
 #' @param gsva.abs.ranking logical whether rank the abs
@@ -24,12 +24,11 @@
 #' @param sv.cor.image.beta integer, the square pixels to calculate the color value for
 #' the RGB channels of histology image, default 2, meaning 2 x 2 pixels square.
 #' @param ... additional parameters
-#' @importFrom BiocParallel SerialParam
 #' @export
 setGeneric('svp', function(data, 
                            gset.idx.list, 
                            assayName,
-                           threads = 1L, 
+                           threads = 2L, 
                            gsva.method = c('gsva', 'ssgsea', 'zscore', 'plage'), 
                            gsva.kcdf = c('Gaussian', 'Poisson', 'none'), 
                            gsva.abs.ranking = FALSE,
@@ -39,7 +38,7 @@ setGeneric('svp', function(data,
                            gsva.tau = switch(gsva.method, gsva=1, ssgsea = 0.25, NA),
                            gsva.ssgsea.norm = TRUE,
                            gsva.verbose = TRUE,
-                           gsva.BPPARAM = SerialParam(progressbar = gsva.verbose),
+                           gsva.BPPARAM = MulticoreParam(progressbar = gsva.verbose, workers = threads),
                            sv.X = NULL,
                            sv.n_neighbors = 10,
                            sv.order = 'AMMD',
@@ -61,7 +60,7 @@ setMethod('svp', signature(data = 'SingleCellExperiment', gset.idx.list = 'GeneS
            data, 
            gset.idx.list,
            assayName,
-           threads = 1L,
+           threads = 2L,
            gsva.method = c('gsva', 'ssgsea', 'zscore', 'plage'),
            gsva.kcdf = c('Gaussian', 'Poisson', 'none'),
            gsva.abs.ranking = FALSE,
@@ -71,7 +70,7 @@ setMethod('svp', signature(data = 'SingleCellExperiment', gset.idx.list = 'GeneS
            gsva.tau = switch(gsva.method, gsva=1, ssgsea = 0.25, NA),
            gsva.ssgsea.norm = TRUE,
            gsva.verbose = TRUE,
-           gsva.BPPARAM = SerialParam(progressbar = gsva.verbose),
+           gsva.BPPARAM = MulticoreParam(progressbar = gsva.verbose, workers = threads),
            sv.X = NULL,
            sv.n_neighbors = 10,
            sv.order = 'AMMD',
@@ -90,7 +89,6 @@ setMethod('svp', signature(data = 'SingleCellExperiment', gset.idx.list = 'GeneS
                        abs.ranking = gsva.abs.ranking,
                        min.sz = gsva.min.sz,
                        max.sz = gsva.max.sz,
-                       parallel.sz = threads,
                        mx.diff = gsva.mx.diff,
                        tau = gsva.tau,
                        ssgsea.norm = gsva.ssgsea.norm,
@@ -144,7 +142,7 @@ setMethod('svp', signature(data = 'SingleCellExperiment', gset.idx.list = 'list'
            data,
            gset.idx.list,
            assayName,
-           threads = 1L,
+           threads = 2L,
            gsva.method = c('gsva', 'ssgsea', 'zscore', 'plage'),
            gsva.kcdf = c('Gaussian', 'Poisson', 'none'),
            gsva.abs.ranking = FALSE,
@@ -154,7 +152,7 @@ setMethod('svp', signature(data = 'SingleCellExperiment', gset.idx.list = 'list'
            gsva.tau = switch(gsva.method, gsva=1, ssgsea = 0.25, NA),
            gsva.ssgsea.norm = TRUE,
            gsva.verbose = TRUE,
-           gsva.BPPARAM = SerialParam(progressbar = gsva.verbose),
+           gsva.BPPARAM = MulticoreParam(progressbar = gsva.verbose, workers = threads),
            sv.X = NULL,
            sv.n_neighbors = 10,
            sv.order = 'AMMD',
@@ -223,7 +221,7 @@ setMethod('svp', signature(data = 'SpatialExperiment', gset.idx.list = 'GeneSetC
            data,
            gset.idx.list,
            assayName,
-           threads = 1L,
+           threads = 2L,
            gsva.method = c('gsva', 'ssgsea', 'zscore', 'plage'),
            gsva.kcdf = c('Gaussian', 'Poisson', 'none'),
            gsva.abs.ranking = FALSE,
@@ -233,7 +231,7 @@ setMethod('svp', signature(data = 'SpatialExperiment', gset.idx.list = 'GeneSetC
            gsva.tau = switch(gsva.method, gsva=1, ssgsea = 0.25, NA),
            gsva.ssgsea.norm = TRUE,
            gsva.verbose = TRUE,
-           gsva.BPPARAM = SerialParam(progressbar = gsva.verbose),
+           gsva.BPPARAM = MulticoreParam(progressbar = gsva.verbose, workers = threads),
            sv.X = NULL,
            sv.n_neighbors = 10,
            sv.order = 'AMMD',
@@ -253,7 +251,7 @@ setMethod('svp', signature(data = 'SpatialExperiment', gset.idx.list = 'list'),
            data,
            gset.idx.list,
            assayName,
-           threads = 1L,
+           threads = 2L,
            gsva.method = c('gsva', 'ssgsea', 'zscore', 'plage'),
            gsva.kcdf = c('Gaussian', 'Poisson', 'none'),
            gsva.abs.ranking = FALSE,
@@ -263,7 +261,7 @@ setMethod('svp', signature(data = 'SpatialExperiment', gset.idx.list = 'list'),
            gsva.tau = switch(gsva.method, gsva=1, ssgsea = 0.25, NA),
            gsva.ssgsea.norm = TRUE,
            gsva.verbose = TRUE,
-           gsva.BPPARAM = SerialParam(progressbar = gsva.verbose),
+           gsva.BPPARAM = MulticoreParam(progressbar = gsva.verbose, workers = threads),
            sv.X = NULL,
            sv.n_neighbors = 10,
            sv.order = 'AMMD',

@@ -1,3 +1,4 @@
+#' @importFrom BiocParallel SerialParam
 #' @importFrom GSEABase geneIds
 #' @export
 setMethod('gsva',signature(expr='dgTMatrix', gset.idx.list='GeneSetCollection'), 
