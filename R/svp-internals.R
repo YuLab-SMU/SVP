@@ -1,5 +1,7 @@
+#' @importFrom spatialEco crossCorrelation
 #' @importFrom BiocParallel bplapply MulticoreParam
-.cal_cor <- function(x, img, coords, beta = 2, cor.method = 'pearson', 
+.cal_cor <- function(x, img, coords, beta = 2, 
+                     cor.method = 'pearson', 
                      BPPARAM = NULL, threads = 5, p.adjust.method = 'fdr', 
                      index.image = 1, ...){
     if (is.null(BPPARAM)) {
@@ -15,10 +17,12 @@
         coords <- coords * img[['scaleFactor']]
         img <- as.raster(img[['data']][[1]])
     }
+    coords.dist <- dist(coords)
     color.features <- .extract_color(img, beta = beta, coords)
     res <- bplapply(seq_len(nrow(x)), function(i){
         xi <- x[i,]
-        tmp <- cor.test(as.numeric(xi), as.numeric(color.features), method = cor.method)
+        #tmp <- cor.test(as.numeric(xi), as.numeric(color.features), method = cor.method)
+        tmp <- crossCorrelation(as.numeric(xi), as.numeric(color.features), w = coords.dist)
         res.i <- c(pvalue.cor.img = tmp$p.value, value.cor.img = as.numeric(tmp$estimate))
         return(res.i)
         }, 

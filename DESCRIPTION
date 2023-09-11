@@ -13,6 +13,7 @@ Imports:
   tibble,
   rlang,
   ggplot2,
+  spatialEco,
   S4Vectors,
   GSEABase,
   GSVA,
