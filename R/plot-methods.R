@@ -70,7 +70,7 @@ setMethod('plot_point_features', c('SingleCellExperiment'),
                  as.matrix() |>
                  tibble::as_tibble(rownames = '.samples')
 
-    default_mapping <- aes_string(x=colnames(coords)[2], 
+    default_mapping <- aes_string(x = colnames(coords)[2], 
                                   y = colnames(coords)[3])
     
     if (is.null(features) || missing(features)){
@@ -130,8 +130,17 @@ setMethod('plot_point_features', c('SingleCellExperiment'),
         .feature_setting(features, ncol) +
          ylab(NULL) +
          xlab(NULL) +
-         coords.obj +
-         scale_color_gradient2(low = '#3A3A98', high = '#832424')
+         coords.obj
+
+    color.aes <- .check_aes_exits(p$mapping, c('color', 'colour')) 
+    if (!is.null(color.aes)) {
+        type.color.value <- p$data |> dplyr::pull(!!color.aes) 
+        if (inherits(type.color.value, 'numeric')) {
+            p <- p + scale_color_gradient2(low = '#3A3A98', high = '#832424')
+        }else{
+            p <- p + scale_color_discrete()
+        }
+    }
 
     return(p)
 })

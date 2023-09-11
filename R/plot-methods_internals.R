@@ -53,4 +53,14 @@ theme_bw2 <- function(...) {
 
 }
 
-
+.check_aes_exits <- function(mapping, aesthetic){
+    x <- match(aesthetic, names(mapping))
+    x <- x[!is.na(x)]
+    if (length(x)==0){
+        return(NULL)
+    }else{
+        x <- names(mapping)[x]
+        x <- mapping[[x]]
+        return(x)
+    }
+}
