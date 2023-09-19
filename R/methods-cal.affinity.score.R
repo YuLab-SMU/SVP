@@ -3,8 +3,8 @@ setGeneric('cal.affinity.score',
     data, 
     gset.idx.list,
     reduction.name = 'MCA', 
-    dims=20, 
-    knn.k.use = 300,
+    dims = 30, 
+    knn.k.use = 350,
     restart = 0.75, 
     subset.row = NULL,
     ...
@@ -18,9 +18,13 @@ setMethod('cal.affinity.score',
     data,
     gset.idx.list,
     reduction.name = 'MCA',
-    dims = 20,
-    knn.k.use = 300,
-    restart = .75,
+    knn.fun = 'findKmknn',
+    knn.BPPARAM = SerialParam(),
+    knn.graph.weighted = TRUE,
+    knn.graph.directed = FALSE,
+    dims = 30,
+    knn.k.use = 350,
+    restart = .7,
     cells = NULL,
     features = NULL,
     ...
@@ -37,5 +41,16 @@ setMethod('cal.affinity.score',
   
   mca.res <- mca.res[, seq(dims), drop = FALSE]
 
+  mca.knn.gh <- .build.knn.graph(
+                  mca.res, 
+                  knn.k.use = knn.k.use, 
+                  fun.nm = knn.fun,
+                  BPPARAM = knn.BPPARAM,
+                  weighted.distance = knn.graph.weighted,
+                  graph.directed = knn.graph.directed,
+                  ...
+                )
+
+  gset.score <- .cal.gset.score(mca.knn.gh)
 
 })

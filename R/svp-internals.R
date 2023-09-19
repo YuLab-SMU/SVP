@@ -70,11 +70,12 @@
 
 #' @importFrom BiocNeighbors findKmknn
 #' @importFrom BiocParallel SerialParam
-.build.knn <- function(x, 
-		       knn.k.use = 300, 
+.build.knn.graph <- function(x, 
+		       knn.k.use = 350, 
 		       fun.nm = "findKmknn", 
 		       BPPARAM = SerialParam(), 
 		       weighted.distance = TRUE,
+               graph.directed = FALSE,
 		       ...){
   dots.params <- list(...)
   all.params <- .extract_dot_args(fun.nm, 
@@ -85,8 +86,8 @@
   all.params$BPPARAM <- BPPARAM
   knn.res <- do.call(fun.nm, all.params)
   knn.edges <- .extract_edge(knn.res, weighted.distance = weighted.distance)
-  
-
+  knn.graph <- .build.graph(knn.edges, graph.directed = graph.directed) 
+  return(knn.graph)
 }
 
 .subset_data <- function(x, n){
@@ -125,8 +126,8 @@
 
 
 .build.graph <- function(edges, 
-			 graph.directed = FALSE,
-			 weighted.distance = TRUE){
+			 graph.directed = FALSE
+			 ){
   g <- igraph::graph_from_data_frame(edges, directed = graph.directed) |>
        igraph::simplify()
   return(g)
