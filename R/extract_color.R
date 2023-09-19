@@ -1,4 +1,10 @@
-.extract_color <- function(img, beta = 2, coords){
+#' @title extract image color feature
+#' @param img raster object
+#' @param beta the size of region to merge
+#' @param coords the coordinate to spots to extract color
+#' @param alpha the color scale
+#' @export
+extract_color <- function(img, beta = 2, coords, alpha = 1){
     img.rgb <- .convert.rgb(img)
     step <- round(beta/2)
     coords <- round(coords)
@@ -7,12 +13,12 @@
     return(res)
 }
 
-.cal_weights_rgb_spots <- function(x, coords, alpha){
+.cal_weights_rgb_spots <- function(x, coords, alpha = 1){
     y <- matrix(apply(x, 1, var), nrow = 1)
     y <- t(y %*% x) / sum(y)
-    #y <- (y - mean(y)) / sd(y)
-    y <- 2 * (y - min(y))/(max(y) - min(y)) - 1
-    #y <- max(apply(coords,2,sd)) * alpha * y
+    y <- (y - mean(y)) / sd(y)
+    #y <- 2 * (y - min(y))/(max(y) - min(y)) - 1
+    y <- max(apply(coords, 2, sd)) * alpha * y
     colnames(y) <- 'weights.rbg.spots'
     return(y)
 }
@@ -36,10 +42,13 @@
     )
 }
 
-.cal_mean_color <- function(x, range.x, range.y, fun.internal = mean){
-    do.call('rbind', lapply(x, function(i)fun.internal(i[seq(range.x[2], range.y[2]), seq(range.x[1], range.y[1])])))
+.internal.calculate.cv <- function(x, na.rm = TRUE){
+    sd(x, na.rm = na.rm)/mean(x, na.rm = na.rm)
 }
 
+.cal_mean_color <- function(x, range.x, range.y, fun.internal = .internal.calculate.cv){
+    do.call('rbind', lapply(x, function(i)fun.internal(i[seq(range.x[2], range.y[2]), seq(range.x[1], range.y[1])])))
+}
 
 .generate_min_max <- function(x, step, img){
     if (inherits(img, 'raster')){
