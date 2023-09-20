@@ -22,7 +22,10 @@ Imports:
   SingleCellExperiment,
   SpatialExperiment,
   BiocGenerics,
-  BiocParallel
+  BiocParallel,
+  BiocNeighbors,
+  igraph,
+  pracma
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

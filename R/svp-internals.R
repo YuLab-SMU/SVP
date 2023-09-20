@@ -71,11 +71,11 @@
 #' @importFrom BiocNeighbors findKmknn
 #' @importFrom BiocParallel SerialParam
 .build.knn.graph <- function(x, 
-		       knn.k.use = 350, 
-		       fun.nm = "findKmknn", 
-		       BPPARAM = SerialParam(), 
-		       weighted.distance = TRUE,
-               graph.directed = FALSE,
+                       knn.k.use = 350, 
+                       fun.nm = "findKmknn", 
+                       BPPARAM = SerialParam(), 
+                       weighted.distance = TRUE,
+                       graph.directed = FALSE,
 		       ...){
   dots.params <- list(...)
   all.params <- .extract_dot_args(fun.nm, 
@@ -85,9 +85,19 @@
   all.params$k <- knn.k.use
   all.params$BPPARAM <- BPPARAM
   knn.res <- do.call(fun.nm, all.params)
-  knn.edges <- .extract_edge(knn.res, weighted.distance = weighted.distance)
+  knn.edges <- .extract_edge(knn.res, x, weighted.distance = weighted.distance)
   knn.graph <- .build.graph(knn.edges, graph.directed = graph.directed) 
   return(knn.graph)
+}
+
+
+.subset_ind <- function(da, nm){
+  if (!is.null(nm)){
+     x <- intersect(nm, rownames(da))
+  }else{
+     x <- rownames(da)
+  }
+  return(x)
 }
 
 .subset_data <- function(x, n){
@@ -113,22 +123,51 @@
   nm <- rownames(x)
   knn.index <- knn$index
   knn.index <- cbind(rep(seq(nrow(knn.index)), 
-			 times=ncol(knn.index)), 
-		     as.vector(knn.index))
+                         times=ncol(knn.index)), 
+                     as.vector(knn.index))
   knn.edges <- cbind(nm[knn.index[,1]], nm[knn.index[,2]])
+  knn.edges <- data.frame(knn.edges)
   colnames(knn.edges) <- c('from', 'to')
+
   if (weighted.distance){
-    knn.edges <- cbind(knn.edges, .normalize_dist(knn$distance))
-    colnames(knn.edges)[3] <- 'weight'
+    knn.edges$weight <- .normalize_dist(knn$distance)
   }
   return(knn.edges)
 }
 
-
-.build.graph <- function(edges, 
-			 graph.directed = FALSE
-			 ){
-  g <- igraph::graph_from_data_frame(edges, directed = graph.directed) |>
-       igraph::simplify()
+#' @importFrom igraph graph_from_data_frame
+#' @importFrom igraph simplify
+.build.graph <- function(
+		edges, 
+		graph.directed = FALSE
+		){
+  g <- igraph::graph_from_data_frame(
+         edges, 
+	 directed = graph.directed
+       ) 
+  g <- igraph::simplify(g)
   return(g)
 }
+
+
+.generate.gset.seed <- function(g, gset.idx.list){
+  x <- matrix(0, 
+	      nrow = igraph::vcount(g), 
+	      ncol = length(gset.idx.list)
+       )
+  nm <- igraph::vertex_attr(g, 'name')
+  rownames(x) <- nm
+  if (is.null(names(gset.idx.list))){
+     cli::cli_abort('The gene set list must have names.')
+  }
+  colnames(x) <- names(gset.idx.list)
+  
+  for (i in seq(length(gset.idx.list))){
+     x[,i] <- ifelse(nm %in% gset.idx.list[[i]], 1, 0)
+  }
+  
+  x <- Matrix::Matrix(x, sparse = TRUE)
+  return(x)
+}
+
+
