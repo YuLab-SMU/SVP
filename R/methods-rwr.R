@@ -34,17 +34,16 @@
               )},
               BPPARAM = BPPARAM
             )
-    saveRDS(pt.m, 'pt.m.list.rds')
     pt.m <- do.call('cbind', pt.m)
     pt.m[pt.m < stop.delta | is.na(pt.m)] <- 0
   }
-  pt.m <- pt.m %*% diag(1/Matrix::colSums(pt.m))
+  pt.m <- pt.m %*% diag(1/colSums(pt.m))
   if (ncol(pt.m) == 1){
     normalize.affinity <- FALSE
   }
   if (normalize.affinity){
     rlang::check_installed('preprocessCore', 'for `.run_rwr()` with `normalize.affinity = TRUE`.')
-    pt.m <- preprocessCore::normalize.quantiles(as.matrix(pt.m))
+    pt.m <- preprocessCore::normalize.quantiles(pt.m)
     pt.m[pt.m < stop.delta] <- 0
   }
   colnames(pt.m) <- colnames(start.m)
@@ -138,6 +137,6 @@
       pt <- px
       step <- step + 1
     }
-    return(pt)
+    return(as.matrix(pt))
 }
 
