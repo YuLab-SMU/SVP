@@ -26,8 +26,8 @@
     pt.m <- start.m
   }else{
     pt.m <- bplapply(seq(ncol(start.m)), function(i){
-              .cal.rwr(x = n.adj.m, 
-                       v = start.m[,i],
+              calRWRCPP(x = n.adj.m, 
+                       v = start.m[, i, drop=FALSE],
                        restart = restart,
                        stop_delta = stop.delta,
                        stop_step = stop.step
@@ -119,11 +119,10 @@
     colnames(x) <- colnames(seeds)
     x <- Matrix::Matrix(x, sparse = TRUE)
   }
-  print (x[1:2, 1:2])
   return(x)
 }
 
-.cal.rwr <- function(x,
+calRWR <- function(x,
                      v,
                      restart = .75,
 		     delta = 1,

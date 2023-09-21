@@ -13,3 +13,7 @@ MCAStep2 <- function(Z, V, Dc) {
     .Call('_SVP_MCAStep2', PACKAGE = 'SVP', Z, V, Dc)
 }
 
+calRWRCPP <- function(x, v, restart = .7, delta = 1, step = 0L, stop_delta = 1e-6, stop_step = 50L) {
+    .Call('_SVP_calRWRCPP', PACKAGE = 'SVP', x, v, restart, delta, step, stop_delta, stop_step)
+}
+

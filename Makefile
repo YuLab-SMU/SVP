@@ -3,7 +3,10 @@ PKGVERS := $(shell sed -n "s/Version: *\([^ ]*\)/\1/p" DESCRIPTION)
 PKGSRC  := $(shell basename `pwd`)
 all: rd check1 clean
 
-rd:
+crd:
+	Rscript -e 'Rcpp::compileAttributes()'
+
+rd: crd
 	Rscript -e 'library(methods);devtools::document()'
 
 readme:
