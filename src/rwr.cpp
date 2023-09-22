@@ -51,7 +51,7 @@ NumericMatrix parallelCalRWR(
     calrwr runrwr(x, v, restart, stop_delta, stop_step, result);
 
     parallelFor(0, n, runrwr);
-
+    
     return wrap(result);
 
 }
@@ -68,24 +68,24 @@ NumericMatrix parallelCalRWR(
 //NumericMatrix calRWRCPP(arma::sp_mat x,
 //	      arma::sp_mat v,
 //	      double restart = .7, 
-//	      double delta = 1,
-//	      int step = 0,
 //	      double stop_delta = 1e-6,
 //	      int stop_step = 50
 //	     ){
+//    int step = 0;
+//    double delta = 1;
 //    arma::sp_mat pt = v;
 //    while((delta > stop_delta) && (step <= stop_step)){
 //	arma::sp_mat px = ((1 - restart) * x * pt) + (restart * v);
 //	delta = arma::accu(abs(px - pt));
 //	pt = px;
-//        step = step + 1;
+//      step = step + 1;
 //    }
 //    arma::mat pt2 = arma::conv_to<mat>::from(pt);
 //    return wrap(pt2);
 //}
 //
 //// [[Rcpp::export]]
-//List calRWRCPP2(
+//NumericMatrix calRWRCPP2(
 //	      arma::sp_mat x,
 //              arma::sp_mat v,
 //              double restart = .7,
@@ -93,19 +93,18 @@ NumericMatrix parallelCalRWR(
 //              int stop_step = 50
 //             ){
 //    int n = v.n_cols;
-//    List res(n);
+//    mat res(x.n_rows, n);
 //    for (int i = 0; i < n; i++){
-//        arma::sp_mat pt = v.col(i);
-//	int step = 0;
-//	double delta = 1;
-//        while((delta > stop_delta) && (step <= stop_step)){
-//            arma::sp_mat px = ((1 - restart) * x * pt) + (restart * v.col(i));
-//            delta = arma::accu(abs(px - pt));
-//            pt = px;
-//            step = step + 1;
-//        }
-//	//arma::mat pt2 = arma::conv_to<mat>::from(pt);
-//	res(i) = pt;
+//      int step = 0;
+//      double delta = 1;
+//      arma::sp_mat pt = v.col(i);
+//      while((delta > stop_delta) && (step <= stop_step)){
+//          arma::sp_mat px = ((1 - restart) * x * pt) + (restart * v.col(i));
+//          delta = arma::accu(abs(px - pt));
+//          pt = px;
+//          step = step + 1;
+//      }
+//	res(i) = arma::conv_to<mat>::from(pt);
 //    }
 //    return wrap(res);
 //}

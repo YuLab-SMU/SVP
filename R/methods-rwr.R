@@ -1,10 +1,11 @@
 #' @importFrom RcppParallel RcppParallelLibs
+#' @importFrom Rcpp evalCpp
 .run_rwr <- function(g, 
                      edge.attr = 'weight',
                      seeds = NULL,
                      normalize.adj.method = c("laplacian","row","column","none"),
                      restart = .7,
-                     BPPARAM = BiocParallel::SerialParam(),
+                     threads = 2L,
                      normalize.affinity = TRUE,
                      verbose = TRUE,
                      ...){
@@ -22,41 +23,42 @@
 
   stop.delta <- 1e-6
   stop.step <- 50
-
+  tic()
+  cli::cli_inform("Calculating the affinity score using Random Walk with Restart ...")
   if (restart == 1){
     pt.m <- start.m
   }else{
-    #pt.m <- bplapply(seq(ncol(start.m)), function(i){
-    #          calRWRCPP(x = n.adj.m, 
-    #                   v = start.m[, i, drop=FALSE],
-    #                   restart = restart,
-    #                   stop_delta = stop.delta,
-    #                   stop_step = stop.step
-    #          )},
-    #          BPPARAM = BPPARAM
-    #        )
-    pt.m <- parallelCalRWR(x = n.adj.m, 
-		       v = start.m, 
-		       restart = restart,
-		       stop_delta = stop.delta,
-		       stop_step = stop.step
-    )
-    #pt.m <- lapply(pt.m, as.matrix)
-    #pt.m <- do.call('cbind', pt.m)
-    pt.m[pt.m < stop.delta | is.na(pt.m)] <- 0
+    flag.threads <- Sys.getenv('RCPP_PARALLEL_NUM_THREADS')
+    if (nchar(flag.threads)==0 && !is.null(threads)){
+      RcppParallel::setThreadOptions(numThreads = threads)
+    }      
+    pt.m <- parallelCalRWR(
+                x = n.adj.m, 
+                v = start.m, 
+                restart = restart,
+                stop_delta = stop.delta,
+                stop_step = stop.step
+             )
+    pt.m[is.na(pt.m)] <- 0
+    pt.m[pt.m < stop.delta] <- 0
   }
-  pt.m <- pt.m %*% diag(1/colSums(pt.m))
+  toc()
+
+  tic()
+  cli::cli_inform(c('Tidying the result of Random Walk with Restart ...'))
+  pt.m <- prop.table(pt.m, 2)
   if (ncol(pt.m) == 1){
     normalize.affinity <- FALSE
   }
   if (normalize.affinity){
-    rlang::check_installed('preprocessCore', 'for `.run_rwr()` with `normalize.affinity = TRUE`.')
-    pt.m <- preprocessCore::normalize.quantiles(pt.m)
+    rlang::check_installed('broman', 'for `.run_rwr()` with `normalize.affinity = TRUE`.')
+    pt.m <- broman::normalize(pt.m)
     pt.m[pt.m < stop.delta] <- 0
   }
   colnames(pt.m) <- colnames(start.m)
   rownames(pt.m) <- rownames(start.m)
   pt.m <- Matrix::Matrix(t(pt.m), sparse = TRUE)
+  toc()
   return(pt.m)
 }
 

@@ -13,7 +13,7 @@ setGeneric('cal.affinity.score',
     rwr.restart = .7,
     rwr.normalize.adj.method = c("laplacian","row","column","none"),
     rwr.normalize.affinity = TRUE,
-    rwr.BPPARAM = SerialParam(),
+    rwr.threads = 2L,
     rwr.verbose = TRUE,
     cells = NULL,
     features = NULL, 
@@ -39,7 +39,7 @@ setMethod('cal.affinity.score',
     rwr.restart = .7,
     rwr.normalize.adj.method = c("laplacian","row","column","none"),
     rwr.normalize.affinity = TRUE,
-    rwr.BPPARAM = SerialParam(),
+    rwr.threads = 2L,
     rwr.verbose = TRUE,
     cells = NULL,
     features = NULL,
@@ -76,30 +76,26 @@ setMethod('cal.affinity.score',
   toc()
 
   tic()
-  cli::cli_inform(c("Building the seed matrix using the gene set ",
-		    "and the KNN graph built before for Random Walk ",
-		    "with Restart ..."))
+  cli::cli_inform("Building the seed matrix using the gene set and the KNN graph 
+		   built before for Random Walk with Restart ...")
 
   seedstart.m <- .generate.gset.seed(rd.knn.gh, gset.idx.list)
   toc()
 
-  tic()
-  cli::cli_inform(c('Calculating the affinity score using Random Walk with Restart ...'))
   gset.score <- .run_rwr(
                   rd.knn.gh, 
 		  edge.attr = 'weight',
                   seeds = seedstart.m,
                   normalize.adj.method = rwr.normalize.adj.method,
                   restart = rwr.restart,
-		  BPPARAM = rwr.BPPARAM,
+		  threads = rwr.threads,
                   normalize.affinity = rwr.normalize.affinity,
                   verbose = rwr.verbose
                 )
+
   gset.score <- gset.score[, cells]
   x <- SingleCellExperiment(assays = list(affi.score = gset.score))
   data <- .sce_to_svpe(data) 
   gsvaExp(data, "rwr") <- x
-  toc()
   return(data)
-
 })
