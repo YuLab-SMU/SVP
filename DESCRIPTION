@@ -8,6 +8,7 @@ Description: What the package does (one paragraph).
 Imports:
   Rcpp,
   RcppArmadillo,
+  RcppParallel,
   methods,
   cli,
   dplyr,

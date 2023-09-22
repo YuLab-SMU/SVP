@@ -1,3 +1,4 @@
+#' @importFrom RcppParallel RcppParallelLibs
 .run_rwr <- function(g, 
                      edge.attr = 'weight',
                      seeds = NULL,
@@ -25,16 +26,23 @@
   if (restart == 1){
     pt.m <- start.m
   }else{
-    pt.m <- bplapply(seq(ncol(start.m)), function(i){
-              calRWRCPP(x = n.adj.m, 
-                       v = start.m[, i, drop=FALSE],
-                       restart = restart,
-                       stop_delta = stop.delta,
-                       stop_step = stop.step
-              )},
-              BPPARAM = BPPARAM
-            )
-    pt.m <- do.call('cbind', pt.m)
+    #pt.m <- bplapply(seq(ncol(start.m)), function(i){
+    #          calRWRCPP(x = n.adj.m, 
+    #                   v = start.m[, i, drop=FALSE],
+    #                   restart = restart,
+    #                   stop_delta = stop.delta,
+    #                   stop_step = stop.step
+    #          )},
+    #          BPPARAM = BPPARAM
+    #        )
+    pt.m <- parallelCalRWR(x = n.adj.m, 
+		       v = start.m, 
+		       restart = restart,
+		       stop_delta = stop.delta,
+		       stop_step = stop.step
+    )
+    #pt.m <- lapply(pt.m, as.matrix)
+    #pt.m <- do.call('cbind', pt.m)
     pt.m[pt.m < stop.delta | is.na(pt.m)] <- 0
   }
   pt.m <- pt.m %*% diag(1/colSums(pt.m))
