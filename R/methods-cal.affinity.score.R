@@ -15,6 +15,11 @@ setGeneric('cal.affinity.score',
     rwr.normalize.affinity = TRUE,
     rwr.threads = 2L,
     rwr.verbose = TRUE,
+    sv.X = NULL,
+    sv.n_neighbors = 10,
+    sv.order = 'AMMD',
+    sv.verbose = FALSE,
+    sv.threads = 2L,    
     cells = NULL,
     features = NULL, 
     ...
@@ -41,6 +46,11 @@ setMethod('cal.affinity.score',
     rwr.normalize.affinity = TRUE,
     rwr.threads = 2L,
     rwr.verbose = TRUE,
+    sv.X = NULL,
+    sv.n_neighbors = 10,
+    sv.order = 'AMMD',
+    sv.verbose = FALSE,
+    sv.threads = 2L,
     cells = NULL,
     features = NULL,
     ...
@@ -84,17 +94,37 @@ setMethod('cal.affinity.score',
 
   gset.score <- .run_rwr(
                   rd.knn.gh, 
-		  edge.attr = 'weight',
+                  edge.attr = 'weight',
                   seeds = seedstart.m,
                   normalize.adj.method = rwr.normalize.adj.method,
                   restart = rwr.restart,
-		  threads = rwr.threads,
+                  threads = rwr.threads,
                   normalize.affinity = rwr.normalize.affinity,
                   verbose = rwr.verbose
                 )
 
   gset.score <- gset.score[, cells]
+
+  flag <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
+  if(flag){
+      specoords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
+      res.sv <- .run_sv(gset.score, 
+                        spatial_coords = specoords, 
+                        sv.X = sv.X, 
+                        sv.order = sv.order,
+                        sv.n_neighbors = sv.n_neighbors,
+                        sv.verbose = sv.verbose,
+                        threads = sv.threads, 
+                        ...)
+  }
+  
   x <- SingleCellExperiment(assays = list(affi.score = gset.score))
+
+  if(flag){
+      res.sv <- .tidy_res.sv(x, res.sv)
+      rowData(x) <- res.sv
+  }
+
   data <- .sce_to_svpe(data) 
   gsvaExp(data, "rwr") <- x
   return(data)
