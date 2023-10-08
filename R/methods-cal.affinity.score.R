@@ -19,7 +19,8 @@ setGeneric('cal.affinity.score',
     sv.n_neighbors = 10,
     sv.order = 'AMMD',
     sv.verbose = FALSE,
-    sv.threads = 2L,    
+    sv.BPPARAM = SerialParam(),
+    run.sv = TRUE,    
     cells = NULL,
     features = NULL, 
     ...
@@ -50,7 +51,8 @@ setMethod('cal.affinity.score',
     sv.n_neighbors = 10,
     sv.order = 'AMMD',
     sv.verbose = FALSE,
-    sv.threads = 2L,
+    sv.BPPARAM = SerialParam(),
+    run.sv = TRUE,
     cells = NULL,
     features = NULL,
     ...
@@ -106,22 +108,26 @@ setMethod('cal.affinity.score',
   gset.score <- gset.score[, cells]
 
   flag <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
-  if(flag){
+  if(flag && run.sv){
       specoords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
+      tic()
+      cli::cli_inform("Identifying the spatially variable gene sets (pathway) based on 
+		       nearest-neighbor Gaussian processes...") 
       res.sv <- .run_sv(gset.score, 
                         spatial_coords = specoords, 
                         sv.X = sv.X, 
                         sv.order = sv.order,
                         sv.n_neighbors = sv.n_neighbors,
                         sv.verbose = sv.verbose,
-                        threads = sv.threads, 
+                        BPPARAM = sv.BPPARAM, 
                         ...)
+      toc()
   }
   
   x <- SingleCellExperiment(assays = list(affi.score = gset.score))
 
-  if(flag){
-      res.sv <- .tidy_res.sv(x, res.sv)
+  if(flag && run.sv){
+      res.sv <- .tidy_res.sv(rowData(x), res.sv)
       rowData(x) <- res.sv
   }
 

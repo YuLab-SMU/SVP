@@ -42,7 +42,7 @@ NumericMatrix parallelCalRWR(
               arma::sp_mat x,
               arma::sp_mat v,
               double restart = 0.75,
-              double stop_delta = 0.000001,
+              double stop_delta = 1e-10,
               int stop_step = 2){
 
     uword n = v.n_cols;

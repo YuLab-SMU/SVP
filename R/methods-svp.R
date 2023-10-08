@@ -121,7 +121,7 @@ setMethod('svp', signature(data = 'SingleCellExperiment', gset.idx.list = 'GeneS
            x <- SingleCellExperiment(x)
 
            if(flag){
-               res.sv <- .tidy_res.sv(x, res.sv)
+               res.sv <- .tidy_res.sv(rowData(x), res.sv)
                rowData(x) <- res.sv
            }
 

@@ -21,7 +21,7 @@
     restart <- .7
   }
 
-  stop.delta <- 1e-6
+  stop.delta <- 1e-10
   stop.step <- 50
   tic()
   cli::cli_inform("Calculating the affinity score using Random Walk with Restart ...")
@@ -39,9 +39,9 @@
                 stop_delta = stop.delta,
                 stop_step = stop.step
              )
-    pt.m[is.na(pt.m)] <- 0
-    pt.m[pt.m < stop.delta] <- 0
   }
+  pt.m[is.na(pt.m)] <- 0
+  pt.m[pt.m < stop.delta] <- 0
   toc()
 
   tic()
@@ -53,17 +53,19 @@
   if (normalize.affinity){
     rlang::check_installed('broman', 'for `.run_rwr()` with `normalize.affinity = TRUE`.')
     pt.m <- broman::normalize(pt.m)
+    pt.m[is.na(pt.m)] <- 0
     pt.m[pt.m < stop.delta] <- 0
   }
   colnames(pt.m) <- colnames(start.m)
   rownames(pt.m) <- rownames(start.m)
+  pt.m <- pt.m[,colSums(pt.m)>0,drop=FALSE]
   pt.m <- Matrix::Matrix(t(pt.m), sparse = TRUE)
   toc()
   return(pt.m)
 }
 
 #' @importFrom igraph as_adjacency_matrix
-.extract.adj.m <- function(g, edge.attr, verbose = TRUE){
+.extract.adj.m <- function(g, edge.attr, verbose = FALSE){
   flag <- .check.edge.attr(g, edge.attr)
   if (inherits(flag, 'numeric')){
     adj.m <- as_adjacency_matrix(g, attr = edge.attr)
@@ -132,20 +134,20 @@
   return(x)
 }
 
-calRWR <- function(x,
-                     v,
-                     restart = .75,
-		     delta = 1,
-		     step = 0,
-                     stop_delta = 1e-6, 
-                     stop_step = 50){
-    pt <- v
-    while(delta > stop_delta && step <= stop_step){
-      px <- (1 - restart) * x %*% pt + restart * v 
-      delta <- sum(abs(px - pt))
-      pt <- px
-      step <- step + 1
-    }
-    return(as.matrix(pt))
-}
+#calRWR <- function(x,
+#                     v,
+#                     restart = .75,
+#		     delta = 1,
+#		     step = 0,
+#                     stop_delta = 1e-6, 
+#                     stop_step = 50){
+#    pt <- v
+#    while(delta > stop_delta && step <= stop_step){
+#      px <- (1 - restart) * x %*% pt + restart * v 
+#      delta <- sum(abs(px - pt))
+#      pt <- px
+#      step <- step + 1
+#    }
+#    return(as.matrix(pt))
+#}
 

@@ -13,7 +13,7 @@ MCAStep2 <- function(Z, V, Dc) {
     .Call('_SVP_MCAStep2', PACKAGE = 'SVP', Z, V, Dc)
 }
 
-parallelCalRWR <- function(x, v, restart = 0.75, stop_delta = 0.000001, stop_step = 2L) {
+parallelCalRWR <- function(x, v, restart = 0.75, stop_delta = 1e-10, stop_step = 2L) {
     .Call('_SVP_parallelCalRWR', PACKAGE = 'SVP', x, v, restart, stop_delta, stop_step)
 }
 
