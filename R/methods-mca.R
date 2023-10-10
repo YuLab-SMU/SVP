@@ -35,8 +35,9 @@ setMethod('runMCA', 'SingleCellExperiment',
   flag.coords <- .check_element_obj(data, key = 'spatialCoords', basefun = int_colData, namefun = names)
   if (flag.coords && consider.coord){
       specoords <- .extract_element_object(data, key = 'spatialCoords', basefun = int_colData, namefun = names)
-      specoords <- log(specoords)
-      specoords[is.infinite(specoords)] <- 0
+      #specoords <- log(specoords)
+      #specoords[is.infinite(specoords)] <- 0
+      specoords <- .normalize.coords(specoords)
       x <- rbind(x, t(specoords))
   }
   

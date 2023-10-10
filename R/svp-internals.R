@@ -37,7 +37,7 @@
 
 ## This function is from CelliD, because it has many depends.
 ## to better developement, it was coped and modified diretcly.
-.runMCA.internal <- function(x, reduction.name = 'MCA', ncomponents){
+.runMCA.internal <- function(x, reduction.name = 'MCA', ncomponents, coords = NULL){
   rlang::check_installed('irlba', '`runMCA()`')
   if (inherits(x, 'dgTMatrix')){
      x <- as(x, "CsparseMatrix")
@@ -60,6 +60,9 @@
   mca <- MCA$cellsCoordinates
   colnames(mca) <- component
   rownames(mca) <- cells.nm
+  if (!is.null(coords)){
+      mca <- cbind(mca, coords)
+  }
   colnames(MCA$featuresCoordinates) <- component
   rownames(MCA$featuresCoordinates) <- features.nm
   attr(mca, 'featuresCoords') <- MCA$featuresCoordinates
@@ -170,4 +173,62 @@
   return(x)
 }
 
+.use.nngp <- function(x, coords, n = 10, order = 'AMMD', BPPARAM = SerialParam()){
+  rlang::check_installed('BRISC', "for identify svg using NNGP method.")
+  coords <- .normalize.coords(coords)
+  # calculate ordering of coordinates
+  brisc.order <- BRISC::BRISC_order(coords, order = order, verbose = FALSE)
+  # calculate nearest neighbors
+  brisc.nn <- BRISC::BRISC_neighbor(coords, n.neighbors = n, n_omp = 1, 
+			     search.type = "tree", 
+			     ordering = brisc.order, verbose = FALSE) 
 
+  brisc.out <- bplapply(seq(nrow(x)), function(i){
+    est.out <- BRISC::BRISC_estimation(coords, y = x[i, ], cov.model = "exponential", 
+				       ordering = brisc.order, 
+				       neighbor = brisc.nn, verbose = FALSE)
+    est.out <- c(est.out$Theta, loglik = out_i$log_likelihood)
+    return(est.out)
+  }, BPPARAM = BPPARAM)
+
+  brisc.out <- do.call('rbind', brisc.out)
+
+}
+
+.identify.svg <- function(x, 
+                          coords, 
+                          n, 
+                          permutation=999, 
+                          p.adjust.method="fdr",
+                          BPPARAM = SerialParam()
+			  ){
+
+  coords <- .normalize.coords(coords)
+  
+  if (BPPARAM$workers == 1){
+      res <- CalSpatialKldCpp(coords, x, n, permutation)
+  }else{
+ 
+      bgkld <- CalBgSpatialKld(coords, n)
+
+      res <- bplapply(seq(nrow(x)), function(i){
+                CalSpatialKld(coords, x[i, ], bgkld, n, permutation) 
+             }, BPPARAM = BPPARAM)
+
+      res <- do.call('rbind', res)
+  }
+
+  rownames(res) <- rownames(x)
+  colnames(res) <- c("sp.kld", "boot.sp.kld.mean", "boot.sp.kld.sd", "sp.kld.pvalue")
+  kld.rank <- rank(res[,"sp.kld"])
+  res <- cbind(res,
+	       sp.kld.rank = max(kld.rank) - kld.rank + 1,
+	       sp.kld.p.adj = p.adjust(res[,"sp.kld.pvalue"], method = p.adjust.method))
+  return(res)
+
+}
+
+.normalize.coords <- function(x){
+  range_all <- max(apply(x, 2, function(col) diff(range(col))))
+  x <- apply(x, 2, function(col) (col - min(col)) / range_all)
+}

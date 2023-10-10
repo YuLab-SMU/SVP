@@ -5,6 +5,36 @@ fastPDist <- function(Ar, Br) {
     .Call('_SVP_fastPDist', PACKAGE = 'SVP', Ar, Br)
 }
 
+#' Compute Background 2D Kernel Density
+#' @param coords coordinate matrix.
+#' @param n the Number of grid points in each direction, default is 25.
+CalBgSpatialKld <- function(coords, n = 25L) {
+    .Call('_SVP_CalBgSpatialKld', PACKAGE = 'SVP', coords, n)
+}
+
+#' Compute the Kullback–Leibler Divergence using 2D Kernel Density Estimation 
+#' With Weighted and Statistical Test With Permutation for single weight vector.
+#' @param coords coordinate matrix.
+#' @param d the weight vector (the expression of gene or score of pathway).
+#' @param bgkld the kernel density of background (the result of CalBgSpatialKld).
+#' @param n the Number of grid points in each direction, default is 25.
+#' @param random_times the permutation numbers for each weight to test whether 
+#' it is significantly, default is 999.
+CalSpatialKld <- function(coords, d, bgkld, n = 25L, random_times = 999L) {
+    .Call('_SVP_CalSpatialKld', PACKAGE = 'SVP', coords, d, bgkld, n, random_times)
+}
+
+#' Compute the Kullback–Leibler Divergence using 2D Kernel Density Estimation 
+#' With Weighted And Statistical Test With Permutation.
+#' @param coords coordinate matrix.
+#' @param d matrix (the expression of gene or score of pathway).
+#' @param n the Number of grid points in each direction, default is 25.
+#' @param random_times the permutation numbers for each weight to test whether
+#' it is significantly, default is 999.
+CalSpatialKldCpp <- function(coords, d, n = 25L, random_times = 999L) {
+    .Call('_SVP_CalSpatialKldCpp', PACKAGE = 'SVP', coords, d, n, random_times)
+}
+
 MCAStep1 <- function(X) {
     .Call('_SVP_MCAStep1', PACKAGE = 'SVP', X)
 }
