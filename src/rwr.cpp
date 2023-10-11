@@ -2,7 +2,6 @@
 #include <RcppParallel.h>
 
 using namespace Rcpp;
-// [[Rcpp::depends(RcppParallel)]]
 using namespace RcppParallel;
 using namespace arma;
 using namespace std;
@@ -25,25 +24,36 @@ struct calrwr : public Worker{
     for (uword i = begin; i < end; i++){
         int step = 0;
         double delta = 1;
-        arma::sp_mat pt = v.col(i);
-        while((delta > stop_delta) && (step <= stop_step)){
-            arma::sp_mat px = ((1 - restart) * (x * pt)) + (restart * v.col(i));
+        arma::mat pt = conv_to<mat>::from(v.col(i));
+        arma::uvec ind = find(pt > 0);
+        while((delta > stop_delta) && (step <= stop_step) && (ind.n_elem > 1)){
+            arma::mat px = ((1 - restart) * (x * pt)) + (restart * v.col(i));
             delta = arma::accu(abs(px - pt));
             pt = px;
             step = step + 1;
         }
-        result.col(i) = conv_to<mat>::from(pt);
+        result.col(i) = pt;
     }
   }
 };
 
+
+//' Computer the affinity score of all nodes in a graph to a seeds 
+//' using Random Walk with Restart
+//' @param x a adjacency matrix of a graph.
+//' @param v a matrix define sets of starting seeds, each column 
+//' corresponds to one set of seeds that a walker starts.
+//' @param restart the restart probability used for RWR, it must be 
+//' between 0 and 1, default is .75.
+//' @param stop_delta minimum threshold to stop RWR, default is 1e-10.
+//' @param stop_step step number to stop RWR, default is 50.
 // [[Rcpp::export]]
 NumericMatrix parallelCalRWR(
               arma::sp_mat x,
               arma::sp_mat v,
               double restart = 0.75,
               double stop_delta = 1e-10,
-              int stop_step = 2){
+              int stop_step = 50){
 
     uword n = v.n_cols;
     mat result(x.n_rows, n);
@@ -57,13 +67,6 @@ NumericMatrix parallelCalRWR(
 }
 
 
-
-//#include <RcppArmadillo.h>
-//// [[Rcpp::depends(RcppArmadillo)]]
-//
-//using namespace Rcpp;
-//using namespace arma;
-//
 //// [[Rcpp::export]]
 //NumericMatrix calRWRCPP(arma::sp_mat x,
 //	      arma::sp_mat v,
@@ -84,27 +87,29 @@ NumericMatrix parallelCalRWR(
 //    return wrap(pt2);
 //}
 //
+//
 //// [[Rcpp::export]]
 //NumericMatrix calRWRCPP2(
 //	      arma::sp_mat x,
 //              arma::sp_mat v,
 //              double restart = .7,
-//              double stop_delta = 1e-6,
+//              double stop_delta = 1e-10,
 //              int stop_step = 50
 //             ){
 //    int n = v.n_cols;
-//    mat res(x.n_rows, n);
+//    arma::mat res(x.n_rows, n);
 //    for (int i = 0; i < n; i++){
 //      int step = 0;
 //      double delta = 1;
-//      arma::sp_mat pt = v.col(i);
-//      while((delta > stop_delta) && (step <= stop_step)){
-//          arma::sp_mat px = ((1 - restart) * x * pt) + (restart * v.col(i));
+//      arma::mat pt = arma::conv_to<mat>::from(v.col(i));
+//      arma::uvec ind = find(pt > 0);
+//      while((delta > stop_delta) && (step <= stop_step) && (ind.n_elem > 1)){
+//          arma::mat px = ((1 - restart) * x * pt) + (restart * v.col(i));
 //          delta = arma::accu(abs(px - pt));
 //          pt = px;
 //          step = step + 1;
 //      }
-//	res(i) = arma::conv_to<mat>::from(pt);
+//	res.col(i) = pt;
 //    }
 //    return wrap(res);
 //}

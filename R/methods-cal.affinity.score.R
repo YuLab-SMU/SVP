@@ -5,6 +5,8 @@ setGeneric('cal.affinity.score',
     gset.idx.list,
     reduction.name = 'MCA', 
     dims = 30,
+    min.sz = 1,
+    max.sz = Inf,
     knn.fun = findKmknn,
     knn.BPPARAM = SerialParam(),
     knn.graph.weighted = TRUE,
@@ -37,7 +39,9 @@ setMethod('cal.affinity.score',
     gset.idx.list,
     reduction.name = 'MCA',
     dims = 30,
-    knn.fun = 'findKmknn',
+    min.sz = 1, 
+    max.sz = Inf,
+    knn.fun = findKmknn,
     knn.BPPARAM = SerialParam(),
     knn.graph.weighted = TRUE,
     knn.graph.directed = FALSE,
@@ -84,14 +88,15 @@ setMethod('cal.affinity.score',
                   weighted.distance = knn.graph.weighted,
                   graph.directed = knn.graph.directed,
                   ...
-                )
+               )
   toc()
 
   tic()
   cli::cli_inform("Building the seed matrix using the gene set and the KNN graph 
 		   built before for Random Walk with Restart ...")
 
-  seedstart.m <- .generate.gset.seed(rd.knn.gh, gset.idx.list)
+  seedstart.m <- .generate.gset.seed(rd.knn.gh, gset.idx.list, min.sz = min.sz, 
+				     max.sz = max.sz, verbose = rwr.verbose)
   toc()
 
   gset.score <- .run_rwr(
@@ -106,6 +111,8 @@ setMethod('cal.affinity.score',
                 )
 
   gset.score <- gset.score[, cells]
+
+  gset.score <- gset.score[Matrix::rowSums(gset.score) > 0,]
 
   flag <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
   if(flag && run.sv){

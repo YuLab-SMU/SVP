@@ -43,7 +43,16 @@ MCAStep2 <- function(Z, V, Dc) {
     .Call('_SVP_MCAStep2', PACKAGE = 'SVP', Z, V, Dc)
 }
 
-parallelCalRWR <- function(x, v, restart = 0.75, stop_delta = 1e-10, stop_step = 2L) {
+#' Computer the affinity score of all nodes in a graph to a seeds 
+#' using Random Walk with Restart
+#' @param x a adjacency matrix of a graph.
+#' @param v a matrix define sets of starting seeds, each column 
+#' corresponds to one set of seeds that a walker starts.
+#' @param restart the restart probability used for RWR, it must be 
+#' between 0 and 1, default is .75.
+#' @param stop_delta minimum threshold to stop RWR, default is 1e-10.
+#' @param stop_step step number to stop RWR, default is 50.
+parallelCalRWR <- function(x, v, restart = 0.75, stop_delta = 1e-10, stop_step = 50L) {
     .Call('_SVP_parallelCalRWR', PACKAGE = 'SVP', x, v, restart, stop_delta, stop_step)
 }
 

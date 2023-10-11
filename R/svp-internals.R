@@ -141,9 +141,8 @@
 #' @importFrom igraph graph_from_data_frame
 #' @importFrom igraph simplify
 .build.graph <- function(
-		edges, 
-		graph.directed = FALSE
-		){
+		  edges, 
+		  graph.directed = FALSE){
   g <- igraph::graph_from_data_frame(
          edges, 
 	 directed = graph.directed
@@ -153,7 +152,21 @@
 }
 
 
-.generate.gset.seed <- function(g, gset.idx.list){
+.generate.gset.seed <- function(g, gset.idx.list, min.sz = 1, max.sz = Inf, verbose = FALSE){
+  
+  total.len <- lapply(gset.idx.list, length)
+
+  if (any(total.len <=1) && verbose){
+      cli::cli_warn(c("Some gene sets have size one.", 
+		      "You've supplied 'min.sz = {min.sz},'
+		      consider setting 'min.sz > 1'."))  
+  }
+  #if (verbose){
+  #     cli::cli_inform(c("The gene sets which length lower than {.cls {class(min.sz)}} {min.sz}
+  #                       and larger than {.cls {class(max.sz)}} {max.sz} are removed"))
+  #}
+  gset.idx.list <- gset.idx.list[total.len >= min.sz & total.len < max.sz]
+
   x <- matrix(0, 
 	      nrow = igraph::vcount(g), 
 	      ncol = length(gset.idx.list)
@@ -220,10 +233,12 @@
 
   rownames(res) <- rownames(x)
   colnames(res) <- c("sp.kld", "boot.sp.kld.mean", "boot.sp.kld.sd", "sp.kld.pvalue")
-  kld.rank <- rank(res[,"sp.kld"])
+  sp.kld <- res[,'sp.kld']
+  kld.rank <- rep(NA, length(sp.kld))
+  kld.rank[!is.na(sp.kld)] <- rank(sp.kld, na.last=NA)
   res <- cbind(res,
-	       sp.kld.rank = max(kld.rank) - kld.rank + 1,
-	       sp.kld.p.adj = p.adjust(res[,"sp.kld.pvalue"], method = p.adjust.method))
+               sp.kld.rank = max(kld.rank, na.rm=TRUE) - kld.rank + 1,
+               sp.kld.p.adj = p.adjust(res[,"sp.kld.pvalue"], method = p.adjust.method))
   return(res)
 
 }

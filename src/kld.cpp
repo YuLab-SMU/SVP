@@ -68,7 +68,7 @@ double CalRandSpatialKld(
         int n = 10){
     NumericVector s = sample(w, w.size());
     NumericVector z = as<NumericVector>(Kde2dWeightedCpp(coords, s, n, R_NilValue));
-    double res = log(sum(z * log(z / bg + 1.0)));
+    double res = sum(z * log(z / bg));
     return (res);
 }
 
@@ -89,7 +89,7 @@ NumericVector CalBgSpatialKld(NumericMatrix coords, int n = 25){
     double prop = 1.0 / coords.nrow();
     NumericVector bgw = rep(prop, coords.nrow());
     NumericMatrix bgm = Kde2dWeightedCpp(coords, bgw, n, R_NilValue);
-    NumericVector bgkld = as<NumericVector>(bgm) + 1e-200;
+    NumericVector bgkld = as<NumericVector>(bgm) + 1e-300;
     return (bgkld);
 }
 
@@ -109,7 +109,7 @@ NumericVector CalSpatialKld(NumericMatrix coords,
                             int random_times = 999){
 
     NumericVector k = as<NumericVector>(Kde2dWeightedCpp(coords, d, n, R_NilValue));
-    double kld = log(sum(k * log(k / bgkld + 1.0)));
+    double kld = sum(k * log(k / bgkld));
 
     NumericVector bootkld(random_times);
 

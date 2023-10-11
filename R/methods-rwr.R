@@ -38,7 +38,7 @@
                 restart = restart,
                 stop_delta = stop.delta,
                 stop_step = stop.step
-             )
+            )
   }
   pt.m[is.na(pt.m)] <- 0
   pt.m[pt.m < stop.delta] <- 0
@@ -58,7 +58,6 @@
   }
   colnames(pt.m) <- colnames(start.m)
   rownames(pt.m) <- rownames(start.m)
-  pt.m <- pt.m[,colSums(pt.m)>0,drop=FALSE]
   pt.m <- Matrix::Matrix(t(pt.m), sparse = TRUE)
   toc()
   return(pt.m)
@@ -129,6 +128,7 @@
     x[is.na(x)] <- 0
     rownames(x) <- nm
     colnames(x) <- colnames(seeds)
+    x <- x[,Matrix::colSums(x)>0,drop=FALSE]
     x <- Matrix::Matrix(x, sparse = TRUE)
   }
   return(x)
