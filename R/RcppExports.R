@@ -5,6 +5,15 @@ fastPDist <- function(Ar, Br) {
     .Call('_SVP_fastPDist', PACKAGE = 'SVP', Ar, Br)
 }
 
+#' Extract the score of gene in each gene sets
+#' @param x the score sparse matrix of gene for each gene sets.
+#' @param rnm the row names of x matrix.
+#' @param cnm the col names of x matrix.
+#' @param g a list of gene set.
+ExtractFeatureScoreCpp <- function(x, rnm, cnm, g) {
+    .Call('_SVP_ExtractFeatureScoreCpp', PACKAGE = 'SVP', x, rnm, cnm, g)
+}
+
 #' Compute Background 2D Kernel Density
 #' @param coords coordinate matrix.
 #' @param n the Number of grid points in each direction, default is 25.

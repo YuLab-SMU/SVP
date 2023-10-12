@@ -23,6 +23,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// ExtractFeatureScoreCpp
+List ExtractFeatureScoreCpp(arma::sp_mat& x, CharacterVector& rnm, CharacterVector& cnm, Rcpp::List& g);
+RcppExport SEXP _SVP_ExtractFeatureScoreCpp(SEXP xSEXP, SEXP rnmSEXP, SEXP cnmSEXP, SEXP gSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< CharacterVector& >::type rnm(rnmSEXP);
+    Rcpp::traits::input_parameter< CharacterVector& >::type cnm(cnmSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List& >::type g(gSEXP);
+    rcpp_result_gen = Rcpp::wrap(ExtractFeatureScoreCpp(x, rnm, cnm, g));
+    return rcpp_result_gen;
+END_RCPP
+}
 // CalBgSpatialKld
 NumericVector CalBgSpatialKld(NumericMatrix coords, int n);
 RcppExport SEXP _SVP_CalBgSpatialKld(SEXP coordsSEXP, SEXP nSEXP) {
@@ -106,6 +120,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_SVP_fastPDist", (DL_FUNC) &_SVP_fastPDist, 2},
+    {"_SVP_ExtractFeatureScoreCpp", (DL_FUNC) &_SVP_ExtractFeatureScoreCpp, 4},
     {"_SVP_CalBgSpatialKld", (DL_FUNC) &_SVP_CalBgSpatialKld, 2},
     {"_SVP_CalSpatialKld", (DL_FUNC) &_SVP_CalSpatialKld, 5},
     {"_SVP_CalSpatialKldCpp", (DL_FUNC) &_SVP_CalSpatialKldCpp, 4},

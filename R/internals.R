@@ -1,5 +1,9 @@
 .gsva_key <- 'gsvaExps'
 
+.fscore_key <- 'fscoreDF'
+
+.sv_key <- 'svDF'
+
 #' @importFrom BiocGenerics updateObject 
 # refering to the internal functions of SingleCellExperiment
 .get_internal_all <- function(x, getfun, key, to.class='SimpleList'){
@@ -68,25 +72,31 @@ setReplaceMethod("names", "SCEByColumn", function(x, value) {
     })
 }
 
+.unnamed.gsva <- 'unnamed.gsva'
+.unnamed.fscore <- 'unnamed.fscore'
+.unnamed.sv <- '.unnamed.sv'
 
-.set_internal_names <- function (x, value, getfun, setfun, key){
+unamekeys <- c(.unnamed.gsva, .unnamed.fscore, .unnamed.sv)
+names(unamekeys) <- c(.gsva_key, .fscore_key, .sv_key)
+
+.set_internal_names <- function (x, value, getfun, setfun, key, unname.key=.unnamed.gsva){
     x <- updateObject(x)
     tmp <- getfun(x)
     value <- .clean_internal_names(value, N = ncol(tmp[[key]]),
-        msg = "value")
+        msg = "value", unname.key)
     colnames(tmp[[key]]) <- value
     setfun(x, tmp)
 }
 
 .unnamed.gsva <- 'unnamed.gsva'
 
-.clean_internal_names <- function(names, N, msg){
+.clean_internal_names <- function(names, N, msg, unname.key){
     if (is.null(names) && N > 0){
         cli::cli_warn(paste0("'", msg, "' is NULL, replacing with '", .unnamed.gsva,"'."))
-        names <- paste0(.unnamed.gsva, seq_len(N))
+        names <- paste0(.unname.key, seq_len(N))
     }else if (any(empty <- nchar(names) == 0)){
         cli::cli_warn(paste0("'", msg, "' contains empty strings, replacing with '", .unnamed.gsva,"'."))
-        names[empty] <- paste0(.unnamed.gsva, seq_along(sum(empty)))
+        names[empty] <- paste0(.unname.key, seq_along(sum(empty)))
     }
     names
 }
@@ -157,7 +167,7 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
             
         }
         names(value) <- .clean_internal_names(names(value), N = length(value),
-            msg = "names(value)")
+            msg = "names(value)", unname.key = unamekeys[key])
         collected <- do.call(DataFrame, c(lapply(value, I), list(row.names = NULL,
             check.names = FALSE)))
         if (is(original, "Annotated")) {

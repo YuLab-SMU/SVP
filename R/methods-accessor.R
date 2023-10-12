@@ -1,4 +1,4 @@
-#' @importFrom SpatialExperiment toSpatialExperiment spatialCoords
+#' @importFrom SpatialExperiment spatialCoords
 #' @export
 setMethod('spatialCoords', 'SVPExperiment', function(x){
     flag <- .check_element_obj(x, key = 'spatialCoords', basefun = int_colData, namefun = names)

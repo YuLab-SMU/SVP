@@ -208,6 +208,28 @@
 
 }
 
+.add.int.rowdata <- function(sce, getfun, setfun1, setfun2, namestr, val){
+  tmp <- getfun(sce) 
+  if (length(tmp) == 0 ){
+    sce <- setfun1(sce, value=list())
+  }
+  sce <- setfun2(x=sce, type=namestr, value=val)
+  return (sce)
+}
+
+#' @importFrom S4Vectors DataFrame List
+.extract.features.score <- function(x, gset.nm, features, gset.idx.list){
+  keep.gset <- x[rownames(x) %in% gset.nm, ,drop=FALSE]
+  keep.gset <- keep.gset[,colnames(keep.gset) %in% features,drop=FALSE]
+  rnm <- rownames(keep.gset)
+  cnm <- colnames(keep.gset)
+  keep.gset.list <- gset.idx.list[names(gset.idx.list) %in% rownames(keep.gset)]
+  res <- ExtractFeatureScoreCpp(keep.gset, rnm, cnm, keep.gset.list)
+  res <- DataFrame(features.score = List(res))
+  rownames(res) <- rnm
+  return(res)
+}
+
 .identify.svg <- function(x, 
                           coords, 
                           n, 

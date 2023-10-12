@@ -30,6 +30,7 @@ setGeneric('cal.affinity.score',
   standardGeneric('cal.affinity.score')
 )
 
+#' @importFrom SingleCellExperiment rowData
 #' @importFrom pracma tic toc
 #' @export
 setMethod('cal.affinity.score', 
@@ -110,17 +111,40 @@ setMethod('cal.affinity.score',
                   verbose = rwr.verbose
                 )
 
-  gset.score <- gset.score[, cells]
+  gset.score.cells <- gset.score[, cells]
+  data <- data[, cells]
 
-  gset.score <- gset.score[Matrix::rowSums(gset.score) > 0,]
+  gset.score.cells <- gset.score.cells[Matrix::rowSums(gset.score.cells) > 0,]
+
+  gset.score.features <- .extract.features.score(
+                            gset.score, 
+                            rownames(gset.score.cells), 
+                            features, 
+                            gset.idx.list
+                         )
+
+  gset.num <- matrix(gset.score.features[[1]] |> lapply(length) |> unlist())
+  rownames(gset.num) <- rownames(gset.score.features)
+  colnames(gset.num) <- "gset.num"
+  
+  x <- SingleCellExperiment(assays = list(affi.score = gset.score.cells))
+
+  rowData(x) <- gset.num
+  
+  x <- .add.int.rowdata(sce=x, getfun=fscoreDfs, 
+			setfun1 = `fscoreDfs<-`, 
+			setfun2 = `fscoreDf<-`, 
+			namestr = "rwr.score", 
+			val = gset.score.features)
 
   flag <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
   if(flag && run.sv){
       specoords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
       tic()
       cli::cli_inform("Identifying the spatially variable gene sets (pathway) based on 
-		       nearest-neighbor Gaussian processes...") 
-      res.sv <- .run_sv(gset.score, 
+                      nearest-neighbor Gaussian processes...") 
+      
+      res.sv <- .run_sv(gset.score.cells, 
                         spatial_coords = specoords, 
                         sv.X = sv.X, 
                         sv.order = sv.order,
@@ -131,13 +155,16 @@ setMethod('cal.affinity.score',
       toc()
   }
   
-  x <- SingleCellExperiment(assays = list(affi.score = gset.score))
-
   if(flag && run.sv){
-      res.sv <- .tidy_res.sv(rowData(x), res.sv)
-      rowData(x) <- res.sv
+      #res.sv <- .tidy_res.sv(rowData(x), res.sv)
+      #rowData(x) <- res.sv
+      x <- .add.int.rowdata(sce=x, getfun=svDfs, 
+			    setfun1 = `svDfs<-`, 
+			    setfun2 = `svDf<-`, 
+			    namestr = 'sv.nngp', 
+			    val = res.sv)
   }
-
+  
   data <- .sce_to_svpe(data) 
   gsvaExp(data, "rwr") <- x
   return(data)
