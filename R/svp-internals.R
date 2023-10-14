@@ -65,11 +65,25 @@
   }
   colnames(MCA$featuresCoordinates) <- component
   rownames(MCA$featuresCoordinates) <- features.nm
-  attr(mca, 'featuresCoords') <- MCA$featuresCoordinates
+  attr(mca, 'genesCoordinates') <- MCA$featuresCoordinates
   attr(mca, 'stdev') <- SVD$d[-1]
   return(mca) 
 }
 
+.build.new.reduced <- function(rd.res, cells, features = NULL){
+  
+  if (!is.null(features)){
+    rd.f.res <- attr(rd.res, 'genesCoordinates')
+    rd.f.res <- rd.f.res[features,,drop=FALSE]
+  }else{
+    rd.f.res <- NULL
+  }
+  
+  rd.res <- rd.res[cells,,drop=FALSE]
+  attr(rd.res, "genesCoordinates") <- rd.f.res
+  return(rd.res)
+
+}
 
 #' @importFrom BiocNeighbors findKmknn
 #' @importFrom BiocParallel SerialParam
@@ -232,8 +246,8 @@
 
 .identify.svg <- function(x, 
                           coords, 
-                          n, 
-                          permutation=999, 
+                          n = 100, 
+                          permutation = 100, 
                           p.adjust.method="fdr",
                           BPPARAM = SerialParam()
 			  ){

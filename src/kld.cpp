@@ -130,7 +130,7 @@ NumericVector CalSpatialKld(NumericMatrix coords,
 //' @param random_times the permutation numbers for each weight to test whether
 //' it is significantly, default is 999.
 // [[Rcpp::export]]
-NumericMatrix CalSpatialKldCpp(NumericMatrix coords, NumericMatrix d, int n = 25, int random_times = 999){
+NumericMatrix CalSpatialKldCpp(NumericMatrix coords, NumericMatrix d, int n = 100, int random_times = 100){
     
     NumericVector bgkld = CalBgSpatialKld(coords, n);
 

@@ -2,7 +2,7 @@
 setGeneric('gsvaExps', function(x,...)standardGeneric('gsvaExps'))
 
 #' @export
-setGeneric('gsvaExp', function(x, e, ...)standardGeneric('gsvaExp'))
+setGeneric('gsvaExp', function(x, e, withDimnames=TRUE, withColData=TRUE, withSpatialCoords = TRUE, withImgData=TRUE, withReducedDim=FALSE, ...)standardGeneric('gsvaExp'))
 
 #' @export
 setGeneric('gsvaExpNames', function(x, ...)standardGeneric('gsvaExpNames'))
@@ -123,7 +123,8 @@ setReplaceMethod('gsvaExps', 'SVPExperiment', function(x, withDimnames=TRUE, wit
 #' @importFrom SingleCellExperiment int_colData
 #' @importFrom S4Vectors endoapply
 #' @export
-setMethod('gsvaExps', 'SVPExperiment', function(x, withDimnames=TRUE, withColData=TRUE, withSpatialCoords=TRUE, withImgData=TRUE, ...){
+setMethod('gsvaExps', 'SVPExperiment', function(x, withDimnames=TRUE, withColData=TRUE, withSpatialCoords=TRUE, 
+						withImgData=TRUE, withReducedDim=FALSE, ...){
     y <- .get_internal_all(x,
            getfun=int_colData,
            key=.gsva_key
@@ -137,13 +138,17 @@ setMethod('gsvaExps', 'SVPExperiment', function(x, withDimnames=TRUE, withColDat
                        withDimnames = withDimnames, 
                        withColData = withColData,
                        withSpatialCoords = withSpatialCoords, 
-                       withImgData = withImgData)
+                       withImgData = withImgData,
+		       withReducedDim = withReducedDim
+	     )
     }
     return(y)
 })
 
 #' @export
-setMethod('gsvaExp', c('SVPExperiment', "missing"), function(x, e, withDimnames = TRUE, withColData = TRUE, withSpatialCoords = TRUE, withImgData = TRUE, ...){
+setMethod('gsvaExp', c('SVPExperiment', "missing"), function(x, e, withDimnames = TRUE, withColData = TRUE, 
+							     withSpatialCoords = TRUE, withImgData = TRUE, 
+							     withReducedDim=FALSE, ...){
     y <- .get_internal_missing(x,
             basefun = gsvaExp,
             namefun = gsvaExpNames,
@@ -152,13 +157,15 @@ setMethod('gsvaExp', c('SVPExperiment', "missing"), function(x, e, withDimnames 
             withColData = withColData,
             withSpatialCoords = withSpatialCoords,
             withImgData = withImgData,
+	    withReducedDim = withReducedDim,
             ...
          )
     return(y)
 })
 
 #' @export
-setMethod('gsvaExp', c('SVPExperiment', 'numeric'), function(x, e, withDimnames = TRUE, withColData = TRUE, withSpatialCoords = TRUE, withImgData = TRUE, ...){
+setMethod('gsvaExp', c('SVPExperiment', 'numeric'), function(x, e, withDimnames = TRUE, withColData = TRUE, withSpatialCoords = TRUE, 
+							     withImgData = TRUE, withReducedDim=FALSE, ...){
     y <- .get_internal_numeric(
            x,
            index = e,
@@ -169,14 +176,16 @@ setMethod('gsvaExp', c('SVPExperiment', 'numeric'), function(x, e, withDimnames 
          )
     y <- .get_sce(y)
 
-    y <- .fill_gsvaexps_info(y, x, withDimnames, withColData, withSpatialCoords, withImgData)
+    y <- .fill_gsvaexps_info(y, x, withDimnames, withColData, withSpatialCoords, withImgData, withReducedDim)
     return(y)
 
 })
 
 
 #' @export
-setMethod('gsvaExp', c('SVPExperiment', 'character'), function(x, e, withDimnames = TRUE, withColData = TRUE, withSpatialCoords = TRUE, withImgData = TRUE, ...){
+setMethod('gsvaExp', c('SVPExperiment', 'character'), function(x, e, withDimnames = TRUE, withColData = TRUE, 
+							       withSpatialCoords = TRUE, withImgData = TRUE, 
+							       withReducedDim=FALSE, ...){
     y <- .get_internal_character(
            x,
            index = e,
@@ -187,7 +196,7 @@ setMethod('gsvaExp', c('SVPExperiment', 'character'), function(x, e, withDimname
            namestr = 'gsvaExpNames'
          )
     y <- .get_sce(y)
-    y <- .fill_gsvaexps_info(y, x, withDimnames, withColData, withSpatialCoords, withImgData)
+    y <- .fill_gsvaexps_info(y, x, withDimnames, withColData, withSpatialCoords, withImgData, withReducedDim)
     return(y)
 })
 

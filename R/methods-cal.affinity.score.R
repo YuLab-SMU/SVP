@@ -4,6 +4,7 @@ setGeneric('cal.affinity.score',
     data, 
     gset.idx.list,
     reduction.name = 'MCA', 
+    gsvaExp.name = 'gset1.rwr',
     dims = 30,
     min.sz = 1,
     max.sz = Inf,
@@ -39,6 +40,7 @@ setMethod('cal.affinity.score',
     data,
     gset.idx.list,
     reduction.name = 'MCA',
+    gsvaExp.name = 'gset1.rwr',
     dims = 30,
     min.sz = 1, 
     max.sz = Inf,
@@ -65,13 +67,14 @@ setMethod('cal.affinity.score',
   if (!reduction.name %in% reducedDimNames(data)){
       cli::cli_abort(c("The {.cls {class(data)}} does not have {.var reduction.name}"))
   }
-  rd.res <- reducedDim(data, reduction.name)
-  rd.f.res <- attr(rd.res, 'featuresCoords')
+  rd.df <- reducedDim(data, reduction.name)
+  rd.f.res <- attr(rd.df, "genesCoordinates")
+  #rd.f.res <- attr(rd.df, 'featuresCoords')
 
-  cells <- .subset_ind(rd.res, cells)
+  cells <- .subset_ind(rd.df, cells)
   features <- .subset_ind(rd.f.res, features)
 
-  rd.res <- rbind(rd.res, rd.f.res)
+  rd.res <- rbind(rd.df, rd.f.res)
   rd.res <- .subset_data(x = rd.res, n = c(cells, features))
   
   dims <- min(ncol(rd.res), dims) 
@@ -112,7 +115,7 @@ setMethod('cal.affinity.score',
                 )
 
   gset.score.cells <- gset.score[, cells]
-  data <- data[, cells]
+  #data <- data[, cells]
 
   gset.score.cells <- gset.score.cells[Matrix::rowSums(gset.score.cells) > 0,]
 
@@ -126,16 +129,18 @@ setMethod('cal.affinity.score',
   gset.num <- matrix(gset.score.features[[1]] |> lapply(length) |> unlist())
   rownames(gset.num) <- rownames(gset.score.features)
   colnames(gset.num) <- "gset.num"
-  
+
   x <- SingleCellExperiment(assays = list(affi.score = gset.score.cells))
 
   rowData(x) <- gset.num
+
   
   x <- .add.int.rowdata(sce=x, getfun=fscoreDfs, 
 			setfun1 = `fscoreDfs<-`, 
 			setfun2 = `fscoreDf<-`, 
 			namestr = "rwr.score", 
 			val = gset.score.features)
+
 
   flag <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
   if(flag && run.sv){
@@ -162,10 +167,12 @@ setMethod('cal.affinity.score',
 			    setfun1 = `svDfs<-`, 
 			    setfun2 = `svDf<-`, 
 			    namestr = 'sv.nngp', 
-			    val = res.sv)
+                            val = res.sv)
   }
   
-  data <- .sce_to_svpe(data) 
-  gsvaExp(data, "rwr") <- x
-  return(data)
+  da <- .sce_to_svpe(data) 
+  gsvaExp(da, gsvaExp.name) <- x
+  new.reduced <- .build.new.reduced(rd.df, cells, features)
+  reducedDim(da, reduction.name) <- new.reduced
+  return(da)
 })

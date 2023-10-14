@@ -209,7 +209,7 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
 }    
 
 #' @importFrom SpatialExperiment spatialCoords imgData imgData<- spatialCoords<-
-.fill_gsvaexps_info <- function(out, x, withDimnames, withColData, withSpatialCoords, withImgData){
+.fill_gsvaexps_info <- function(out, x, withDimnames, withColData, withSpatialCoords, withImgData, withReducedDim){
     if (withDimnames) {
         colnames(out) <- colnames(x)
     }
@@ -228,10 +228,16 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
         out <- as(out, 'SpatialExperiment')
         imgData(out) <- .extract_element_object(x, key = 'imgData', basefun = int_metadata, namefun = names)
     }
+    if (withReducedDim){
+        reducedDims(out) <- reducedDims(x)
+    }
     return(out)
 }
 
 .sce_to_svpe <- function(sce, gsvaExps = list()){
+    if (inherits(sce, "SVPExperiment")){
+        return(sce)
+    }
     svpe <- new('SVPExperiment', sce)
     int_colData(svpe)[[.gsva_key]] <- new('DFrame', nrows=ncol(svpe))
     gsvaExps(svpe) <- gsvaExps
