@@ -45,11 +45,11 @@ NumericMatrix Kde2dWeightedCpp(NumericMatrix x,
     NumericVector v = rep_each(w, n);
     NumericVector dax = Rcpp::dnorm(as<NumericVector>(ax));
 
-    NumericVector day = Rcpp::dnorm(as<NumericVector>(ay));
+    NumericVector day = Rcpp::dnorm(as<NumericVector>(ay)) * v;
     day.attr("dim") = Dimension(n, nx);
     NumericMatrix daym = as<NumericMatrix>(day);
 
-    daym = transpose(daym) / (sum(w) * h1 * h2);
+    daym = transpose(daym) / (sum(v) * h1 * h2);
 
     v = v * dax;
     v.attr("dim") = Dimension(n, nx);
