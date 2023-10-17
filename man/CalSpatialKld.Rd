@@ -5,7 +5,7 @@
 \title{Compute the Kullback–Leibler Divergence using 2D Kernel Density Estimation
 With Weighted and Statistical Test With Permutation for single weight vector.}
 \usage{
-CalSpatialKld(coords, d, bgkld, n = 25L, random_times = 999L)
+CalSpatialKld(coords, d, bgkld, gx, gy, h, random_times = 100L)
 }
 \arguments{
 \item{coords}{coordinate matrix.}
@@ -14,10 +14,15 @@ CalSpatialKld(coords, d, bgkld, n = 25L, random_times = 999L)
 
 \item{bgkld}{the kernel density of background (the result of CalBgSpatialKld).}
 
-\item{n}{the Number of grid points in each direction, default is 25.}
+\item{gx}{Vector grid points in x direction, see(seq(lims\link{1}, lims\link{2}, length.out=300)).}
+
+\item{gy}{Vector grid points in y direction, see(seq(lims\link{3}, lims\link{4}, length.out=300)).}
+
+\item{h}{The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
+(see bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).}
 
 \item{random_times}{the permutation numbers for each weight to test whether
-it is significantly, default is 999.}
+it is significantly, default is 100.}
 }
 \description{
 Compute the Kullback–Leibler Divergence using 2D Kernel Density Estimation

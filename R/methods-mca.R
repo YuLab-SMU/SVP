@@ -42,7 +42,7 @@ setMethod('runMCA', 'SingleCellExperiment',
   }
   
   res.mca <- .runMCA.internal(x, 
-			      reduction.name = reduction.name, 
+                              reduction.name = reduction.name, 
 			      ncomponents = ncomponents
              )
 

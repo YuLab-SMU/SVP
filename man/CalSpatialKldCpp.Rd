@@ -5,17 +5,22 @@
 \title{Compute the Kullback–Leibler Divergence using 2D Kernel Density Estimation
 With Weighted And Statistical Test With Permutation.}
 \usage{
-CalSpatialKldCpp(coords, d, n = 25L, random_times = 999L)
+CalSpatialKldCpp(coords, d, l, h, n = 300L, random_times = 100L)
 }
 \arguments{
 \item{coords}{coordinate matrix.}
 
 \item{d}{matrix (the expression of gene or score of pathway).}
 
-\item{n}{the Number of grid points in each direction, default is 25.}
+\item{l}{The limits of the rectangle covered by the grid as c(xl, xu, yl, yu).}
+
+\item{h}{The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
+(see bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).}
+
+\item{n}{the Number of grid points in each direction, default is 300.}
 
 \item{random_times}{the permutation numbers for each weight to test whether
-it is significantly, default is 999.}
+it is significantly, default is 100.}
 }
 \description{
 Compute the Kullback–Leibler Divergence using 2D Kernel Density Estimation

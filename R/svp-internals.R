@@ -38,18 +38,20 @@
 ## This function is from CelliD, because it has many depends.
 ## to better developement, it was coped and modified diretcly.
 .runMCA.internal <- function(x, reduction.name = 'MCA', ncomponents, coords = NULL){
-  rlang::check_installed('irlba', '`runMCA()`')
+  rlang::check_installed(c('irlba', 'Matrix', 'matrixStats'), '`runMCA()`')
   if (inherits(x, 'dgTMatrix')){
      x <- as(x, "CsparseMatrix")
+  }else if (inherits(x, 'matrix')){
+     x <- Matrix::Matrix(x, sparse = TRUE)
   }
-  x <- x[rowVars(x) != 0, ]
+  #x <- x[matrixStats::rowVars(x) != 0, ]
   cells.nm <- colnames(x)
   features.nm <- rownames(x)
   if (ncol(x) < 4){
      cli::cli_abort(c('The length of variables is', ncol(x), ', which is too few to runMCA().'))
   }
   ncomponents <- min(ncol(x) - 2, ncomponents)
-  x <- as.matrix(x)
+  #x <- as.matrix(x)
   message("Computing Fuzzy Matrix")
   MCAPrepRes <- MCAStep1(x)
   message("Computing SVD")
@@ -254,14 +256,20 @@
 
   coords <- .normalize.coords(coords)
   
-  if (BPPARAM$workers == 1){
-      res <- CalSpatialKldCpp(coords, x, n, permutation)
-  }else{
+  lims <- c(range(coords[,1]), range(coords[,2]))
+  h <- c(ks::hpi(coords[,1]), ks::hpi(coords[,2]))
  
-      bgkld <- CalBgSpatialKld(coords, n)
+  if (BPPARAM$workers == 1 || nrow(x) < 50){
+      res <- CalSpatialKldCpp(coords, x, lims, h, n, permutation)
+  }else{
+
+      gx <- seq.int(lims[1], lims[2], length.out = n)
+      gy <- seq.int(lims[3], lims[4], length.out = n)
+ 
+      bgkld <- CalBgSpatialKld(coords, gx, gy, h)
 
       res <- bplapply(seq(nrow(x)), function(i){
-                CalSpatialKld(coords, x[i, ], bgkld, n, permutation) 
+                CalSpatialKld(coords, x[i, ], bgkld, gx, gy, h, permutation) 
              }, BPPARAM = BPPARAM)
 
       res <- do.call('rbind', res)
@@ -273,8 +281,8 @@
   kld.rank <- rep(NA, length(sp.kld))
   kld.rank[!is.na(sp.kld)] <- rank(sp.kld, na.last=NA)
   res <- cbind(res,
-               sp.kld.rank = max(kld.rank, na.rm=TRUE) - kld.rank + 1,
-               sp.kld.p.adj = p.adjust(res[,"sp.kld.pvalue"], method = p.adjust.method))
+	       sp.kld.p.adj = p.adjust(res[,"sp.kld.pvalue"], method = p.adjust.method),
+               sp.kld.rank = max(kld.rank, na.rm=TRUE) - kld.rank + 1)
   return(res)
 
 }

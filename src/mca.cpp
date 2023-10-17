@@ -4,8 +4,9 @@ using namespace RcppArmadillo;
 using namespace arma;
 //[[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::export]]
-List MCAStep1(NumericMatrix X) {
-    arma::mat AM = arma::mat(X.begin(), X.rows(), X.cols(), true);
+List MCAStep1(arma::sp_mat& X) {
+    ////arma::mat AM = arma::mat(X.begin(), X.rows(), X.cols(), true);
+    arma::mat AM = conv_to<arma::mat>::from(X);
     arma::colvec rmin = arma::min(AM,1);
     arma::colvec rmax = arma::max(AM,1);
     arma::colvec range = (rmax -rmin);

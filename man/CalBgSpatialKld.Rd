@@ -4,12 +4,17 @@
 \alias{CalBgSpatialKld}
 \title{Compute Background 2D Kernel Density}
 \usage{
-CalBgSpatialKld(coords, n = 25L)
+CalBgSpatialKld(coords, gx, gy, h)
 }
 \arguments{
 \item{coords}{coordinate matrix.}
 
-\item{n}{the Number of grid points in each direction, default is 25.}
+\item{gx}{Vector grid points in x direction, see(seq(lims\link{1}, lims\link{2}, length.out=300)).}
+
+\item{gy}{Vector grid points in y direction, see(seq(lims\link{3}, lims\link{4}, length.out=300)).}
+
+\item{h}{The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
+(see MASS::bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).}
 }
 \description{
 Compute Background 2D Kernel Density
