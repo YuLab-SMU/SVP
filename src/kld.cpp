@@ -35,34 +35,32 @@ double BandwidthNrdCpp(NumericVector x){
     return (v);
 }
 
-////arma::uvec findIntervalCpp(arma::vec x, arma::vec breaks) {
-////  uvec out(x.size());
-////
-////  vec::iterator it, pos;
-////  uvec::iterator out_it;
-////
-////  for(it = x.begin(), out_it = out.begin(); it != x.end();
-////      ++it, ++out_it) {
-////    pos = std::upper_bound(breaks.begin(), breaks.end(), *it);
-////    *out_it = std::distance(breaks.begin(), pos);
-////  }
-////  return (out - 1);
-////}
-////
-////NumericVector extractDensity(NumericMatrix x, NumericVector gx, NumericVector gy, arma::mat z){
-////  NumericVector coordx = x( _ , 0);
-////  NumericVector coordy = x( _ , 1);
-////  arma::vec oldx = as<arma::vec>(coordx);
-////  arma::vec oldy = as<arma::vec>(coordy);
-////  arma::vec gxv = as<arma::vec>(gx);
-////  arma::vec gyv = as<arma::vec>(gy);
-////  arma::uvec newx = findIntervalCpp(oldx, as<arma::vec>(gx));
-////  arma::uvec newy = findIntervalCpp(oldy, gyv);
-////  arma::mat sz = z.submat(newx, newy);
-////  arma::vec tmp = sz.diag();
-////  NumericVector res = as<NumericVector>(wrap(tmp));
-////  return (res);
-////}
+arma::uvec findIntervalCpp(arma::vec x, arma::vec breaks) {
+  uvec out(x.size());
+
+  vec::iterator it, pos;
+  uvec::iterator out_it;
+
+  for(it = x.begin(), out_it = out.begin(); it != x.end();
+      ++it, ++out_it) {
+    pos = std::upper_bound(breaks.begin(), breaks.end(), *it);
+    *out_it = std::distance(breaks.begin(), pos);
+  }
+  return (out - 1);
+}
+
+NumericVector extractDensity(NumericMatrix x, NumericVector gx, NumericVector gy, arma::mat z){
+  NumericVector coordx = x( _ , 0);
+  NumericVector coordy = x( _ , 1);
+  arma::vec oldx = as<arma::vec>(coordx);
+  arma::vec oldy = as<arma::vec>(coordy);
+  arma::uvec newx = findIntervalCpp(oldx, as<arma::vec>(gx));
+  arma::uvec newy = findIntervalCpp(oldy, as<arma::vec>(gy));
+  arma::mat sz = z.submat(newx, newy);
+  arma::vec tmp = sz.diag();
+  NumericVector res = as<NumericVector>(wrap(tmp));
+  return (res);
+}
 
 NumericVector Kde2dWeightedCpp(NumericMatrix x,
                    NumericVector w, 
@@ -73,21 +71,7 @@ NumericVector Kde2dWeightedCpp(NumericMatrix x,
     
     int nx = x.nrow();
     int n = gx.length();
-    //NumericVector l;
-    
-    //if (lims.isNotNull()){
-    //    l = lims;
-    //}else{
-    //    NumericVector t1 = range(x( _ , 0));
-    //    NumericVector t2 = range(x( _ , 1));
-    //    l = {t1[0], t1[1], t2[0], t2[1]};
-    //}
-
-    //double h1 = BandwidthNrdCpp(x( _ , 0)) / 4;
-    //double h2 = BandwidthNrdCpp(x( _ , 1)) / 4;
-    
-    //NumericVector gx = wrap(arma::linspace(l[0], l[1], n));
-    //NumericVector gy = wrap(arma::linspace(l[2], l[3], n));
+    w = w/sum(w) * w.length();
 
     NumericMatrix ax = outer(gx, x( _ , 0), std::minus<double>());
     NumericMatrix ay = outer(gy, x( _ , 1), std::minus<double>());    
@@ -98,7 +82,7 @@ NumericVector Kde2dWeightedCpp(NumericMatrix x,
     NumericVector v = rep_each(w, n);
     NumericVector dax = Rcpp::dnorm(as<NumericVector>(ax));
 
-    NumericVector day = Rcpp::dnorm(as<NumericVector>(ay));
+    NumericVector day = Rcpp::dnorm(as<NumericVector>(ay)) * v;
     day.attr("dim") = Dimension(n, nx);
     NumericMatrix daym = as<NumericMatrix>(day);
 
@@ -109,29 +93,42 @@ NumericVector Kde2dWeightedCpp(NumericMatrix x,
     
     NumericMatrix u = as<NumericMatrix>(v);
 
-    arma::mat z = (as<arma::mat>(u) * as<arma::mat>(daym))/(sum(w) * h[0] * h[1]);
+    arma::mat z = (as<arma::mat>(u) * as<arma::mat>(daym))/(sum(v) * h[0] * h[1]);
     
-    NumericMatrix tmp = as<NumericMatrix>(wrap(z));
-    NumericVector res = as<NumericVector>(tmp);
-    //NumericVector res = extractDensity(x, gx, gy, z);
+    //NumericMatrix tmp = as<NumericMatrix>(wrap(z));
+    //NumericVector res = as<NumericVector>(tmp);
+
+    NumericVector res = extractDensity(x, gx, gy, z);
     return (res);
 }
 
-double CalRandSpatialKld(
+//[[Rcpp::export]]
+NumericVector CalRandSpatialKld(
         NumericMatrix coords, 
         NumericVector w, 
 	NumericVector gx,
 	NumericVector gy,
 	NumericVector h,
-        NumericVector bg 
+        NumericVector bg,
+        int random_times = 200,
+	unsigned int seed = 1024
         ){
-    NumericVector s = sample(w, w.size());
-    NumericVector z = Kde2dWeightedCpp(coords, s, gx, gy, h);
-    double res = sum(z * log(z / bg));
-    return (res);
+    Rcpp::Environment base_env("package:base");
+    Rcpp::Function set_seed_r = base_env["set.seed"];
+    NumericVector bootkld(random_times);
+
+    set_seed_r(seed);
+
+    for (int j = 0; j < random_times; j++){
+        NumericVector s = sample(w, w.size());
+        NumericVector z = Kde2dWeightedCpp(coords, s, gx, gy, h);
+        bootkld[j] = log(sum(z * log(z / bg)));
+    }
+    return(bootkld);
 }
 
 NumericVector CalKldPvalue(NumericVector boot, double x){
+    boot = boot[is_finite(boot)];
     double bmean = mean(boot);
     double bsd = sd(boot);
     double pval = R::pnorm(x, bmean, bsd, 0, 0);
@@ -142,15 +139,15 @@ NumericVector CalKldPvalue(NumericVector boot, double x){
 
 //' Compute Background 2D Kernel Density
 //' @param coords coordinate matrix.
-//' @param gx Vector grid points in x direction, see(seq(lims[1], lims[2], length.out=300)).
-//' @param gy Vector grid points in y direction, see(seq(lims[3], lims[4], length.out=300)).
+//' @param gx Vector grid points in x direction, see(seq(lims[1], lims[2], length.out=200)).
+//' @param gy Vector grid points in y direction, see(seq(lims[3], lims[4], length.out=200)).
 //' @param h The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
 //' (see MASS::bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
 // [[Rcpp::export]]
 NumericVector CalBgSpatialKld(NumericMatrix coords, 
 	NumericVector gx, 
 	NumericVector gy, 
-	NumericVector h){
+        NumericVector h){
     double prop = 1.0 / coords.nrow();
     NumericVector bgw = rep(prop, coords.nrow());
     NumericVector bgm = Kde2dWeightedCpp(coords, bgw, gx, gy, h);
@@ -163,12 +160,13 @@ NumericVector CalBgSpatialKld(NumericMatrix coords,
 //' @param coords coordinate matrix.
 //' @param d the weight vector (the expression of gene or score of pathway).
 //' @param bgkld the kernel density of background (the result of CalBgSpatialKld).
-//' @param gx Vector grid points in x direction, see(seq(lims[1], lims[2], length.out=300)).
-//' @param gy Vector grid points in y direction, see(seq(lims[3], lims[4], length.out=300)).
+//' @param gx Vector grid points in x direction, see(seq(lims[1], lims[2], length.out=100)).
+//' @param gy Vector grid points in y direction, see(seq(lims[3], lims[4], length.out=100)).
 //' @param h The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
 //' (see bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
 //' @param random_times the permutation numbers for each weight to test whether 
-//' it is significantly, default is 100.
+//' it is significantly, default is 200.
+//' @param seed The random seed to use to evaluate, default 123.
 // [[Rcpp::export]]
 NumericVector CalSpatialKld(NumericMatrix coords, 
                             NumericVector d,
@@ -176,16 +174,17 @@ NumericVector CalSpatialKld(NumericMatrix coords,
 			    NumericVector gx,
 			    NumericVector gy,
 			    NumericVector h,
-                            int random_times = 100){
+                            int random_times = 200,
+			    unsigned int seed = 123
+			    ){
 
-    NumericVector k = Kde2dWeightedCpp(coords, d, gx, gy, h);
-    double kld = sum(k * log(k / bgkld));
-
-    NumericVector bootkld(random_times);
-
-    for (int j = 0; j < random_times; j++){
-        bootkld[j] = CalRandSpatialKld(coords, d, gx, gy, h, bgkld);
+    NumericVector z = Kde2dWeightedCpp(coords, d, gx, gy, h);
+    double kld = log(sum(z * log(z / bgkld)));
+    if (! std::isnormal(kld)){
+        kld = 0.0;
     }
+
+    NumericVector bootkld = CalRandSpatialKld(coords, d, gx, gy, h, bgkld, random_times, seed);
     
     NumericVector res = CalKldPvalue(bootkld, kld);
     return(res);
@@ -201,10 +200,13 @@ NumericVector CalSpatialKld(NumericMatrix coords,
 //' (see bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
 //' @param n the Number of grid points in each direction, default is 100.
 //' @param random_times the permutation numbers for each weight to test whether
-//' it is significantly, default is 100.
+//' it is significantly, default is 200.
+//' @param seed The random seed to use to evaluate, default 123.
 // [[Rcpp::export]]
-NumericMatrix CalSpatialKldCpp(NumericMatrix coords, NumericMatrix d, NumericVector l, Nullable<NumericVector> h, 
-	int n = 100, int random_times = 100){
+NumericMatrix CalSpatialKldCpp(NumericMatrix coords, arma::sp_mat d, NumericVector l, Nullable<NumericVector> h, 
+	int n = 100, int random_times = 200, unsigned int seed = 123){
+
+    NumericMatrix w = as<NumericMatrix>(wrap(d));
 
     NumericVector gx = wrap(arma::linspace(l[0], l[1], n));
     NumericVector gy = wrap(arma::linspace(l[2], l[3], n));
@@ -220,11 +222,11 @@ NumericMatrix CalSpatialKldCpp(NumericMatrix coords, NumericMatrix d, NumericVec
     
     NumericVector bgkld = CalBgSpatialKld(coords, gx, gy, H);
 
-    int num = d.nrow();
+    int num = w.nrow();
 
     NumericMatrix result(num, 4);
     for (int i = 0; i < num; i++){
-       result(i, _ ) = CalSpatialKld(coords, d( i, _ ), bgkld, gx, gy, H, random_times);
+       result(i, _ ) = CalSpatialKld(coords, w( i, _ ), bgkld, gx, gy, H, random_times, seed);
     }
 
     return (result);

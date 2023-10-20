@@ -72,17 +72,17 @@
   return(mca) 
 }
 
-.build.new.reduced <- function(rd.res, cells, features = NULL){
+.build.new.reduced <- function(rd.res, cells, features = NULL, rd.f.nm = 'genesCoordinates'){
   
   if (!is.null(features)){
-    rd.f.res <- attr(rd.res, 'genesCoordinates')
+    rd.f.res <- attr(rd.res, rd.f.nm)
     rd.f.res <- rd.f.res[features,,drop=FALSE]
   }else{
     rd.f.res <- NULL
   }
   
   rd.res <- rd.res[cells,,drop=FALSE]
-  attr(rd.res, "genesCoordinates") <- rd.f.res
+  attr(rd.res, rd.f.nm) <- rd.f.res
   return(rd.res)
 
 }
@@ -168,27 +168,42 @@
 }
 
 
-.generate.gset.seed <- function(g, gset.idx.list, min.sz = 1, max.sz = Inf, verbose = FALSE){
+.filter.gset.gene <- function(x, gset.idx.list, min.sz = 10, max.sz = Inf, 
+			      gene.occurrence.rate = .4){
+    
+    total.genes <- x
+    gset.gene.num <- lapply(gset.idx.list, function(i)length(unique(i))) |> unlist()
+    exp.gene.num  <- lapply(gset.idx.list, function(i) sum(unique(i) %in% total.genes)) |> unlist()
+    if (any(gset.gene.num <=1) && min.sz == 1){
+        cli::cli_warn(c("Some gene sets have size one.",
+                        "You've supplied 'min.sz = {min.sz},'
+                        consider setting 'min.sz > 1'."))
+    }    
+    
+    gene.num <- data.frame(
+                  exp.gene.num = exp.gene.num, 
+	          gset.gene.num = gset.gene.num, 
+	          gene.occurrence.rate = exp.gene.num/gset.gene.num
+                )
+    rownames(gene.num) <- names(gset.idx.list)
+    gene.num <- gene.num[gene.num$gset.gene.num >= min.sz & gene.num$gene.occurrence.rate >= gene.occurrence.rate,]
+
+    return(as.matrix(gene.num))
+
+}
+
+
+.generate.gset.seed <- function(g, 
+                                gset.idx.list
+				){
   
-  total.len <- lapply(gset.idx.list, length)
-
-  if (any(total.len <=1) && verbose){
-      cli::cli_warn(c("Some gene sets have size one.", 
-		      "You've supplied 'min.sz = {min.sz},'
-		      consider setting 'min.sz > 1'."))  
-  }
-  #if (verbose){
-  #     cli::cli_inform(c("The gene sets which length lower than {.cls {class(min.sz)}} {min.sz}
-  #                       and larger than {.cls {class(max.sz)}} {max.sz} are removed"))
-  #}
-  gset.idx.list <- gset.idx.list[total.len >= min.sz & total.len < max.sz]
-
   x <- matrix(0, 
-	      nrow = igraph::vcount(g), 
-	      ncol = length(gset.idx.list)
+  	      nrow = igraph::vcount(g), 
+  	      ncol = length(gset.idx.list)
        )
   nm <- igraph::vertex_attr(g, 'name')
   rownames(x) <- nm
+  
   if (is.null(names(gset.idx.list))){
      cli::cli_abort('The gene set list must have names.')
   }
@@ -200,28 +215,6 @@
   
   x <- Matrix::Matrix(x, sparse = TRUE)
   return(x)
-}
-
-.use.nngp <- function(x, coords, n = 10, order = 'AMMD', BPPARAM = SerialParam()){
-  rlang::check_installed('BRISC', "for identify svg using NNGP method.")
-  coords <- .normalize.coords(coords)
-  # calculate ordering of coordinates
-  brisc.order <- BRISC::BRISC_order(coords, order = order, verbose = FALSE)
-  # calculate nearest neighbors
-  brisc.nn <- BRISC::BRISC_neighbor(coords, n.neighbors = n, n_omp = 1, 
-			     search.type = "tree", 
-			     ordering = brisc.order, verbose = FALSE) 
-
-  brisc.out <- bplapply(seq(nrow(x)), function(i){
-    est.out <- BRISC::BRISC_estimation(coords, y = x[i, ], cov.model = "exponential", 
-				       ordering = brisc.order, 
-				       neighbor = brisc.nn, verbose = FALSE)
-    est.out <- c(est.out$Theta, loglik = out_i$log_likelihood)
-    return(est.out)
-  }, BPPARAM = BPPARAM)
-
-  brisc.out <- do.call('rbind', brisc.out)
-
 }
 
 .add.int.rowdata <- function(sce, getfun, setfun1, setfun2, namestr, val){
@@ -251,7 +244,8 @@
                           n = 100, 
                           permutation = 100, 
                           p.adjust.method="fdr",
-                          BPPARAM = SerialParam()
+                          BPPARAM = SerialParam(),
+			  random.seed = 123
 			  ){
 
   coords <- .normalize.coords(coords)
@@ -260,7 +254,7 @@
   h <- c(ks::hpi(coords[,1]), ks::hpi(coords[,2]))
  
   if (BPPARAM$workers == 1 || nrow(x) < 50){
-      res <- CalSpatialKldCpp(coords, x, lims, h, n, permutation)
+      res <- CalSpatialKldCpp(coords, x, lims, h, n, permutation, random.seed)
   }else{
 
       gx <- seq.int(lims[1], lims[2], length.out = n)
@@ -269,7 +263,7 @@
       bgkld <- CalBgSpatialKld(coords, gx, gy, h)
 
       res <- bplapply(seq(nrow(x)), function(i){
-                CalSpatialKld(coords, x[i, ], bgkld, gx, gy, h, permutation) 
+                CalSpatialKld(coords, x[i, ], bgkld, gx, gy, h, permutation, random.seed) 
              }, BPPARAM = BPPARAM)
 
       res <- do.call('rbind', res)
@@ -277,12 +271,16 @@
 
   rownames(res) <- rownames(x)
   colnames(res) <- c("sp.kld", "boot.sp.kld.mean", "boot.sp.kld.sd", "sp.kld.pvalue")
-  sp.kld <- res[,'sp.kld']
-  kld.rank <- rep(NA, length(sp.kld))
-  kld.rank[!is.na(sp.kld)] <- rank(sp.kld, na.last=NA)
+  sp.kld.pvalue <- res[,'sp.kld.pvalue']
+  kld.rank <- kld.pvalue.rank <- rep(NA, length(sp.kld.pvalue))
+  kld.pvalue.rank[!is.na(sp.kld.pvalue)] <- rank(sp.kld.pvalue, na.last=NA, ties.method='first')
+  kld.rank[!is.na(res[,'sp.kld'])] <- rank(res[,'sp.kld'], na.last = NA, ties.method = 'first')
   res <- cbind(res,
 	       sp.kld.p.adj = p.adjust(res[,"sp.kld.pvalue"], method = p.adjust.method),
-               sp.kld.rank = max(kld.rank, na.rm=TRUE) - kld.rank + 1)
+               sp.kld.pvalue.rank = kld.pvalue.rank,
+               sp.kld.rank = max(kld.rank, na.rm=TRUE) - kld.rank + 1
+            )
+
   return(res)
 
 }

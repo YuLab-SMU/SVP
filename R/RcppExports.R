@@ -10,10 +10,14 @@ ExtractFeatureScoreCpp <- function(x, rnm, cnm, g) {
     .Call('_SVP_ExtractFeatureScoreCpp', PACKAGE = 'SVP', x, rnm, cnm, g)
 }
 
+CalRandSpatialKld <- function(coords, w, gx, gy, h, bg, random_times = 200L, seed = 1024L) {
+    .Call('_SVP_CalRandSpatialKld', PACKAGE = 'SVP', coords, w, gx, gy, h, bg, random_times, seed)
+}
+
 #' Compute Background 2D Kernel Density
 #' @param coords coordinate matrix.
-#' @param gx Vector grid points in x direction, see(seq(lims[1], lims[2], length.out=300)).
-#' @param gy Vector grid points in y direction, see(seq(lims[3], lims[4], length.out=300)).
+#' @param gx Vector grid points in x direction, see(seq(lims[1], lims[2], length.out=200)).
+#' @param gy Vector grid points in y direction, see(seq(lims[3], lims[4], length.out=200)).
 #' @param h The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
 #' (see MASS::bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
 CalBgSpatialKld <- function(coords, gx, gy, h) {
@@ -25,14 +29,15 @@ CalBgSpatialKld <- function(coords, gx, gy, h) {
 #' @param coords coordinate matrix.
 #' @param d the weight vector (the expression of gene or score of pathway).
 #' @param bgkld the kernel density of background (the result of CalBgSpatialKld).
-#' @param gx Vector grid points in x direction, see(seq(lims[1], lims[2], length.out=300)).
-#' @param gy Vector grid points in y direction, see(seq(lims[3], lims[4], length.out=300)).
+#' @param gx Vector grid points in x direction, see(seq(lims[1], lims[2], length.out=100)).
+#' @param gy Vector grid points in y direction, see(seq(lims[3], lims[4], length.out=100)).
 #' @param h The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
 #' (see bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
 #' @param random_times the permutation numbers for each weight to test whether 
-#' it is significantly, default is 100.
-CalSpatialKld <- function(coords, d, bgkld, gx, gy, h, random_times = 100L) {
-    .Call('_SVP_CalSpatialKld', PACKAGE = 'SVP', coords, d, bgkld, gx, gy, h, random_times)
+#' it is significantly, default is 200.
+#' @param seed The random seed to use to evaluate, default 123.
+CalSpatialKld <- function(coords, d, bgkld, gx, gy, h, random_times = 200L, seed = 123L) {
+    .Call('_SVP_CalSpatialKld', PACKAGE = 'SVP', coords, d, bgkld, gx, gy, h, random_times, seed)
 }
 
 #' Compute the Kullback–Leibler Divergence using 2D Kernel Density Estimation 
@@ -42,11 +47,12 @@ CalSpatialKld <- function(coords, d, bgkld, gx, gy, h, random_times = 100L) {
 #' @param l The limits of the rectangle covered by the grid as c(xl, xu, yl, yu).
 #' @param h The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
 #' (see bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
-#' @param n the Number of grid points in each direction, default is 300.
+#' @param n the Number of grid points in each direction, default is 100.
 #' @param random_times the permutation numbers for each weight to test whether
-#' it is significantly, default is 100.
-CalSpatialKldCpp <- function(coords, d, l, h, n = 300L, random_times = 100L) {
-    .Call('_SVP_CalSpatialKldCpp', PACKAGE = 'SVP', coords, d, l, h, n, random_times)
+#' it is significantly, default is 200.
+#' @param seed The random seed to use to evaluate, default 123.
+CalSpatialKldCpp <- function(coords, d, l, h, n = 100L, random_times = 200L, seed = 123L) {
+    .Call('_SVP_CalSpatialKldCpp', PACKAGE = 'SVP', coords, d, l, h, n, random_times, seed)
 }
 
 MCAStep1 <- function(X) {
