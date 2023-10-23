@@ -1,40 +1,3 @@
-#' @importFrom BiocParallel bplapply MulticoreParam
-.cal_cor <- function(x, img, coords, beta = 2, 
-                     cor.method = 'pearson', 
-                     BPPARAM = NULL, threads = 5, p.adjust.method = 'fdr', 
-                     index.image = 1, k = 999, ...){
-    if (is.null(BPPARAM)) {
-        BPPARAM <- MulticoreParam(workers = threads)
-    }
-    if (nrow(img) == 0){
-        return(NULL)
-    }else{
-        if (is.numeric(index.image)){
-            index.image <- unique(img$image_id)[index.image]
-        }
-        img <- img[img$image_id == index.image,]
-        coords <- coords * img[['scaleFactor']]
-        img <- as.raster(img[['data']][[1]])
-    }
-    coords.dist <- as.matrix(dist(coords))
-    color.features <- extract_color(img, beta = beta, coords)
-    res <- bplapply(seq_len(nrow(x)), function(i){
-        xi <- x[i,]
-        tmp <- cor.test(as.numeric(xi), as.numeric(color.features), method = cor.method)
-        #tmp <- crossCorrelation(as.numeric(xi), as.numeric(color.features), w = coords.dist, k = k)
-        #res.i <- c(pvalue.cor.img = tmp$global.p, value.cor.img = as.numeric(tmp$I))
-	res.i <- c(pvalue.cor.img = tmp$p.value, value.cor.img = as.numeric(tmp$estimate))
-        return(res.i)
-        }, 
-        BPPARAM = BPPARAM
-    )
-    res <- do.call('rbind', res)
-    p.adj.cor.img <- p.adjust(res[,1], method = p.adjust.method)
-    res <- cbind(res, p.adj.cor.img)
-    rownames(res) <- rownames(x)
-    return(res)
-}
-
 ## This function is from CelliD, because it has many depends.
 ## to better developement, it was coped and modified diretcly.
 .runMCA.internal <- function(x, reduction.name = 'MCA', ncomponents, coords = NULL){
@@ -239,6 +202,9 @@
   return(res)
 }
 
+#' @importFrom rlang .data
+#' @importFrom stats p.adjust
+#' @importFrom BiocParallel bplapply
 .identify.svg <- function(x, 
                           coords, 
                           n = 100, 
@@ -253,7 +219,7 @@
   lims <- c(range(coords[,1]), range(coords[,2]))
   h <- c(ks::hpi(coords[,1]), ks::hpi(coords[,2]))
  
-  if (BPPARAM$workers == 1 || nrow(x) < 50){
+  if (BPPARAM$workers <= 2 || nrow(x) < 50){
       res <- CalSpatialKldCpp(coords, x, lims, h, n, permutation, random.seed)
   }else{
 
@@ -271,18 +237,12 @@
 
   rownames(res) <- rownames(x)
   colnames(res) <- c("sp.kld", "boot.sp.kld.mean", "boot.sp.kld.sd", "sp.kld.pvalue")
-  sp.kld.pvalue <- res[,'sp.kld.pvalue']
-  kld.rank <- kld.pvalue.rank <- rep(NA, length(sp.kld.pvalue))
-  kld.pvalue.rank[!is.na(sp.kld.pvalue)] <- rank(sp.kld.pvalue, na.last=NA, ties.method='first')
-  kld.rank[!is.na(res[,'sp.kld'])] <- rank(res[,'sp.kld'], na.last = NA, ties.method = 'first')
   res <- cbind(res,
-	       sp.kld.p.adj = p.adjust(res[,"sp.kld.pvalue"], method = p.adjust.method),
-               sp.kld.pvalue.rank = kld.pvalue.rank,
-               sp.kld.rank = max(kld.rank, na.rm=TRUE) - kld.rank + 1
-            )
-
+	       sp.kld.p.adj = p.adjust(res[,"sp.kld.pvalue"], method = p.adjust.method)
+            ) |> data.frame()
+  res <- res |> dplyr::arrange(.data$sp.kld.p.adj, dplyr::desc(.data$sp.kld)) |>
+         dplyr::mutate(sp.kld.rank = seq(nrow(res))) |> as.matrix()
   return(res)
-
 }
 
 .normalize.coords <- function(x){

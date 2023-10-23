@@ -16,8 +16,8 @@ CalRandSpatialKld <- function(coords, w, gx, gy, h, bg, random_times = 200L, see
 
 #' Compute Background 2D Kernel Density
 #' @param coords coordinate matrix.
-#' @param gx Vector grid points in x direction, see(seq(lims[1], lims[2], length.out=200)).
-#' @param gy Vector grid points in y direction, see(seq(lims[3], lims[4], length.out=200)).
+#' @param gx Vector grid points in x direction, see(\code{seq(lims[1], lims[2], length.out=200)}).
+#' @param gy Vector grid points in y direction, see(\code{seq(lims[3], lims[4], length.out=200)}).
 #' @param h The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
 #' (see MASS::bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
 CalBgSpatialKld <- function(coords, gx, gy, h) {
@@ -29,8 +29,8 @@ CalBgSpatialKld <- function(coords, gx, gy, h) {
 #' @param coords coordinate matrix.
 #' @param d the weight vector (the expression of gene or score of pathway).
 #' @param bgkld the kernel density of background (the result of CalBgSpatialKld).
-#' @param gx Vector grid points in x direction, see(seq(lims[1], lims[2], length.out=100)).
-#' @param gy Vector grid points in y direction, see(seq(lims[3], lims[4], length.out=100)).
+#' @param gx Vector grid points in x direction, see(\code{seq(lims[1], lims[2], length.out=100)}).
+#' @param gy Vector grid points in y direction, see(\code{seq(lims[3], lims[4], length.out=100)}).
 #' @param h The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
 #' (see bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
 #' @param random_times the permutation numbers for each weight to test whether 

@@ -1,3 +1,4 @@
+#' @importFrom methods as callNextMethod is new
 #' @importFrom S4Vectors coolcat
 .show_svpe <- function(object){
     callNextMethod()
@@ -6,5 +7,8 @@
     coolcat("gsvaExps names(%d) : %s\n", gsvaExpNames(object))
 }
 
+#' @rdname SVP-accessors
+#' @importFrom methods show
+#' @aliases show,SVPExperiment-method
 #' @export
 setMethod('show', 'SVPExperiment', .show_svpe)

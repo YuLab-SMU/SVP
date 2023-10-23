@@ -46,7 +46,7 @@ arma::uvec findIntervalCpp(arma::vec x, arma::vec breaks) {
     pos = std::upper_bound(breaks.begin(), breaks.end(), *it);
     *out_it = std::distance(breaks.begin(), pos);
   }
-  return (out);
+  return (out - 1);
 }
 
 NumericVector extractDensity(NumericMatrix x, NumericVector gx, NumericVector gy, arma::mat z){
@@ -139,8 +139,8 @@ NumericVector CalKldPvalue(NumericVector boot, double x){
 
 //' Compute Background 2D Kernel Density
 //' @param coords coordinate matrix.
-//' @param gx Vector grid points in x direction, see(seq(lims[1], lims[2], length.out=200)).
-//' @param gy Vector grid points in y direction, see(seq(lims[3], lims[4], length.out=200)).
+//' @param gx Vector grid points in x direction, see(\code{seq(lims[1], lims[2], length.out=200)}).
+//' @param gy Vector grid points in y direction, see(\code{seq(lims[3], lims[4], length.out=200)}).
 //' @param h The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
 //' (see MASS::bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
 // [[Rcpp::export]]
@@ -160,8 +160,8 @@ NumericVector CalBgSpatialKld(NumericMatrix coords,
 //' @param coords coordinate matrix.
 //' @param d the weight vector (the expression of gene or score of pathway).
 //' @param bgkld the kernel density of background (the result of CalBgSpatialKld).
-//' @param gx Vector grid points in x direction, see(seq(lims[1], lims[2], length.out=100)).
-//' @param gy Vector grid points in y direction, see(seq(lims[3], lims[4], length.out=100)).
+//' @param gx Vector grid points in x direction, see(\code{seq(lims[1], lims[2], length.out=100)}).
+//' @param gy Vector grid points in y direction, see(\code{seq(lims[3], lims[4], length.out=100)}).
 //' @param h The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
 //' (see bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
 //' @param random_times the permutation numbers for each weight to test whether 
@@ -205,8 +205,9 @@ NumericVector CalSpatialKld(NumericMatrix coords,
 // [[Rcpp::export]]
 NumericMatrix CalSpatialKldCpp(NumericMatrix coords, arma::sp_mat d, NumericVector l, Nullable<NumericVector> h, 
 	int n = 100, int random_times = 200, unsigned int seed = 123){
-
-    NumericMatrix w = as<NumericMatrix>(wrap(d));
+    
+    arma::mat dm = conv_to<arma::mat>::from(d);
+    NumericMatrix w = as<NumericMatrix>(wrap(dm));
 
     NumericVector gx = wrap(arma::linspace(l[0], l[1], n));
     NumericVector gy = wrap(arma::linspace(l[2], l[3], n));

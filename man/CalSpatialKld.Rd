@@ -14,9 +14,9 @@ CalSpatialKld(coords, d, bgkld, gx, gy, h, random_times = 200L, seed = 123L)
 
 \item{bgkld}{the kernel density of background (the result of CalBgSpatialKld).}
 
-\item{gx}{Vector grid points in x direction, see(seq(lims\link{1}, lims\link{2}, length.out=100)).}
+\item{gx}{Vector grid points in x direction, see(\code{seq(lims[1], lims[2], length.out=100)}).}
 
-\item{gy}{Vector grid points in y direction, see(seq(lims\link{3}, lims\link{4}, length.out=100)).}
+\item{gy}{Vector grid points in y direction, see(\code{seq(lims[3], lims[4], length.out=100)}).}
 
 \item{h}{The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
 (see bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).}

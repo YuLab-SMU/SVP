@@ -93,10 +93,10 @@ names(unamekeys) <- c(.gsva_key, .fscore_key, .sv_key)
 .clean_internal_names <- function(names, N, msg, unname.key){
     if (is.null(names) && N > 0){
         cli::cli_warn(paste0("'", msg, "' is NULL, replacing with '", .unnamed.gsva,"'."))
-        names <- paste0(.unname.key, seq_len(N))
+        names <- paste0(unname.key, seq_len(N))
     }else if (any(empty <- nchar(names) == 0)){
         cli::cli_warn(paste0("'", msg, "' contains empty strings, replacing with '", .unnamed.gsva,"'."))
-        names[empty] <- paste0(.unname.key, seq_along(sum(empty)))
+        names[empty] <- paste0(unname.key, seq_along(sum(empty)))
     }
     names
 }
@@ -148,6 +148,7 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
     setfun(x, internals)
 }    
 
+#' @importFrom S4Vectors metadata<- metadata mcols mcols<-
 .set_internal_all <- function(x, value, getfun, setfun, key, 
                               convertfun, xdimfun, vdimfun, 
                               funstr, xdimstr, vdimstr){
@@ -182,7 +183,9 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
     setfun(x, tmp)
 }
 
-.check_gsvaexp_columns <- function(main, alt, withDimnames, withColData, fun = "gsvaExp", vname = "value"){
+.check_gsvaexp_columns <- function(main, alt, withDimnames, withColData, 
+				   withSpatialCoords, withImgData, withReducedDim, 
+				   fun = "gsvaExp", vname = "value"){
     if (!is.null(alt)){
         if (withDimnames) {
             if (!identical(colnames(main), colnames(alt))) {
@@ -204,11 +207,22 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
                 colData(alt) <- alt.cd[, !keep, drop = FALSE]
             }
         }
+	if (!withSpatialCoords){
+            int_colData(alt)[['spatialCoords']] <- NULL
+	}
+	if (!withColData){
+            int_metadata(alt)[["imgData"]] <- NULL
+	}
+        if (!withReducedDim){
+            reducedDims(alt) <- NULL
+        }
     }
     alt
 }    
 
 #' @importFrom SpatialExperiment spatialCoords imgData imgData<- spatialCoords<-
+#' @importFrom SummarizedExperiment colData
+#' @importFrom SingleCellExperiment reducedDims reducedDims<-
 .fill_gsvaexps_info <- function(out, x, withDimnames, withColData, withSpatialCoords, withImgData, withReducedDim){
     if (withDimnames) {
         colnames(out) <- colnames(x)
@@ -244,10 +258,8 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
     return(svpe)
 }
 
-#.check_element_obj(x, key='spatialCoords', basefun=int_colData, namefun = names)
 
 .check_element_obj <- function(x, key, basefun, namefun){
-    #tmp <- .extract_element_object(x=x, basefun = basefun, namefun = namefun)
     tmp <- basefun(x)
     if (key %in% namefun(tmp)){
         tmp <- tmp[[key]]
@@ -266,25 +278,3 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
     }
 }
 
-#' @importFrom rlang check_installed
-.run_sv <- function(x, svgfun, ...){
-    params <- list(...)
-    params <- c(list(x), params)
-    if (missing(svgfun)){
-        check_installed('nnSVG', "for svp().", action=BiocManager::install)
-        svgfun <- nnSVG::nnSVG
-        if ('threads' %in% names(params)){
-            names(params)[names(params)=='threads'] <- 'n_threads'
-        }
-        names(params) <- gsub('sv.', '', names(params))
-        res <- do.call(svgfun, params)
-        return(res)
-    }
-}
-
-.tidy_res.sv <- function(x, y){
-    x <- S4Vectors::merge(x, y, by = 0, all = TRUE)
-    rownames(x) <- x$Row.names
-    x$Row.names <- NULL
-    return(x)
-}
