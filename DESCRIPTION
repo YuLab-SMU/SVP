@@ -13,8 +13,7 @@ Authors@R: c(
            email = "guangchuangyu@gmail.com", 
            role = c("aut", "ctb"), 
            comment = c(ORCID = "0000-0002-6485-8781")
-    )
-)
+    ))
 Description: SVP uses the KNN Graph and random walk with restrat based on the space of 
   MCA to calculate the activity of gene sets (such as kegg pathway, signatures, go term, 
   gene modules, ...) efficiently. Then to detect the spatially or single cell variable 
