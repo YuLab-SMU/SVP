@@ -1,23 +1,35 @@
 Package: SVP
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+Title: Efficient analysis of 'gene set' activity in spatial or single-cell data
+Version: 0.0.1
+Authors@R: c(
+    person(
+           "Shuangbin", "Xu", 
+           email = "xshuangbin@163.com", 
+           role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-3513-5362")
+    ),
+    person(
+           "Guangchuang", "Yu", 
+           email = "guangchuangyu@gmail.com", 
+           role = c("aut", "ctb"), 
+           comment = c(ORCID = "0000-0002-6485-8781")
+    )
+)
+Description: SVP uses the KNN Graph and random walk with restrat based on the space of 
+  MCA to calculate the activity of gene sets (such as kegg pathway, signatures, go term, 
+  gene modules, ...) efficiently. Then to detect the spatially or single cell variable 
+  gene sets or (other features) with avoiding the lost of low activity score of gene sets
+  or other features (such as the expression of genes), SVP uses the 2D Weighted Kernel 
+  Density Estimation to process the score of gene sets (or expression of genes) and uses
+  Kullback–Leibler divergence to identify the signal features.
 Imports:
   Rcpp,
   RcppParallel,
   methods,
   cli,
   dplyr,
-  tidyr,
-  tibble,
   rlang,
-  ggplot2,
   S4Vectors,
-  GSEABase,
-  GSVA,
   SummarizedExperiment,
   SingleCellExperiment,
   SpatialExperiment,
@@ -27,11 +39,15 @@ Imports:
   igraph,
   pracma
 Suggests:
-  broman
+  broman,
+  irlba,
+  ks,
+  Matrix
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
+SystemRequirements: GNU make
 LinkingTo: 
   Rcpp,
   RcppArmadillo,
