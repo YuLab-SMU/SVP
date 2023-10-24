@@ -13,17 +13,19 @@ html_preview: false
 library(badger)
 ```
 
+## :newspaper: Description
+
 ```{r, comment="", echo=FALSE, results='asis'}
 cat(packageDescription('SVP')$Description)
 ```
 
-# :writing_hand: Author
+## :writing_hand: Author
 
 [Shuangbin Xu](https://github.com/xiangpin) and [Guangchuang Yu](https://guangchuangyu.github.io)
 
 School of Basic Medical Sciences, Southern Medical University
 
-# :arrow_double_down: Installation
+## :arrow_double_down: Installation
 
 The development version from `github`:
 
@@ -33,7 +35,7 @@ if (!requireNamespace("remotes", quietly=TRUE))
 remotes::install_github("xiangpin/SVP")
 ```
 
-# :sparkling_heart: Contributing
+## :sparkling_heart: Contributing
 
 We welcome any contributions! By participating in this project you agree to abide
 by the terms outlined in the [Contributor Code of Conduct](CONDUCT.md).
