@@ -12,17 +12,22 @@
 #' dimensionality reduction. This can be a character vector of row names, 
 #' an integer vector of row indices or a logical vector, default is NULL, meaning
 #' all features to be used for dimensionality reduction.
+#' @param subset.col Vector specifying the subset of cells to be used for
+#' dimensionality reduction. This can be a character vector of column names,
+#' an integer vector of column indices or a logical vector, default is NULL, meaning
+#' all cells to be used for dimensionality reduction.
 #' @param consider.spcoord whether consider the spatial coords to run MCA with 
 #' the features of data, default is TRUE.
 #' @param ... additional parameters, meaningless now.
 #' @export
 setGeneric('runMCA', function(data, 
-			      assay.type = 'logcounts', 
-			      reduction.name = "MCA", 
-			      ncomponents = 30, 
-			      subset.row = NULL, 
-			      consider.spcoord = TRUE,
-			      ...)
+                              assay.type = 'logcounts', 
+                              reduction.name = "MCA", 
+                              ncomponents = 30, 
+                              subset.row = NULL, 
+                              subset.col = NULL,
+                              consider.spcoord = TRUE,
+                              ...)
   standardGeneric('runMCA')
 )
 
@@ -33,12 +38,13 @@ setGeneric('runMCA', function(data,
 #' @export runMCA
 setMethod('runMCA', 'SingleCellExperiment', 
 	  function(data, 
-		   assay.type = 'logcounts', 
-		   reduction.name = 'MCA', 
-		   ncomponents = 50, 
-		   subset.row = NULL, 
-		   consider.spcoord = TRUE,
-		   ...){
+                   assay.type = 'logcounts', 
+                   reduction.name = 'MCA', 
+                   ncomponents = 50, 
+                   subset.row = NULL,
+                   subset.col = NULL, 
+                   consider.spcoord = TRUE,
+                   ...){
   if (!assay.type %in% assayNames(data)){
       cli::cli_abort("the {.var assay.type} = {assay.type} is not present in the assays of {.cls {class(data)}}.")
   }
@@ -47,6 +53,10 @@ setMethod('runMCA', 'SingleCellExperiment',
       data <- data[subset.row,]
   }
   
+  if (!is.null(subset.col)){
+      data <- data[,subset.col]
+  }
+
   x <- assay(data, assay.type)
 
   flag.coords <- .check_element_obj(data, key = 'spatialCoords', basefun = int_colData, namefun = names)

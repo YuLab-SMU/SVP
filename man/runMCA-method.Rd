@@ -12,6 +12,7 @@ runMCA(
   reduction.name = "MCA",
   ncomponents = 30,
   subset.row = NULL,
+  subset.col = NULL,
   consider.spcoord = TRUE,
   ...
 )
@@ -22,6 +23,7 @@ runMCA(
   reduction.name = "MCA",
   ncomponents = 50,
   subset.row = NULL,
+  subset.col = NULL,
   consider.spcoord = TRUE,
   ...
 )
@@ -40,6 +42,11 @@ default is \code{logcounts}.}
 dimensionality reduction. This can be a character vector of row names,
 an integer vector of row indices or a logical vector, default is NULL, meaning
 all features to be used for dimensionality reduction.}
+
+\item{subset.col}{Vector specifying the subset of cells to be used for
+dimensionality reduction. This can be a character vector of column names,
+an integer vector of column indices or a logical vector, default is NULL, meaning
+all cells to be used for dimensionality reduction.}
 
 \item{consider.spcoord}{whether consider the spatial coords to run MCA with
 the features of data, default is TRUE.}
