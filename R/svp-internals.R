@@ -214,26 +214,29 @@
 			  random.seed = 123
 			  ){
 
+  rlang::check_installed("withr", "is required to reproducible in the identification of SVG or SVP.")
+
   coords <- .normalize.coords(coords)
   
   lims <- c(range(coords[,1]), range(coords[,2]))
   h <- c(ks::hpi(coords[,1]), ks::hpi(coords[,2]))
  
-  if (BPPARAM$workers <= 2 || nrow(x) < 50){
-      res <- CalSpatialKldCpp(coords, x, lims, h, n, permutation, random.seed)
-  }else{
+  gx <- seq.int(lims[1], lims[2], length.out = n)
+  gy <- seq.int(lims[3], lims[4], length.out = n)
 
-      gx <- seq.int(lims[1], lims[2], length.out = n)
-      gy <- seq.int(lims[3], lims[4], length.out = n)
+  indx <- findIntervalCpp(coords[, 1], gx)
+  indy <- findIntervalCpp(coords[, 2], gy)
+
+  axm <- outergrid(gx, coords[, 1]) 
+  aym <- outergrid(gy, coords[, 2])
  
-      bgkld <- CalBgSpatialKld(coords, gx, gy, h)
+  bgkld <- CalBgSpatialKld(coords, axm, aym, h, indx, indy)
 
-      res <- bplapply(seq(nrow(x)), function(i){
-                CalSpatialKld(coords, x[i, ], bgkld, gx, gy, h, permutation, random.seed) 
-             }, BPPARAM = BPPARAM)
+  res <- bplapply(seq(nrow(x)), function(i){
+            withr::with_seed(random.seed, CalSpatialKld(x[i, ], bgkld, axm, aym, h, indx, indy, permutation, random.seed))
+         }, BPPARAM = BPPARAM)
 
-      res <- do.call('rbind', res)
-  }
+  res <- do.call('rbind', res)
 
   rownames(res) <- rownames(x)
   colnames(res) <- c("sp.kld", "boot.sp.kld.mean", "boot.sp.kld.sd", "sp.kld.pvalue")

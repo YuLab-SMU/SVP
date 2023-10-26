@@ -41,7 +41,8 @@ Suggests:
   broman,
   irlba,
   ks,
-  Matrix
+  Matrix,
+  withr
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

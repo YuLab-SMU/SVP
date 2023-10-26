@@ -10,49 +10,68 @@ ExtractFeatureScoreCpp <- function(x, rnm, cnm, g) {
     .Call('_SVP_ExtractFeatureScoreCpp', PACKAGE = 'SVP', x, rnm, cnm, g)
 }
 
-CalRandSpatialKld <- function(coords, w, gx, gy, h, bg, random_times = 200L, seed = 1024L) {
-    .Call('_SVP_CalRandSpatialKld', PACKAGE = 'SVP', coords, w, gx, gy, h, bg, random_times, seed)
+#' Find Interval Numbers or Indices in C++
+#' @param x numeric vector (orignial).
+#' @param breaks numeric vector (new).
+findIntervalCpp <- function(x, breaks) {
+    .Call('_SVP_findIntervalCpp', PACKAGE = 'SVP', x, breaks)
+}
+
+Kde2dWeightedCpp <- function(w, ax, ay, h, indx, indy) {
+    .Call('_SVP_Kde2dWeightedCpp', PACKAGE = 'SVP', w, ax, ay, h, indx, indy)
+}
+
+#' Obtaion the difference between the grid points and original points
+#' @param grid the grid points in one direction
+#' @param x the original points in one direction
+outergrid <- function(grid, x) {
+    .Call('_SVP_outergrid', PACKAGE = 'SVP', grid, x)
+}
+
+#' Compute the Kullback–Leibler Divergence by permutating a weight vector.
+#' @param w the weight vector (the expression of gene or score of pathway).
+#' @param bg the kernel density of background (the result of CalBgSpatialKld).
+#' @param axm matrix the difference between the original point and grid points in x direction.
+#' @param aym matrix the difference between the original point and grid points in y direction.
+#' @param h The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
+#' (see bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
+#' @param indx the index of original point by mapping to the grid points in x direction.
+#' @param indy the index of original point by mapping to the grid points in y direction.
+#' @param random_times the permutation numbers for each weight to test whether
+#' it is significantly, default is 200.
+#' @param seed The random seed to use to evaluate, default 123.
+#' @return a vector of Kullback–Leibler Divergence with permutation.
+CalRandSpatialKld <- function(w, bg, axm, aym, h, indx, indy, random_times = 100L, seed = 1024.0) {
+    .Call('_SVP_CalRandSpatialKld', PACKAGE = 'SVP', w, bg, axm, aym, h, indx, indy, random_times, seed)
 }
 
 #' Compute Background 2D Kernel Density
 #' @param coords coordinate matrix.
-#' @param gx Vector grid points in x direction, see(\code{seq(lims[1], lims[2], length.out=200)}).
-#' @param gy Vector grid points in y direction, see(\code{seq(lims[3], lims[4], length.out=200)}).
+#' @param axm matrix the difference between the original point and grid points in x direction.
+#' @param aym matrix the difference between the original point and grid points in y direction.
 #' @param h The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
+#' @param indx the index of original point by mapping to the grid points in x direction.
+#' @param indy the index of original point by mapping to the grid points in y direction.
 #' (see MASS::bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
-CalBgSpatialKld <- function(coords, gx, gy, h) {
-    .Call('_SVP_CalBgSpatialKld', PACKAGE = 'SVP', coords, gx, gy, h)
+CalBgSpatialKld <- function(coords, axm, aym, h, indx, indy) {
+    .Call('_SVP_CalBgSpatialKld', PACKAGE = 'SVP', coords, axm, aym, h, indx, indy)
 }
 
 #' Compute the Kullback–Leibler Divergence using 2D Kernel Density Estimation 
 #' With Weighted and Statistical Test With Permutation for single weight vector.
-#' @param coords coordinate matrix.
 #' @param d the weight vector (the expression of gene or score of pathway).
 #' @param bgkld the kernel density of background (the result of CalBgSpatialKld).
-#' @param gx Vector grid points in x direction, see(\code{seq(lims[1], lims[2], length.out=100)}).
-#' @param gy Vector grid points in y direction, see(\code{seq(lims[3], lims[4], length.out=100)}).
+#' @param axm matrix the difference between the original point and grid points in x direction. 
+#' @param aym matrix the difference between the original point and grid points in y direction.
 #' @param h The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
 #' (see bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
+#' @param indx the index of original point by mapping to the grid points in x direction.
+#' @param indy the index of original point by mapping to the grid points in y direction.
 #' @param random_times the permutation numbers for each weight to test whether 
 #' it is significantly, default is 200.
 #' @param seed The random seed to use to evaluate, default 123.
-CalSpatialKld <- function(coords, d, bgkld, gx, gy, h, random_times = 200L, seed = 123L) {
-    .Call('_SVP_CalSpatialKld', PACKAGE = 'SVP', coords, d, bgkld, gx, gy, h, random_times, seed)
-}
-
-#' Compute the Kullback–Leibler Divergence using 2D Kernel Density Estimation 
-#' With Weighted And Statistical Test With Permutation.
-#' @param coords coordinate matrix.
-#' @param d matrix (the expression of gene or score of pathway).
-#' @param l The limits of the rectangle covered by the grid as c(xl, xu, yl, yu).
-#' @param h The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
-#' (see bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
-#' @param n the Number of grid points in each direction, default is 100.
-#' @param random_times the permutation numbers for each weight to test whether
-#' it is significantly, default is 200.
-#' @param seed The random seed to use to evaluate, default 123.
-CalSpatialKldCpp <- function(coords, d, l, h, n = 100L, random_times = 200L, seed = 123L) {
-    .Call('_SVP_CalSpatialKldCpp', PACKAGE = 'SVP', coords, d, l, h, n, random_times, seed)
+CalSpatialKld <- function(d, bgkld, axm, aym, h, indx, indy, random_times = 100L, seed = 1024.0) {
+    .Call('_SVP_CalSpatialKld', PACKAGE = 'SVP', d, bgkld, axm, aym, h, indx, indy, random_times, seed)
 }
 
 MCAStep1 <- function(X) {
