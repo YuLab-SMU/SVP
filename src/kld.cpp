@@ -1,5 +1,6 @@
 #include <RcppArmadillo.h>
-
+#include <RcppParallel.h>
+using namespace RcppParallel;
 using namespace arma;
 using namespace Rcpp;
 
@@ -77,6 +78,29 @@ arma::vec Kde2dWeightedCpp(
     return (res);
 }
 
+struct RunWkde : public Worker{
+  const arma::mat& w;
+  const arma::mat& ax;
+  const arma::mat& ay;
+  const arma::vec& H;
+  const arma::uvec& indx;
+  const arma::uvec& indy;
+
+  arma::mat& result;
+
+  RunWkde(const arma::mat& w, const arma::mat& ax, const arma::mat& ay, 
+	  const arma::vec& H, const arma::uvec& indx, const arma::uvec& indy, 
+	  mat& result): 
+      w(w), ax(ax), ay(ay), H(H), indx(indx), indy(indy), result(result) { }
+
+  void operator()(std::size_t begin, std::size_t end){
+    for (uword i = begin; i < end; i++){
+        result.col(i) = Kde2dWeightedCpp(w.row(i), ax, ay, H, indx, indy);
+    }
+  }
+};
+
+
 //' Obtaion the difference between the grid points and original points
 //' @param grid the grid points in one direction
 //' @param x the original points in one direction
@@ -136,6 +160,7 @@ arma::rowvec CalKldPvalue(arma::vec boot, double x){
 
     return (res);
 }
+
 
 //' Compute Background 2D Kernel Density
 //' @param coords coordinate matrix.
@@ -197,6 +222,50 @@ arma::rowvec CalSpatialKld(
     arma::rowvec res = CalKldPvalue(bootkld, kld);
 
     return(res);
+}
+
+//' Two-Dimensional Weighted Kernel Density Estimation And Mapping the Result To Original Dimension
+//' @param x The 2-D coordinate matrix
+//' @param w The weighted sparse matrix, the number columns the same than the number rows than x.
+//' @param l The limits of the rectangle covered by the grid as c(xl, xu, yl, yu)
+//' @param h The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
+//' (see bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
+//' @param adjust numeric value to adjust to bandwidth, default is 1.
+//' @param n number of grid points in the two directions, default is 400.
+// [[Rcpp::export]]
+arma::sp_mat CalWkdeParallel(arma::mat& x, arma::sp_mat& w, arma::vec& l, Nullable<NumericVector> h,
+        double adjust = 1.0, int n = 400) {
+
+  arma::mat wv = conv_to<arma::mat>::from(w);
+
+  arma::mat result(x.n_rows, w.n_rows);
+
+  arma::vec gx = arma::linspace(l[0], l[1], n);
+  arma::vec gy = arma::linspace(l[2], l[3], n);
+
+  arma::vec H(x.n_cols);
+  if (h.isNull()){
+    for (uword j=0; j < x.n_cols;j ++){
+       H[j] = BandwidthNrdCpp(x.col(j)) / 4 * adjust;
+    }
+  }else{
+    H = as<arma::vec>(h);
+  }
+
+  //mapping to original coords
+  arma::uvec indx = findIntervalCpp(x.col(0), gx);
+  arma::uvec indy = findIntervalCpp(x.col(1), gy);
+
+  arma::mat ax = outergrid(gx, x.col(0));
+  arma::mat ay = outergrid(gy, x.col(1));
+
+  uword num = wv.n_rows;
+  RunWkde runWkde(wv, ax, ay, H, indx, indy, result);
+  parallelFor(0, num, runWkde);
+
+  arma::sp_mat res = conv_to<arma::sp_mat>::from(result.t());
+
+  return (res);
 }
 
 

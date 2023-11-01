@@ -30,6 +30,7 @@ setReplaceMethod("[", "SCEByColumn", function(x, i, j, ..., value) {
 
 setMethod("c", "SCEByColumn", function(x, ...) {
     gathered <- lapply(list(x, ...), .get_sce)
+    print (gathered)
     initialize(x, sce=do.call(cbind, gathered))
 })
 
@@ -207,12 +208,13 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
                 colData(alt) <- alt.cd[, !keep, drop = FALSE]
             }
         }
-	if (!withSpatialCoords){
-            int_colData(alt)[['spatialCoords']] <- NULL
-	}
-	if (!withColData){
-            int_metadata(alt)[["imgData"]] <- NULL
-	}
+        flag1 <- .check_element_obj(alt, key = 'spatialCoords', basefun = int_colData, namefun = names)
+        flag2 <- .check_element_obj(alt, key = 'imgData', basefun = int_metadata, namefun = names)
+        if (!withSpatialCoords && flag1 || (!withImgData && flag2)){
+            alt <- as(alt, "SingleCellExperiment")
+            int_colData(alt)[["spatialCoords"]] <- NULL
+            int_metadata(alt)[['imgData']] <- NULL
+        }
         if (!withReducedDim){
             reducedDims(alt) <- NULL
         }

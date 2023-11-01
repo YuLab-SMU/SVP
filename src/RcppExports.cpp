@@ -119,6 +119,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// CalWkdeParallel
+arma::sp_mat CalWkdeParallel(arma::mat& x, arma::sp_mat& w, arma::vec& l, Nullable<NumericVector> h, double adjust, int n);
+RcppExport SEXP _SVP_CalWkdeParallel(SEXP xSEXP, SEXP wSEXP, SEXP lSEXP, SEXP hSEXP, SEXP adjustSEXP, SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type w(wSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type l(lSEXP);
+    Rcpp::traits::input_parameter< Nullable<NumericVector> >::type h(hSEXP);
+    Rcpp::traits::input_parameter< double >::type adjust(adjustSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    rcpp_result_gen = Rcpp::wrap(CalWkdeParallel(x, w, l, h, adjust, n));
+    return rcpp_result_gen;
+END_RCPP
+}
 // MCAStep1
 List MCAStep1(arma::sp_mat& X);
 RcppExport SEXP _SVP_MCAStep1(SEXP XSEXP) {
@@ -167,6 +183,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_SVP_CalRandSpatialKld", (DL_FUNC) &_SVP_CalRandSpatialKld, 9},
     {"_SVP_CalBgSpatialKld", (DL_FUNC) &_SVP_CalBgSpatialKld, 6},
     {"_SVP_CalSpatialKld", (DL_FUNC) &_SVP_CalSpatialKld, 9},
+    {"_SVP_CalWkdeParallel", (DL_FUNC) &_SVP_CalWkdeParallel, 6},
     {"_SVP_MCAStep1", (DL_FUNC) &_SVP_MCAStep1, 1},
     {"_SVP_MCAStep2", (DL_FUNC) &_SVP_MCAStep2, 3},
     {"_SVP_parallelCalRWR", (DL_FUNC) &_SVP_parallelCalRWR, 5},

@@ -15,10 +15,8 @@ kldSVG(
   sv.used.reduction = c("UMAP", "TSNE"),
   sv.grid.n = 100,
   sv.permutation = 100,
-  sv.p.adjust.method = "fdr",
+  sv.p.adjust.method = "bonferroni",
   sv.BPPARAM = SerialParam(),
-  cells = NULL,
-  features = NULL,
   verbose = TRUE,
   random.seed = 1024,
   gsvaexp = NULL,
@@ -32,10 +30,8 @@ kldSVG(
   sv.used.reduction = c("UMAP", "TSNE"),
   sv.grid.n = 100,
   sv.permutation = 100,
-  sv.p.adjust.method = "fdr",
+  sv.p.adjust.method = "bonferroni",
   sv.BPPARAM = SerialParam(),
-  cells = NULL,
-  features = NULL,
   verbose = TRUE,
   random.seed = 1024,
   gsvaexp = NULL,
@@ -49,10 +45,8 @@ kldSVG(
   sv.used.reduction = c("UMAP", "TSNE"),
   sv.grid.n = 100,
   sv.permutation = 100,
-  sv.p.adjust.method = "fdr",
+  sv.p.adjust.method = "bonferroni",
   sv.BPPARAM = SerialParam(),
-  cells = NULL,
-  features = NULL,
   verbose = TRUE,
   random.seed = 1024,
   gsvaexp = NULL,
@@ -76,20 +70,12 @@ density, default is 100.}
 \item{sv.permutation}{numeric the number of permutation for each single feature to detect the
 signicantly spatially or single cell variable features, default is 100.}
 
-\item{sv.p.adjust.method}{character the method to adjust the pvalue of the result, default is \code{fdr}.}
+\item{sv.p.adjust.method}{character the method to adjust the pvalue of the result, default is \code{bonferroni}.}
 
 \item{sv.BPPARAM}{A BiocParallelParam object specifying whether the identification of SV features should be parallelized
 default is \code{SerialParam()}, meaning no parallel. You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=T)}
 to parallel it, the \code{workers} of \code{MulticoreParam} is the number of cores used, see also
 \code{\link[BiocParallel]{MulticoreParam}}. default is \code{SerialParam()}.}
-
-\item{cells}{Vector specifying the subset of cells to be used for the calculation of the activaty score or identification
-of SV features. This can be a character vector of cell names, an integer vector of column indices or a logical vector,
-default is NULL, meaning all cells to be used for the calculation of the activaty score or identification of SV features.}
-
-\item{features}{Vector specifying the subset of features to be used for the calculation of the activaty score or identification
-of SV features. This can be a character vector of features names, an integer vector of row indices or a logical vector,
-default is NULL, meaning all features to be used for the calculation of the activaty score or identification of SV features.}
 
 \item{verbose}{logical whether print the intermediate message when running the program, default is TRUE.}
 
