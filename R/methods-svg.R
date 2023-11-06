@@ -59,18 +59,11 @@ setMethod('kldSVG', 'SingleCellExperiment',
     gsvaexp.assay.type = NULL,
     ...
   ){
-  if (!assay.type %in% assayNames(data)){
-      cli::cli_abort("the {.var assay.type} = {assay.type} is not present in the assays of {.cls {class(data)}}.")
+  if (is.null(assay.type)){
+    assay.type <- assayNames(data)[1]
   }
 
   x <- assay(data, assay.type)
-
-  flag <- .check_element_obj(data, key = 'gsvaExps', basefun=int_colData, namefun = names)
-  if (!is.null(gsvaexp) && flag){
-    data <- gsvaExp(data, gsvaexp, withSpatialCoords = TRUE, withReducedDim = TRUE)
-    if (is.null(gsvaexp.assay.type)){gsvaexp.assay.type <- 1}
-    x <- assay(data, gsvaexp.assay.type)
-  }
 
   flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
 
@@ -133,15 +126,25 @@ setMethod('kldSVG', 'SVPExperiment',
     gsvaexp.assay.type = NULL,
     ...){
     
-    x <- callNextMethod()
-    
     if (!is.null(gsvaexp)){
        if (verbose){
           cli::cli_inform("The {.var gsvaexp} was specified, the specified {.var gsvaExp} will be used to detect 'svg'.")
        }	
-       gsvaExp(data, gsvaexp, withSpatialCoords = FALSE, withReducedDim = FALSE) <- x
-       return(data)
+       da2 <- gsvaExp(data, gsvaexp, withSpatialCoords = TRUE, withReducedDim = TRUE)
+       da2 <- kldSVG(da2, 
+                     gsvaexp.assay.type, 
+                     sv.used.reduction, 
+                     sv.grid.n, 
+                     sv.permutation, 
+                     sv.p.adjust.method, 
+                     sv.BPPARAM, 
+                     verbose, 
+                     random.seed, 
+                     ...)
+       gsvaExp(data, gsvaexp, withSpatialCoords = FALSE, withReducedDim = FALSE) <- da2
+    }else{
+       data <- callNextMethod()
     }
-    return(x)  
+    return(data)  
   }
 )

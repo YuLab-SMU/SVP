@@ -36,13 +36,14 @@ Imports:
   BiocParallel,
   BiocNeighbors,
   igraph,
-  pracma
+  pracma,
+  stats,
+  withr
 Suggests:
   broman,
   irlba,
   ks,
-  Matrix,
-  withr
+  Matrix
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
