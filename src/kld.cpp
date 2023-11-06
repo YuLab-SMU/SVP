@@ -147,6 +147,7 @@ arma::vec CalRandSpatialKld(
     for (int j = 0; j < random_times; j++){
         arma::rowvec s = shuffle(w);
         arma::vec z = Kde2dWeightedCpp(s, axm, aym, h, indx, indy);
+        z = z + 1e-300;
         bootkld[j] = log(sum(z % log(z / bg)));
     }
     return(bootkld);
@@ -213,6 +214,7 @@ arma::rowvec CalSpatialKld(
                       ){
 
     arma::vec z = Kde2dWeightedCpp(d, axm, aym, h, indx, indy);
+    z = z + 1e-300;
     double kld = log(sum(z % log(z / bgkld)));
 
     arma::vec bootkld(random_times);

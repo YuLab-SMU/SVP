@@ -127,7 +127,7 @@ setMethod('sc.rwr',
   rd.knn.gh <- .build.knn.graph(
                   rd.res, 
                   knn.k.use = knn.k.use, 
-                  fun.nm = "findKmknn",
+                  fun.nm = findKmknn,
                   BPPARAM = knn.BPPARAM,
                   weighted.distance = knn.graph.weighted,
                   graph.directed = knn.graph.directed,

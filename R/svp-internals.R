@@ -54,7 +54,7 @@
 #' @importFrom BiocParallel SerialParam
 .build.knn.graph <- function(x, 
                        knn.k.use = 350, 
-                       fun.nm = "findKmknn", 
+                       fun.nm = findKmknn, 
                        BPPARAM = SerialParam(), 
                        weighted.distance = TRUE,
                        graph.directed = FALSE,

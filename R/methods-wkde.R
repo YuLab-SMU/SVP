@@ -49,23 +49,16 @@ setMethod('wkde', 'SingleCellExperiment',
     gsvaexp.assay.type = NULL,
     ...
   ){
+
+  if (is.null(assay.type)){
+      assay.type <- assayNames(data)[1]
+  }
+ 
   if (is.numeric(assay.type)){
       assay.type <- assayNames(data)[assay.type]
-  }      
-  if (!assay.type %in% assayNames(data)){
-      cli::cli_abort("the {.var assay.type} = {assay.type} is not present in the assays of {.cls {class(data)}}.")
-  }
+  } 
 
   x <- assay(data, assay.type)
-
-  flag <- .check_element_obj(data, key = 'gsvaExps', basefun=int_colData, namefun = names)
-  if (!is.null(gsvaexp) && flag){
-    data <- gsvaExp(data, gsvaexp, withSpatialCoords = TRUE, withImgData = FALSE, withReducedDim = TRUE)
-    if (is.numeric(gsvaexp.assay.type)){gsvaexp.assay.type <- assayNames(data)[gsvaexp.assay.type]}
-    if (is.null(gsvaexp.assay.type)){gsvaexp.assay.type <- assayNames(data)[1]}
-    x <- assay(data, gsvaexp.assay.type)
-    assay.type <- gsvaexp.assay.type
-  }
 
   flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
 
@@ -110,15 +103,22 @@ setMethod('wkde', 'SVPExperiment',
     gsvaexp.assay.type = NULL,
     ...){
 
-    x <- callNextMethod()
-    #if (!is.null(gsvaexp)){
-    #   if (verbose){
-    #      cli::cli_inform("The {.var gsvaexp} was specified, the specified {.var gsvaExp} will be used to calculate density.")
-    #   }
-    #   gsvaExp(data, gsvaexp) <- x
-    #   return(data)
-    #}
-    return(x)
+    if (!is.null(gsvaexp)){
+       if (verbose){
+          cli::cli_inform("The {.var gsvaexp} was specified, the specified {.var gsvaExp} will be used to calculate density.")
+       }
+       da2 <- gsvaExp(data, gsvaexp, withSpatialCoords=TRUE, withReducedDim=TRUE)
+       da2 <- wkde(da2, 
+                   assay.type = gsvaexp.assay.type, 
+                   reduction = reduction, 
+                   grid.n = grid.n, 
+                   adjust = adjust, 
+                   bandwidths = bandwidths)
+       gsvaExp(data, gsvaexp) <- da2
+    }else{
+       data <- callNextMethod()
+    }
+    return(data)
 })
 
 .internal_wkde <- function(x, coords, bandwidths = NULL, adjust = 1, grid.n = 100){

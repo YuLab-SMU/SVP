@@ -1,3 +1,5 @@
+//// This was from the CelliD package,
+//// modified to support sparse matrix as input.
 #include <RcppArmadillo.h>
 using namespace Rcpp;
 using namespace RcppArmadillo;
