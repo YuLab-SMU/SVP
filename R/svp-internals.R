@@ -31,12 +31,13 @@
   colnames(MCA$featuresCoordinates) <- component
   rownames(MCA$featuresCoordinates) <- features.nm
   attr(mca, 'genesCoordinates') <- MCA$featuresCoordinates
+  attr(mca, 'mcaFlag') <- TRUE
   attr(mca, 'stdev') <- SVD$d[-1]
   return(mca) 
 }
 
 .build.new.reduced <- function(rd.res, cells, features = NULL, rd.f.nm = 'genesCoordinates'){
-  
+  rd.old <- rd.res
   if (!is.null(features)){
     rd.f.res <- attr(rd.res, rd.f.nm)
     rd.f.res <- rd.f.res[features,,drop=FALSE]
@@ -46,8 +47,15 @@
   
   rd.res <- rd.res[cells,,drop=FALSE]
   attr(rd.res, rd.f.nm) <- rd.f.res
-  return(rd.res)
 
+  othernm <- setdiff(names(attributes(rd.old)), names(attributes(rd.res)))
+  if (length(othernm) > 0){
+      for (i in seq(length(othernm))){
+          attr(rd.res, othernm[i]) <- attr(rd.old, othernm[i])
+      }
+  }
+
+  return(rd.res)
 }
 
 #' @importFrom BiocNeighbors findKmknn
