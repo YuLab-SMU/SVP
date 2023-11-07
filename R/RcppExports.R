@@ -94,6 +94,13 @@ MCAStep2 <- function(Z, V, Dc) {
     .Call('_SVP_MCAStep2', PACKAGE = 'SVP', Z, V, Dc)
 }
 
+#' Obtain the pair distance of row between Ar and Br matrix
+#' @param Ar matrix which number of column should be equal to column number of Br.
+#' @param Br matrix which number of column should be equal to column number of Ar.
+fastPDist <- function(Ar, Br) {
+    .Call('_SVP_fastPDist', PACKAGE = 'SVP', Ar, Br)
+}
+
 #' Computer the affinity score of all nodes in a graph to a seeds 
 #' using Random Walk with Restart
 #' @param x a adjacency matrix of a graph.

@@ -50,6 +50,32 @@
 
 }
 
+
+pairDist <- function(x, y){
+    z <- fastPDist(y, x)
+    rownames(z) <- rownames(y)
+    colnames(z) <- rownames(x)
+    return(z)
+}
+
+
+.build.nndist.graph <- function(cells.rd, 
+                            features.rd, 
+                            top.n = 400, 
+                            weighted.distance = TRUE, 
+                            graph.directed = FALSE){
+    x <- pairDist(cells.rd, features.rd)
+    nn.m <- apply(x, 2, function(i)names(sort(i))[seq(top.n)])
+    nn.edge <- data.frame(from = rep(colnames(nn.m), each=nrow(nn.m)), to = c(nn.m))
+    if (weighted.distance){
+        nn.edge$weight <- .normalize_dist(apply(x, 2, function(i)sort(i)[seq(top.n)]))
+    }
+
+    g <- .build.graph(nn.edge, graph.directed = graph.directed)
+    return(g)
+}
+
+
 #' @importFrom BiocNeighbors findKmknn
 #' @importFrom BiocParallel SerialParam
 .build.knn.graph <- function(x, 
@@ -98,7 +124,7 @@
 
 .normalize_dist <- function(x){
   x <- as.vector(x)
-  (x - min(x))/(max(x) - min(x))
+  1 - (x - min(x))/(max(x) - min(x))
 }
 
 .extract_edge <- function(knn, x, weighted.distance = TRUE){

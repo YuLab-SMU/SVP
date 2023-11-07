@@ -159,6 +159,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// fastPDist
+NumericMatrix fastPDist(NumericMatrix Ar, NumericMatrix Br);
+RcppExport SEXP _SVP_fastPDist(SEXP ArSEXP, SEXP BrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type Ar(ArSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type Br(BrSEXP);
+    rcpp_result_gen = Rcpp::wrap(fastPDist(Ar, Br));
+    return rcpp_result_gen;
+END_RCPP
+}
 // parallelCalRWR
 NumericMatrix parallelCalRWR(arma::sp_mat x, arma::sp_mat v, double restart, double stop_delta, int stop_step);
 RcppExport SEXP _SVP_parallelCalRWR(SEXP xSEXP, SEXP vSEXP, SEXP restartSEXP, SEXP stop_deltaSEXP, SEXP stop_stepSEXP) {
@@ -186,6 +198,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_SVP_CalWkdeParallel", (DL_FUNC) &_SVP_CalWkdeParallel, 6},
     {"_SVP_MCAStep1", (DL_FUNC) &_SVP_MCAStep1, 1},
     {"_SVP_MCAStep2", (DL_FUNC) &_SVP_MCAStep2, 3},
+    {"_SVP_fastPDist", (DL_FUNC) &_SVP_fastPDist, 2},
     {"_SVP_parallelCalRWR", (DL_FUNC) &_SVP_parallelCalRWR, 5},
     {NULL, NULL, 0}
 };

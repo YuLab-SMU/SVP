@@ -128,10 +128,12 @@ setMethod('detect.svp',
   knn.used.reduction <- 'MCA'
   if (!"MCA" %in% reducedDimNames(data)){
       cli::cli_warn(c("The {.cls {class(data)}} does not have MCA, run 'runMCA()' first."))
-      data <- runMCA(data, assay.type = assay.type, 
-		     ncomponents = knn.used.reduction.dims, 
+      data <- runMCA(data, 
+                     assay.type = assay.type, 
+                     ncomponents = knn.used.reduction.dims, 
                      consider.spcoord = knn.mca.consider.spcoord, 
-		     subset.row = cells, subset.col = features)
+                     subset.row = cells, 
+                     subset.col = features)
   }
   rd.df <- reducedDim(data, knn.used.reduction)
   rd.f.nm <- switch(knn.used.reduction, MCA='genesCoordinates', PCA='rotation')
@@ -140,12 +142,16 @@ setMethod('detect.svp',
   cells <- .subset_ind(rd.df, cells)
   features <- .subset_ind(rd.f.res, features)
 
-  rd.res <- rbind(rd.df, rd.f.res)
-  rd.res <- .subset_data(x = rd.res, n = c(cells, features))
+  #rd.res <- rbind(rd.df, rd.f.res)
+  #rd.res <- .subset_data(x = rd.res, n = c(cells, features))
+  #
+  #dims <- min(ncol(rd.res), knn.used.reduction.dims) 
+  #
+  #rd.res <- rd.res[, seq(dims), drop = FALSE]
   
-  dims <- min(ncol(rd.res), knn.used.reduction.dims) 
-  
-  rd.res <- rd.res[, seq(dims), drop = FALSE]
+  dims <- min(ncol(rd.df), knn.used.reduction.dims)
+  cells.rd <- rd.df[cells, seq(dims), drop=FALSE]
+  features.rd <- rd.f.res[features, seq(dims), drop=FALSE]
 
   gset.num <- .filter.gset.gene(features, gset.idx.list)
 
@@ -154,14 +160,21 @@ setMethod('detect.svp',
   tic()
   cli::cli_inform(c("Building the knn graph ..."))
 
-  rd.knn.gh <- .build.knn.graph(
-                  rd.res, 
-                  knn.k.use = knn.k.use, 
-                  fun.nm = findKmknn,
-                  BPPARAM = knn.BPPARAM,
-                  weighted.distance = knn.graph.weighted,
-                  graph.directed = knn.graph.directed,
-                  ...
+  #rd.knn.gh <- .build.knn.graph(
+  #                rd.res, 
+  #                knn.k.use = knn.k.use, 
+  #                fun.nm = findKmknn,
+  #                BPPARAM = knn.BPPARAM,
+  #                weighted.distance = knn.graph.weighted,
+  #                graph.directed = knn.graph.directed,
+  #                ...
+  #             )
+  rd.knn.gh <- .build.nndist.graph(
+                   cells.rd, 
+                   features.rd, 
+                   top.n = knn.k.use, 
+                   weighted.distance = knn.graph.weighted, 
+                   graph.directed = knn.graph.directed
                )
   toc()
 
@@ -221,11 +234,11 @@ setMethod('detect.svp',
                       Kullback-Leibler divergence of 2D Weighted Kernel Density ...") 
       
       res.sv <- .identify.svg(
-			gset.score.cells, 
+                        gset.score.cells, 
                         coords = coords,
                         n = sv.grid.n,
                         permutation = sv.permutation,
-			p.adjust.method = sv.p.adjust.method,
+                        p.adjust.method = sv.p.adjust.method,
                         BPPARAM = sv.BPPARAM, 
                         random.seed = random.seed,
                         ...)
