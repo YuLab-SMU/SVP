@@ -4,15 +4,17 @@
 
 ## :newspaper: Description
 
-SVP uses the KNN Graph and random walk with restrat based on the space
-of MCA to calculate the activity of gene sets (such as kegg pathway,
-signatures, go term, gene modules, …) efficiently. Then to detect the
-spatially or single cell variable gene sets or (other features) with
-avoiding the lost of low activity score of gene sets or other features
-(such as the expression of genes), SVP uses the 2D Weighted Kernel
-Density Estimation to process the score of gene sets (or expression of
-genes) and uses Kullback–Leibler divergence to identify the signal
-features.
+SVP uses the distance between cells and cells, features and features,
+cells and features in the space of MCA to build nearest neighbor graph,
+then uses random walk with restart algorithm to calculate the activity
+score of gene sets (such as kegg pathway, signatures, go term, gene
+modules, transcription factor, …). In addition, to detect the spatially
+or single cell variable gene sets or (other features) accurately, SVP
+uses the 2d weighted kernel density estimation to process the score of
+gene sets (or expression of genes) and uses Kullback–Leibler divergence
+to identify the signal features based on permutation test. SVP is
+developed based on SingleCellExperiment class, which can be
+interoperable with the existing computing ecosystem.
 
 ## :writing_hand: Author
 

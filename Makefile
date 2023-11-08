@@ -12,22 +12,26 @@ rd: crd
 readme:
 	Rscript -e 'rmarkdown::render("README.Rmd", encoding="UTF-8")'
 
-build1:
+build:
 	Rscript -e 'devtools::build()'
 
 build2:
 	Rscript -e 'devtools::build(vignettes = FALSE)'
 
-install: build1
+install: build
 	cd ..;\
 	R CMD INSTALL $(PKGNAME)_$(PKGVERS).tar.gz
 
-check1: rd build1
+check: rd build
 	cd ..;\
 	Rscript -e 'rcmdcheck::rcmdcheck("$(PKGNAME)_$(PKGVERS).tar.gz")'
 
-check: build
+check2: rd build
 	R CMD check $(PKGNAME)_$(PKGVERS).tar.gz
+
+bioccheck: rd build
+	cd ..;\
+        Rscript -e 'BiocCheck::BiocCheck("$(PKGNAME)_$(PKGVERS).tar.gz")'
 
 clean:
 	@rm -rf $(PKGNAME)_$(PKGVERS).tar.gz $(PKGNAME).Rcheck
