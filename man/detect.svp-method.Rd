@@ -4,9 +4,7 @@
 \alias{detect.svp}
 \alias{detect.svp,SingleCellExperiment-method}
 \alias{detect.svp,SingleCellExperiment}
-\title{Calculate the activity of gene sets in spatial or single-cell data with Restart Walk
-with Restart and detect the spatially or single cell variable gene sets with Kullback–Leibler
-divergence of 2D Weighted Kernel Density}
+\title{detect.svp}
 \usage{
 detect.svp(
   data,
@@ -18,10 +16,9 @@ detect.svp(
   assay.type = "logcounts",
   knn.mca.consider.spcoord = TRUE,
   knn.used.reduction.dims = 30,
-  knn.BPPARAM = SerialParam(),
+  knn.combined.cell.feature = FALSE,
   knn.graph.weighted = TRUE,
-  knn.graph.directed = FALSE,
-  knn.k.use = 500,
+  knn.k.use = 600,
   rwr.restart = 0.7,
   rwr.normalize.adj.method = c("laplacian", "row", "column", "none"),
   rwr.normalize.affinity = TRUE,
@@ -49,10 +46,9 @@ detect.svp(
   assay.type = "logcounts",
   knn.mca.consider.spcoord = TRUE,
   knn.used.reduction.dims = 30,
-  knn.BPPARAM = SerialParam(),
+  knn.combined.cell.feature = FALSE,
   knn.graph.weighted = TRUE,
-  knn.graph.directed = FALSE,
-  knn.k.use = 500,
+  knn.k.use = 600,
   rwr.restart = 0.7,
   rwr.normalize.adj.method = c("laplacian", "row", "column", "none"),
   rwr.normalize.affinity = TRUE,
@@ -94,16 +90,13 @@ default is 0.4.}
 \item{knn.used.reduction.dims}{the top components of the reduction with \code{knn.used.reduction}
 to be used to build KNN Graph, default is 30.}
 
-\item{knn.BPPARAM}{A BiocParallelParam object specifying whether the built of KNN should be parallelized
-default is \code{SerialParam()}, meaning no parallel. You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=T)}
-to parallel it, the \code{workers} of \code{MulticoreParam} is the number of cores used, see also
-\code{\link[BiocParallel]{MulticoreParam}}.}
+\item{knn.combined.cell.feature}{whether combined the embeddings of cells and features to find the nearest
+neighbor and build graph, default is FALSE, meaning the nearest neighbor will be found in cells to cells,
+features to features, cells to features respectively to build graph.}
 
 \item{knn.graph.weighted}{logical whether consider the distance of nodes in the Nearest Neighbors, default is TRUE.}
 
-\item{knn.graph.directed}{logical whether consider the direction of the KNN Graph, default is FALSE.}
-
-\item{knn.k.use}{numeric the number of the Nearest Neighbors nodes, default is 500.}
+\item{knn.k.use}{numeric the number of the Nearest Neighbors nodes, default is 600.}
 
 \item{rwr.restart}{default is 0.7.}
 

@@ -66,29 +66,59 @@ pairDist <- function(x, y){
     return(z)
 }
 
-
-.build.nndist.graph <- function(cells.rd, 
-                            features.rd, 
-                            top.n = 400, 
-                            weighted.distance = TRUE, 
-                            graph.directed = FALSE){
-    x <- pairDist(cells.rd, features.rd)
+.obtain.nndist.edge <- function(
+     x, 
+     top.n = 400, 
+     weighted.distance = FALSE
+   ){
     nn.m <- apply(x, 2, function(i)names(sort(i))[seq(top.n)])
     nn.edge <- data.frame(from = rep(colnames(nn.m), each=nrow(nn.m)), to = c(nn.m))
     if (weighted.distance){
-        nn.edge$weight <- .normalize_dist(apply(x, 2, function(i)sort(i)[seq(top.n)]))
+        nn.edge$weight <- c(apply(x, 2, function(i)sort(i)[seq(top.n)]))
     }
+    return(nn.edge)
+}
 
+
+.build.nndist.graph <- function(
+                            cells.rd, 
+                            features.rd, 
+                            top.n = 600,
+                            combined.cell.feature = FALSE, 
+                            weighted.distance = FALSE,
+                            graph.directed = FALSE){
+    if (!combined.cell.feature){
+        x <- pairDist(cells.rd, features.rd)
+        cell.dist <- pairDist(cells.rd, cells.rd)
+        fs.dist <- pairDist(features.rd, features.rd)
+        top.n <- min(top.n, nrow(features.rd))
+        cell2fs <- .obtain.nndist.edge(x, top.n, weighted.distance)
+        top.n.cell <- min(max(100, top.n - 200), nrow(cells.rd)) + 1
+        cell2cell <- .obtain.nndist.edge(cell.dist, top.n.cell, weighted.distance)
+        cell2cell <- cell2cell[-1, ,drop=FALSE]
+        top.n.fs <- min(max(100, top.n - 200), nrow(features.rd)) + 1
+        fs2fs <- .obtain.nndist.edge(fs.dist, top.n.fs, weighted.distance)
+        fs2fs <- fs2fs[-1,,drop = FALSE]
+        nn.edge <- rbind(cell2fs, cell2cell, fs2fs)
+    }else{
+        total.rd <- rbind(cells.rd, features.rd)
+        total.dist <- pairDist(total.rd, total.rd)
+        top.n <- min(top.n, nrow(total.rd)) + 1
+        nn.edge <- .obtain.nndist.edge(total.dist, top.n, weighted.distance)
+        nn.edge <- nn.edge[-1, ]
+    }
+    if (weighted.distance){
+        nn.edge$weight <- .normalize_dist(nn.edge$weight)
+    }
     g <- .build.graph(nn.edge, graph.directed = graph.directed)
     return(g)
 }
 
 
-#' @importFrom BiocNeighbors findKmknn
 #' @importFrom BiocParallel SerialParam
 .build.knn.graph <- function(x, 
-                       knn.k.use = 350, 
-                       fun.nm = findKmknn, 
+                       knn.k.use = 600, 
+                       fun.nm = "findKmknn", 
                        BPPARAM = SerialParam(), 
                        weighted.distance = TRUE,
                        graph.directed = FALSE,

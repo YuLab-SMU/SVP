@@ -1,4 +1,5 @@
-#' @title Calculate the activity of gene sets in spatial or single-cell data with Restart Walk 
+#' @title detect.svp
+#' @description Calculate the activity of gene sets in spatial or single-cell data with Restart Walk 
 #' with Restart and detect the spatially or single cell variable gene sets with Kullback–Leibler 
 #' divergence of 2D Weighted Kernel Density
 #' @rdname detect.svp-method
@@ -16,13 +17,11 @@
 #' @param knn.mca.consider.spcoord logical whether consider the spatial coordinates to run MCA, default is TRUE.
 #' @param knn.used.reduction.dims the top components of the reduction with \code{knn.used.reduction} 
 #' to be used to build KNN Graph, default is 30.
-#' @param knn.BPPARAM A BiocParallelParam object specifying whether the built of KNN should be parallelized
-#' default is \code{SerialParam()}, meaning no parallel. You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=T)}
-#' to parallel it, the \code{workers} of \code{MulticoreParam} is the number of cores used, see also
-#' \code{\link[BiocParallel]{MulticoreParam}}.
+#' @param knn.combined.cell.feature whether combined the embeddings of cells and features to find the nearest
+#' neighbor and build graph, default is FALSE, meaning the nearest neighbor will be found in cells to cells,
+#' features to features, cells to features respectively to build graph.
 #' @param knn.graph.weighted logical whether consider the distance of nodes in the Nearest Neighbors, default is TRUE.
-#' @param knn.graph.directed logical whether consider the direction of the KNN Graph, default is FALSE.
-#' @param knn.k.use numeric the number of the Nearest Neighbors nodes, default is 500.
+#' @param knn.k.use numeric the number of the Nearest Neighbors nodes, default is 600.
 #' @param rwr.restart  default is 0.7.
 #' @param rwr.normalize.adj.method character the method to normalize the adjacency matrix of the input graph,
 #' default is \code{laplacian}.
@@ -62,10 +61,9 @@ setGeneric('detect.svp',
     assay.type = 'logcounts',
     knn.mca.consider.spcoord = TRUE,
     knn.used.reduction.dims = 30,
-    knn.BPPARAM = SerialParam(),
+    knn.combined.cell.feature = FALSE,
     knn.graph.weighted = TRUE,
-    knn.graph.directed = FALSE,
-    knn.k.use = 500,
+    knn.k.use = 600,
     rwr.restart = .7,
     rwr.normalize.adj.method = c("laplacian","row","column","none"),
     rwr.normalize.affinity = TRUE,
@@ -88,7 +86,6 @@ setGeneric('detect.svp',
 #' @importFrom SingleCellExperiment reducedDim<- reducedDimNames SingleCellExperiment
 #' @importFrom SummarizedExperiment rowData colData<- rowData<- 
 #' @importFrom pracma tic toc
-#' @importFrom BiocNeighbors findKmknn
 #' @rdname detect.svp-method
 #' @aliases detect.svp,SingleCellExperiment
 #' @export detect.svp
@@ -104,10 +101,9 @@ setMethod('detect.svp',
     assay.type = 'logcounts',
     knn.mca.consider.spcoord = TRUE,
     knn.used.reduction.dims = 30,
-    knn.BPPARAM = SerialParam(),
+    knn.combined.cell.feature = FALSE,    
     knn.graph.weighted = TRUE,
-    knn.graph.directed = FALSE,
-    knn.k.use = 500,
+    knn.k.use = 600,
     rwr.restart = .7,
     rwr.normalize.adj.method = c("laplacian","row","column","none"),
     rwr.normalize.affinity = TRUE,
@@ -142,13 +138,6 @@ setMethod('detect.svp',
   cells <- .subset_ind(rd.df, cells)
   features <- .subset_ind(rd.f.res, features)
 
-  #rd.res <- rbind(rd.df, rd.f.res)
-  #rd.res <- .subset_data(x = rd.res, n = c(cells, features))
-  #
-  #dims <- min(ncol(rd.res), knn.used.reduction.dims) 
-  #
-  #rd.res <- rd.res[, seq(dims), drop = FALSE]
-  
   dims <- min(ncol(rd.df), knn.used.reduction.dims)
   cells.rd <- rd.df[cells, seq(dims), drop=FALSE]
   features.rd <- rd.f.res[features, seq(dims), drop=FALSE]
@@ -158,23 +147,14 @@ setMethod('detect.svp',
   gset.idx.list <- gset.idx.list[names(gset.idx.list) %in% rownames(gset.num)]
 
   tic()
-  cli::cli_inform(c("Building the knn graph ..."))
+  cli::cli_inform(c("Building the nearest neighbor graph with the distance between features and cells ..."))
 
-  #rd.knn.gh <- .build.knn.graph(
-  #                rd.res, 
-  #                knn.k.use = knn.k.use, 
-  #                fun.nm = findKmknn,
-  #                BPPARAM = knn.BPPARAM,
-  #                weighted.distance = knn.graph.weighted,
-  #                graph.directed = knn.graph.directed,
-  #                ...
-  #             )
   rd.knn.gh <- .build.nndist.graph(
                    cells.rd, 
                    features.rd, 
                    top.n = knn.k.use, 
-                   weighted.distance = knn.graph.weighted, 
-                   graph.directed = knn.graph.directed
+                   combined.cell.feature = knn.combined.cell.feature,
+                   weighted.distance = knn.graph.weighted 
                )
   toc()
 

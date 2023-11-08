@@ -1,0 +1,28 @@
+---
+title: "SVP"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{SVP}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(SVP)
+```
+
+
+# Session information
+
+Here is the output of `sessionInfo()` on the system on which this document was compiled:
+
+```{r, echo=FALSE}
+sessionInfo()
+```
