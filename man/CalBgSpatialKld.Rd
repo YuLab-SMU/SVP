@@ -20,6 +20,9 @@ CalBgSpatialKld(coords, axm, aym, h, indx, indy)
 \item{indy}{the index of original point by mapping to the grid points in y direction.
 (see MASS::bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).}
 }
+\value{
+a vector of 2D weighted kernel density value of background without spatial variability.
+}
 \description{
 Compute Background 2D Kernel Density
 }

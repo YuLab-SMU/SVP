@@ -26,7 +26,7 @@ detect.svp(
   sv.used.reduction = c("UMAP", "TSNE"),
   sv.grid.n = 100,
   sv.permutation = 100,
-  sv.p.adjust.method = "bonferroni",
+  sv.p.adjust.method = "BY",
   sv.BPPARAM = SerialParam(),
   run.sv = TRUE,
   cells = NULL,
@@ -116,7 +116,7 @@ if \code{data} has \code{spatialCoords}, which will be used as spatial coordinat
 \item{sv.permutation}{numeric the number of permutation for each single feature to detect the signicantly spatially or single
 cell variable features, default is 100.}
 
-\item{sv.p.adjust.method}{character the method to adjust the pvalue of the result, default is \code{bonferroni}.}
+\item{sv.p.adjust.method}{character the method to adjust the pvalue of the result, default is \code{BY}.}
 
 \item{sv.BPPARAM}{A BiocParallelParam object specifying whether the identification of SV features should be parallelized
 default is \code{SerialParam()}, meaning no parallel. You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=T)}
@@ -140,8 +140,36 @@ default is NULL, meaning all features to be used for the calculation of the acti
 
 \item{...}{additional parameters}
 }
+\value{
+a \linkS4class{SVPExperiment} or a \linkS4class{SingleCellExperiment}, see details.
+}
 \description{
 Calculate the activity of gene sets in spatial or single-cell data with Restart Walk
 with Restart and detect the spatially or single cell variable gene sets with Kullback–Leibler
 divergence of 2D Weighted Kernel Density
+}
+\details{
+if input is a \linkS4class{SVPExperiment}, output will be also a \linkS4class{SVPExperiment}, the activity score of gene sets
+was stored in \code{assay} slot of the specified \code{gsvaexp}, and the spatially variable gene sets result is stored in \code{svDfs}
+of the specified \code{gsvaexp}, which is a \linkS4class{SingleCellExperiment}. If input is a \linkS4class{SingleCellExperiment}
+(which is extracted from \linkS4class{SVPExperiment} using \code{gsvaExp()} funtion), output will be also a
+\linkS4class{SingleCellExperiment}, the activity score of gene sets result can be extracted using \code{assay()} function, and the
+spatial variable gene sets result can be extracted using \code{svDf} function.
+The result of \code{svDf} will return a matrix which has \code{sp.kld}, \code{boot.sp.kld.mean}, \code{boot.sp.kld.sd}, \code{pvalue},
+\code{padj} and \code{rank}.
+\itemize{
+\item \code{sp.kld} which is logarithms of Kullback–Leibler divergence, larger value meaning the greater the difference from the
+background distribution without spatial variability.
+\item \code{boot.sp.kld.mean} which is mean of logarithms of Kullback–Leibler divergence based on the permutation of each features.
+\item \code{boot.sp.kld.sd} which is standard deviation of logarithms of Kullback–Leibler divergence based on the permutation of
+each features.
+\item \code{pvalue} the pvalue is calculated using the real \code{sp.kld} and the permutation \code{boot.sp.kld.mean} and
+\code{boot.sp.kld.sd} based on the normal distribution.
+\item \code{padj} the adjusted pvalue based on the speficied \code{sv.p.adjust.method}, default is \code{BY}.
+\item \code{rank} the order of significant spatial variable features based on \code{padj} and \code{sp.kld}.
+}
+}
+\seealso{
+\code{\link{sc.rwr}} to calculate the activity score of gene sets and \code{\link{kldSVG}} to identify the spatiall variable or specified
+cell gene sets or a features.
 }

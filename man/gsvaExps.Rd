@@ -28,18 +28,10 @@
 \alias{mainGsvaExpName,SVPExperiment-method}
 \alias{mainGsvaExpName<-}
 \alias{mainGsvaExpName<-,SVPExperiment,character_OR_NULL-method}
-\alias{\%}
-\alias{Dumping}
-\alias{the}
-\alias{SEBC}
-\alias{methods}
-\alias{here,}
-\alias{so}
-\alias{that}
-\alias{check}
-\alias{doesn't}
-\alias{complain.}
 \title{Gene Set Variation Analysis Experiment methods}
+\value{
+see \code{Getter} and \code{setter}.
+}
 \description{
 In some experiments, gene set variation analysis will generated different features (the names of KEGG pathway or the GO term).
 These data cannot be stored in the main \code{assays} of the \linkS4class{SVPExperiment} itself.

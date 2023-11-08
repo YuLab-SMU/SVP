@@ -4,6 +4,9 @@
 \name{SVPExperiment-class}
 \alias{SVPExperiment-class}
 \title{The SVPExperiment class}
+\value{
+a \linkS4class{SVPExperiment} object
+}
 \description{
 The SVPExperiment class
 }

@@ -17,8 +17,10 @@
 #' an integer vector of column indices or a logical vector, default is NULL, meaning
 #' all cells to be used for dimensionality reduction.
 #' @param consider.spcoord whether consider the spatial coords to run MCA with 
-#' the features of data, default is TRUE.
+#' the features of data, default is FALSE (TRUE is experimental).
 #' @param ... additional parameters, meaningless now.
+#' @return a \linkS4class{SingleCellExperiment} and the reduction result of \code{MCA}
+#' can be extracted using \code{reducedDim()} function.
 #' @export
 setGeneric('runMCA', function(data, 
                               assay.type = 'logcounts', 
@@ -26,7 +28,7 @@ setGeneric('runMCA', function(data,
                               ncomponents = 30, 
                               subset.row = NULL, 
                               subset.col = NULL,
-                              consider.spcoord = TRUE,
+                              consider.spcoord = FALSE,
                               ...)
   standardGeneric('runMCA')
 )
@@ -43,7 +45,7 @@ setMethod('runMCA', 'SingleCellExperiment',
                    ncomponents = 50, 
                    subset.row = NULL,
                    subset.col = NULL, 
-                   consider.spcoord = TRUE,
+                   consider.spcoord = FALSE,
                    ...){
   if (!assay.type %in% assayNames(data)){
       cli::cli_abort("the {.var assay.type} = {assay.type} is not present in the assays of {.cls {class(data)}}.")

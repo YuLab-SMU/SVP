@@ -3,9 +3,10 @@ using namespace Rcpp;
 using namespace arma;
 
 //// This script was from the CelliD package
-//' Obtain the pair distance of row between Ar and Br matrix
-//' @param Ar matrix which number of column should be equal to column number of Br.
-//' @param Br matrix which number of column should be equal to column number of Ar.
+//' Obtain the pair distance of row between \code{Ar} and \code{Br} matrix
+//' @param Ar matrix which number of column should be equal to column number of \code{Br}.
+//' @param Br matrix which number of column should be equal to column number of \code{Ar}.
+//' @return a distance matrix of row feature in \code{Ar} and \code{Br}.
 //[[Rcpp::export]]
 NumericMatrix fastPDist(NumericMatrix Ar, NumericMatrix Br) {
     int m = Ar.nrow(), 

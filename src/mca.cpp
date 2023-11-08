@@ -4,7 +4,7 @@
 using namespace Rcpp;
 using namespace RcppArmadillo;
 using namespace arma;
-//[[Rcpp::depends(RcppArmadillo)]]
+
 // [[Rcpp::export]]
 List MCAStep1(arma::sp_mat& X) {
     ////arma::mat AM = arma::mat(X.begin(), X.rows(), X.cols(), true);
@@ -26,7 +26,6 @@ List MCAStep1(arma::sp_mat& X) {
                         Named("Dc") = wrap(Dc));
 }
 
-//[[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::export]]
 List MCAStep2(NumericMatrix Z, NumericMatrix V, NumericVector Dc) {
     arma::mat AV = arma::mat(V.begin(), V.rows(), V.cols(),  true);

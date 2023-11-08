@@ -33,6 +33,15 @@
 #' default is NULL, meaning all features to be used for the calculation of the activaty score or identification of SV features.
 #' @param verbose logical whether print the intermediate message when running the program, default is TRUE.
 #' @param ... additional parameters
+#' @return a \linkS4class{SVPExperiment} or a \linkS4class{SingleCellExperiment}, see details.
+#' @details
+#' if input is a \linkS4class{SVPExperiment}, output will be also a \linkS4class{SVPExperiment}, the activity score of gene sets
+#' was stored in \code{assay} slot of the specified \code{gsvaexp}, and the spatially variable gene sets result is stored in \code{svDfs}
+#' of the specified \code{gsvaexp}, which is a \linkS4class{SingleCellExperiment}. If input is a \linkS4class{SingleCellExperiment}
+#' (which is extracted from \linkS4class{SVPExperiment} using \code{gsvaExp()} funtion), output will be also a
+#' \linkS4class{SingleCellExperiment}, the activity score of gene sets result can be extracted using \code{assay()} function.
+#' @seealso [`cluster.assign`] to classify cell using the activity score of gene sets base \code{kmean} and [`kldSVG`] to identify the 
+#' spatiall variable or specified cell gene sets or a features.
 #' @export
 setGeneric('sc.rwr', 
   function(

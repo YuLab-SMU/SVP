@@ -20,6 +20,9 @@ between 0 and 1, default is .75.}
 
 \item{stop_step}{step number to stop RWR, default is 50.}
 }
+\value{
+a matrix of affinity score of all nodes in a graph
+}
 \description{
 Computer the affinity score of all nodes in a graph to a seeds
 using Random Walk with Restart

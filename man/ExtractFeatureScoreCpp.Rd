@@ -15,6 +15,9 @@ ExtractFeatureScoreCpp(x, rnm, cnm, g)
 
 \item{g}{a list of gene set.}
 }
+\value{
+a list contained the score of gene in each gene sets
+}
 \description{
 Extract the score of gene in each gene sets
 }

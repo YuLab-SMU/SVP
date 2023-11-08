@@ -11,6 +11,11 @@ findIntervalCpp(x, breaks)
 
 \item{breaks}{numeric vector (new).}
 }
+\value{
+the vector of length \code{length(x)} with values in \code{0:N}
+this is like \code{findInterval()} of R base, but result of this is can be used
+to the C++
+}
 \description{
 Find Interval Numbers or Indices in C++
 }

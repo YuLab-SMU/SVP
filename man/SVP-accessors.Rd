@@ -22,6 +22,9 @@
 
 \item{object}{a \linkS4class{SVPExperiment} class.}
 }
+\value{
+matrix or character or print the information of object.
+}
 \description{
 Some accessor funtions to get the internal slots of SVPExperiment
 }

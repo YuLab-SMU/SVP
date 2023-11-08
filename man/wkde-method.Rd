@@ -73,6 +73,9 @@ reference bandwidth \code{\link[ks]{hpi}}, see also \code{\link[MASS]{bandwidth.
 
 \item{...}{additional parameters}
 }
+\value{
+a \linkS4class{SVPExperiment} or \linkS4class{SingleCellExperiment}
+}
 \description{
 Calculating the 2D Weighted Kernel Density Estimation
 }

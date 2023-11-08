@@ -303,12 +303,13 @@ pairDist <- function(x, y){
   res <- do.call('rbind', res)
 
   rownames(res) <- rownames(x)
-  colnames(res) <- c("sp.kld", "boot.sp.kld.mean", "boot.sp.kld.sd", "sp.kld.pvalue")
+  colnames(res) <- c("sp.kld", "boot.sp.kld.mean", "boot.sp.kld.sd", "pvalue")
   res <- cbind(res,
-	       sp.kld.p.adj = p.adjust(res[,"sp.kld.pvalue"], method = p.adjust.method)
+               padj = p.adjust(res[, "pvalue"], method = p.adjust.method)
             ) |> data.frame()
-  res <- res |> dplyr::arrange(.data$sp.kld.p.adj, dplyr::desc(.data$sp.kld)) |>
+  res <- res |> dplyr::arrange(.data$padj, dplyr::desc(.data$sp.kld)) |>
          dplyr::mutate(sp.kld.rank = seq(nrow(res))) |> as.matrix()
+  res <- res[match(rownames(x), rownames(res)), ]
   return(res)
 }
 

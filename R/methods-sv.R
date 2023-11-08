@@ -72,6 +72,7 @@
 #' svDf<-,SingleCellExperiment,character-method
 #' svDfs<-,SingleCellExperiment-method
 #' svDfNames<-,SingleCellExperiment,character-method
+#' @return see \code{Getters} and \code{setter}.
 NULL
 
 #' @export

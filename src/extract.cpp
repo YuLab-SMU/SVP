@@ -20,6 +20,7 @@ NumericVector SortNv(NumericVector x, bool decreasing = true) {
 //' @param rnm the row names of x matrix.
 //' @param cnm the col names of x matrix.
 //' @param g a list of gene set.
+//' @return a list contained the score of gene in each gene sets
 //[[Rcpp::export]]
 List ExtractFeatureScoreCpp(arma::sp_mat& x,
               CharacterVector& rnm,

@@ -20,6 +20,9 @@ CalWkdeParallel(x, w, l, h, adjust = 1, n = 400L)
 
 \item{n}{number of grid points in the two directions, default is 400.}
 }
+\value{
+a matrix of 2D Weighted Kernel Density Estimation
+}
 \description{
 Two-Dimensional Weighted Kernel Density Estimation And Mapping the Result To Original Dimension
 }

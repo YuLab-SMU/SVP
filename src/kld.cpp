@@ -36,6 +36,9 @@ double BandwidthNrdCpp(arma::vec x){
 //' Find Interval Numbers or Indices in C++
 //' @param x numeric vector (orignial).
 //' @param breaks numeric vector (new).
+//' @return the vector of length \code{length(x)} with values in \code{0:N}
+//' this is like \code{findInterval()} of R base, but result of this is can be used 
+//' to the C++
 //[[Rcpp::export]]
 arma::uvec findIntervalCpp(arma::vec x, arma::vec breaks) {
   uvec out(x.size());
@@ -51,7 +54,6 @@ arma::uvec findIntervalCpp(arma::vec x, arma::vec breaks) {
   return (out - 1);
 }
 
-//[[Rcpp::export]]
 arma::vec Kde2dWeightedCpp(
                    arma::rowvec w,
                    arma::mat ax,
@@ -104,6 +106,7 @@ struct RunWkde : public Worker{
 //' Obtaion the difference between the grid points and original points
 //' @param grid the grid points in one direction
 //' @param x the original points in one direction
+//' @return a matrix of the difference between the grid points and original points
 //[[Rcpp::export]]
 arma::mat outergrid(arma::vec grid, arma::vec x){
     arma::mat gxm = repelem(grid, 1, x.n_elem);
@@ -171,6 +174,7 @@ arma::rowvec CalKldPvalue(arma::vec boot, double x){
 //' @param indx the index of original point by mapping to the grid points in x direction.
 //' @param indy the index of original point by mapping to the grid points in y direction.
 //' (see MASS::bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
+//' @return a vector of 2D weighted kernel density value of background without spatial variability. 
 // [[Rcpp::export]]
 arma::vec CalBgSpatialKld(
         arma::mat coords,
@@ -200,6 +204,8 @@ arma::vec CalBgSpatialKld(
 //' @param random_times the permutation numbers for each weight to test whether 
 //' it is significantly, default is 200.
 //' @param seed The random seed to use to evaluate, default 123.
+//' @return a vector of input features about the statistical test value with 2D weighted kernel density 
+//'  and Kullback–Leibler Divergence.
 // [[Rcpp::export]]
 arma::rowvec CalSpatialKld(
                         arma::rowvec d,
@@ -234,6 +240,7 @@ arma::rowvec CalSpatialKld(
 //' (see bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
 //' @param adjust numeric value to adjust to bandwidth, default is 1.
 //' @param n number of grid points in the two directions, default is 400.
+//' @return a matrix of 2D Weighted Kernel Density Estimation
 // [[Rcpp::export]]
 arma::sp_mat CalWkdeParallel(arma::mat& x, arma::sp_mat& w, arma::vec& l, Nullable<NumericVector> h,
         double adjust = 1.0, int n = 400) {

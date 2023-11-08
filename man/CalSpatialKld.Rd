@@ -38,6 +38,10 @@ it is significantly, default is 200.}
 
 \item{seed}{The random seed to use to evaluate, default 123.}
 }
+\value{
+a vector of input features about the statistical test value with 2D weighted kernel density
+and Kullback–Leibler Divergence.
+}
 \description{
 Compute the Kullback–Leibler Divergence using 2D Kernel Density Estimation
 With Weighted and Statistical Test With Permutation for single weight vector.

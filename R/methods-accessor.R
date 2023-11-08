@@ -5,6 +5,7 @@
 #' @param object a \linkS4class{SVPExperiment} class.
 #' @importFrom SpatialExperiment spatialCoords
 #' @aliases spatialCoords,SVPExperiment-method
+#' @return matrix or character or print the information of object.
 #' @export
 setMethod('spatialCoords', 'SVPExperiment', function(x){
     flag <- .check_element_obj(x, key = 'spatialCoords', basefun = int_colData, namefun = names)

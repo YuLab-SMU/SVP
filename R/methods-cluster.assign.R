@@ -4,7 +4,7 @@
 #' a \linkS4class{SingleCellExperiment} which was extracted from \linkS4class{SVPExperiment} using
 #' \code{gsvaExp} function.
 #' @param assay.type which expressed data to be pulled to run, default is \code{affi.score}.
-#' @param ncluster integer the number cluster for each feature, default is 2.
+#' @param ncluster integer the number cluster for each feature, see details, default is 2.
 #' @param random.seed integer random number to be reproducted.
 #' @param BPPARAM A BiocParallelParam object specifying whether the built of KNN should be parallelized
 #' default is \code{SerialParam()}, meaning no parallel. You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=T)}
@@ -14,6 +14,15 @@
 #' \linkS4class{SVPExperiment}, default is NULL.
 #' @param gsvaexp.assay.type which assay data in the specified \code{gsvaexp} will be used to run, default is NULL.
 #' @param ... dot parameters
+#' @return if input is a \linkS4class{SVPExperiment}, output will be also a \linkS4class{SVPExperiment}, and the result assay 
+#' was stored in assay of the specified \code{gsvaexp}, which is a \linkS4class{SingleCellExperiment}. If input is a
+#' \linkS4class{SingleCellExperiment} (which is extracted from \linkS4class{SVPExperiment} using \code{gsvaExp()} funtion), 
+#' output will be a \linkS4class{SingleCellExperiment}, the result can be extracted using \code{assay()} function.
+#' @details 
+#' \code{cluster.assign} using \code{kmeans} to classfing the cells with the each activity score of the gene sets. When the argument 
+#' \code{ncluster = 2}, meaning the gene sets or pathway was activated in the \code{1} labeled cells. When the argument \code{ncluster}
+#' larger than 2, the larger the cluster label, the stronger the activation of the cell in the specified pathway.
+#' @seealso to calculate the activity score of gene sets or pathway: [`sc.rwr`].
 #' @export
 setGeneric('cluster.assign', 
   function(

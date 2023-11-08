@@ -19,6 +19,9 @@
 \alias{fscoreDfs<-,SingleCellExperiment-method}
 \alias{fscoreDfNames<-,SingleCellExperiment,character-method}
 \title{features score matrix extract method}
+\value{
+see \code{Getter} and \code{setter}
+}
 \description{
 In some experiment, to calculated the contribution value of original features
 (such as genes) in the new features (gene sets), if the result is stored with

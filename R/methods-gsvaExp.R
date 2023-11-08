@@ -152,8 +152,7 @@
 #' mainGsvaExpName,SVPExperiment-method
 #' mainGsvaExpName<-
 #' mainGsvaExpName<-,SVPExperiment,character_OR_NULL-method
-#'
-#' % Dumping the SEBC methods here, so that check doesn't complain.
+#' @return see \code{Getter} and \code{setter}.
 NULL
 
 #' @export

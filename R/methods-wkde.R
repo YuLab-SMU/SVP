@@ -15,6 +15,7 @@
 #' \linkS4class{SVPExperiment}, default is NULL.
 #' @param gsvaexp.assay.type which assay data in the specified \code{gsvaexp} will be used to run, default is NULL.
 #' @param ... additional parameters
+#' @return a \linkS4class{SVPExperiment} or \linkS4class{SingleCellExperiment}
 #' @export
 setGeneric('wkde',
   function(

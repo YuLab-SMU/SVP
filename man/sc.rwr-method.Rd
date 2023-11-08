@@ -106,6 +106,20 @@ default is NULL, meaning all features to be used for the calculation of the acti
 
 \item{...}{additional parameters}
 }
+\value{
+a \linkS4class{SVPExperiment} or a \linkS4class{SingleCellExperiment}, see details.
+}
 \description{
 Calculate the activity of gene sets in spatial or single-cell data with Restart Walk with Restart
+}
+\details{
+if input is a \linkS4class{SVPExperiment}, output will be also a \linkS4class{SVPExperiment}, the activity score of gene sets
+was stored in \code{assay} slot of the specified \code{gsvaexp}, and the spatially variable gene sets result is stored in \code{svDfs}
+of the specified \code{gsvaexp}, which is a \linkS4class{SingleCellExperiment}. If input is a \linkS4class{SingleCellExperiment}
+(which is extracted from \linkS4class{SVPExperiment} using \code{gsvaExp()} funtion), output will be also a
+\linkS4class{SingleCellExperiment}, the activity score of gene sets result can be extracted using \code{assay()} function.
+}
+\seealso{
+\code{\link{cluster.assign}} to classify cell using the activity score of gene sets base \code{kmean} and \code{\link{kldSVG}} to identify the
+spatiall variable or specified cell gene sets or a features.
 }

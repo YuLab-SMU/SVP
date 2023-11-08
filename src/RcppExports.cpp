@@ -37,22 +37,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// Kde2dWeightedCpp
-arma::vec Kde2dWeightedCpp(arma::rowvec w, arma::mat ax, arma::mat ay, arma::vec h, arma::uvec indx, arma::uvec indy);
-RcppExport SEXP _SVP_Kde2dWeightedCpp(SEXP wSEXP, SEXP axSEXP, SEXP aySEXP, SEXP hSEXP, SEXP indxSEXP, SEXP indySEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::rowvec >::type w(wSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type ax(axSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type ay(aySEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type h(hSEXP);
-    Rcpp::traits::input_parameter< arma::uvec >::type indx(indxSEXP);
-    Rcpp::traits::input_parameter< arma::uvec >::type indy(indySEXP);
-    rcpp_result_gen = Rcpp::wrap(Kde2dWeightedCpp(w, ax, ay, h, indx, indy));
-    return rcpp_result_gen;
-END_RCPP
-}
 // outergrid
 arma::mat outergrid(arma::vec grid, arma::vec x);
 RcppExport SEXP _SVP_outergrid(SEXP gridSEXP, SEXP xSEXP) {
@@ -190,7 +174,6 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_SVP_ExtractFeatureScoreCpp", (DL_FUNC) &_SVP_ExtractFeatureScoreCpp, 4},
     {"_SVP_findIntervalCpp", (DL_FUNC) &_SVP_findIntervalCpp, 2},
-    {"_SVP_Kde2dWeightedCpp", (DL_FUNC) &_SVP_Kde2dWeightedCpp, 6},
     {"_SVP_outergrid", (DL_FUNC) &_SVP_outergrid, 2},
     {"_SVP_CalRandSpatialKld", (DL_FUNC) &_SVP_CalRandSpatialKld, 9},
     {"_SVP_CalBgSpatialKld", (DL_FUNC) &_SVP_CalBgSpatialKld, 6},

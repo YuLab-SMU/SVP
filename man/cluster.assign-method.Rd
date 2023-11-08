@@ -48,7 +48,7 @@ a \linkS4class{SingleCellExperiment} which was extracted from \linkS4class{SVPEx
 
 \item{assay.type}{which expressed data to be pulled to run, default is \code{affi.score}.}
 
-\item{ncluster}{integer the number cluster for each feature, default is 2.}
+\item{ncluster}{integer the number cluster for each feature, see details, default is 2.}
 
 \item{random.seed}{integer random number to be reproducted.}
 
@@ -64,6 +64,20 @@ to parallel it, the \code{workers} of \code{MulticoreParam} is the number of cor
 
 \item{...}{dot parameters}
 }
+\value{
+if input is a \linkS4class{SVPExperiment}, output will be also a \linkS4class{SVPExperiment}, and the result assay
+was stored in assay of the specified \code{gsvaexp}, which is a \linkS4class{SingleCellExperiment}. If input is a
+\linkS4class{SingleCellExperiment} (which is extracted from \linkS4class{SVPExperiment} using \code{gsvaExp()} funtion),
+output will be a \linkS4class{SingleCellExperiment}, the result can be extracted using \code{assay()} function.
+}
 \description{
 clusting and assign the label for each feature(especifily the gene sets).
+}
+\details{
+\code{cluster.assign} using \code{kmeans} to classfing the cells with the each activity score of the gene sets. When the argument
+\code{ncluster = 2}, meaning the gene sets or pathway was activated in the \code{1} labeled cells. When the argument \code{ncluster}
+larger than 2, the larger the cluster label, the stronger the activation of the cell in the specified pathway.
+}
+\seealso{
+to calculate the activity score of gene sets or pathway: \code{\link{sc.rwr}}.
 }

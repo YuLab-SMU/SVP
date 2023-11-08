@@ -13,7 +13,7 @@ runMCA(
   ncomponents = 30,
   subset.row = NULL,
   subset.col = NULL,
-  consider.spcoord = TRUE,
+  consider.spcoord = FALSE,
   ...
 )
 
@@ -24,7 +24,7 @@ runMCA(
   ncomponents = 50,
   subset.row = NULL,
   subset.col = NULL,
-  consider.spcoord = TRUE,
+  consider.spcoord = FALSE,
   ...
 )
 }
@@ -49,9 +49,13 @@ an integer vector of column indices or a logical vector, default is NULL, meanin
 all cells to be used for dimensionality reduction.}
 
 \item{consider.spcoord}{whether consider the spatial coords to run MCA with
-the features of data, default is TRUE.}
+the features of data, default is FALSE (TRUE is experimental).}
 
 \item{...}{additional parameters, meaningless now.}
+}
+\value{
+a \linkS4class{SingleCellExperiment} and the reduction result of \code{MCA}
+can be extracted using \code{reducedDim()} function.
 }
 \description{
 Perform a Multiple Correspondence Analysis (MCA) on cells, based on

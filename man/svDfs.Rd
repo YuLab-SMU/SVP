@@ -19,6 +19,9 @@
 \alias{svDfs<-,SingleCellExperiment-method}
 \alias{svDfNames<-,SingleCellExperiment,character-method}
 \title{spatial or single cell variable features matrix extract method}
+\value{
+see \code{Getters} and \code{setter}.
+}
 \description{
 the identification result of the spatial variable or single cell variable (SV) features
 is important to the downstream analysis.

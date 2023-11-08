@@ -74,6 +74,7 @@
 #' fscoreDf<-,SingleCellExperiment,character-method
 #' fscoreDfs<-,SingleCellExperiment-method
 #' fscoreDfNames<-,SingleCellExperiment,character-method
+#' @return see \code{Getter} and \code{setter}
 NULL
 
 #' @export

@@ -88,7 +88,32 @@ to parallel it, the \code{workers} of \code{MulticoreParam} is the number of cor
 
 \item{...}{additional parameters}
 }
+\value{
+a \linkS4class{SVPExperiment} or a \linkS4class{SingleCellExperiment}, see details.
+}
 \description{
 Detecting the spatially or single cell variable features with Kullback–Leibler
 divergence of 2D Weighted Kernel Density
+}
+\details{
+if input is a \linkS4class{SVPExperiment}, output will be also a \linkS4class{SVPExperiment}, the spatially variable gene sets
+result is stored in \code{svDfs} of the specified \code{gsvaexp}, which is a \linkS4class{SingleCellExperiment}. If input is
+a \linkS4class{SingleCellExperiment} (which is extracted from \linkS4class{SVPExperiment} using \code{gsvaExp()} funtion), output
+will be also a \linkS4class{SingleCellExperiment}, the spatial variable gene sets result can be extracted using \code{svDf} function.
+The result of \code{svDf} will return a matrix which has \code{sp.kld}, \code{boot.sp.kld.mean}, \code{boot.sp.kld.sd}, \code{pvalue},
+\code{padj} and \code{rank}.
+\itemize{
+\item \code{sp.kld} which is logarithms of Kullback–Leibler divergence, larger value meaning the greater the difference from the
+background distribution without spatial variability.
+\item \code{boot.sp.kld.mean} which is mean of logarithms of Kullback–Leibler divergence based on the permutation of each features.
+\item \code{boot.sp.kld.sd} which is standard deviation of logarithms of Kullback–Leibler divergence based on the permutation of
+each features.
+\item \code{pvalue} the pvalue is calculated using the real \code{sp.kld} and the permutation \code{boot.sp.kld.mean} and
+\code{boot.sp.kld.sd} based on the normal distribution.
+\item \code{padj} the adjusted pvalue based on the speficied \code{sv.p.adjust.method}, default is \code{BY}.
+\item \code{rank} the order of significant spatial variable features based on \code{padj} and \code{sp.kld}.
+}
+}
+\seealso{
+\code{\link{sc.rwr}} to calculate the activity score of gene sets.
 }

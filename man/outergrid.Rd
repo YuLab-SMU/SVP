@@ -11,6 +11,9 @@ outergrid(grid, x)
 
 \item{x}{the original points in one direction}
 }
+\value{
+a matrix of the difference between the grid points and original points
+}
 \description{
 Obtaion the difference between the grid points and original points
 }

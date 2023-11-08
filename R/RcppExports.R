@@ -6,6 +6,7 @@
 #' @param rnm the row names of x matrix.
 #' @param cnm the col names of x matrix.
 #' @param g a list of gene set.
+#' @return a list contained the score of gene in each gene sets
 ExtractFeatureScoreCpp <- function(x, rnm, cnm, g) {
     .Call('_SVP_ExtractFeatureScoreCpp', PACKAGE = 'SVP', x, rnm, cnm, g)
 }
@@ -13,17 +14,17 @@ ExtractFeatureScoreCpp <- function(x, rnm, cnm, g) {
 #' Find Interval Numbers or Indices in C++
 #' @param x numeric vector (orignial).
 #' @param breaks numeric vector (new).
+#' @return the vector of length \code{length(x)} with values in \code{0:N}
+#' this is like \code{findInterval()} of R base, but result of this is can be used 
+#' to the C++
 findIntervalCpp <- function(x, breaks) {
     .Call('_SVP_findIntervalCpp', PACKAGE = 'SVP', x, breaks)
-}
-
-Kde2dWeightedCpp <- function(w, ax, ay, h, indx, indy) {
-    .Call('_SVP_Kde2dWeightedCpp', PACKAGE = 'SVP', w, ax, ay, h, indx, indy)
 }
 
 #' Obtaion the difference between the grid points and original points
 #' @param grid the grid points in one direction
 #' @param x the original points in one direction
+#' @return a matrix of the difference between the grid points and original points
 outergrid <- function(grid, x) {
     .Call('_SVP_outergrid', PACKAGE = 'SVP', grid, x)
 }
@@ -53,6 +54,7 @@ CalRandSpatialKld <- function(w, bg, axm, aym, h, indx, indy, random_times = 100
 #' @param indx the index of original point by mapping to the grid points in x direction.
 #' @param indy the index of original point by mapping to the grid points in y direction.
 #' (see MASS::bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
+#' @return a vector of 2D weighted kernel density value of background without spatial variability. 
 CalBgSpatialKld <- function(coords, axm, aym, h, indx, indy) {
     .Call('_SVP_CalBgSpatialKld', PACKAGE = 'SVP', coords, axm, aym, h, indx, indy)
 }
@@ -70,6 +72,8 @@ CalBgSpatialKld <- function(coords, axm, aym, h, indx, indy) {
 #' @param random_times the permutation numbers for each weight to test whether 
 #' it is significantly, default is 200.
 #' @param seed The random seed to use to evaluate, default 123.
+#' @return a vector of input features about the statistical test value with 2D weighted kernel density 
+#'  and Kullback–Leibler Divergence.
 CalSpatialKld <- function(d, bgkld, axm, aym, h, indx, indy, random_times = 100L, seed = 1024.0) {
     .Call('_SVP_CalSpatialKld', PACKAGE = 'SVP', d, bgkld, axm, aym, h, indx, indy, random_times, seed)
 }
@@ -82,6 +86,7 @@ CalSpatialKld <- function(d, bgkld, axm, aym, h, indx, indy, random_times = 100L
 #' (see bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
 #' @param adjust numeric value to adjust to bandwidth, default is 1.
 #' @param n number of grid points in the two directions, default is 400.
+#' @return a matrix of 2D Weighted Kernel Density Estimation
 CalWkdeParallel <- function(x, w, l, h, adjust = 1.0, n = 400L) {
     .Call('_SVP_CalWkdeParallel', PACKAGE = 'SVP', x, w, l, h, adjust, n)
 }
@@ -94,9 +99,10 @@ MCAStep2 <- function(Z, V, Dc) {
     .Call('_SVP_MCAStep2', PACKAGE = 'SVP', Z, V, Dc)
 }
 
-#' Obtain the pair distance of row between Ar and Br matrix
-#' @param Ar matrix which number of column should be equal to column number of Br.
-#' @param Br matrix which number of column should be equal to column number of Ar.
+#' Obtain the pair distance of row between \code{Ar} and \code{Br} matrix
+#' @param Ar matrix which number of column should be equal to column number of \code{Br}.
+#' @param Br matrix which number of column should be equal to column number of \code{Ar}.
+#' @return a distance matrix of row feature in \code{Ar} and \code{Br}.
 fastPDist <- function(Ar, Br) {
     .Call('_SVP_fastPDist', PACKAGE = 'SVP', Ar, Br)
 }
@@ -110,6 +116,7 @@ fastPDist <- function(Ar, Br) {
 #' between 0 and 1, default is .75.
 #' @param stop_delta minimum threshold to stop RWR, default is 1e-10.
 #' @param stop_step step number to stop RWR, default is 50.
+#' @return a matrix of affinity score of all nodes in a graph
 parallelCalRWR <- function(x, v, restart = 0.75, stop_delta = 1e-10, stop_step = 50L) {
     .Call('_SVP_parallelCalRWR', PACKAGE = 'SVP', x, v, restart, stop_delta, stop_step)
 }

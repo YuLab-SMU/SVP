@@ -47,6 +47,7 @@ struct calrwr : public Worker{
 //' between 0 and 1, default is .75.
 //' @param stop_delta minimum threshold to stop RWR, default is 1e-10.
 //' @param stop_step step number to stop RWR, default is 50.
+//' @return a matrix of affinity score of all nodes in a graph
 // [[Rcpp::export]]
 NumericMatrix parallelCalRWR(
               arma::sp_mat x,
