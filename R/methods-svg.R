@@ -128,8 +128,8 @@ setMethod('kldSVG', 'SingleCellExperiment',
   return(data)
 })
 
-#' @rdname kldSVG-method	  
-#' @aliases kldSVG,SVPExperiment	  
+#' @rdname kldSVG-method          
+#' @aliases kldSVG,SVPExperiment          
 #' @export kldSVG
 setMethod('kldSVG', 'SVPExperiment',
   function(
@@ -149,7 +149,7 @@ setMethod('kldSVG', 'SVPExperiment',
     if (!is.null(gsvaexp)){
        if (verbose){
           cli::cli_inform("The {.var gsvaexp} was specified, the specified {.var gsvaExp} will be used to detect 'svg'.")
-       }	
+       }        
        da2 <- gsvaExp(data, gsvaexp, withSpatialCoords = TRUE, withReducedDim = TRUE)
        da2 <- kldSVG(da2, 
                      gsvaexp.assay.type, 

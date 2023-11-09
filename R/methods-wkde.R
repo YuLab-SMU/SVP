@@ -89,8 +89,8 @@ setMethod('wkde', 'SingleCellExperiment',
   return(data)
 })
 
-##' @rdname wkde-method	  
-##' @aliases wkde,SVPExperiment	  
+##' @rdname wkde-method   
+##' @aliases wkde,SVPExperiment   
 ##' @export wkde
 setMethod('wkde', 'SVPExperiment',
   function(
@@ -135,4 +135,4 @@ setMethod('wkde', 'SVPExperiment',
   colnames(res) <- colnames(x)
   rownames(res) <- rownames(x)
   return(res)
-}	    
+}

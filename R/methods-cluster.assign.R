@@ -48,10 +48,10 @@ setMethod(
         data, 
         assay.type = 'affi.score',
         ncluster = 2,
-	random.seed = 1024,
+        random.seed = 1024,
         BPPARAM = SerialParam(),
-	gsvaexp = NULL,
-	gsvaexp.assay.type = NULL,
+        gsvaexp = NULL,
+        gsvaexp.assay.type = NULL,
         ...
     ){
   if (is.null(assay.type)){
@@ -78,8 +78,8 @@ setMethod(
         ncluster = 2,
         random.seed = 1024,
         BPPARAM = SerialParam(),
-	gsvaexp = NULL,
-	gsvaexp.assay.type = NULL,
+        gsvaexp = NULL,
+        gsvaexp.assay.type = NULL,
         ...
     ){
     

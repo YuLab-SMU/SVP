@@ -158,12 +158,12 @@ setReplaceMethod("fscoreDf", c("SingleCellExperiment", "numeric"), function(x, t
         getfun = int_elementMetadata,
         setfun = `int_elementMetadata<-`,
         key = .fscore_key,
-	convertfun = NULL,
-	xdimfun = nrow,
-	vdimfun = nrow,
+        convertfun = NULL,
+        xdimfun = nrow,
+        vdimfun = nrow,
         funstr = "fscoreDf",
-	xdimstr = 'nrow',
-	vdimstr = 'nrow',
+        xdimstr = 'nrow',
+        vdimstr = 'nrow',
         substr = "type")
 })
 

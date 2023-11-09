@@ -185,8 +185,8 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
 }
 
 .check_gsvaexp_columns <- function(main, alt, withDimnames, withColData, 
-				   withSpatialCoords, withImgData, withReducedDim, 
-				   fun = "gsvaExp", vname = "value"){
+                                   withSpatialCoords, withImgData, withReducedDim, 
+                                   fun = "gsvaExp", vname = "value"){
     if (!is.null(alt)){
         if (withDimnames) {
             if (!identical(colnames(main), colnames(alt))) {

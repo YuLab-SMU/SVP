@@ -159,12 +159,12 @@ setReplaceMethod("svDf", c("SingleCellExperiment", "numeric"), function(x, type,
         getfun = int_elementMetadata,
         setfun = `int_elementMetadata<-`,
         key = .sv_key,
-	convertfun = NULL,
-	xdimfun = nrow,
-	vdimfun = nrow,
+        convertfun = NULL,
+        xdimfun = nrow,
+        vdimfun = nrow,
         funstr = "svDf",
-	xdimstr = 'nrow',
-	vdimstr = 'nrow',
+        xdimstr = 'nrow',
+        vdimstr = 'nrow',
         substr = "type")
 })
 

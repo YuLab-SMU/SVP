@@ -155,6 +155,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// fusiondist
+arma::mat fusiondist(arma::mat s, arma::mat p, double alpha, double beta);
+RcppExport SEXP _SVP_fusiondist(SEXP sSEXP, SEXP pSEXP, SEXP alphaSEXP, SEXP betaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type s(sSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type p(pSEXP);
+    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
+    Rcpp::traits::input_parameter< double >::type beta(betaSEXP);
+    rcpp_result_gen = Rcpp::wrap(fusiondist(s, p, alpha, beta));
+    return rcpp_result_gen;
+END_RCPP
+}
 // parallelCalRWR
 NumericMatrix parallelCalRWR(arma::sp_mat x, arma::sp_mat v, double restart, double stop_delta, int stop_step);
 RcppExport SEXP _SVP_parallelCalRWR(SEXP xSEXP, SEXP vSEXP, SEXP restartSEXP, SEXP stop_deltaSEXP, SEXP stop_stepSEXP) {
@@ -182,6 +196,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_SVP_MCAStep1", (DL_FUNC) &_SVP_MCAStep1, 1},
     {"_SVP_MCAStep2", (DL_FUNC) &_SVP_MCAStep2, 3},
     {"_SVP_fastPDist", (DL_FUNC) &_SVP_fastPDist, 2},
+    {"_SVP_fusiondist", (DL_FUNC) &_SVP_fusiondist, 4},
     {"_SVP_parallelCalRWR", (DL_FUNC) &_SVP_parallelCalRWR, 5},
     {NULL, NULL, 0}
 };

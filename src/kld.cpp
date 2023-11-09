@@ -91,8 +91,8 @@ struct RunWkde : public Worker{
   arma::mat& result;
 
   RunWkde(const arma::mat& w, const arma::mat& ax, const arma::mat& ay, 
-	  const arma::vec& H, const arma::uvec& indx, const arma::uvec& indy, 
-	  mat& result): 
+          const arma::vec& H, const arma::uvec& indx, const arma::uvec& indy, 
+          mat& result): 
       w(w), ax(ax), ay(ay), H(H), indx(indx), indy(indy), result(result) { }
 
   void operator()(std::size_t begin, std::size_t end){

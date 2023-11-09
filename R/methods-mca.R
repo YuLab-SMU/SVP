@@ -39,7 +39,7 @@ setGeneric('runMCA', function(data,
 #' @aliases runMCA,SingleCellExperiment
 #' @export runMCA
 setMethod('runMCA', 'SingleCellExperiment', 
-	  function(data, 
+          function(data, 
                    assay.type = 'logcounts', 
                    reduction.name = 'MCA', 
                    ncomponents = 50, 
@@ -70,7 +70,7 @@ setMethod('runMCA', 'SingleCellExperiment',
   
   res.mca <- .runMCA.internal(x, 
                               reduction.name = reduction.name, 
-			      ncomponents = ncomponents
+                              ncomponents = ncomponents
              )
 
   reducedDim(data, reduction.name) <- res.mca

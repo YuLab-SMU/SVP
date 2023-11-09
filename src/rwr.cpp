@@ -70,18 +70,18 @@ NumericMatrix parallelCalRWR(
 
 //// [[Rcpp::export]]
 //NumericMatrix calRWRCPP(arma::sp_mat x,
-//	      arma::sp_mat v,
-//	      double restart = .7, 
-//	      double stop_delta = 1e-6,
-//	      int stop_step = 50
-//	     ){
+//            arma::sp_mat v,
+//            double restart = .7, 
+//            double stop_delta = 1e-6,
+//            int stop_step = 50
+//           ){
 //    int step = 0;
 //    double delta = 1;
 //    arma::sp_mat pt = v;
 //    while((delta > stop_delta) && (step <= stop_step)){
-//	arma::sp_mat px = ((1 - restart) * x * pt) + (restart * v);
-//	delta = arma::accu(abs(px - pt));
-//	pt = px;
+//      arma::sp_mat px = ((1 - restart) * x * pt) + (restart * v);
+//      delta = arma::accu(abs(px - pt));
+//      pt = px;
 //      step = step + 1;
 //    }
 //    arma::mat pt2 = arma::conv_to<mat>::from(pt);
@@ -91,7 +91,7 @@ NumericMatrix parallelCalRWR(
 //
 //// [[Rcpp::export]]
 //NumericMatrix calRWRCPP2(
-//	      arma::sp_mat x,
+//            arma::sp_mat x,
 //              arma::sp_mat v,
 //              double restart = .7,
 //              double stop_delta = 1e-10,
@@ -110,7 +110,7 @@ NumericMatrix parallelCalRWR(
 //          pt = px;
 //          step = step + 1;
 //      }
-//	res.col(i) = pt;
+//      res.col(i) = pt;
 //    }
 //    return wrap(res);
 //}

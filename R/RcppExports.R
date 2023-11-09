@@ -107,6 +107,10 @@ fastPDist <- function(Ar, Br) {
     .Call('_SVP_fastPDist', PACKAGE = 'SVP', Ar, Br)
 }
 
+fusiondist <- function(s, p, alpha = 0.2, beta = 0.1) {
+    .Call('_SVP_fusiondist', PACKAGE = 'SVP', s, p, alpha, beta)
+}
+
 #' Computer the affinity score of all nodes in a graph to a seeds 
 #' using Random Walk with Restart
 #' @param x a adjacency matrix of a graph.
