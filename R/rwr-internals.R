@@ -136,8 +136,8 @@
 #calRWR <- function(x,
 #                     v,
 #                     restart = .75,
-#		     delta = 1,
-#		     step = 0,
+#                    delta = 1,
+#                    step = 0,
 #                     stop_delta = 1e-6, 
 #                     stop_step = 50){
 #    pt <- v

@@ -21,3 +21,15 @@ NumericMatrix fastPDist(NumericMatrix Ar, NumericMatrix Br) {
     C.each_row() += Bn.t();
     return wrap(sqrt(C)); 
 }
+
+//[[Rcpp::export]]
+arma::mat fusiondist(
+        arma::mat s,
+        arma::mat p,
+        double alpha = 0.2,
+        double beta = 0.1){
+  double alpha_s = 1.0 - alpha;
+  double beta_s = 1.0 - beta;
+  arma::mat z = beta_s * (alpha_s * s + alpha * p) + beta * s % p;
+  return (z);
+}

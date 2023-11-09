@@ -82,29 +82,46 @@ pairDist <- function(x, y){
 
 .build.nndist.graph <- function(
                             cells.rd, 
-                            features.rd, 
+                            features.rd,
+                            cells.sp.coord = NULL,
+                            knn.consider.spcoord = FALSE,
+                            sp.alpha.add.weight = .2,
+                            sp.beta.add.mp.weight = .1,
                             top.n = 600,
                             combined.cell.feature = FALSE, 
                             weighted.distance = FALSE,
                             graph.directed = FALSE){
     if (!combined.cell.feature){
+        # This is split the cells and features to build knn
         x <- pairDist(cells.rd, features.rd)
-        cell.dist <- pairDist(cells.rd, cells.rd)
+        
+        #cell.dist <- pairDist(cells.rd, cells.rd)
+        cell.dist <- .fusion.sc.sp.dist(
+                       cells.rd, 
+                       cells.sp.coord, 
+                       knn.consider.spcoord, 
+                       sp.alpha.add.weight, 
+                       sp.beta.add.mp.weight
+        )
+
         fs.dist <- pairDist(features.rd, features.rd)
         top.n <- min(top.n, nrow(features.rd))
         cell2fs <- .obtain.nndist.edge(x, top.n, weighted.distance)
         top.n.cell <- min(max(100, top.n - 200), nrow(cells.rd)) + 1
         cell2cell <- .obtain.nndist.edge(cell.dist, top.n.cell, weighted.distance)
+        # do not consider the same cell-cell or feature-feature
         cell2cell <- cell2cell[-1, ,drop=FALSE]
         top.n.fs <- min(max(100, top.n - 200), nrow(features.rd)) + 1
         fs2fs <- .obtain.nndist.edge(fs.dist, top.n.fs, weighted.distance)
         fs2fs <- fs2fs[-1,,drop = FALSE]
         nn.edge <- rbind(cell2fs, cell2cell, fs2fs)
     }else{
+        # build knn by merge the MCA space of cells and features 
         total.rd <- rbind(cells.rd, features.rd)
         total.dist <- pairDist(total.rd, total.rd)
         top.n <- min(top.n, nrow(total.rd)) + 1
         nn.edge <- .obtain.nndist.edge(total.dist, top.n, weighted.distance)
+        # do not consider the same cells-self or features-self
         nn.edge <- nn.edge[-1, ]
     }
     if (weighted.distance){
@@ -114,6 +131,18 @@ pairDist <- function(x, y){
     return(g)
 }
 
+.fusion.sc.sp.dist <- function(cells.rd, 
+                               cells.sp.coord, 
+                               consider.spcoord = FALSE,
+                               alpha = 0.2, 
+                               beta=0.1){
+    cell.dist <- pairDist(cells.rd, cells.rd)
+    if (consider.spcoord && !is.null(cells.sp.coord)){
+        cell.sp.dist <- pairDist(cells.sp.coord, cells.sp.coord)
+        cell.dist <- fusiondist(cell.dist, cell.sp.dist, alpha, beta)
+    }
+    return(cell.dist)
+}
 
 #' @importFrom BiocParallel SerialParam
 .build.knn.graph <- function(x, 
@@ -122,11 +151,11 @@ pairDist <- function(x, y){
                        BPPARAM = SerialParam(), 
                        weighted.distance = TRUE,
                        graph.directed = FALSE,
-		       ...){
+                       ...){
   dots.params <- list(...)
   all.params <- .extract_dot_args(fun.nm, 
-				  c('X', 'k', 'BPPARAM'), 
-				  dots.params)
+                                  c('X', 'k', 'BPPARAM'), 
+                                  dots.params)
   all.params$X <- x
   all.params$k <- knn.k.use
   all.params$BPPARAM <- BPPARAM
@@ -184,11 +213,11 @@ pairDist <- function(x, y){
 #' @importFrom igraph graph_from_data_frame
 #' @importFrom igraph simplify
 .build.graph <- function(
-		  edges, 
-		  graph.directed = FALSE){
+                  edges, 
+                  graph.directed = FALSE){
   g <- igraph::graph_from_data_frame(
          edges, 
-	 directed = graph.directed
+         directed = graph.directed
        ) 
   g <- igraph::simplify(g)
   return(g)
@@ -196,7 +225,7 @@ pairDist <- function(x, y){
 
 
 .filter.gset.gene <- function(x, gset.idx.list, min.sz = 10, max.sz = Inf, 
-			      gene.occurrence.rate = .4){
+                              gene.occurrence.rate = .4){
     
     total.genes <- x
     gset.gene.num <- lapply(gset.idx.list, function(i)length(unique(i))) |> unlist()
@@ -209,8 +238,8 @@ pairDist <- function(x, y){
     
     gene.num <- data.frame(
                   exp.gene.num = exp.gene.num, 
-	          gset.gene.num = gset.gene.num, 
-	          gene.occurrence.rate = exp.gene.num/gset.gene.num
+                  gset.gene.num = gset.gene.num, 
+                  gene.occurrence.rate = exp.gene.num/gset.gene.num
                 )
     rownames(gene.num) <- names(gset.idx.list)
     gene.num <- gene.num[gene.num$gset.gene.num >= min.sz & gene.num$gene.occurrence.rate >= gene.occurrence.rate,]
@@ -222,11 +251,11 @@ pairDist <- function(x, y){
 
 .generate.gset.seed <- function(g, 
                                 gset.idx.list
-				){
+                                ){
   
   x <- matrix(0, 
-  	      nrow = igraph::vcount(g), 
-  	      ncol = length(gset.idx.list)
+              nrow = igraph::vcount(g), 
+              ncol = length(gset.idx.list)
        )
   nm <- igraph::vertex_attr(g, 'name')
   rownames(x) <- nm
@@ -275,8 +304,8 @@ pairDist <- function(x, y){
                           permutation = 100, 
                           p.adjust.method="fdr",
                           BPPARAM = SerialParam(),
-			  random.seed = 123
-			  ){
+                          random.seed = 123
+                          ){
 
   rlang::check_installed("withr", "is required to reproducible in the identification of SVG or SVP.")
 

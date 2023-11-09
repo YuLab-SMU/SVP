@@ -14,7 +14,9 @@ detect.svp(
   max.sz = Inf,
   gene.occurrence.rate = 0.4,
   assay.type = "logcounts",
-  knn.mca.consider.spcoord = TRUE,
+  knn.consider.spcoord = FALSE,
+  sp.alpha.add.weight = 0.2,
+  sp.beta.add.mp.weight = 0.1,
   knn.used.reduction.dims = 30,
   knn.combined.cell.feature = FALSE,
   knn.graph.weighted = TRUE,
@@ -44,7 +46,9 @@ detect.svp(
   max.sz = Inf,
   gene.occurrence.rate = 0.4,
   assay.type = "logcounts",
-  knn.mca.consider.spcoord = TRUE,
+  knn.consider.spcoord = FALSE,
+  sp.alpha.add.weight = 0.2,
+  sp.beta.add.mp.weight = 0.1,
   knn.used.reduction.dims = 30,
   knn.combined.cell.feature = FALSE,
   knn.graph.weighted = TRUE,
@@ -85,7 +89,16 @@ default is 0.4.}
 
 \item{assay.type}{which expressed data to be pulled to build KNN Graph, default is \code{logcounts}.}
 
-\item{knn.mca.consider.spcoord}{logical whether consider the spatial coordinates to run MCA, default is TRUE.}
+\item{knn.consider.spcoord}{logical whether combine the space of \code{MCA} and the spatial physical
+space, default is FALSE. It only works when the input \code{data} has spatial coordinates and the
+argument \code{knn.combined.cell.feature=FALSE} and \code{knn.consider.spcoord=TRUE}.}
+
+\item{sp.alpha.add.weight}{only work when \code{knn.consider.spcoord=TRUE} and \code{knn.combined.cell.feature=FALSE},
+which is weight of spatial space of the additive term in single cell and spatial space funsion formula, default is 0.2.}
+
+\item{sp.beta.add.mp.weight}{only work when \code{knn.consider.spcoord=TRUE} and \code{knn.combined.cell.feature=FALSE},
+which is weight of spatial space of the additive term and multiplicative term in single cell and spatial space funsion
+formula, default is 0.1.}
 
 \item{knn.used.reduction.dims}{the top components of the reduction with \code{knn.used.reduction}
 to be used to build KNN Graph, default is 30.}
@@ -94,7 +107,7 @@ to be used to build KNN Graph, default is 30.}
 neighbor and build graph, default is FALSE, meaning the nearest neighbor will be found in cells to cells,
 features to features, cells to features respectively to build graph.}
 
-\item{knn.graph.weighted}{logical whether consider the distance of nodes in the Nearest Neighbors, default is TRUE.}
+\item{knn.graph.weighted}{logical whether consider the distance of nodes in the nearest neighbors, default is TRUE.}
 
 \item{knn.k.use}{numeric the number of the Nearest Neighbors nodes, default is 600.}
 

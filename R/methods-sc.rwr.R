@@ -1,4 +1,17 @@
-#' @title Calculate the activity of gene sets in spatial or single-cell data with Restart Walk with Restart 
+#' Calculate the activity of gene sets in spatial or single-cell data with restart walk with restart.
+#' @description 
+#' First, we calculated the distance between cells and between genes, between cells and genes in space
+#' of \code{MCA}. Because the closer a gene g is to a cell c, the more specific to such a cell it can 
+#' be considered in \code{MCA} space. We extract the top nearest genes for each cells, to obtain the
+#' cells and cells association, genes and gens association, we also extract the top nearest cells or
+#' genes respectively, then combine all the association into the same network to obtain the adjacency 
+#' matrix of all cells and genes. Another method is that we build the network using the combined \code{MCA} 
+#' space of cells and genes directly, but this method can not combine the spatial physical space.(see also 
+#' details). Next, we build a starting seed matrix (which each column measures the initial probability 
+#' distribution of each gene set in graph nodes) for random walk with restart using the gene set and all
+#' nodes of the graph, Final we use restart walk with restart to calculate the affinity score for each
+#' gene set or pathway.
+#'
 #' @rdname sc.rwr-method
 #' @param data a \linkS4class{SingleCellExperiment} object normalized and have the result of 
 #' \code{UMAP} or \code{TSNE}. Or a \linkS4class{SVPExperiment} object.
@@ -11,7 +24,12 @@
 #' @param gene.occurrence.rate the occurrence proportion of the gene set in the input object,
 #' default is 0.4.
 #' @param assay.type which expressed data to be pulled to build KNN Graph, default is \code{logcounts}.
-#' @param knn.mca.consider.spcoord logical whether consider the spatial coordinates to run MCA, default is TRUE.
+#' @param knn.consider.spcoord logical whether consider the spatial coordinates to run MCA, default is TRUE.
+#' @param sp.alpha.add.weight only work when \code{knn.consider.spcoord=TRUE} and \code{knn.combined.cell.feature=FALSE},
+#' which is weight of spatial space of the additive term in single cell and spatial space funsion formula, default is 0.2.
+#' @param sp.beta.add.mp.weight only work when \code{knn.consider.spcoord=TRUE} and \code{knn.combined.cell.feature=FALSE},
+#' which is weight of spatial space of the additive term and multiplicative term in single cell and spatial space funsion
+#' formula, default is 0.1.
 #' @param knn.used.reduction.dims the top components of the reduction with \code{MCA} to be used to build KNN 
 #' Graph, default is 30.
 #' @param knn.combined.cell.feature whether combined the embeddings of cells and features to find the nearest 
@@ -34,14 +52,45 @@
 #' @param verbose logical whether print the intermediate message when running the program, default is TRUE.
 #' @param ... additional parameters
 #' @return a \linkS4class{SVPExperiment} or a \linkS4class{SingleCellExperiment}, see details.
+#'
 #' @details
 #' if input is a \linkS4class{SVPExperiment}, output will be also a \linkS4class{SVPExperiment}, the activity score of gene sets
 #' was stored in \code{assay} slot of the specified \code{gsvaexp}, and the spatially variable gene sets result is stored in \code{svDfs}
 #' of the specified \code{gsvaexp}, which is a \linkS4class{SingleCellExperiment}. If input is a \linkS4class{SingleCellExperiment}
 #' (which is extracted from \linkS4class{SVPExperiment} using \code{gsvaExp()} funtion), output will be also a
 #' \linkS4class{SingleCellExperiment}, the activity score of gene sets result can be extracted using \code{assay()} function.
+#'
+#' When the \code{knn.consider.spcoord = TRUE}, \code{combined.cell.feature=FALSE} and the input \code{data} contains the spatial space
+#' the distance between cells will be reconstructed by taking into account both the space of \code{MCA} from cell transcriptomics data and 
+#' the physical space of cells in the following way (refer to the first refercence article):
+#'
+#' \eqn{C.dist = (1 - \beta) * ((1-\alpha) * S.dist + \alpha * P.dist) + \beta * S.dist \odot P.dist}
+#' 
+#' where \eqn{C.dist} is the new distance matrix of cells, \eqn{S.dist} is the distance matrix of cells in the \code{MCA} space from 
+#' transcriptomics data, \eqn{P.dist} is the distance matrix from physical space of cells, \eqn{beta} weights the contributions of the 
+#' additive and multiplicative terms, which is the argument \code{sp.beta.add.mp.weight}, \eqn{alpha} weighs the contributions of \eqn{P.dist} 
+#' and \eqn{S.dist}, which is the argument \code{sp.alpha.add.weight}, and the \eqn{\odot} is the element-wise product.
+#'
+#' The affinity score is calculated in the following way (refer to the second refercence article):
+#' 
+#' \eqn{P_{t+1} = (1 - r) * M * P_{t} + r * P_{0}}
+#' 
+#' where \eqn{P_{0}} is the initial probability distribution for each gene set, \eqn{M} is the transition matrix that is the column normalization 
+#' of adjacency matrix of graph, \eqn{r} is the the global restart probability, \eqn{P_{t+1}} and \eqn{P_{t}} are the probability distribution in 
+#' each iteration. After several iterations, the difference between \eqn{P_{t+1}} and \eqn{P_{t}} becomes negligible, the stationary probability 
+#' distribution is reached, and the elements for each gene set represent a proximity measure from every graph node. Iterations are stoped when the 
+#' difference between \eqn{P_{t+1}} and \eqn{P_{t}} falls below 1e-10.
+#' 
+#' @references
+#' 1. Arutyunyan, A., Roberts, K., Troulé, K. et al. Spatial multiomics map of trophoblast development in early pregnancy. 
+#' Nature, 616, 143–151 (2023). https://doi.org/10.1038/s41586-023-05869-0.
+#'
+#' 2. Alberto Valdeolivas, Laurent Tichit, Claire Navarro, Sophie Perrin, et al. Random walk with restart on multiplex and 
+#' heterogeneous biological networks, Bioinformatics, 35, 3, 497–505(2019), https://doi.org/10.1093/bioinformatics/bty637
+#'
 #' @seealso [`cluster.assign`] to classify cell using the activity score of gene sets base \code{kmean} and [`kldSVG`] to identify the 
 #' spatiall variable or specified cell gene sets or a features.
+#' @author Shuangbin Xu
 #' @export
 setGeneric('sc.rwr', 
   function(
@@ -52,7 +101,9 @@ setGeneric('sc.rwr',
     max.sz = Inf,
     gene.occurrence.rate = .4,
     assay.type = 'logcounts',
-    knn.mca.consider.spcoord = TRUE,
+    knn.consider.spcoord = TRUE,
+    sp.alpha.add.weight = .2,
+    sp.beta.add.mp.weight = .1,    
     knn.used.reduction.dims = 30,
     knn.combined.cell.feature = FALSE,
     knn.graph.weighted = TRUE,
@@ -85,7 +136,9 @@ setMethod('sc.rwr',
     max.sz = Inf,
     gene.occurrence.rate = .4,
     assay.type = 'logcounts',
-    knn.mca.consider.spcoord = TRUE,
+    knn.consider.spcoord = FALSE,
+    sp.alpha.add.weight = .2,
+    sp.beta.add.mp.weight = .1,    
     knn.used.reduction.dims = 30,
     knn.combined.cell.feature = FALSE,
     knn.graph.weighted = TRUE,
@@ -105,7 +158,7 @@ setMethod('sc.rwr',
       data <- runMCA(data, 
                      assay.type = assay.type, 
                      ncomponents = knn.used.reduction.dims, 
-                     consider.spcoord = knn.mca.consider.spcoord, 
+                     #consider.spcoord = knn.consider.spcoord, 
                      subset.row = cells, 
                      subset.col = features)
   }
@@ -123,13 +176,23 @@ setMethod('sc.rwr',
   gset.num <- .filter.gset.gene(features, gset.idx.list)
   gset.idx.list <- gset.idx.list[names(gset.idx.list) %in% rownames(gset.num)]
 
+  flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
+  if (flag1){
+    coords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
+  }else{
+    coords <- NULL
+  }  
+  
   tic()
   cli::cli_inform(c("Building the nearest neighbor graph with the distance between 
-		    features and cells ..."))
+                    features and cells ..."))
   
   rd.knn.gh <- .build.nndist.graph(
                        cells.rd,
                        features.rd,
+                       knn.consider.spcoord,
+                       sp.alpha.add.weight,
+                       sp.beta.add.mp.weight,
                        top.n = knn.k.use,
                        combined.cell.feature = knn.combined.cell.feature,
                        weighted.distance = knn.graph.weighted
@@ -170,10 +233,10 @@ setMethod('sc.rwr',
   rowData(x) <- gset.num[rownames(gset.num) %in% rownames(x), ]
   
   x <- .add.int.rowdata(sce=x, getfun=fscoreDfs, 
-			setfun1 = `fscoreDfs<-`, 
-			setfun2 = `fscoreDf<-`, 
-			namestr = "rwr.score", 
-			val = gset.score.features)
+                        setfun1 = `fscoreDfs<-`, 
+                        setfun2 = `fscoreDf<-`, 
+                        namestr = "rwr.score", 
+                        val = gset.score.features)
 
   da <- .sce_to_svpe(data) 
   gsvaExp(da, gsvaExp.name) <- x

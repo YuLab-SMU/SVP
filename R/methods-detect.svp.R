@@ -14,13 +14,20 @@
 #' @param gene.occurrence.rate the occurrence proportion of the gene set in the input object,
 #' default is 0.4.
 #' @param assay.type which expressed data to be pulled to build KNN Graph, default is \code{logcounts}.
-#' @param knn.mca.consider.spcoord logical whether consider the spatial coordinates to run MCA, default is TRUE.
+#' @param knn.consider.spcoord logical whether combine the space of \code{MCA} and the spatial physical 
+#' space, default is FALSE. It only works when the input \code{data} has spatial coordinates and the
+#' argument \code{knn.combined.cell.feature=FALSE} and \code{knn.consider.spcoord=TRUE}.
+#' @param sp.alpha.add.weight only work when \code{knn.consider.spcoord=TRUE} and \code{knn.combined.cell.feature=FALSE},
+#' which is weight of spatial space of the additive term in single cell and spatial space funsion formula, default is 0.2.
+#' @param sp.beta.add.mp.weight only work when \code{knn.consider.spcoord=TRUE} and \code{knn.combined.cell.feature=FALSE},
+#' which is weight of spatial space of the additive term and multiplicative term in single cell and spatial space funsion 
+#' formula, default is 0.1.
 #' @param knn.used.reduction.dims the top components of the reduction with \code{knn.used.reduction} 
 #' to be used to build KNN Graph, default is 30.
 #' @param knn.combined.cell.feature whether combined the embeddings of cells and features to find the nearest
 #' neighbor and build graph, default is FALSE, meaning the nearest neighbor will be found in cells to cells,
 #' features to features, cells to features respectively to build graph.
-#' @param knn.graph.weighted logical whether consider the distance of nodes in the Nearest Neighbors, default is TRUE.
+#' @param knn.graph.weighted logical whether consider the distance of nodes in the nearest neighbors, default is TRUE.
 #' @param knn.k.use numeric the number of the Nearest Neighbors nodes, default is 600.
 #' @param rwr.restart  default is 0.7.
 #' @param rwr.normalize.adj.method character the method to normalize the adjacency matrix of the input graph,
@@ -82,7 +89,9 @@ setGeneric('detect.svp',
     max.sz = Inf,
     gene.occurrence.rate = .4,
     assay.type = 'logcounts',
-    knn.mca.consider.spcoord = TRUE,
+    knn.consider.spcoord = FALSE,
+    sp.alpha.add.weight = .2,
+    sp.beta.add.mp.weight = .1,    
     knn.used.reduction.dims = 30,
     knn.combined.cell.feature = FALSE,
     knn.graph.weighted = TRUE,
@@ -122,7 +131,9 @@ setMethod('detect.svp',
     max.sz = Inf,
     gene.occurrence.rate = .4,
     assay.type = 'logcounts',
-    knn.mca.consider.spcoord = TRUE,
+    knn.consider.spcoord = FALSE,
+    sp.alpha.add.weight = .2,
+    sp.beta.add.mp.weight = .1,    
     knn.used.reduction.dims = 30,
     knn.combined.cell.feature = FALSE,    
     knn.graph.weighted = TRUE,
@@ -150,7 +161,6 @@ setMethod('detect.svp',
       data <- runMCA(data, 
                      assay.type = assay.type, 
                      ncomponents = knn.used.reduction.dims, 
-                     consider.spcoord = knn.mca.consider.spcoord, 
                      subset.row = cells, 
                      subset.col = features)
   }
@@ -166,15 +176,25 @@ setMethod('detect.svp',
   features.rd <- rd.f.res[features, seq(dims), drop=FALSE]
 
   gset.num <- .filter.gset.gene(features, gset.idx.list)
-
   gset.idx.list <- gset.idx.list[names(gset.idx.list) %in% rownames(gset.num)]
 
+  flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
+  if (flag1){
+    coords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
+  }else{
+    coords <- NULL
+  }
+  
   tic()
   cli::cli_inform(c("Building the nearest neighbor graph with the distance between features and cells ..."))
 
   rd.knn.gh <- .build.nndist.graph(
                    cells.rd, 
-                   features.rd, 
+                   features.rd,
+                   coords,
+                   knn.consider.spcoord,
+                   sp.alpha.add.weight,
+                   sp.beta.add.mp.weight,
                    top.n = knn.k.use, 
                    combined.cell.feature = knn.combined.cell.feature,
                    weighted.distance = knn.graph.weighted 
@@ -215,23 +235,23 @@ setMethod('detect.svp',
   rowData(x) <- gset.num[rownames(gset.num) %in% rownames(x), ]
   
   x <- .add.int.rowdata(sce=x, getfun=fscoreDfs, 
-			setfun1 = `fscoreDfs<-`, 
-			setfun2 = `fscoreDf<-`, 
-			namestr = "rwr.score", 
-			val = gset.score.features)
+                        setfun1 = `fscoreDfs<-`, 
+                        setfun2 = `fscoreDf<-`, 
+                        namestr = "rwr.score", 
+                        val = gset.score.features)
 
-  flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
+  #flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
 
   flag2 <- any(sv.used.reduction %in% reducedDimNames(data))
 
   if((flag1 || flag2) && run.sv){
-      if (flag2){
+      if (flag2 && is.null(coords)){
           coords <- reducedDim(data, sv.used.reduction)
-	  coords <- coords[,c(1, 2)]
+          coords <- coords[,c(1, 2)]
       }
-      if (flag1){
-          coords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
-      }
+      #if (flag1){
+      #    coords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
+      #}
       tic()
       cli::cli_inform("Identifying the spatially variable gene sets (pathway) based on 
                       Kullback-Leibler divergence of 2D Weighted Kernel Density ...") 
@@ -247,10 +267,10 @@ setMethod('detect.svp',
                         ...)
       
       x <- .add.int.rowdata(sce = x, 
-			    getfun = svDfs, 
-			    setfun1 = `svDfs<-`, 
-			    setfun2 = `svDf<-`, 
-			    namestr = 'sv.kld', 
+                            getfun = svDfs, 
+                            setfun1 = `svDfs<-`, 
+                            setfun2 = `svDf<-`, 
+                            namestr = 'sv.kld', 
                             val = res.sv)
       toc()
   }
