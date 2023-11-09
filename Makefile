@@ -1,7 +1,7 @@
 PKGNAME := $(shell sed -n "s/Package: *\([^ ]*\)/\1/p" DESCRIPTION)
 PKGVERS := $(shell sed -n "s/Version: *\([^ ]*\)/\1/p" DESCRIPTION)
 PKGSRC  := $(shell basename `pwd`)
-all: rd check1 clean
+all: rd check clean
 
 crd:
 	Rscript -e 'Rcpp::compileAttributes()'

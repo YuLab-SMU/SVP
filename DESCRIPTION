@@ -2,18 +2,9 @@ Package: SVP
 Title: Efficient analysis of 'gene set' activity in spatial or single-cell data
 Version: 0.99.0
 Authors@R: c(
-    person(
-           "Shuangbin", "Xu", 
-           email = "xshuangbin@163.com", 
-           role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0003-3513-5362")
-    ),
-    person(
-           "Guangchuang", "Yu", 
-           email = "guangchuangyu@gmail.com", 
-           role = c("aut", "ctb"), 
-           comment = c(ORCID = "0000-0002-6485-8781")
-    ))
+  person("Shuangbin", "Xu", email = "xshuangbin@163.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3513-5362")),
+  person("Guangchuang", "Yu", email = "guangchuangyu@gmail.com", role = c("aut", "ctb"), comment = c(ORCID = "0000-0002-6485-8781"))
+)
 Description: SVP uses the distance between cells and cells, features and features, cells and 
   features in the space of MCA to build nearest neighbor graph, then uses random walk with 
   restart algorithm to calculate the activity score of gene sets (such as kegg pathway, signatures, 
@@ -45,8 +36,9 @@ Suggests:
   knitr,
   ks,
   Matrix,
-  rmarkdown
-License: GPL-3 + file LICENSE
+  rmarkdown,
+  testthat (>= 3.0.0)
+License: GPL-3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
@@ -59,3 +51,4 @@ LinkingTo:
   Rcpp,
   RcppArmadillo,
   RcppParallel
+Config/testthat/edition: 3
