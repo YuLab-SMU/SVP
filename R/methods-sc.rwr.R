@@ -137,8 +137,8 @@ setMethod('sc.rwr',
   toc()
 
   tic()
-  cli::cli_inform("Building the seed matrix using the gene set and the neareast 
-		   neighbor graph for Random Walk with Restart ...")
+  cli::cli_inform("Building the seed matrix using the gene set and the nearest neighbor 
+                   graph for random walk with restart ...")
 
   seedstart.m <- .generate.gset.seed(rd.knn.gh, gset.idx.list)
   toc()

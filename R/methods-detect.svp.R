@@ -182,8 +182,8 @@ setMethod('detect.svp',
   toc()
 
   tic()
-  cli::cli_inform("Building the seed matrix using the gene set and the KNN graph 
-		   built before for Random Walk with Restart ...")
+  cli::cli_inform("Building the seed matrix using the gene set and the nearest neighbor 
+                   graph for random walk with restart ...")
 
   seedstart.m <- .generate.gset.seed(rd.knn.gh, gset.idx.list)
   toc()

@@ -24,7 +24,7 @@
   stop.delta <- 1e-10
   stop.step <- 50
   tic()
-  cli::cli_inform("Calculating the affinity score using Random Walk with Restart ...")
+  cli::cli_inform("Calculating the affinity score using random walk with restart ...")
   if (restart == 1){
     pt.m <- start.m
   }else{
@@ -45,7 +45,7 @@
   toc()
 
   tic()
-  cli::cli_inform(c('Tidying the result of Random Walk with Restart ...'))
+  cli::cli_inform(c('Tidying the result of random walk with restart ...'))
   pt.m <- prop.table(pt.m, 2)
   if (ncol(pt.m) == 1){
     normalize.affinity <- FALSE
@@ -113,7 +113,6 @@
   nm <- vertex_attr(g, name="name")
   if (is.null(seeds)){
     x <- Matrix::Matrix(diag(vcount(g)), sparse = TRUE)
-    #x <- diag(vcount(g))
     rownames(x) <- colnames(x) <- nm
   }else{
     if (length(dim(seeds))!=2){
