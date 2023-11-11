@@ -1,15 +1,15 @@
 #' Calculate the activity of gene sets in spatial or single-cell data with restart walk with restart.
 #' @description 
 #' First, we calculated the distance between cells and between genes, between cells and genes in space
-#' of \code{MCA}. Because the closer a gene g is to a cell c, the more specific to such a cell it can 
-#' be considered in \code{MCA} space. We extract the top nearest genes for each cells, to obtain the
-#' cells and cells association, genes and gens association, we also extract the top nearest cells or
-#' genes respectively, then combine all the association into the same network to obtain the adjacency 
+#' of \code{MCA}. Because the closer gene is to a cell, the more specific to such the cell it can 
+#' be considered in \code{MCA} space (first reference). We extract the top nearest genes for each cells, 
+#' to obtain the cells and cells association, genes and gens association, we also extract the top nearest 
+#' cells or genes respectively, then combine all the association into the same network to obtain the adjacency 
 #' matrix of all cells and genes. Another method is that we build the network using the combined \code{MCA} 
 #' space of cells and genes directly, but this method can not combine the spatial physical space.(see also 
 #' details). Next, we build a starting seed matrix (which each column measures the initial probability 
 #' distribution of each gene set in graph nodes) for random walk with restart using the gene set and all
-#' nodes of the graph, Final we use restart walk with restart to calculate the affinity score for each
+#' nodes of the graph, Finally we use restart walk with restart to calculate the affinity score for each
 #' gene set or pathway.
 #'
 #' @rdname sc.rwr-method
@@ -58,11 +58,12 @@
 #' was stored in \code{assay} slot of the specified \code{gsvaexp}, and the spatially variable gene sets result is stored in \code{svDfs}
 #' of the specified \code{gsvaexp}, which is a \linkS4class{SingleCellExperiment}. If input is a \linkS4class{SingleCellExperiment}
 #' (which is extracted from \linkS4class{SVPExperiment} using \code{gsvaExp()} funtion), output will be also a
-#' \linkS4class{SingleCellExperiment}, the activity score of gene sets result can be extracted using \code{assay()} function.
+#' \linkS4class{SingleCellExperiment}, the activity score of gene sets result can be extracted using \code{assay()} function. The 
+#' spatially variable gene sets result can be extracted using \code{svDf()} function.
 #'
-#' When the \code{knn.consider.spcoord = TRUE}, \code{combined.cell.feature=FALSE} and the input \code{data} contains the spatial space
-#' the distance between cells will be reconstructed by taking into account both the space of \code{MCA} from cell transcriptomics data and 
-#' the physical space of cells in the following way (refer to the first refercence article):
+#' When the \code{knn.consider.spcoord = TRUE}, \code{combined.cell.feature=FALSE} and the input \code{data} contains the spatial space.
+#' The distance between cells will be reconstructed by taking into account both the space of \code{MCA} from cell transcriptomics data and 
+#' the physical space of cells in the following way (refer to the second refercence article):
 #'
 #' \eqn{C.dist = (1 - \beta) * ((1-\alpha) * S.dist + \alpha * P.dist) + \beta * S.dist \odot P.dist}
 #' 
@@ -71,7 +72,7 @@
 #' additive and multiplicative terms, which is the argument \code{sp.beta.add.mp.weight}, \eqn{alpha} weighs the contributions of \eqn{P.dist} 
 #' and \eqn{S.dist}, which is the argument \code{sp.alpha.add.weight}, and the \eqn{\odot} is the element-wise product.
 #'
-#' The affinity score is calculated in the following way (refer to the second refercence article):
+#' The affinity score is calculated in the following way (refer to the third refercence article):
 #' 
 #' \eqn{P_{t+1} = (1 - r) * M * P_{t} + r * P_{0}}
 #' 
@@ -82,11 +83,14 @@
 #' difference between \eqn{P_{t+1}} and \eqn{P_{t}} falls below 1e-10.
 #' 
 #' @references
-#' 1. Arutyunyan, A., Roberts, K., Troulé, K. et al. Spatial multiomics map of trophoblast development in early pregnancy. 
-#' Nature, 616, 143–151 (2023). https://doi.org/10.1038/s41586-023-05869-0.
+#' 1. Cortal, A., Martignetti, L., Six, E. et al. Gene signature extraction and cell identity recognition at the single-cell 
+#'    level with Cell-ID. Nat Biotechnol 39, 1095–1102 (2021). https://doi.org/10.1038/s41587-021-00896-6
 #'
-#' 2. Alberto Valdeolivas, Laurent Tichit, Claire Navarro, Sophie Perrin, et al. Random walk with restart on multiplex and 
-#' heterogeneous biological networks, Bioinformatics, 35, 3, 497–505(2019), https://doi.org/10.1093/bioinformatics/bty637
+#' 2. Arutyunyan, A., Roberts, K., Troulé, K. et al. Spatial multiomics map of trophoblast development in early pregnancy. 
+#'    Nature, 616, 143–151 (2023). https://doi.org/10.1038/s41586-023-05869-0.
+#'
+#' 3. Alberto Valdeolivas, Laurent Tichit, Claire Navarro, Sophie Perrin, et al. Random walk with restart on multiplex and 
+#'    heterogeneous biological networks, Bioinformatics, 35, 3, 497–505(2019), https://doi.org/10.1093/bioinformatics/bty637
 #'
 #' @seealso [`cluster.assign`] to classify cell using the activity score of gene sets base \code{kmean} and [`kldSVG`] to identify the 
 #' spatiall variable or specified cell gene sets or a features.
@@ -179,6 +183,7 @@ setMethod('sc.rwr',
   flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
   if (flag1){
     coords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
+    coords <- .normalize.coords(coords)
   }else{
     coords <- NULL
   }  
@@ -190,6 +195,7 @@ setMethod('sc.rwr',
   rd.knn.gh <- .build.nndist.graph(
                        cells.rd,
                        features.rd,
+                       coords,
                        knn.consider.spcoord,
                        sp.alpha.add.weight,
                        sp.beta.add.mp.weight,
@@ -221,12 +227,18 @@ setMethod('sc.rwr',
 
   gset.score.cells <- gset.score.cells[Matrix::rowSums(gset.score.cells) > 0,]
 
-  gset.score.features <- .extract.features.score(
-                            gset.score, 
-                            rownames(gset.score.cells), 
-                            features, 
-                            gset.idx.list
-                         )
+  #gset.score.features <- .extract.features.score(
+  #                          gset.score, 
+  #                          rownames(gset.score.cells), 
+  #                          features, 
+  #                          gset.idx.list
+  #                       )
+  gset.score.features <- .extract.features.rank(
+                             gset.score.cells,
+                             assay(data, assay.type),
+                             features,
+                             gset.idx.list
+                          )
 
   x <- SingleCellExperiment(assays = list(affi.score = gset.score.cells))
 

@@ -18,7 +18,7 @@ build:
 build2:
 	Rscript -e 'devtools::build(vignettes = FALSE)'
 
-install: build
+install: build2
 	cd ..;\
 	R CMD INSTALL $(PKGNAME)_$(PKGVERS).tar.gz
 

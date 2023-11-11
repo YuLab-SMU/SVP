@@ -181,6 +181,7 @@ setMethod('detect.svp',
   flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
   if (flag1){
     coords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
+    coords <- .normalize.coords(coords)
   }else{
     coords <- NULL
   }
@@ -223,12 +224,18 @@ setMethod('detect.svp',
 
   gset.score.cells <- gset.score.cells[Matrix::rowSums(gset.score.cells) > 0,]
 
-  gset.score.features <- .extract.features.score(
-                            gset.score, 
-                            rownames(gset.score.cells), 
-                            features, 
-                            gset.idx.list
-                         )
+  #gset.score.features <- .extract.features.score(
+  #                          gset.score, 
+  #                          rownames(gset.score.cells), 
+  #                          features, 
+  #                          gset.idx.list
+  #                       )
+  gset.score.features <- .extract.features.rank(
+                             gset.score.cells,
+                             assay(data, assay.type),
+                             features,
+                             gset.idx.list
+                          )
 
   x <- SingleCellExperiment(assays = list(affi.score = gset.score.cells))
 

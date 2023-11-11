@@ -58,7 +58,6 @@
   return(rd.res)
 }
 
-
 pairDist <- function(x, y){
     z <- fastPDist(y, x)
     rownames(z) <- rownames(y)
@@ -96,6 +95,7 @@ pairDist <- function(x, y){
         x <- pairDist(cells.rd, features.rd)
         
         #cell.dist <- pairDist(cells.rd, cells.rd)
+        
         cell.dist <- .fusion.sc.sp.dist(
                        cells.rd, 
                        cells.sp.coord, 
@@ -106,7 +106,9 @@ pairDist <- function(x, y){
 
         fs.dist <- pairDist(features.rd, features.rd)
         top.n <- min(top.n, nrow(features.rd))
+        #top.n2 <- min(top.n, nrow(cells.rd))
         cell2fs <- .obtain.nndist.edge(x, top.n, weighted.distance)
+        #fs2cell <- .obtain.nndist.edge(t(x), top.n2, weighted.distance)
         top.n.cell <- min(max(100, top.n - 200), nrow(cells.rd)) + 1
         cell2cell <- .obtain.nndist.edge(cell.dist, top.n.cell, weighted.distance)
         # do not consider the same cell-cell or feature-feature
@@ -115,6 +117,7 @@ pairDist <- function(x, y){
         fs2fs <- .obtain.nndist.edge(fs.dist, top.n.fs, weighted.distance)
         fs2fs <- fs2fs[-1,,drop = FALSE]
         nn.edge <- rbind(cell2fs, cell2cell, fs2fs)
+        #nn.edge <- rbind(cell2fs, fs2cell)
     }else{
         # build knn by merge the MCA space of cells and features 
         total.rd <- rbind(cells.rd, features.rd)
@@ -139,7 +142,10 @@ pairDist <- function(x, y){
     cell.dist <- pairDist(cells.rd, cells.rd)
     if (consider.spcoord && !is.null(cells.sp.coord)){
         cell.sp.dist <- pairDist(cells.sp.coord, cells.sp.coord)
+        nm <- rownames(cell.dist)
         cell.dist <- fusiondist(cell.dist, cell.sp.dist, alpha, beta)
+        rownames(cell.dist) <- nm
+        colnames(cell.dist) <- nm
     }
     return(cell.dist)
 }
@@ -283,17 +289,30 @@ pairDist <- function(x, y){
 }
 
 #' @importFrom S4Vectors DataFrame List
-.extract.features.score <- function(x, gset.nm, features, gset.idx.list){
-  keep.gset <- x[rownames(x) %in% gset.nm, ,drop=FALSE]
-  keep.gset <- keep.gset[,colnames(keep.gset) %in% features,drop=FALSE]
-  rnm <- rownames(keep.gset)
-  cnm <- colnames(keep.gset)
+.extract.features.rank <- function(x, y, features, gset.idx.list){
+  y <- y[features %in% rownames(y), ]
+  keep.gset <- corCpp(Matrix::t(x), Matrix::t(y))
+  rownames(keep.gset) <- rownames(x)
+  colnames(keep.gset) <- rownames(y)
   keep.gset.list <- gset.idx.list[names(gset.idx.list) %in% rownames(keep.gset)]
-  res <- ExtractFeatureScoreCpp(keep.gset, rnm, cnm, keep.gset.list)
+  res <- ExtractFeatureScoreCpp(keep.gset, rownames(keep.gset), colnames(keep.gset), keep.gset.list)
   res <- DataFrame(features.score = List(res))
-  rownames(res) <- rnm
+  rownames(res) <- rownames(keep.gset)
   return(res)
 }
+
+# #' @importFrom S4Vectors DataFrame List
+#.extract.features.score <- function(x, gset.nm, features, gset.idx.list){
+#  keep.gset <- x[rownames(x) %in% gset.nm, ,drop=FALSE]
+#  keep.gset <- keep.gset[,colnames(keep.gset) %in% features,drop=FALSE]
+#  rnm <- rownames(keep.gset)
+#  cnm <- colnames(keep.gset)
+#  keep.gset.list <- gset.idx.list[names(gset.idx.list) %in% rownames(keep.gset)]
+#  res <- ExtractFeatureScoreCpp(keep.gset, rnm, cnm, keep.gset.list)
+#  res <- DataFrame(features.score = List(res))
+#  rownames(res) <- rnm
+#  return(res)
+#}
 
 #' @importFrom rlang .data
 #' @importFrom stats p.adjust

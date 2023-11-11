@@ -11,13 +11,25 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// corCpp
+arma::mat corCpp(arma::sp_mat a, arma::sp_mat b);
+RcppExport SEXP _SVP_corCpp(SEXP aSEXP, SEXP bSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::sp_mat >::type a(aSEXP);
+    Rcpp::traits::input_parameter< arma::sp_mat >::type b(bSEXP);
+    rcpp_result_gen = Rcpp::wrap(corCpp(a, b));
+    return rcpp_result_gen;
+END_RCPP
+}
 // ExtractFeatureScoreCpp
-List ExtractFeatureScoreCpp(arma::sp_mat& x, CharacterVector& rnm, CharacterVector& cnm, Rcpp::List& g);
+List ExtractFeatureScoreCpp(NumericMatrix& x, CharacterVector& rnm, CharacterVector& cnm, Rcpp::List& g);
 RcppExport SEXP _SVP_ExtractFeatureScoreCpp(SEXP xSEXP, SEXP rnmSEXP, SEXP cnmSEXP, SEXP gSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::sp_mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix& >::type x(xSEXP);
     Rcpp::traits::input_parameter< CharacterVector& >::type rnm(rnmSEXP);
     Rcpp::traits::input_parameter< CharacterVector& >::type cnm(cnmSEXP);
     Rcpp::traits::input_parameter< Rcpp::List& >::type g(gSEXP);
@@ -186,6 +198,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_SVP_corCpp", (DL_FUNC) &_SVP_corCpp, 2},
     {"_SVP_ExtractFeatureScoreCpp", (DL_FUNC) &_SVP_ExtractFeatureScoreCpp, 4},
     {"_SVP_findIntervalCpp", (DL_FUNC) &_SVP_findIntervalCpp, 2},
     {"_SVP_outergrid", (DL_FUNC) &_SVP_outergrid, 2},
