@@ -1,5 +1,13 @@
-#' @title Detecting the spatially or single cell variable features with Kullback–Leibler
-#' divergence of 2D Weighted Kernel Density
+#' Detecting the spatially or single cell variable features with kullback–leibler divergence of 
+#' 2D weighted kernel density estimation
+#' @description
+#' To resolve the sparsity of single cell or spatial omics data, we use kernel function smoothing cell 
+#' density weighted by the gene expression in a low-dimensional space or physical space. This method had 
+#' reported that it can better represent the gene expression, it can also recover the signal from cells that 
+#' are more likely to express a gene based on their neighbouring cells (first reference). Next, we use
+#' kullback-leibler divergence to detect the signal genes in a low-dimensional space (\code{UMAP} or \code{TSNE}
+#' for single cell omics data) or a physical space (for spatial omics data). See details to learn more.
+#'
 #' @rdname kldSVG-method
 #' @param data a \linkS4class{SingleCellExperiment} object with contains \code{UMAP} or \code{TSNE},
 #' or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} object with specified
@@ -41,6 +49,43 @@
 #'   \item \code{padj} the adjusted pvalue based on the speficied \code{sv.p.adjust.method}, default is \code{BY}.
 #'   \item \code{rank} the order of significant spatial variable features based on \code{padj} and \code{sp.kld}.
 #' }
+#' 
+#' The kernel density estimation for each features in each cells is done in the following way (first reference article):
+#'
+#'   \eqn{f_{h}(x) = 1/n \sum_{i=1}^n W_{i} * K_{h}(x - X_{i})}
+#'
+#' Where \eqn{W_{i}} is the value of feature (such as gene expression or gene set score). \eqn{X_{i}} is the embeddings (two 
+#' dimenstion coordinates of \code{UMAP} or \code{TSNE} or the physical space for spatial omics data) of the cell \eqn{i}.
+#' \eqn{h} is a smoothing parameter corresponding to the bandwidth matrix, default is the implemention of \code{ks} package.
+#' \eqn{K(x)} is a gaussian kernel function. \eqn{x} is the a reference point in the embedding space defined by the grid size 
+#' used for the computation to weight the distances of nearby cells. \eqn{K_{h}(x—X_{i})}works as a weight for \eqn{W_{i}} to 
+#' smooth the feature value based on neighbouring cells at a \code{UMAP} or \code{TSNE} or physical space.
+#'
+#' The Kullback-Leibler divergence for each features is calculated in the following way:
+#' 
+#'   \eqn{D_{KL}(G) = \sum_{x \in X} P(x) * \log(P(x) / Q(x))}
+#' 
+#'  Where \eqn{P(x)} is the kernel density value of a feature at the space \eqn{X}. and \eqn{Q(x)} is the kernel density value of no spatially
+#'  variabilty reference feature at the space \eqn{X}. The smaller kullback-leibler divergence (\eqn{D_{KL}(G)}) show that the distribution of 
+#'  features is more like the no spatially variabilty reference feature at th space \eqn{X}. So we randomly shuffle the position of each feature 
+#'  and calculate Kullback-Leibler divergence, next we use the normal distribution to calculate the pvalue with the actual Kullback-Leibler 
+#'  divergence, and the average value and standard deviation value of random Kullback-Leibler divergence, since the random Kullback-Leibler 
+#'  divergence for each feature is normally distributed in the following:
+#'  
+#'   \eqn{X \sim \mathcal{N}(\mu,\,\sigma^{2})}
+#' 
+#'  where \eqn{\mu} is the average value of random Kullback-Leibler divergence, and \eqn{\sigma} is standard deviation.
+#'
+#' @references
+#'
+#' 1. Jose Alquicira-Hernandez, Joseph E Powell, Nebulosa recovers single-cell gene expression signals by kernel density estimation.
+#'    Bioinformatics, 37, 2485–2487(2021), https://doi.org/10.1093/bioinformatics/btab003.
+#' 
+#' 2. Vandenbon, A., Diez, D. A clustering-independent method for finding differentially expressed genes in single-cell transcriptome 
+#'    data. Nat Commun, 11, 4318 (2020). https://doi.org/10.1038/s41467-020-17900-3
+#' 
+#' 3. https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
+#'
 #' @seealso [`sc.rwr`] to calculate the activity score of gene sets.
 #' @export
 setGeneric('kldSVG',

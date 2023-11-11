@@ -15,6 +15,13 @@ NumericVector SortNv(NumericVector x, bool decreasing = true) {
     return y;
 }
 
+//[[Rcpp::export]]
+arma::mat corCpp(arma::sp_mat a, arma::sp_mat b){
+    arma::mat z = arma::cor(arma::conv_to<mat>::from(a), arma::conv_to<mat>::from(b));
+    return(z);
+}
+
+
 //' Extract the score of gene in each gene sets
 //' @param x the score sparse matrix of gene for each gene sets.
 //' @param rnm the row names of x matrix.
@@ -22,12 +29,12 @@ NumericVector SortNv(NumericVector x, bool decreasing = true) {
 //' @param g a list of gene set.
 //' @return a list contained the score of gene in each gene sets
 //[[Rcpp::export]]
-List ExtractFeatureScoreCpp(arma::sp_mat& x,
+List ExtractFeatureScoreCpp(NumericMatrix& x,
               CharacterVector& rnm,
               CharacterVector& cnm,
               Rcpp::List& g
               ){
-    arma::mat xx = conv_to<arma::mat>::from(x);
+    //arma::mat xx = conv_to<arma::mat>::from(x);
     uword n = rnm.length();
     Rcpp::List res(n);
     for (uword i = 0; i < n; i++){
@@ -35,7 +42,8 @@ List ExtractFeatureScoreCpp(arma::sp_mat& x,
         CharacterVector gene = g[gnm];
         LogicalVector ind = in(cnm, gene);
         CharacterVector nm = cnm[ind];
-        NumericVector f = as<NumericVector>(wrap(xx.row(i)));
+        //NumericVector f = as<NumericVector>(wrap(x.row(i)));
+        NumericVector f= x(i, _ );
         NumericVector fn = f[ind];
         fn.names() = nm;
         res[i] = SortNv(fn);
