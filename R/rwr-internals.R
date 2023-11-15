@@ -3,15 +3,19 @@
 .run_rwr <- function(g, 
                      edge.attr = 'weight',
                      seeds = NULL,
-                     normalize.adj.method = c("laplacian","row","column","none"),
+                     normalize.adj.method = c("laplacian", "row", "column", "none"),
                      restart = .7,
                      threads = 2L,
-                     normalize.affinity = TRUE,
+                     normalize.affinity = FALSE,
                      verbose = TRUE,
                      ...){
 
   normalize.adj.method <- match.arg(normalize.adj.method)
-  adj.m <- .extract.adj.m(g, edge.attr, verbose)
+  if (inherits(g, 'igraph')){
+    adj.m <- .extract.adj.m(g, edge.attr, verbose)
+  }else{
+    adj.m <- g
+  }
   n.adj.m <- .normalize.adj.m(adj.m, normalize.adj.method)
   start.m <- .obtain.seeds(g, seeds = seeds, nrow = nrow(n.adj.m))
   
@@ -21,8 +25,8 @@
     restart <- .7
   }
 
-  stop.delta <- 1e-10
-  stop.step <- 50
+  stop.delta <- 1e-6
+  stop.step <- 1000
   tic()
   cli::cli_inform("Calculating the affinity score using random walk with restart ...")
   if (restart == 1){
@@ -40,13 +44,14 @@
                 stop_step = stop.step
             )
   }
-  pt.m[is.na(pt.m)] <- 0
-  pt.m[pt.m < stop.delta] <- 0
   toc()
+
+  pt.m[is.na(pt.m)] <- 0
 
   tic()
   cli::cli_inform(c('Tidying the result of random walk with restart ...'))
-  pt.m <- prop.table(pt.m, 2)
+  pt.m <- prop.table(pt.m, 1)
+  pt.m[is.na(pt.m)] <- 0
   if (ncol(pt.m) == 1){
     normalize.affinity <- FALSE
   }
@@ -54,8 +59,8 @@
     rlang::check_installed('broman', 'for `.run_rwr()` with `normalize.affinity = TRUE`.')
     pt.m <- broman::normalize(pt.m)
     pt.m[is.na(pt.m)] <- 0
-    pt.m[pt.m < stop.delta] <- 0
   }
+  pt.m[pt.m < stop.delta] <- 0
   colnames(pt.m) <- colnames(start.m)
   rownames(pt.m) <- rownames(start.m)
   pt.m <- Matrix::Matrix(t(pt.m), sparse = TRUE)
@@ -63,11 +68,10 @@
   return(pt.m)
 }
 
-#' @importFrom igraph as_adjacency_matrix
 .extract.adj.m <- function(g, edge.attr, verbose = FALSE){
   flag <- .check.edge.attr(g, edge.attr)
   if (inherits(flag, 'numeric')){
-    adj.m <- as_adjacency_matrix(g, attr = edge.attr)
+    adj.m <- igraph::as_adjacency_matrix(g, attr = edge.attr)
   }else{
     if (verbose){
       if (is.null(flag)){
@@ -77,7 +81,7 @@
       }
       cli::cli_inform(c('Unweighted adjacency matrix will be used.'))
     }
-    adj.m <- as_adjacency_matrix(g)
+    adj.m <- igraph::as_adjacency_matrix(g)
   }
   return(adj.m)
 }
@@ -102,17 +106,19 @@
   return(n.adj.m)
 }
 
-#' @importFrom igraph edge_attr
 .check.edge.attr <- function(g, edge.attr){
-  x <- edge_attr(g, name='weight')
+  x <- igraph::edge_attr(g, name='weight')
   return(x)
 }
 
-#' @importFrom igraph vcount vertex_attr
 .obtain.seeds <- function(g, seeds = NULL, nrow){
-  nm <- vertex_attr(g, name="name")
+  if (inherits(g, 'igraph')){    
+    nm <- igraph::vertex_attr(g, name="name")
+  }else{
+    nm <- colnames(g)
+  }
   if (is.null(seeds)){
-    x <- Matrix::Matrix(diag(vcount(g)), sparse = TRUE)
+    x <- Matrix::Matrix(diag(length(nm)), sparse = TRUE)
     rownames(x) <- colnames(x) <- nm
   }else{
     if (length(dim(seeds))!=2){

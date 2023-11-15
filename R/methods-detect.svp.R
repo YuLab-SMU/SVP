@@ -28,13 +28,15 @@
 #' neighbor and build graph, default is FALSE, meaning the nearest neighbor will be found in cells to cells,
 #' features to features, cells to features respectively to build graph.
 #' @param knn.graph.weighted logical whether consider the distance of nodes in the nearest neighbors, default is TRUE.
-#' @param knn.k.use numeric the number of the Nearest Neighbors nodes, default is 600.
-#' @param rwr.restart  default is 0.7.
+#' @param knn.k.use numeric the number of the Nearest Neighbors nodes, default is 400.
+#' @param rwr.restart  default is 0.75.
 #' @param rwr.normalize.adj.method character the method to normalize the adjacency matrix of the input graph,
 #' default is \code{laplacian}.
 #' @param rwr.normalize.affinity logical whether normalize the activity (affinity) result score using quantile normalisation,
-#' default is TRUE.
+#' default is FALSE.
 #' @param rwr.threads the threads to run Random Walk With Restart (RWR), default is 2L.
+#' @param hyper.test.weighted logical whether consider weighting the enrichment score of cell using hypergeometric test,
+#' default is TRUE.
 #' @param sv.used.reduction character used as spatial coordinates to detect SVG, default is \code{UMAP},
 #' if \code{data} has \code{spatialCoords}, which will be used as spatial coordinates.
 #' @param sv.grid.n numeric number of grid points in the two directions to estimate 2D weighted kernel density, default is 100.
@@ -95,11 +97,12 @@ setGeneric('detect.svp',
     knn.used.reduction.dims = 30,
     knn.combined.cell.feature = FALSE,
     knn.graph.weighted = TRUE,
-    knn.k.use = 600,
-    rwr.restart = .7,
-    rwr.normalize.adj.method = c("laplacian","row","column","none"),
-    rwr.normalize.affinity = TRUE,
+    knn.k.use = 400,
+    rwr.restart = .75,
+    rwr.normalize.adj.method = c("laplacian", "row", "column", "none"),
+    rwr.normalize.affinity = FALSE,
     rwr.threads = 2L,
+    hyper.test.weighted = TRUE,
     sv.used.reduction = c('UMAP', 'TSNE'),
     sv.grid.n = 100,
     sv.permutation = 100,
@@ -137,15 +140,16 @@ setMethod('detect.svp',
     knn.used.reduction.dims = 30,
     knn.combined.cell.feature = FALSE,    
     knn.graph.weighted = TRUE,
-    knn.k.use = 600,
-    rwr.restart = .7,
-    rwr.normalize.adj.method = c("laplacian","row","column","none"),
-    rwr.normalize.affinity = TRUE,
+    knn.k.use = 400,
+    rwr.restart = .75,
+    rwr.normalize.adj.method = c("laplacian", "row", "column", "none"),
+    rwr.normalize.affinity = FALSE,
     rwr.threads = 2L,
+    hyper.test.weighted = TRUE,
     sv.used.reduction = c('UMAP', 'TSNE'),
     sv.grid.n = 100,
     sv.permutation = 100,
-    sv.p.adjust.method = "bonferroni",
+    sv.p.adjust.method = "BY",
     sv.BPPARAM = SerialParam(),
     run.sv = TRUE,
     cells = NULL,
@@ -154,137 +158,38 @@ setMethod('detect.svp',
     random.seed = 1024,
     ...
   ){
-  
-  knn.used.reduction <- 'MCA'
-  if (!"MCA" %in% reducedDimNames(data)){
-      cli::cli_warn(c("The {.cls {class(data)}} does not have MCA, run 'runMCA()' first."))
-      data <- runMCA(data, 
-                     assay.type = assay.type, 
-                     ncomponents = knn.used.reduction.dims, 
-                     subset.row = cells, 
-                     subset.col = features)
-  }
-  rd.df <- reducedDim(data, knn.used.reduction)
-  rd.f.nm <- switch(knn.used.reduction, MCA='genesCoordinates', PCA='rotation')
-  rd.f.res <- attr(rd.df, rd.f.nm)
-
-  cells <- .subset_ind(rd.df, cells)
-  features <- .subset_ind(rd.f.res, features)
-
-  dims <- min(ncol(rd.df), knn.used.reduction.dims)
-  cells.rd <- rd.df[cells, seq(dims), drop=FALSE]
-  features.rd <- rd.f.res[features, seq(dims), drop=FALSE]
-
-  gset.num <- .filter.gset.gene(features, gset.idx.list)
-  gset.idx.list <- gset.idx.list[names(gset.idx.list) %in% rownames(gset.num)]
-
-  flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
-  if (flag1){
-    coords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
-    coords <- .normalize.coords(coords)
-  }else{
-    coords <- NULL
-  }
-  
-  tic()
-  cli::cli_inform(c("Building the nearest neighbor graph with the distance between features and cells ..."))
-
-  rd.knn.gh <- .build.nndist.graph(
-                   cells.rd, 
-                   features.rd,
-                   coords,
-                   knn.consider.spcoord,
-                   sp.alpha.add.weight,
-                   sp.beta.add.mp.weight,
-                   top.n = knn.k.use, 
-                   combined.cell.feature = knn.combined.cell.feature,
-                   weighted.distance = knn.graph.weighted 
-               )
-  toc()
-
-  tic()
-  cli::cli_inform("Building the seed matrix using the gene set and the nearest neighbor 
-                   graph for random walk with restart ...")
-
-  seedstart.m <- .generate.gset.seed(rd.knn.gh, gset.idx.list)
-  toc()
-
-  gset.score <- .run_rwr(
-                  rd.knn.gh, 
-                  edge.attr = 'weight',
-                  seeds = seedstart.m,
-                  normalize.adj.method = rwr.normalize.adj.method,
-                  restart = rwr.restart,
-                  threads = rwr.threads,
-                  normalize.affinity = rwr.normalize.affinity,
-                  verbose = verbose
-                )
-
-  gset.score.cells <- gset.score[, cells]
-
-  gset.score.cells <- gset.score.cells[Matrix::rowSums(gset.score.cells) > 0,]
-
-  #gset.score.features <- .extract.features.score(
-  #                          gset.score, 
-  #                          rownames(gset.score.cells), 
-  #                          features, 
-  #                          gset.idx.list
-  #                       )
-  gset.score.features <- .extract.features.rank(
-                             gset.score.cells,
-                             assay(data, assay.type),
-                             features,
-                             gset.idx.list
-                          )
-
-  x <- SingleCellExperiment(assays = list(affi.score = gset.score.cells))
-
-  rowData(x) <- gset.num[rownames(gset.num) %in% rownames(x), ]
-  
-  x <- .add.int.rowdata(sce=x, getfun=fscoreDfs, 
-                        setfun1 = `fscoreDfs<-`, 
-                        setfun2 = `fscoreDf<-`, 
-                        namestr = "rwr.score", 
-                        val = gset.score.features)
-
-  #flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
-
-  flag2 <- any(sv.used.reduction %in% reducedDimNames(data))
-
-  if((flag1 || flag2) && run.sv){
-      if (flag2 && is.null(coords)){
-          coords <- reducedDim(data, sv.used.reduction)
-          coords <- coords[,c(1, 2)]
-      }
-      #if (flag1){
-      #    coords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
-      #}
-      tic()
-      cli::cli_inform("Identifying the spatially variable gene sets (pathway) based on 
-                      Kullback-Leibler divergence of 2D Weighted Kernel Density ...") 
-      
-      res.sv <- .identify.svg(
-                        gset.score.cells, 
-                        coords = coords,
-                        n = sv.grid.n,
-                        permutation = sv.permutation,
-                        p.adjust.method = sv.p.adjust.method,
-                        BPPARAM = sv.BPPARAM, 
-                        random.seed = random.seed,
-                        ...)
-      
-      x <- .add.int.rowdata(sce = x, 
-                            getfun = svDfs, 
-                            setfun1 = `svDfs<-`, 
-                            setfun2 = `svDf<-`, 
-                            namestr = 'sv.kld', 
-                            val = res.sv)
-      toc()
-  }
-  
-  da <- .sce_to_svpe(data) 
-  gsvaExp(da, gsvaExp.name) <- x
-  new.reduced <- .build.new.reduced(rd.df, cells, features, rd.f.nm)
-  reducedDim(da, knn.used.reduction) <- new.reduced
-  return(da)
+    sce <- sc.rwr(data, 
+              gset.idx.list, 
+              gsvaExp.name, 
+              min.sz, 
+              max.sz, 
+              gene.occurrence.rate, 
+              assay.type, 
+              knn.consider.spcoord, 
+              sp.alpha.add.weight,
+              sp.beta.add.mp.weight,
+              knn.used.reduction.dims,
+              knn.combined.cell.feature,
+              knn.graph.weighted,
+              knn.k.use,
+              rwr.restart,
+              rwr.normalize.adj.method,
+              rwr.normalize.affinity,
+              rwr.threads,
+              hyper.test.weighted,
+              cells,
+              features,
+              verbose
+        )
+    if (run.sv){
+        sce <- kldSVG(data = sce, 
+                  sv.used.reduction = sv.used.reduction,
+                  sv.grid.n = sv.grid.n,
+                  sv.permutation = sv.permutation,
+                  sv.p.adjust.method = sv.p.adjust.method,
+                  verbose = verbose,
+                  random.seed = random.seed,
+                  gsvaexp = gsvaExp.name)
+    }
+    return(sce)
 })

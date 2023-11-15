@@ -1,7 +1,7 @@
 ## This function is from CelliD, because it has many depends.
 ## to better developement, it was coped and modified diretcly.
 .runMCA.internal <- function(x, reduction.name = 'MCA', ncomponents, coords = NULL){
-  rlang::check_installed(c('irlba', 'Matrix', 'matrixStats'), '`runMCA()`')
+  rlang::check_installed(c('irlba', 'Matrix'), '`runMCA()`')
   if (inherits(x, 'dgTMatrix')){
      x <- as(x, "CsparseMatrix")
   }else if (inherits(x, 'matrix')){
@@ -65,19 +65,70 @@ pairDist <- function(x, y){
     return(z)
 }
 
-.obtain.nndist.edge <- function(
-     x, 
-     top.n = 400, 
-     weighted.distance = FALSE
-   ){
-    nn.m <- apply(x, 2, function(i)names(sort(i))[seq(top.n)])
-    nn.edge <- data.frame(from = rep(colnames(nn.m), each=nrow(nn.m)), to = c(nn.m))
+# #' build the adjacency matrix with the distance matrix
+# #' @param x a dist matrix
+# #' @param top.n number of the nearest neighbors.
+# #' @param weighted.distance whether consider the distance between nodes.
+# #' @return adjacency matrix
+
+#' @importFrom Matrix sparseMatrix Matrix
+.build.adj.m <- function(x, top.n = 600, weighted.distance = FALSE){
+    rnm <- rownames(x)
+    cnm <- colnames(x)
+    
+    top.n <- min(nrow(x), top.n)
+    i <- apply(x, 2, order)[seq(top.n), ]
+    j <- rep(seq(ncol(x)), each = top.n)
+    adj.m <- Matrix::sparseMatrix(i, j, x = 1, dims = c(length(rnm),
+        length(cnm)), dimnames = list(rnm, cnm))
     if (weighted.distance){
-        nn.edge$weight <- c(apply(x, 2, function(i)sort(i)[seq(top.n)]))
+        adj.m <- adj.m * x
     }
-    return(nn.edge)
+    return(adj.m)
 }
 
+.join.adj.m <- function(fs2cell, cell2cell, fs2fs){
+    x12 <- rbind(cell2cell, fs2cell)
+    x13 <- cbind(fs2cell, fs2fs)
+    x <- cbind(x12, Matrix::t(x13))
+    return(x)
+}
+
+# #' Perform hyper geometric test on cells with the nearest neighbors features
+# #' @param fs2cell.adj the adjacency matrix of gene to cell.
+# #' @param fs2gset.adj the adjacency matrix of gene to gene set (or pathway).
+# #' @param gene.set.list the pathway or gene set list
+# #' @param top.n the number of nearest neighbors features
+# #' @return a matrix, the result of hypergeometric for each cell to each pathway.
+
+#' @importFrom stats phyper
+#' @importFrom fastmatch %fin%
+.run_hgt <- function(fs2cell.adj, 
+                        fs2gset.adj, 
+                        gene.set.list, 
+                        m = NULL,
+                        top.n = 600, 
+                        combined.cell.feature = FALSE,
+                        weighted.distance=FALSE){
+    if (weighted.distance){
+        fs2cell.adj@x <- rep(1, length(fs2cell.adj@x))
+    }
+    q <- as.data.frame(suppressWarnings(as.matrix(Matrix::t(fs2cell.adj) %*% fs2gset.adj)) - 1)
+    if (is.null(m)){
+        m <- vapply(gene.set.list, function(x) sum(x %fin% rownames(fs2cell.adj)), numeric(1))
+    }
+    n <- nrow(fs2cell.adj) - m
+    k <- top.n
+    if (combined.cell.feature){
+        k <- Matrix::colSums(fs2cell.adj)
+    }
+    res <- mapply(phyper, q = q, m = m, n = n, MoreArgs=list(k=k, lower.tail = FALSE))
+    rownames(res) <- rownames(q)
+    colnames(res) <- colnames(fs2gset.adj)
+    res <- t(res)
+    res <- Matrix::Matrix((as.matrix(-log10(res))), sparse = TRUE)
+    return(res)
+}
 
 .build.nndist.graph <- function(
                             cells.rd, 
@@ -89,7 +140,9 @@ pairDist <- function(x, y){
                             top.n = 600,
                             combined.cell.feature = FALSE, 
                             weighted.distance = FALSE,
-                            graph.directed = FALSE){
+                            graph.directed = FALSE,
+                            normalize.dist = TRUE
+                            ){
     if (!combined.cell.feature){
         # This is split the cells and features to build knn
         x <- pairDist(cells.rd, features.rd)
@@ -106,32 +159,24 @@ pairDist <- function(x, y){
 
         fs.dist <- pairDist(features.rd, features.rd)
         top.n <- min(top.n, nrow(features.rd))
-        #top.n2 <- min(top.n, nrow(cells.rd))
-        cell2fs <- .obtain.nndist.edge(x, top.n, weighted.distance)
-        #fs2cell <- .obtain.nndist.edge(t(x), top.n2, weighted.distance)
-        top.n.cell <- min(max(100, top.n - 200), nrow(cells.rd)) + 1
-        cell2cell <- .obtain.nndist.edge(cell.dist, top.n.cell, weighted.distance)
-        # do not consider the same cell-cell or feature-feature
-        cell2cell <- cell2cell[-1, ,drop=FALSE]
-        top.n.fs <- min(max(100, top.n - 200), nrow(features.rd)) + 1
-        fs2fs <- .obtain.nndist.edge(fs.dist, top.n.fs, weighted.distance)
-        fs2fs <- fs2fs[-1,,drop = FALSE]
-        nn.edge <- rbind(cell2fs, cell2cell, fs2fs)
-        #nn.edge <- rbind(cell2fs, fs2cell)
+        top.n.cell <- min(max(50, round(top.n/10)), nrow(cells.rd)) + 1
+        top.n.fs <- min(max(50, round(top.n/10)), nrow(features.rd)) + 1
+        adj.m.list <- mapply(.build.adj.m, list(x, cell.dist, fs.dist), 
+	       list(top.n, top.n.cell, top.n.fs), MoreArgs=list(weighted.distance)) 
+        adj.m <- do.call(.join.adj.m, adj.m.list)
     }else{
         # build knn by merge the MCA space of cells and features 
         total.rd <- rbind(cells.rd, features.rd)
         total.dist <- pairDist(total.rd, total.rd)
         top.n <- min(top.n, nrow(total.rd)) + 1
-        nn.edge <- .obtain.nndist.edge(total.dist, top.n, weighted.distance)
-        # do not consider the same cells-self or features-self
-        nn.edge <- nn.edge[-1, ]
+        adj.m <- .build.adj.m(total.dist, top.n, weighted.distance)
     }
     if (weighted.distance){
-        nn.edge$weight <- .normalize_dist(nn.edge$weight)
+       if (normalize.dist){
+          adj.m@x <- .normalize_dist(adj.m@x)
+       }
     }
-    g <- .build.graph(nn.edge, graph.directed = graph.directed)
-    return(g)
+    return(adj.m)
 }
 
 .fusion.sc.sp.dist <- function(cells.rd, 
@@ -192,12 +237,12 @@ pairDist <- function(x, y){
   total.args <- names(as.list(args(fun.nm))) 
   left.args <- setdiff(c(total.args, "distance"), c(used.arg, "...", ""))
   dots <- dots[intersect(names(dots), left.args)]
-  return(dots)  
+  return(dots)
 }
 
-.normalize_dist <- function(x){
+.normalize_dist <- function(x, beta=.01){
   x <- as.vector(x)
-  1 - (x - min(x))/(max(x) - min(x))
+  1 - (beta + (1 - 2 * beta) * (x - min(x))/(max(x) - min(x)))
 }
 
 .extract_edge <- function(knn, x, weighted.distance = TRUE){
@@ -216,8 +261,6 @@ pairDist <- function(x, y){
   return(knn.edges)
 }
 
-#' @importFrom igraph graph_from_data_frame
-#' @importFrom igraph simplify
 .build.graph <- function(
                   edges, 
                   graph.directed = FALSE){
@@ -235,7 +278,7 @@ pairDist <- function(x, y){
     
     total.genes <- x
     gset.gene.num <- lapply(gset.idx.list, function(i)length(unique(i))) |> unlist()
-    exp.gene.num  <- lapply(gset.idx.list, function(i) sum(unique(i) %in% total.genes)) |> unlist()
+    exp.gene.num  <- lapply(gset.idx.list, function(i) sum(unique(i) %fin% total.genes)) |> unlist()
     if (any(gset.gene.num <=1) && min.sz == 1){
         cli::cli_warn(c("Some gene sets have size one.",
                         "You've supplied 'min.sz = {min.sz},'
@@ -258,12 +301,19 @@ pairDist <- function(x, y){
 .generate.gset.seed <- function(g, 
                                 gset.idx.list
                                 ){
+  if (inherits(g, 'igraph')){
+      num.row <- igraph::vcount(g)
+      nm <- igraph::vertex_attr(g, 'name')
+  }else{
+      num.row <- nrow(g)
+      nm <- rownames(g)
+  }
   
   x <- matrix(0, 
-              nrow = igraph::vcount(g), 
+              nrow = num.row, 
               ncol = length(gset.idx.list)
        )
-  nm <- igraph::vertex_attr(g, 'name')
+
   rownames(x) <- nm
   
   if (is.null(names(gset.idx.list))){
@@ -272,7 +322,7 @@ pairDist <- function(x, y){
   colnames(x) <- names(gset.idx.list)
   
   for (i in seq(length(gset.idx.list))){
-     x[,i] <- ifelse(nm %in% gset.idx.list[[i]], 1, 0)
+     x[,i] <- ifelse(nm %fin% gset.idx.list[[i]], 1, 0)
   }
   
   x <- Matrix::Matrix(x, sparse = TRUE)
