@@ -25,17 +25,18 @@ Imports:
   SpatialExperiment,
   BiocGenerics,
   BiocParallel,
-  igraph,
+  fastmatch,
   pracma,
   stats,
-  withr
+  withr,
+  Matrix
 Suggests:
   broman,
   irlba,
   knitr,
   ks,
-  Matrix,
   rmarkdown,
+  igraph,
   testthat (>= 3.0.0)
 License: GPL-3
 Encoding: UTF-8
