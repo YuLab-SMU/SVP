@@ -20,11 +20,12 @@ sc.rwr(
   knn.used.reduction.dims = 30,
   knn.combined.cell.feature = FALSE,
   knn.graph.weighted = TRUE,
-  knn.k.use = 600,
-  rwr.restart = 0.7,
+  knn.k.use = 400,
+  rwr.restart = 0.75,
   rwr.normalize.adj.method = c("laplacian", "row", "column", "none"),
-  rwr.normalize.affinity = TRUE,
+  rwr.normalize.affinity = FALSE,
   rwr.threads = 2L,
+  hyper.test.weighted = TRUE,
   cells = NULL,
   features = NULL,
   verbose = TRUE,
@@ -45,11 +46,12 @@ sc.rwr(
   knn.used.reduction.dims = 30,
   knn.combined.cell.feature = FALSE,
   knn.graph.weighted = TRUE,
-  knn.k.use = 600,
-  rwr.restart = 0.7,
+  knn.k.use = 400,
+  rwr.restart = 0.75,
   rwr.normalize.adj.method = c("laplacian", "row", "column", "none"),
-  rwr.normalize.affinity = TRUE,
+  rwr.normalize.affinity = FALSE,
   rwr.threads = 2L,
+  hyper.test.weighted = TRUE,
   cells = NULL,
   features = NULL,
   verbose = TRUE,
@@ -93,17 +95,20 @@ features to features, cells to features respectively to build graph.}
 
 \item{knn.graph.weighted}{logical whether consider the distance of nodes in the Nearest Neighbors, default is TRUE.}
 
-\item{knn.k.use}{numeric the number of the Nearest Neighbors nodes, default is 600.}
+\item{knn.k.use}{numeric the number of the Nearest Neighbors nodes, default is 400.}
 
-\item{rwr.restart}{default is 0.7.}
+\item{rwr.restart}{default is 0.75.}
 
 \item{rwr.normalize.adj.method}{character the method to normalize the adjacency matrix of the input graph,
 default is \code{laplacian}.}
 
 \item{rwr.normalize.affinity}{logical whether normalize the activity (affinity) result score using quantile normalisation,
-default is TRUE.}
+default is FALSE.}
 
 \item{rwr.threads}{the threads to run Random Walk With Restart (RWR), default is 2L.}
+
+\item{hyper.test.weighted}{logical whether consider weighting the enrichment score of cell using hypergeometric test,
+default is TRUE.}
 
 \item{cells}{Vector specifying the subset of cells to be used for the calculation of the activaty score or identification
 of SV features. This can be a character vector of cell names, an integer vector of column indices or a logical vector,

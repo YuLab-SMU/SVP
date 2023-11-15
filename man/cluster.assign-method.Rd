@@ -11,9 +11,7 @@
 cluster.assign(
   data,
   assay.type = "affi.score",
-  ncluster = 2,
-  random.seed = 1024,
-  BPPARAM = SerialParam(),
+  assign = FALSE,
   gsvaexp = NULL,
   gsvaexp.assay.type = NULL,
   ...
@@ -22,9 +20,7 @@ cluster.assign(
 \S4method{cluster.assign}{SingleCellExperiment}(
   data,
   assay.type = "affi.score",
-  ncluster = 2,
-  random.seed = 1024,
-  BPPARAM = SerialParam(),
+  assign = FALSE,
   gsvaexp = NULL,
   gsvaexp.assay.type = NULL,
   ...
@@ -33,9 +29,7 @@ cluster.assign(
 \S4method{cluster.assign}{SVPExperiment}(
   data,
   assay.type = "affi.score",
-  ncluster = 2,
-  random.seed = 1024,
-  BPPARAM = SerialParam(),
+  assign = FALSE,
   gsvaexp = NULL,
   gsvaexp.assay.type = NULL,
   ...
@@ -48,14 +42,7 @@ a \linkS4class{SingleCellExperiment} which was extracted from \linkS4class{SVPEx
 
 \item{assay.type}{which expressed data to be pulled to run, default is \code{affi.score}.}
 
-\item{ncluster}{integer the number cluster for each feature, see details, default is 2.}
-
-\item{random.seed}{integer random number to be reproducted.}
-
-\item{BPPARAM}{A BiocParallelParam object specifying whether the built of KNN should be parallelized
-default is \code{SerialParam()}, meaning no parallel. You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=T)}
-to parallel it, the \code{workers} of \code{MulticoreParam} is the number of cores used, see also
-\code{\link[BiocParallel]{MulticoreParam}}.}
+\item{assign}{whether assign the max affinity of gene set or pathway to the each cell, default is FALSE.}
 
 \item{gsvaexp}{which gene set variation experiment will be pulled to run, this only work when \code{data} is a
 \linkS4class{SVPExperiment}, default is NULL.}
@@ -74,9 +61,8 @@ output will be a \linkS4class{SingleCellExperiment}, the result can be extracted
 clusting and assign the label for each feature(especifily the gene sets).
 }
 \details{
-\code{cluster.assign} using \code{kmeans} to classfing the cells with the each activity score of the gene sets. When the argument
-\code{ncluster = 2}, meaning the gene sets or pathway was activated in the \code{1} labeled cells. When the argument \code{ncluster}
-larger than 2, the larger the cluster label, the stronger the activation of the cell in the specified pathway.
+when use \code{sc.rwr} to calculated the gene set activity of cell, if \code{assign = TRUE} we will assign the max affinity of
+gene set or pathway to the each cell. If \code{assign = FALSE}, the max affinity of gene set or pathway will be kept.
 }
 \seealso{
 to calculate the activity score of gene sets or pathway: \code{\link{sc.rwr}}.

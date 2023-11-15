@@ -50,8 +50,8 @@ struct calrwr : public Worker{
 //' @return a matrix of affinity score of all nodes in a graph
 // [[Rcpp::export]]
 NumericMatrix parallelCalRWR(
-              arma::sp_mat x,
-              arma::sp_mat v,
+              arma::sp_mat& x,
+              arma::sp_mat& v,
               double restart = 0.75,
               double stop_delta = 1e-10,
               int stop_step = 50){

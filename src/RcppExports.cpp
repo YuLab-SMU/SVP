@@ -182,13 +182,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // parallelCalRWR
-NumericMatrix parallelCalRWR(arma::sp_mat x, arma::sp_mat v, double restart, double stop_delta, int stop_step);
+NumericMatrix parallelCalRWR(arma::sp_mat& x, arma::sp_mat& v, double restart, double stop_delta, int stop_step);
 RcppExport SEXP _SVP_parallelCalRWR(SEXP xSEXP, SEXP vSEXP, SEXP restartSEXP, SEXP stop_deltaSEXP, SEXP stop_stepSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::sp_mat >::type x(xSEXP);
-    Rcpp::traits::input_parameter< arma::sp_mat >::type v(vSEXP);
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type v(vSEXP);
     Rcpp::traits::input_parameter< double >::type restart(restartSEXP);
     Rcpp::traits::input_parameter< double >::type stop_delta(stop_deltaSEXP);
     Rcpp::traits::input_parameter< int >::type stop_step(stop_stepSEXP);
