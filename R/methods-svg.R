@@ -19,7 +19,7 @@
 #' density, default is 100.
 #' @param sv.permutation numeric the number of permutation for each single feature to detect the 
 #' signicantly spatially or single cell variable features, default is 100.
-#' @param sv.p.adjust.method character the method to adjust the pvalue of the result, default is \code{bonferroni}.
+#' @param sv.p.adjust.method character the method to adjust the pvalue of the result, default is \code{BY}.
 #' @param sv.BPPARAM A BiocParallelParam object specifying whether the identification of SV features should be parallelized
 #' default is \code{SerialParam()}, meaning no parallel. You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=T)}
 #' to parallel it, the \code{workers} of \code{MulticoreParam} is the number of cores used, see also
@@ -95,7 +95,7 @@ setGeneric('kldSVG',
     sv.used.reduction = c('UMAP', 'TSNE'),
     sv.grid.n = 100,
     sv.permutation = 100,
-    sv.p.adjust.method = "bonferroni",
+    sv.p.adjust.method = "BY",
     sv.BPPARAM = SerialParam(),
     verbose = TRUE,
     random.seed = 1024,
@@ -116,7 +116,7 @@ setMethod('kldSVG', 'SingleCellExperiment',
     sv.used.reduction = c('UMAP', 'TSNE'),
     sv.grid.n = 100,
     sv.permutation = 100,
-    sv.p.adjust.method = "bonferroni",
+    sv.p.adjust.method = "BY",
     sv.BPPARAM = SerialParam(),
     verbose = TRUE,
     random.seed = 1024,
@@ -183,7 +183,7 @@ setMethod('kldSVG', 'SVPExperiment',
     sv.used.reduction = c('UMAP', 'TSNE'),
     sv.grid.n = 100,
     sv.permutation = 100,
-    sv.p.adjust.method = "bonferroni",
+    sv.p.adjust.method = "BY",
     sv.BPPARAM = SerialParam(),
     verbose = TRUE,
     random.seed = 1024,
