@@ -82,7 +82,7 @@
 #' of adjacency matrix of graph, \eqn{r} is the the global restart probability, \eqn{P_{t+1}} and \eqn{P_{t}} are the probability distribution in 
 #' each iteration. After several iterations, the difference between \eqn{P_{t+1}} and \eqn{P_{t}} becomes negligible, the stationary probability 
 #' distribution is reached, and the elements for each gene set represent a proximity measure from every graph node. Iterations are stoped when the 
-#' difference between \eqn{P_{t+1}} and \eqn{P_{t}} falls below 1e-10.
+#' difference between \eqn{P_{t+1}} and \eqn{P_{t}} falls below 1e-6.
 #' 
 #' @references
 #' 1. Cortal, A., Martignetti, L., Six, E. et al. Gene signature extraction and cell identity recognition at the single-cell 
@@ -249,6 +249,9 @@ setMethod('sc.rwr',
                   ))  
 
       gset.score.cells <- gset.score.cells * gset.hgt[rownames(gset.score.cells),]
+      if (nrow(gset.score.cells) > 1){
+          gset.score.cells <- gset.score.cells %*% Matrix::Diagonal(x=1/Matrix::colSums(gset.score.cells))
+      }
   }
 
   x <- SingleCellExperiment(assays = list(affi.score = gset.score.cells))

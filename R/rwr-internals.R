@@ -26,7 +26,7 @@
   }
 
   stop.delta <- 1e-6
-  stop.step <- 1000
+  stop.step <- 100
   tic()
   cli::cli_inform("Calculating the affinity score using random walk with restart ...")
   if (restart == 1){
@@ -35,7 +35,7 @@
     flag.threads <- Sys.getenv('RCPP_PARALLEL_NUM_THREADS')
     if (nchar(flag.threads)==0 && !is.null(threads)){
       RcppParallel::setThreadOptions(numThreads = threads)
-    }      
+    }
     pt.m <- parallelCalRWR(
                 x = n.adj.m, 
                 v = start.m, 
@@ -47,11 +47,10 @@
   toc()
 
   pt.m[is.na(pt.m)] <- 0
+  pt.m[pt.m < stop.delta] <- 0
 
   tic()
   cli::cli_inform(c('Tidying the result of random walk with restart ...'))
-  pt.m <- prop.table(pt.m, 1)
-  pt.m[is.na(pt.m)] <- 0
   if (ncol(pt.m) == 1){
     normalize.affinity <- FALSE
   }
@@ -60,7 +59,9 @@
     pt.m <- broman::normalize(pt.m)
     pt.m[is.na(pt.m)] <- 0
   }
-  pt.m[pt.m < stop.delta] <- 0
+  if (ncol(pt.m) > 1){
+    pt.m <- prop.table(pt.m, 1)
+  }
   colnames(pt.m) <- colnames(start.m)
   rownames(pt.m) <- rownames(start.m)
   pt.m <- Matrix::Matrix(t(pt.m), sparse = TRUE)

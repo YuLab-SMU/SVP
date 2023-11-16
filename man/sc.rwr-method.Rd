@@ -165,7 +165,7 @@ where \eqn{P_{0}} is the initial probability distribution for each gene set, \eq
 of adjacency matrix of graph, \eqn{r} is the the global restart probability, \eqn{P_{t+1}} and \eqn{P_{t}} are the probability distribution in
 each iteration. After several iterations, the difference between \eqn{P_{t+1}} and \eqn{P_{t}} becomes negligible, the stationary probability
 distribution is reached, and the elements for each gene set represent a proximity measure from every graph node. Iterations are stoped when the
-difference between \eqn{P_{t+1}} and \eqn{P_{t}} falls below 1e-10.
+difference between \eqn{P_{t+1}} and \eqn{P_{t}} falls below 1e-6.
 }
 \references{
 \enumerate{
