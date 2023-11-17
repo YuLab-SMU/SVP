@@ -45,10 +45,8 @@
             )
   }
   toc()
-
   pt.m[is.na(pt.m)] <- 0
   pt.m[pt.m < stop.delta] <- 0
-
   tic()
   cli::cli_inform(c('Tidying the result of random walk with restart ...'))
   if (ncol(pt.m) == 1){
@@ -60,8 +58,14 @@
     pt.m[is.na(pt.m)] <- 0
   }
   if (ncol(pt.m) > 1){
+    if (any(pt.m < 0)){
+        pt.m <- .normalize.single.score(pt.m)
+    }
     pt.m <- prop.table(pt.m, 1)
+  }else{
+    pt.m <- .normalize.single.score(pt.m)
   }
+  pt.m[is.na(pt.m)] <- 0
   colnames(pt.m) <- colnames(start.m)
   rownames(pt.m) <- rownames(start.m)
   pt.m <- Matrix::Matrix(t(pt.m), sparse = TRUE)
@@ -130,7 +134,9 @@
     x <- Matrix::Matrix(0, nrow=nrow, ncol = ncol(seeds), sparse = TRUE)
     #x <- matrix(0, nrow = nrow, ncol = ncol(seeds))
     x[ind,] <- seeds[ind,]
-    x <- x %*% diag(1/Matrix::colSums(x))
+    if (ncol(x) > 1){
+       x <- x %*% diag(1/Matrix::colSums(x))
+    }
     x[is.na(x)] <- 0
     rownames(x) <- nm
     colnames(x) <- colnames(seeds)

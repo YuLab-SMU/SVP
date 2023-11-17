@@ -89,7 +89,7 @@ setMethod(
 .internal.predict.cell.sign <- function(da, threshold = NULL, ...){
     pred <- rownames(da)[apply(da, 2, function(x) which.max(x))]
     if (is.null(threshold)){
-        threshold <- 1 / nrow(da)
+        threshold <- (nrow(da) / 3) * (1 / (nrow(da) + 1))
     }
     pred <- ifelse(apply(da, 2, max) > threshold, pred, 'unassigned')
     return(pred)

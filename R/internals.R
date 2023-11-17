@@ -30,7 +30,6 @@ setReplaceMethod("[", "SCEByColumn", function(x, i, j, ..., value) {
 
 setMethod("c", "SCEByColumn", function(x, ...) {
     gathered <- lapply(list(x, ...), .get_sce)
-    print (gathered)
     initialize(x, sce=do.call(cbind, gathered))
 })
 

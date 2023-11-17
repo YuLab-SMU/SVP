@@ -88,9 +88,9 @@ pairDist <- function(x, y){
 }
 
 .join.adj.m <- function(fs2cell, cell2cell, fs2fs){
-    x12 <- rbind(cell2cell, fs2cell)
-    x13 <- cbind(fs2cell, fs2fs)
-    x <- cbind(x12, Matrix::t(x13))
+    x12 <- Matrix::rbind2(cell2cell, fs2cell)
+    x13 <- Matrix::cbind2(fs2cell, fs2fs)
+    x <- Matrix::cbind2(x12, Matrix::t(x13))
     return(x)
 }
 
@@ -125,8 +125,8 @@ pairDist <- function(x, y){
     res <- mapply(phyper, q = q, m = m, n = n, MoreArgs=list(k=k, lower.tail = FALSE))
     rownames(res) <- rownames(q)
     colnames(res) <- colnames(fs2gset.adj)
-    res <- t(res)
-    res <- Matrix::Matrix((as.matrix(-log10(res))), sparse = TRUE)
+    res <- -log10(t(res))
+    res <- Matrix::Matrix(res, sparse = TRUE)
     return(res)
 }
 
@@ -141,8 +141,9 @@ pairDist <- function(x, y){
                             combined.cell.feature = FALSE, 
                             weighted.distance = FALSE,
                             graph.directed = FALSE,
-                            normalize.dist = TRUE
-                            ){
+                            normalize.dist = TRUE,
+                            BPPARAM = BiocParallel::MulticoreParam(workers = 3)
+                       ){
     if (!combined.cell.feature){
         # This is split the cells and features to build knn
         x <- pairDist(cells.rd, features.rd)
@@ -161,8 +162,11 @@ pairDist <- function(x, y){
         top.n <- min(top.n, nrow(features.rd))
         top.n.cell <- min(max(50, round(top.n/10)), nrow(cells.rd)) + 1
         top.n.fs <- min(max(50, round(top.n/10)), nrow(features.rd)) + 1
-        adj.m.list <- mapply(.build.adj.m, list(x, cell.dist, fs.dist), 
-	       list(top.n, top.n.cell, top.n.fs), MoreArgs=list(weighted.distance)) 
+        adj.m.list <- BiocParallel::bpmapply(.build.adj.m, list(x, cell.dist, fs.dist), 
+                                             list(top.n, top.n.cell, top.n.fs), 
+                                             MoreArgs=list(weighted.distance),
+                                             BPPARAM = BPPARAM
+        ) 
         adj.m <- do.call(.join.adj.m, adj.m.list)
     }else{
         # build knn by merge the MCA space of cells and features 
@@ -240,9 +244,28 @@ pairDist <- function(x, y){
   return(dots)
 }
 
-.normalize_dist <- function(x, beta=.01){
+.normalize.single.score <- function(x){
+    if (inherits(x, 'matrix')){
+        y <- .normalize_dist(x, beta=0, reverse=FALSE)
+        attr(y, 'dim') <- attr(x, 'dim')
+        attr(y, 'dimnames') <- attr(x, 'dimnames')
+        return(y)
+    }else if (inherits(x, 'dgCMatrix')){
+        x@x <- .normalize_dist(x@x, beta=0, reverse=FALSE)
+    }
+    return(x)
+}
+
+.normalize_dist <- function(x, beta=.01, reverse=TRUE){
   x <- as.vector(x)
-  1 - (beta + (1 - 2 * beta) * (x - min(x))/(max(x) - min(x)))
+  if (stats::var(x, na.rm = TRUE) == 0){
+     return(x)
+  }
+  x <- beta + (1 - 2 * beta) * (x - min(x))/(max(x) - min(x))
+  if (reverse){
+     x <- 1 - x
+  }
+  return(x)
 }
 
 .extract_edge <- function(knn, x, weighted.distance = TRUE){
@@ -340,7 +363,7 @@ pairDist <- function(x, y){
 
 #' @importFrom S4Vectors DataFrame List
 .extract.features.rank <- function(x, y, features, gset.idx.list){
-  y <- y[features %in% rownames(y), ]
+  y <- y[features %in% rownames(y), ,drop=FALSE]
   keep.gset <- corCpp(Matrix::t(x), Matrix::t(y))
   rownames(keep.gset) <- rownames(x)
   colnames(keep.gset) <- rownames(y)

@@ -227,9 +227,9 @@ setMethod('sc.rwr',
                   verbose = verbose
                 )
 
-  gset.score.cells <- gset.score[, cells]
-
-  gset.score.cells <- gset.score.cells[Matrix::rowSums(gset.score.cells) > 0,]
+  gset.score.cells <- gset.score[, cells, drop=FALSE]
+  
+  #gset.score.cells <- gset.score.cells[Matrix::rowSums(gset.score.cells) > 0,]
 
   gset.score.features <- .extract.features.rank(
                              gset.score.cells,
@@ -246,24 +246,27 @@ setMethod('sc.rwr',
                            top.n = knn.k.use,
                            combined.cell.feature = knn.combined.cell.feature,
                            weighted.distance = knn.graph.weighted
-                  ))  
-
-      gset.score.cells <- gset.score.cells * gset.hgt[rownames(gset.score.cells),]
+                  ))
+      gset.score.cells <- gset.score.cells * gset.hgt
       if (nrow(gset.score.cells) > 1){
+          cnm <- colnames(gset.score.cells)
+          rnm <- rownames(gset.score.cells)
           gset.score.cells <- gset.score.cells %*% Matrix::Diagonal(x=1/Matrix::colSums(gset.score.cells))
+          gset.score.cells[is.na(gset.score.cells)] <- 0
+          colnames(gset.score.cells) <- cnm
+          rownames(gset.score.cells) <- rnm
+      }else{
+          gset.score.cells <- .normalize.single.score(gset.score.cells)
       }
   }
-
   x <- SingleCellExperiment(assays = list(affi.score = gset.score.cells))
-
-  rowData(x) <- gset.num[rownames(gset.num) %in% rownames(x), ]
+  rowData(x) <- gset.num[rownames(gset.num) %in% rownames(x), ,drop=FALSE]
   
   x <- .add.int.rowdata(sce=x, getfun=fscoreDfs, 
                         setfun1 = `fscoreDfs<-`, 
                         setfun2 = `fscoreDf<-`, 
                         namestr = "rwr.score", 
                         val = gset.score.features)
-
   da <- .sce_to_svpe(data) 
   gsvaExp(da, gsvaExp.name) <- x
   new.reduced <- .build.new.reduced(rd.df, cells, features, rd.f.nm)
