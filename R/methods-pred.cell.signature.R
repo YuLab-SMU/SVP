@@ -70,13 +70,14 @@ setMethod(
         threshold = NULL,
         gsvaexp = NULL,
         gsvaexp.assay.type = NULL,
+        pred.col.name = 'pred.cell.sign',
         ...
     ){
     
     if (!is.null(gsvaexp)){
        cli::cli_inform("The {.var gsvaexp} was specified, the specified {.var gsvaExp} will be used to predict the cell signature.")
        da2 <- gsvaExp(data, gsvaexp, withColData=FALSE)
-       da2 <- pred.cell.signature(da2, assay.type = gsvaexp.assay.type, threshold = threshold, ...)
+       da2 <- pred.cell.signature(da2, assay.type = gsvaexp.assay.type, threshold = threshold, pred.col.name = pred.col.name, ...)
        gsvaExp(data, gsvaexp) <- da2
     }else{
        data <- callNextMethod()
