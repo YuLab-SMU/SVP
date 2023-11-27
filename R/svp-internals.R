@@ -429,7 +429,7 @@ pairDist <- function(x, y){
                padj = p.adjust(res[, "pvalue"], method = p.adjust.method)
             ) |> data.frame()
   res <- res |> dplyr::arrange(.data$padj, dplyr::desc(.data$sp.kld)) |>
-         dplyr::mutate(sp.kld.rank = seq(nrow(res))) |> as.matrix()
+         dplyr::mutate(rank = seq(nrow(res))) |> as.matrix()
   res <- res[match(rownames(x), rownames(res)), ]
   return(res)
 }

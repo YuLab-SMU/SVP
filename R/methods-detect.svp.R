@@ -187,6 +187,7 @@ setMethod('detect.svp',
                   sv.grid.n = sv.grid.n,
                   sv.permutation = sv.permutation,
                   sv.p.adjust.method = sv.p.adjust.method,
+                  sv.BPPARAM = sv.BPPARAM,
                   verbose = verbose,
                   random.seed = random.seed,
                   gsvaexp = gsvaExp.name)
