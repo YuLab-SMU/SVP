@@ -2,7 +2,6 @@
 using namespace arma;
 using namespace Rcpp;
 
-//[[Rcpp::export]]
 NumericVector SortNv(NumericVector x, bool decreasing = true) {
     IntegerVector idx = seq_along(x) - 1;
     if (decreasing){
