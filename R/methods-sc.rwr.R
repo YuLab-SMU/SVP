@@ -24,7 +24,7 @@
 #' @param gene.occurrence.rate the occurrence proportion of the gene set in the input object,
 #' default is 0.4.
 #' @param assay.type which expressed data to be pulled to build KNN Graph, default is \code{logcounts}.
-#' @param knn.consider.spcoord logical whether consider the spatial coordinates to run MCA, default is TRUE.
+#' @param knn.consider.spcoord logical whether consider the spatial coordinates to run MCA, default is FALSE.
 #' @param sp.alpha.add.weight only work when \code{knn.consider.spcoord=TRUE} and \code{knn.combined.cell.feature=FALSE},
 #' which is weight of spatial space of the additive term in single cell and spatial space funsion formula, default is 0.2.
 #' @param sp.beta.add.mp.weight only work when \code{knn.consider.spcoord=TRUE} and \code{knn.combined.cell.feature=FALSE},
@@ -107,7 +107,7 @@ setGeneric('sc.rwr',
     max.sz = Inf,
     gene.occurrence.rate = .4,
     assay.type = 'logcounts',
-    knn.consider.spcoord = TRUE,
+    knn.consider.spcoord = FALSE,
     sp.alpha.add.weight = .2,
     sp.beta.add.mp.weight = .1,
     knn.used.reduction.dims = 30,
@@ -181,7 +181,7 @@ setMethod('sc.rwr',
   cells.rd <- rd.df[cells, seq(dims), drop=FALSE]
   features.rd <- rd.f.res[features, seq(dims), drop=FALSE]
 
-  gset.num <- .filter.gset.gene(features, gset.idx.list)
+  gset.num <- .filter.gset.gene(features, gset.idx.list, min.sz, max.sz, gene.occurrence.rate)
   gset.idx.list <- gset.idx.list[match(rownames(gset.num), names(gset.idx.list))]
 
   flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)

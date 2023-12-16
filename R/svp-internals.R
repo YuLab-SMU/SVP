@@ -190,6 +190,7 @@ pairDist <- function(x, y){
                                beta=0.1){
     cell.dist <- pairDist(cells.rd, cells.rd)
     if (consider.spcoord && !is.null(cells.sp.coord)){
+        cli::cli_inform('Considering the spatial location ...')
         cell.sp.dist <- pairDist(cells.sp.coord, cells.sp.coord)
         nm <- rownames(cell.dist)
         cell.dist <- fusiondist(cell.dist, cell.sp.dist, alpha, beta)

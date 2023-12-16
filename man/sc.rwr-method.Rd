@@ -14,7 +14,7 @@ sc.rwr(
   max.sz = Inf,
   gene.occurrence.rate = 0.4,
   assay.type = "logcounts",
-  knn.consider.spcoord = TRUE,
+  knn.consider.spcoord = FALSE,
   sp.alpha.add.weight = 0.2,
   sp.beta.add.mp.weight = 0.1,
   knn.used.reduction.dims = 30,
@@ -77,7 +77,7 @@ default is 0.4.}
 
 \item{assay.type}{which expressed data to be pulled to build KNN Graph, default is \code{logcounts}.}
 
-\item{knn.consider.spcoord}{logical whether consider the spatial coordinates to run MCA, default is TRUE.}
+\item{knn.consider.spcoord}{logical whether consider the spatial coordinates to run MCA, default is FALSE.}
 
 \item{sp.alpha.add.weight}{only work when \code{knn.consider.spcoord=TRUE} and \code{knn.combined.cell.feature=FALSE},
 which is weight of spatial space of the additive term in single cell and spatial space funsion formula, default is 0.2.}
