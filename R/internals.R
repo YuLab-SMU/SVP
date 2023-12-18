@@ -264,7 +264,7 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
     tmp <- basefun(x)
     if (key %in% namefun(tmp)){
         tmp <- tmp[[key]]
-        return((inherits(tmp,'matrix') || inherits(tmp, 'DFrame')) && !all(is.na(tmp)))
+        return((inherits(tmp,'matrix') || inherits(tmp, 'DFrame')) && nrow(tmp) > 0)
     }else{
         return(FALSE)
     }
