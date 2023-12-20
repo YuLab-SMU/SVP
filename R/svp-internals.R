@@ -60,6 +60,7 @@
 
 pairDist <- function(x, y){
     z <- fastPDist(y, x)
+    z[is.na(z)] <- 6.629066e-15
     rownames(z) <- rownames(y)
     colnames(z) <- rownames(x)
     return(z)
