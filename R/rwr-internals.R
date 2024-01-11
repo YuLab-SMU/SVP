@@ -1,12 +1,14 @@
 #' @importFrom RcppParallel RcppParallelLibs
 #' @importFrom Rcpp evalCpp
 .run_rwr <- function(g, 
+                     cells,
                      edge.attr = 'weight',
                      seeds = NULL,
                      normalize.adj.method = c("laplacian", "row", "column", "none"),
                      restart = .7,
                      threads = 2L,
                      normalize.affinity = FALSE,
+                     prop.normalize = TRUE,
                      verbose = TRUE,
                      ...){
 
@@ -25,7 +27,7 @@
     restart <- .7
   }
 
-  stop.delta <- 1e-6
+  stop.delta <- 1e-10
   stop.step <- 100
   tic()
   cli::cli_inform("Calculating the affinity score using random walk with restart ...")
@@ -52,23 +54,27 @@
   if (ncol(pt.m) == 1){
     normalize.affinity <- FALSE
   }
+  colnames(pt.m) <- colnames(start.m)
+  rownames(pt.m) <- rownames(start.m)
+  pt.m <- pt.m[cells,,drop=FALSE]
+  if (prop.normalize){
+    if (ncol(pt.m) > 1){
+      if (any(pt.m < 0)){
+          pt.m <- .normalize.single.score(pt.m)
+      }
+      pt.m <- prop.table(pt.m, 2)
+    }else{
+      pt.m <- .normalize.single.score(pt.m)
+    }
+  }
+
   if (normalize.affinity){
     rlang::check_installed('broman', 'for `.run_rwr()` with `normalize.affinity = TRUE`.')
     pt.m <- broman::normalize(pt.m)
-    pt.m[is.na(pt.m)] <- 0
-  }
-  if (ncol(pt.m) > 1){
-    if (any(pt.m < 0)){
-        pt.m <- .normalize.single.score(pt.m)
-    }
-    pt.m <- prop.table(pt.m, 1)
-  }else{
-    pt.m <- .normalize.single.score(pt.m)
   }
   pt.m[is.na(pt.m)] <- 0
-  colnames(pt.m) <- colnames(start.m)
-  rownames(pt.m) <- rownames(start.m)
-  pt.m <- Matrix::Matrix(t(pt.m), sparse = TRUE)
+  #pt.m <- Matrix::Matrix(t(pt.m), sparse = TRUE)
+  pt.m <- t(pt.m)
   toc()
   return(pt.m)
 }
