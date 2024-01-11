@@ -29,10 +29,13 @@ Imports:
   pracma,
   stats,
   withr,
-  Matrix
+  Matrix,
+  matrixStats
 Suggests:
+  BiocNeighbors,
   broman,
   irlba,
+  BiasedUrn,
   knitr,
   ks,
   rmarkdown,
