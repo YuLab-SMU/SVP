@@ -88,11 +88,39 @@ pairDist <- function(x, y){
     return(adj.m)
 }
 
+#' @importFrom matrixStats colRanks
+.build.adj.m_by_expr <- function(x, top.n = 600, weighted.distance = FALSE){
+    expr.rank.dist <- suppressWarnings(1 - (matrixStats::colRanks(as.matrix(x), 
+								  preserveShape=TRUE) / (nrow(x) + 1)))
+    adj.m <- .build.adj.m(expr.rank.dist, top.n, weighted.distance)
+    if (weighted.distance){
+        adj.m@x <- .normalize_dist(adj.m@x)
+    }
+    return(adj.m)
+}
+
 .join.adj.m <- function(fs2cell, cell2cell, fs2fs){
     x12 <- Matrix::rbind2(cell2cell, fs2cell)
     x13 <- Matrix::cbind2(fs2cell, fs2fs)
     x <- Matrix::cbind2(x12, Matrix::t(x13))
     return(x)
+}
+
+.calculate.odds.weighted <- function(x, y, z){
+    x2 <- x
+    x@x <- rep(1, length(x@x))
+    q2 <- Matrix::t(x) %*% (1 - y)
+    w1 <- (Matrix::t(x2) %*% (1 - y))/q2
+    w2 <- (Matrix::t(x2) %*% y) / as.matrix(z+1)
+    res <- as.matrix(w1/w2)
+    res[is.na(res)] <- 1e-10
+    res[res==0] <- 1e-10
+    as.data.frame(res, check.names=FALSE)
+}
+
+.internal.pWNCHypergeo <- function(x, m1, m2, n, odds, lower.tail=FALSE){
+    mapply(BiasedUrn::pWNCHypergeo, x = x, m1 = m1, m2 = m2, n = n, odds = odds,
+           MoreArgs=list(lower.tail=lower.tail))
 }
 
 # #' Perform hyper geometric test on cells with the nearest neighbors features
@@ -105,29 +133,52 @@ pairDist <- function(x, y){
 #' @importFrom stats phyper
 #' @importFrom fastmatch %fin%
 .run_hgt <- function(fs2cell.adj, 
-                        fs2gset.adj, 
-                        gene.set.list, 
-                        m = NULL,
-                        top.n = 600, 
-                        combined.cell.feature = FALSE,
-                        weighted.distance=FALSE){
+                     fs2gset.adj, 
+                     gene.set.list, 
+                     cells.gene.num = NULL,
+		     m = NULL,
+                     top.n = 600, 
+                     combined.cell.feature = FALSE,
+                     weighted.distance = FALSE,
+                     method = c("Wallenius", "Hypergeometric")
+                    ){
+    method <- match.arg(method)
+    if (!weighted.distance){
+        method <- 'Hypergeometric'
+    }
+    fs2cell.adj2 <- fs2cell.adj 
     if (weighted.distance){
         fs2cell.adj@x <- rep(1, length(fs2cell.adj@x))
     }
     q <- as.data.frame(suppressWarnings(as.matrix(Matrix::t(fs2cell.adj) %*% fs2gset.adj)) - 1)
+
     if (is.null(m)){
         m <- vapply(gene.set.list, function(x) sum(x %fin% rownames(fs2cell.adj)), numeric(1))
     }
-    n <- nrow(fs2cell.adj) - m
+    
+    if (is.null(cells.gene.num)){
+        n <- nrow(fs2cell.adj) - m
+    }else{
+        n <- vapply(cells.gene.num, function(i)i-m, numeric(length(m))) |> t() |> as.data.frame(check.names=FALSE)
+    }
     k <- top.n
     if (combined.cell.feature){
         k <- Matrix::colSums(fs2cell.adj)
     }
-    res <- mapply(phyper, q = q, m = m, n = n, MoreArgs=list(k=k, lower.tail = FALSE))
+    if (method == 'Hypergeometric'){
+        res <- mapply(phyper, q = q, m = m, n = n, MoreArgs=list(k=k, lower.tail = FALSE))
+    }else if (method == 'Wallenius'){
+        rlang::check_installed('BiasedUrn', 'for `Wallenius` method.')
+        odds <- .calculate.odds.weighted(fs2cell.adj2, fs2gset.adj, q)
+        res <- mapply(.internal.pWNCHypergeo, x = q, m1 = m, m2 = n, n = k,
+                      odds = odds, MoreArgs=list(lower.tail = FALSE)) 
+    }
     rownames(res) <- rownames(q)
     colnames(res) <- colnames(fs2gset.adj)
+    res[res==0] <- 1e-10
     res <- -log10(t(res))
-    res <- Matrix::Matrix(res, sparse = TRUE)
+    res[res < 0 ] <- 0
+    #res <- Matrix::Matrix(res, sparse = TRUE)
     return(res)
 }
 
@@ -169,12 +220,17 @@ pairDist <- function(x, y){
                                              BPPARAM = BPPARAM
         ) 
         adj.m <- do.call(.join.adj.m, adj.m.list)
+        Matrix::diag(adj.m) <- 0
     }else{
         # build knn by merge the MCA space of cells and features 
         total.rd <- rbind(cells.rd, features.rd)
-        total.dist <- pairDist(total.rd, total.rd)
-        top.n <- min(top.n, nrow(total.rd)) + 1
-        adj.m <- .build.adj.m(total.dist, top.n, weighted.distance)
+        #total.dist <- pairDist(total.rd, total.rd)
+        top.n <- min(top.n, nrow(total.rd)) 
+        knn.graph <- .build.knn.graph(total.rd, top.n, 
+                                      fun.nm = BiocNeighbors::findKmknn, 
+                                      weighted.distance = weighted.distance)
+        adj.m <- .extract.adj.m(knn.graph, edge.attr = 'weight') 
+        #adj.m <- .build.adj.m(total.dist, top.n, weighted.distance)
     }
     if (weighted.distance){
        if (normalize.dist){
@@ -216,7 +272,7 @@ pairDist <- function(x, y){
   all.params$X <- x
   all.params$k <- knn.k.use
   all.params$BPPARAM <- BPPARAM
-  knn.res <- do.call(fun.nm, all.params)
+  knn.res <- suppressWarnings(do.call(fun.nm, all.params))
   knn.edges <- .extract_edge(knn.res, x, weighted.distance = weighted.distance)
   knn.graph <- .build.graph(knn.edges, graph.directed = graph.directed) 
   return(knn.graph)
@@ -334,22 +390,12 @@ pairDist <- function(x, y){
       nm <- rownames(g)
   }
   
-  x <- matrix(0, 
-              nrow = num.row, 
-              ncol = length(gset.idx.list)
-       )
-
-  rownames(x) <- nm
-  
   if (is.null(names(gset.idx.list))){
      cli::cli_abort('The gene set list must have names.')
   }
-  colnames(x) <- names(gset.idx.list)
-  
-  for (i in seq(length(gset.idx.list))){
-     x[,i] <- ifelse(nm %fin% gset.idx.list[[i]], 1, 0)
-  }
-  
+  x <- vapply(gset.idx.list, function(i) ifelse(nm %fin% i, 1, 0), numeric(num.row))
+  rownames(x) <- nm
+
   x <- Matrix::Matrix(x, sparse = TRUE)
   return(x)
 }
