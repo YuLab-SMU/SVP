@@ -36,15 +36,19 @@
 #' neighbor and build graph, default is FALSE, meaning the nearest neighbor will be found in cells to cells, 
 #' features to features, cells to features respectively to build graph.
 #' @param knn.graph.weighted logical whether consider the distance of nodes in the Nearest Neighbors, default is TRUE.
-#' @param knn.k.use numeric the number of the Nearest Neighbors nodes, default is 400.
+#' @param knn.k.use numeric the number of the Nearest Neighbors nodes, default is 600.
 #' @param rwr.restart  default is 0.75.
 #' @param rwr.normalize.adj.method character the method to normalize the adjacency matrix of the input graph,
 #' default is \code{laplacian}.
 #' @param rwr.normalize.affinity logical whether normalize the activity (affinity) result score using quantile normalisation,
 #' default is FALSE.
+#' @param rwr.prop.normalize logical whether divide the specific activity score by total activity score for a sample,
+#' default is FALSE. 
 #' @param rwr.threads the threads to run Random Walk With Restart (RWR), default is 2L.
-#' @param hyper.test.weighted logical whether consider weighting the enrichment score of cell using hypergeometric test,
-#' default is TRUE.
+#' @param hyper.test.weighted character which method to weight the activity score of cell, should is one of "Hypergeometric", "Wallenius", 
+#' "none", default is "Hypergeometric".
+#' @param hyper.test.by.expr logical whether using the expression matrix to find the nearest genes of cells, default is \code{TRUE},
+#' if it is \code{FALSE}, meaning using the result of reduction to find the nearest genes of cells to perfrom the \code{hyper.test.weighted}.
 #' @param cells Vector specifying the subset of cells to be used for the calculation of the activaty score or identification 
 #' of SV features. This can be a character vector of cell names, an integer vector of column indices or a logical vector, 
 #' default is NULL, meaning all cells to be used for the calculation of the activaty score or identification of SV features. 
@@ -113,12 +117,14 @@ setGeneric('sc.rwr',
     knn.used.reduction.dims = 30,
     knn.combined.cell.feature = FALSE,
     knn.graph.weighted = TRUE,
-    knn.k.use = 400,
+    knn.k.use = 600,
     rwr.restart = .75,
     rwr.normalize.adj.method = c("laplacian", "row", "column", "none"),
     rwr.normalize.affinity = FALSE,
+    rwr.prop.normalize = FALSE,
     rwr.threads = 2L,
-    hyper.test.weighted = TRUE,
+    hyper.test.weighted = c("Hypergeometric", "Wallenius", "none"),
+    hyper.test.by.expr = TRUE,
     cells = NULL,
     features = NULL,
     verbose = TRUE, 
@@ -149,17 +155,20 @@ setMethod('sc.rwr',
     knn.used.reduction.dims = 30,
     knn.combined.cell.feature = FALSE,
     knn.graph.weighted = TRUE,
-    knn.k.use = 400,
+    knn.k.use = 600,
     rwr.restart = .75,
     rwr.normalize.adj.method = c("laplacian", "row", "column", "none"),
     rwr.normalize.affinity = FALSE,
+    rwr.prop.normalize = FALSE,
     rwr.threads = 2L,
-    hyper.test.weighted = TRUE,
+    hyper.test.weighted = c("Hypergeometric", "Wallenius", "none"),
+    hyper.test.by.expr = TRUE,
     cells = NULL,
     features = NULL,
     verbose = TRUE,
     ...
   ){
+  hyper.test.weighted <- match.arg(hyper.test.weighted)
   knn.used.reduction <- 'MCA'
   if (!"MCA" %in% reducedDimNames(data)){
       cli::cli_warn(c("The {.cls {class(data)}} does not have MCA, run 'runMCA()' first."))
@@ -224,43 +233,50 @@ setMethod('sc.rwr',
                   restart = rwr.restart,
                   threads = rwr.threads,
                   normalize.affinity = rwr.normalize.affinity,
+                  prop.normalize = rwr.prop.normalize,
                   verbose = verbose
                 )
 
   gset.score.cells <- gset.score[, cells, drop=FALSE]
   
   #gset.score.cells <- gset.score.cells[Matrix::rowSums(gset.score.cells) > 0,]
-
-  gset.score.features <- .extract.features.rank(
-                             gset.score.cells,
-                             assay(data, assay.type),
-                             features,
-                             gset.idx.list
-                          )
-
-  if (hyper.test.weighted){ 
-      gset.hgt <- suppressWarnings(.run_hgt(rd.knn.gh[features, cells],
+  features.expr <- assay(data, assay.type)
+  
+  if (hyper.test.weighted != 'none'){ 
+      #cells.gene.num <- colSums(as.matrix(features.expr) > 0)
+      if (hyper.test.by.expr){
+          knn.gh <- .build.adj.m_by_expr(features.expr, top.n = knn.k.use, weighted.distance = knn.graph.weighted)
+      }else{
+          knn.gh <- rd.knn.gh[features, cells]
+      }
+      gset.hgt <- suppressWarnings(.run_hgt(
+                           knn.gh,
                            seedstart.m[features,],
                            gset.idx.list,
+                           #cells.gene.num,
                            m = gset.num[,'exp.gene.num'],
                            top.n = knn.k.use,
                            combined.cell.feature = knn.combined.cell.feature,
-                           weighted.distance = knn.graph.weighted
+                           weighted.distance = knn.graph.weighted,
+                           method = hyper.test.weighted
                   ))
       gset.score.cells <- gset.score.cells * gset.hgt
-      if (nrow(gset.score.cells) > 1){
-          cnm <- colnames(gset.score.cells)
-          rnm <- rownames(gset.score.cells)
-          gset.score.cells <- gset.score.cells %*% Matrix::Diagonal(x=1/Matrix::colSums(gset.score.cells))
-          gset.score.cells[is.na(gset.score.cells)] <- 0
-          colnames(gset.score.cells) <- cnm
-          rownames(gset.score.cells) <- rnm
-      }else{
-          gset.score.cells <- .normalize.single.score(gset.score.cells)
-      }
+      #if (rwr.prop.normalize && ncol(gset.score.cells) > 1){
+      #    gset.score.cells <- gset.score.cells |> prop.table(1) 
+      #    gset.score.cells[is.na(gset.score.cells)] <- 0
+      #}
   }
+  
+  gset.score.cells <- Matrix::Matrix(gset.score.cells, sparse = TRUE)
+  gset.score.features <- .extract.features.rank(
+                             gset.score.cells,
+                             features.expr,
+                             features,
+                             gset.idx.list
+                          )  
+ 
   x <- SingleCellExperiment(assays = list(affi.score = gset.score.cells))
-  rowData(x) <- gset.num[rownames(gset.num) %in% rownames(x), ,drop=FALSE]
+  rowData(x) <- gset.num[rownames(x), ,drop=FALSE]
   
   x <- .add.int.rowdata(sce=x, getfun=fscoreDfs, 
                         setfun1 = `fscoreDfs<-`, 

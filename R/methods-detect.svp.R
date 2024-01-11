@@ -28,15 +28,19 @@
 #' neighbor and build graph, default is FALSE, meaning the nearest neighbor will be found in cells to cells,
 #' features to features, cells to features respectively to build graph.
 #' @param knn.graph.weighted logical whether consider the distance of nodes in the nearest neighbors, default is TRUE.
-#' @param knn.k.use numeric the number of the Nearest Neighbors nodes, default is 400.
+#' @param knn.k.use numeric the number of the Nearest Neighbors nodes, default is 600.
 #' @param rwr.restart  default is 0.75.
 #' @param rwr.normalize.adj.method character the method to normalize the adjacency matrix of the input graph,
 #' default is \code{laplacian}.
 #' @param rwr.normalize.affinity logical whether normalize the activity (affinity) result score using quantile normalisation,
 #' default is FALSE.
+#' @param rwr.prop.normalize logical whether divide the specific activity score by total activity score for a sample,
+#' default is FALSE.
 #' @param rwr.threads the threads to run Random Walk With Restart (RWR), default is 2L.
-#' @param hyper.test.weighted logical whether consider weighting the enrichment score of cell using hypergeometric test,
-#' default is TRUE.
+#' @param hyper.test.weighted character which method to weight the activity score of cell, should is one of "Hypergeometric", "Wallenius",
+#' "none", default is "Hypergeometric".
+#' @param hyper.test.by.expr logical whether using the expression matrix to find the nearest genes of cells, default is \code{TRUE},
+#' if it is \code{FALSE}, meaning using the result of reduction to find the nearest genes of cells to perfrom the \code{hyper.test.weighted}.
 #' @param sv.used.reduction character used as spatial coordinates to detect SVG, default is \code{UMAP},
 #' if \code{data} has \code{spatialCoords}, which will be used as spatial coordinates.
 #' @param sv.grid.n numeric number of grid points in the two directions to estimate 2D weighted kernel density, default is 100.
@@ -97,12 +101,14 @@ setGeneric('detect.svp',
     knn.used.reduction.dims = 30,
     knn.combined.cell.feature = FALSE,
     knn.graph.weighted = TRUE,
-    knn.k.use = 400,
+    knn.k.use = 600,
     rwr.restart = .75,
     rwr.normalize.adj.method = c("laplacian", "row", "column", "none"),
     rwr.normalize.affinity = FALSE,
+    rwr.prop.normalize = FALSE,
     rwr.threads = 2L,
-    hyper.test.weighted = TRUE,
+    hyper.test.weighted = c("Hypergeometric", "Wallenius", "none"),
+    hyper.test.by.expr = TRUE,
     sv.used.reduction = c('UMAP', 'TSNE'),
     sv.grid.n = 100,
     sv.permutation = 100,
@@ -140,12 +146,14 @@ setMethod('detect.svp',
     knn.used.reduction.dims = 30,
     knn.combined.cell.feature = FALSE,    
     knn.graph.weighted = TRUE,
-    knn.k.use = 400,
+    knn.k.use = 600,
     rwr.restart = .75,
     rwr.normalize.adj.method = c("laplacian", "row", "column", "none"),
     rwr.normalize.affinity = FALSE,
+    rwr.prop.normalize = FALSE,
     rwr.threads = 2L,
-    hyper.test.weighted = TRUE,
+    hyper.test.weighted = c("Hypergeometric", "Wallenius", "none"),
+    hyper.test.by.expr = TRUE,
     sv.used.reduction = c('UMAP', 'TSNE'),
     sv.grid.n = 100,
     sv.permutation = 100,
@@ -175,6 +183,7 @@ setMethod('detect.svp',
               rwr.restart,
               rwr.normalize.adj.method,
               rwr.normalize.affinity,
+              rwr.prop.normalize,
               rwr.threads,
               hyper.test.weighted,
               cells,
