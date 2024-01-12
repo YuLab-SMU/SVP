@@ -1,5 +1,5 @@
 #' @title Calculating the 2D Weighted Kernel Density Estimation
-#' @rdname wkde-method
+#' @rdname runWKDE-method
 #' @param data a \linkS4class{SingleCellExperiment} object with contains \code{UMAP} or \code{TSNE},
 #' or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} object with specified
 #' \code{gsvaexp} argument.
@@ -17,7 +17,7 @@
 #' @param ... additional parameters
 #' @return a \linkS4class{SVPExperiment} or \linkS4class{SingleCellExperiment}
 #' @export
-setGeneric('wkde',
+setGeneric('runWKDE',
   function(
     data,
     assay.type = 'logcounts',
@@ -30,14 +30,14 @@ setGeneric('wkde',
     gsvaexp.assay.type = NULL,
     ...
   )
-  standardGeneric('wkde')
+  standardGeneric('runWKDE')
 )
 
 #' @importFrom SummarizedExperiment assay<-
-#' @rdname wkde-method
-#' @aliases wkde,SingleCellExperiment
-#' @export wkde
-setMethod('wkde', 'SingleCellExperiment',
+#' @rdname runWKDE-method
+#' @aliases runWKDE,SingleCellExperiment
+#' @export runWKDE
+setMethod('runWKDE', 'SingleCellExperiment',
   function(
     data,
     assay.type = 'logcounts',
@@ -79,7 +79,7 @@ setMethod('wkde', 'SingleCellExperiment',
           cli::cli_inform("Running the 2D Weighted Density Estimation using RcppParallel ...")
       }
       new.assay.nm <- paste0(assay.type, ".density")
-      res <- .internal_wkde(x, coords, bandwidths, adjust, grid.n)
+      res <- .internal_runWKDE(x, coords, bandwidths, adjust, grid.n)
       
       assay(data, new.assay.nm) <- res
       toc()
@@ -89,10 +89,10 @@ setMethod('wkde', 'SingleCellExperiment',
   return(data)
 })
 
-##' @rdname wkde-method   
-##' @aliases wkde,SVPExperiment   
-##' @export wkde
-setMethod('wkde', 'SVPExperiment',
+##' @rdname runWKDE-method   
+##' @aliases runWKDE,SVPExperiment   
+##' @export runWKDE
+setMethod('runWKDE', 'SVPExperiment',
   function(
     data,
     assay.type = 'logcounts',
@@ -109,7 +109,7 @@ setMethod('wkde', 'SVPExperiment',
           cli::cli_inform("The {.var gsvaexp} was specified, the specified {.var gsvaExp} will be used to calculate density.")
        }
        da2 <- gsvaExp(data, gsvaexp, withSpatialCoords=TRUE, withReducedDim=TRUE)
-       da2 <- wkde(da2, 
+       da2 <- runWKDE(da2, 
                    assay.type = gsvaexp.assay.type, 
                    reduction = reduction, 
                    grid.n = grid.n, 
@@ -122,7 +122,7 @@ setMethod('wkde', 'SVPExperiment',
     return(data)
 })
 
-.internal_wkde <- function(x, coords, bandwidths = NULL, adjust = 1, grid.n = 100){
+.internal_runWKDE <- function(x, coords, bandwidths = NULL, adjust = 1, grid.n = 100){
   coords <- .normalize.coords(coords)
 
   lims <- c(range(coords[,1]), range(coords[,2]))
