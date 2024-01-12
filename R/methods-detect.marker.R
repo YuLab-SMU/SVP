@@ -1,5 +1,5 @@
 #' @title Detecting the specific cell features with nearest distance of cells in MCA space
-#' @rdname detect.marker-method
+#' @rdname runDetectMarker-method
 #' @param data SingleCellExperiment object
 #' @param group.by the column name of cell annotation.
 #' @param aggregate.group logical whether calculate the center cluster of each group of cell according
@@ -8,7 +8,9 @@
 #' @param reduction character which reduction space, default is \code{'MCA'}.
 #' @param dims integer the number of components to defined the nearest distance.
 #' @param ntop integer the top number of nearest or furthest (\code{type = 'negative'}) features, 
-#' default is 200.
+#' default is 200 .
+#' @param present.prop numeric the appearance proportion of samples in the corresponding group in \code{group.by},
+#' default is 0.2 .
 #' @param type character which features are be extracted, the nearest features (\code{type='positive'}) 
 #' or furthest features (\code{type = 'negative'}) or both (\code{type='all'}), default is 
 #' \code{type='positive'}.
@@ -16,7 +18,7 @@
 #' @param ... additional parameters.
 #' @return a list, which contains features and named with clusters of \code{group.by}.
 #' @export
-setGeneric('detect.marker',
+setGeneric('runDetectMarker',
   function(
     data,
     group.by,
@@ -24,19 +26,20 @@ setGeneric('detect.marker',
     reduction = 'MCA',
     dims = 30,
     ntop = 200,
+    present.prop = .2,
     type = c('positive', 'all', 'negative'),
     consider.unique.in.group = TRUE,
     ...
   )
-  standardGeneric('detect.marker')
+  standardGeneric('runDetectMarker')
 )
 
-#' @rdname detect.marker-method
-#' @aliases detect.marker,SingleCellExperiment
-#' @export detect.marker
+#' @rdname runDetectMarker-method
+#' @aliases runDetectMarker,SingleCellExperiment
+#' @export runDetectMarker
 #' @importFrom stats setNames
 setMethod(
-  'detect.marker', 
+  'runDetectMarker', 
   'SingleCellExperiment', 
   function(
     data, 
@@ -45,6 +48,7 @@ setMethod(
     reduction = 'MCA', 
     dims = 30, 
     ntop = 200,
+    present.prop = .2,
     type = c('positive', 'all', 'negative'),
     consider.unique.in.group = TRUE,
     ...
@@ -93,6 +97,11 @@ setMethod(
             gsetlist <- dt
         }
     }
+    
+    if (present.prop > 1){
+        present.prop <- .5
+    }
+    gsetlist <- .check.genes.present(data, group.by, gsetlist, present.prop)
     return(gsetlist)
 })
 
@@ -116,4 +125,19 @@ setMethod(
         dt <- rbind(dt1, dt)
     }
     return(dt)
+}
+
+
+
+.check.genes.present <- function(da, group.by, pseudomarker, present.prop = .5){
+    nm <- names(pseudomarker)
+    
+    res <- lapply(nm, function(i){
+       tmpda <- da[pseudomarker[[i]], da[[group.by]]==i,drop=FALSE]
+       flag <- Matrix::rowMeans(assay(tmpda) > 0) >= present.prop
+       rownames(tmpda)[flag]
+    }) |> setNames(nm)
+    
+    return(res)
+
 }
