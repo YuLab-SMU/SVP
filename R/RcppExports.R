@@ -103,6 +103,10 @@ MCAStep2 <- function(Z, V, Dc) {
     .Call('_SVP_MCAStep2', PACKAGE = 'SVP', Z, V, Dc)
 }
 
+CalMoransiParallel <- function(x, weight, scaled = FALSE) {
+    .Call('_SVP_CalMoransiParallel', PACKAGE = 'SVP', x, weight, scaled)
+}
+
 #' Obtain the pair distance of row between \code{Ar} and \code{Br} matrix
 #' @param Ar matrix which number of column should be equal to column number of \code{Br}.
 #' @param Br matrix which number of column should be equal to column number of \code{Ar}.
@@ -113,6 +117,10 @@ fastPDist <- function(Ar, Br) {
 
 fusiondist <- function(s, p, alpha = 0.2, beta = 0.1) {
     .Call('_SVP_fusiondist', PACKAGE = 'SVP', s, p, alpha, beta)
+}
+
+CalMoransiPermParallel <- function(x, weight, permutation = 999L) {
+    .Call('_SVP_CalMoransiPermParallel', PACKAGE = 'SVP', x, weight, permutation)
 }
 
 #' Computer the affinity score of all nodes in a graph to a seeds 

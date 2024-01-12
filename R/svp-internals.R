@@ -422,18 +422,45 @@ pairDist <- function(x, y){
   return(res)
 }
 
-# #' @importFrom S4Vectors DataFrame List
-#.extract.features.score <- function(x, gset.nm, features, gset.idx.list){
-#  keep.gset <- x[rownames(x) %in% gset.nm, ,drop=FALSE]
-#  keep.gset <- keep.gset[,colnames(keep.gset) %in% features,drop=FALSE]
-#  rnm <- rownames(keep.gset)
-#  cnm <- colnames(keep.gset)
-#  keep.gset.list <- gset.idx.list[names(gset.idx.list) %in% rownames(keep.gset)]
-#  res <- ExtractFeatureScoreCpp(keep.gset, rnm, cnm, keep.gset.list)
-#  res <- DataFrame(features.score = List(res))
-#  rownames(res) <- rnm
-#  return(res)
-#}
+.identify.svg.by.autocorrelation <- function(
+  x, 
+  coords, 
+  method = 'moransi',
+  permutation = 100, 
+  scaled = FALSE,
+  alternative = 'two.sided',
+  p.adjust.method = 'BH',
+  ...
+  ){
+  
+  coords <- .normalize.coords(coords)
+  coords.dist <- pairDist(coords, coords)
+  
+  if (method == 'moransi'){
+      if (permutation <= 1 || is.null(permutation)){
+          res <- CalMoransiParallel(x, coords.dist, scaled)
+          if (alternative == "two.sided")
+              res[,4] <- ifelse(res[,1] <= res[,2], 2 * res[,4], 2 * (1 - res[,4]))
+          if (alternative == "greater")
+              res[,4] <- 1 - res[,4]
+          colnames(res) <- c('obs', 'expect.moransi', 'sd.moransi', 'pvalue')
+      }else{
+          res <- CalMoransiPermParallel(x, coords.dist, permutation)
+          colnames(res) <- c("obs", "pvalue")
+      }
+  }
+
+  rownames(res) <- rownames(x)
+  res <- cbind(res,
+               padj = p.adjust(res[, "pvalue"], method = p.adjust.method)
+            ) |> as.data.frame(check.names=FALSE)
+  res <- res |> dplyr::arrange(.data$padj, .data$obs) |>
+         dplyr::mutate(rank = seq(nrow(res))) |> as.matrix()
+  res <- res[match(rownames(x), rownames(res)), ]  
+  return(res)
+}
+
+
 
 #' @importFrom rlang .data
 #' @importFrom stats p.adjust
