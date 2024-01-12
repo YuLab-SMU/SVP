@@ -8,7 +8,7 @@
 #' kullback-leibler divergence to detect the signal genes in a low-dimensional space (\code{UMAP} or \code{TSNE}
 #' for single cell omics data) or a physical space (for spatial omics data). See details to learn more.
 #'
-#' @rdname kldSVG-method
+#' @rdname runKldSVG-method
 #' @param data a \linkS4class{SingleCellExperiment} object with contains \code{UMAP} or \code{TSNE},
 #' or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} object with specified
 #' \code{gsvaexp} argument.
@@ -86,9 +86,9 @@
 #' 
 #' 3. https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
 #'
-#' @seealso [`sc.rwr`] to calculate the activity score of gene sets.
+#' @seealso [`runSGSA`] to calculate the activity score of gene sets.
 #' @export
-setGeneric('kldSVG',
+setGeneric('runKldSVG',
   function(
     data,
     assay.type = 'logcounts',
@@ -103,13 +103,13 @@ setGeneric('kldSVG',
     gsvaexp.assay.type = NULL,
     ...
   )
-  standardGeneric('kldSVG')
+  standardGeneric('runKldSVG')
 )
 
-#' @rdname kldSVG-method
-#' @aliases kldSVG,SingleCellExperiment
-#' @export kldSVG
-setMethod('kldSVG', 'SingleCellExperiment',
+#' @rdname runKldSVG-method
+#' @aliases runKldSVG,SingleCellExperiment
+#' @export runKldSVG
+setMethod('runKldSVG', 'SingleCellExperiment',
   function(
     data,
     assay.type = 'logcounts',
@@ -173,10 +173,10 @@ setMethod('kldSVG', 'SingleCellExperiment',
   return(data)
 })
 
-#' @rdname kldSVG-method          
-#' @aliases kldSVG,SVPExperiment          
-#' @export kldSVG
-setMethod('kldSVG', 'SVPExperiment',
+#' @rdname runKldSVG-method          
+#' @aliases runKldSVG,SVPExperiment          
+#' @export runKldSVG
+setMethod('runKldSVG', 'SVPExperiment',
   function(
     data,
     assay.type = 'logcounts',
@@ -196,7 +196,7 @@ setMethod('kldSVG', 'SVPExperiment',
           cli::cli_inform("The {.var gsvaexp} was specified, the specified {.var gsvaExp} will be used to detect 'svg'.")
        }        
        da2 <- gsvaExp(data, gsvaexp, withSpatialCoords = TRUE, withReducedDim = TRUE)
-       da2 <- kldSVG(da2, 
+       da2 <- runKldSVG(da2, 
                      gsvaexp.assay.type, 
                      sv.used.reduction, 
                      sv.grid.n, 
@@ -213,3 +213,182 @@ setMethod('kldSVG', 'SVPExperiment',
     return(data)  
   }
 )
+
+
+#' Detecting the spatially or single cell variable features with Moran's I or Geary's C of
+#' 2D weighted kernel density estimation
+#' @description
+#' To resolve the sparsity of single cell or spatial omics data, we use kernel function smoothing cell
+#' density weighted by the gene expression in a low-dimensional space or physical space. This method had
+#' reported that it can better represent the gene expression, it can also recover the signal from cells that
+#' are more likely to express a gene based on their neighbouring cells (first reference). Next, we use
+#' Moran's I or Geary's C to detect the signal genes in a low-dimensional space (\code{UMAP} or \code{TSNE}
+#' for single cell omics data) or a physical space (for spatial omics data).
+#'
+#' @rdname runDetectSVG-method
+#' @param data a \linkS4class{SingleCellExperiment} object with contains \code{UMAP} or \code{TSNE},
+#' or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} object with specified
+#' \code{gsvaexp} argument.
+#' @param assay.type which expressed data to be pulled to run, default is \code{logcounts}.
+#' @param method character one of \code{'morans'} and \code{"geary"}, default is \code{'morans'}.
+#' @param sv.runWKDE logical whether perform the 2D weighted kernel density estimation firstly, 
+#' default is FALSE.
+#' @param sv.used.reduction character used as spatial coordinates to detect SVG, default is \code{UMAP},
+#' if \code{data} has \code{spatialCoords}, which will be used as spatial coordinates.
+#' @param sv.grid.n numeric number of grid points in the two directions to estimate 2D weighted kernel
+#' density, default is 100.
+#' @param sv.permutation integer the number to permutation test for the calculation of Moran's I, default
+#' is 1.
+#' @param sv.p.adjust.method character the method to adjust the pvalue of the result, default is \code{BY}.
+#' @param verbose logical whether print the intermediate message when running the program, default is TRUE.
+#' @param gsvaexp which gene set variation experiment will be pulled to run, this only work when \code{data} is a
+#' \linkS4class{SVPExperiment}, default is NULL.
+#' @param gsvaexp.assay.type which assay data in the specified \code{gsvaexp} will be used to run, default is NULL.
+#' @param ... additional parameters
+#' @return a \linkS4class{SVPExperiment} or a \linkS4class{SingleCellExperiment}, see details.
+#' @references
+#'
+#' 1. Jose Alquicira-Hernandez, Joseph E Powell, Nebulosa recovers single-cell gene expression signals by kernel density estimation.
+#'    Bioinformatics, 37, 2485–2487(2021), https://doi.org/10.1093/bioinformatics/btab003.
+#' @export
+setGeneric("runDetectSVG", function(
+    data,
+    assay.type = 'logcounts',
+    method = c("moransi", "geary"),
+    sv.runWKDE = FALSE,
+    sv.used.reduction = c('UMAP', 'TSNE'),
+    sv.grid.n = 100,
+    sv.permutation = 1,
+    sv.p.adjust.method = "BH",
+    verbose = TRUE,
+    gsvaexp = NULL,
+    gsvaexp.assay.type = NULL,
+    ...
+  )
+  standardGeneric('runDetectSVG')
+)
+
+#' @rdname runDetectSVG-method
+#' @aliases runDetectSVG,SingleCellExperiment
+#' @export runDetectSVG
+setMethod('runDetectSVG', 'SingleCellExperiment',
+  function(
+    data,
+    assay.type = 'logcounts',
+    method = c("moransi", "geary"),
+    sv.runWKDE = FALSE,
+    sv.used.reduction = c('UMAP', 'TSNE'),
+    sv.grid.n = 100,
+    sv.permutation = 1,
+    sv.p.adjust.method = "BH",
+    verbose = TRUE,
+    gsvaexp = NULL,
+    gsvaexp.assay.type = NULL,
+    ...
+  ){
+  method <- match.arg(method)
+  if (is.null(assay.type)){
+    assay.type <- assayNames(data)[1]
+  }else if (is.numeric(assay.type)){
+    assay.type <- assayNames(data)[assay.type]
+  }
+  if (sv.runWKDE){
+    new.assay.nm <- paste0(assay.type, ".density")
+    if (!new.assay.nm %in% assayNames(data)){
+      data <- runWKDE(
+        data, 
+        assay.type = assay.type,
+        reduction = sv.used.reduction,
+        grid.n = sv.grid.n,
+        adjust = 1,
+        bandwidths = NULL,
+        verbose = verbose
+      )
+    }
+    x <- assay(data, new.assay.nm)
+  }else{
+    x <- assay(data, assay.type)
+  }
+
+  flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
+
+  flag2 <- any(sv.used.reduction %in% reducedDimNames(data))
+
+  if((flag1 || flag2)){
+      if (flag2){
+          coords <- reducedDim(data, sv.used.reduction)
+          coords <- coords[,c(1, 2)]
+      }
+      if (flag1){
+          coords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
+      }
+      tic()
+      if (verbose && sv.runWKDE){
+          cli::cli_inform("Identifying the spatially variable gene sets (pathway) based on
+                           Moran's Index of 2D Weighted Kernel Density ...")
+
+      }
+
+      res.sv <- .identify.svg.by.autocorrelation(
+                        x,
+                        coords = coords,
+                        method = method,
+                        permutation = sv.permutation,
+                        p.adjust.method = sv.p.adjust.method,
+                        ...)
+
+      data <- .add.int.rowdata(sce = data,
+                            getfun = svDfs,
+                            setfun1 = `svDfs<-`,
+                            setfun2 = `svDf<-`,
+                            namestr = paste0('sv.', method),
+                            val = res.sv)
+      toc()
+  }else{
+      cli::cli_abort("The {.cls {class(data)}} should have 'spatialCoords' or the reduction result of 'UMAP' or 'TSNE'.")
+  }
+
+  return(data)  
+})
+
+#' @rdname runDetectSVG-method
+#' @aliases runDetectSVG,SVPExperiment
+#' @export runDetectSVG
+setMethod('runDetectSVG', 'SVPExperiment',
+  function(
+    data,
+    assay.type = 'logcounts',
+    method = c("moransi", "geary"),
+    sv.runWKDE = FALSE,
+    sv.used.reduction = c('UMAP', 'TSNE'),
+    sv.grid.n = 100,
+    sv.permutation = 1,
+    sv.p.adjust.method = "BH",
+    verbose = TRUE,
+    gsvaexp = NULL,
+    gsvaexp.assay.type = NULL,    
+    ...){
+
+    if (!is.null(gsvaexp)){
+       if (verbose){
+          cli::cli_inform("The {.var gsvaexp} was specified, the specified {.var gsvaExp} will be used to detect 'svg'.")
+       }
+       da2 <- gsvaExp(data, gsvaexp, withSpatialCoords = TRUE, withReducedDim = TRUE)
+       da2 <- runDetectSVG(da2,
+                     gsvaexp.assay.type,
+                     method,
+                     sv.runWKDE,
+                     sv.used.reduction,
+                     sv.grid.n,
+                     sv.permutation,
+                     sv.p.adjust.method,
+                     verbose,
+                     ...)
+       gsvaExp(data, gsvaexp, withSpatialCoords = FALSE, withReducedDim = FALSE) <- da2
+    }else{
+       data <- callNextMethod()
+    }
+    return(data)
+  }
+)
+
