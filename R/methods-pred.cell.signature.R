@@ -1,6 +1,6 @@
 #' @title predict the cell signature according the gene sets or pathway activity score.
 #' @rdname pred.cell.signature-method
-#' @param data A \linkS4class{SVPExperiment}, which has run \code{sc.rwr} or \code{detect.svp}, or 
+#' @param data A \linkS4class{SVPExperiment}, which has run \code{runSGSA} or \code{detect.svp}, or 
 #' a \linkS4class{SingleCellExperiment} which was extracted from \linkS4class{SVPExperiment} using
 #' \code{gsvaExp} function.
 #' @param assay.type which expressed data to be pulled to run, default is \code{affi.score}.
@@ -16,7 +16,7 @@
 #' \linkS4class{SingleCellExperiment}. If input is a \linkS4class{SingleCellExperiment} (which is extracted from 
 #' \linkS4class{SVPExperiment} using \code{gsvaExp()} funtion), output will be a \linkS4class{SingleCellExperiment}, 
 #' the result can be extracted using \code{colData()} function with specified column in default is \code{pred.cell.sign}.
-#' @seealso to calculate the activity score of gene sets or pathway: [`sc.rwr`], 
+#' @seealso to calculate the activity score of gene sets or pathway: [`runSGSA`], 
 #' to keep the max gene set or pathway activity score of cell: [`cluster.assign`].
 #' @export
 setGeneric('pred.cell.signature', 

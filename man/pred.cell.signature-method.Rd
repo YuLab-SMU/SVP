@@ -39,7 +39,7 @@ pred.cell.signature(
 )
 }
 \arguments{
-\item{data}{A \linkS4class{SVPExperiment}, which has run \code{sc.rwr} or \code{detect.svp}, or
+\item{data}{A \linkS4class{SVPExperiment}, which has run \code{runSGSA} or \code{detect.svp}, or
 a \linkS4class{SingleCellExperiment} which was extracted from \linkS4class{SVPExperiment} using
 \code{gsvaExp} function.}
 
@@ -68,6 +68,6 @@ the result can be extracted using \code{colData()} function with specified colum
 predict the cell signature according the gene sets or pathway activity score.
 }
 \seealso{
-to calculate the activity score of gene sets or pathway: \code{\link{sc.rwr}},
+to calculate the activity score of gene sets or pathway: \code{\link{runSGSA}},
 to keep the max gene set or pathway activity score of cell: \code{\link{cluster.assign}}.
 }

@@ -51,7 +51,7 @@
 #' default is \code{SerialParam()}, meaning no parallel. You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=T)}
 #' to parallel it, the \code{workers} of \code{MulticoreParam} is the number of cores used, see also
 #' \code{\link[BiocParallel]{MulticoreParam}}. default is \code{SerialParam()}.
-#' @param run.sv logical whether run the identication of SV features using \code{kldSVG}, if it is \code{FALSE}, the identification 
+#' @param run.sv logical whether run the identication of SV features using \code{runKldSVG}, if it is \code{FALSE}, the identification 
 #' of SV features will not be done, default is TRUE.
 #' @param cells Vector specifying the subset of cells to be used for the calculation of the activaty score or identification 
 #' of SV features. This can be a character vector of cell names, an integer vector of column indices or a logical vector, 
@@ -83,7 +83,7 @@
 #'   \item \code{padj} the adjusted pvalue based on the speficied \code{sv.p.adjust.method}, default is \code{BY}.
 #'   \item \code{rank} the order of significant spatial variable features based on \code{padj} and \code{sp.kld}.
 #' }
-#' @seealso [`sc.rwr`] to calculate the activity score of gene sets and [`kldSVG`] to identify the spatiall variable or specified 
+#' @seealso [`runSGSA`] to calculate the activity score of gene sets and [`runKldSVG`] to identify the spatiall variable or specified 
 #' cell gene sets or a features.
 #' @export
 setGeneric('detect.svp', 
@@ -166,7 +166,7 @@ setMethod('detect.svp',
     random.seed = 1024,
     ...
   ){
-    sce <- sc.rwr(data, 
+    sce <- runSGSA(data, 
               gset.idx.list, 
               gsvaExp.name, 
               min.sz, 
@@ -191,7 +191,7 @@ setMethod('detect.svp',
               verbose
         )
     if (run.sv){
-        sce <- kldSVG(data = sce, 
+        sce <- runKldSVG(data = sce, 
                   sv.used.reduction = sv.used.reduction,
                   sv.grid.n = sv.grid.n,
                   sv.permutation = sv.permutation,

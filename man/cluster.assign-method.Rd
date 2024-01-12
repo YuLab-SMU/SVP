@@ -36,7 +36,7 @@ cluster.assign(
 )
 }
 \arguments{
-\item{data}{A \linkS4class{SVPExperiment}, which has run \code{sc.rwr} or \code{detect.svp}, or
+\item{data}{A \linkS4class{SVPExperiment}, which has run \code{runSGSA} or \code{detect.svp}, or
 a \linkS4class{SingleCellExperiment} which was extracted from \linkS4class{SVPExperiment} using
 \code{gsvaExp} function.}
 
@@ -61,9 +61,9 @@ output will be a \linkS4class{SingleCellExperiment}, the result can be extracted
 clusting and assign the label for each feature(especifily the gene sets).
 }
 \details{
-when use \code{sc.rwr} to calculated the gene set activity of cell, if \code{assign = TRUE} we will assign the max affinity of
+when use \code{runSGSA} to calculated the gene set activity of cell, if \code{assign = TRUE} we will assign the max affinity of
 gene set or pathway to the each cell. If \code{assign = FALSE}, the max affinity of gene set or pathway will be kept.
 }
 \seealso{
-to calculate the activity score of gene sets or pathway: \code{\link{sc.rwr}}.
+to calculate the activity score of gene sets or pathway: \code{\link{runSGSA}}.
 }

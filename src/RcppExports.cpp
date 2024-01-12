@@ -155,6 +155,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// CalMoransiParallel
+arma::mat CalMoransiParallel(arma::sp_mat& x, arma::mat& weight, bool scaled);
+RcppExport SEXP _SVP_CalMoransiParallel(SEXP xSEXP, SEXP weightSEXP, SEXP scaledSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type weight(weightSEXP);
+    Rcpp::traits::input_parameter< bool >::type scaled(scaledSEXP);
+    rcpp_result_gen = Rcpp::wrap(CalMoransiParallel(x, weight, scaled));
+    return rcpp_result_gen;
+END_RCPP
+}
 // fastPDist
 NumericMatrix fastPDist(NumericMatrix Ar, NumericMatrix Br);
 RcppExport SEXP _SVP_fastPDist(SEXP ArSEXP, SEXP BrSEXP) {
@@ -178,6 +191,19 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
     Rcpp::traits::input_parameter< double >::type beta(betaSEXP);
     rcpp_result_gen = Rcpp::wrap(fusiondist(s, p, alpha, beta));
+    return rcpp_result_gen;
+END_RCPP
+}
+// CalMoransiPermParallel
+arma::mat CalMoransiPermParallel(arma::sp_mat& x, arma::mat& weight, int permutation);
+RcppExport SEXP _SVP_CalMoransiPermParallel(SEXP xSEXP, SEXP weightSEXP, SEXP permutationSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type weight(weightSEXP);
+    Rcpp::traits::input_parameter< int >::type permutation(permutationSEXP);
+    rcpp_result_gen = Rcpp::wrap(CalMoransiPermParallel(x, weight, permutation));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -208,8 +234,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_SVP_CalWkdeParallel", (DL_FUNC) &_SVP_CalWkdeParallel, 6},
     {"_SVP_MCAStep1", (DL_FUNC) &_SVP_MCAStep1, 1},
     {"_SVP_MCAStep2", (DL_FUNC) &_SVP_MCAStep2, 3},
+    {"_SVP_CalMoransiParallel", (DL_FUNC) &_SVP_CalMoransiParallel, 3},
     {"_SVP_fastPDist", (DL_FUNC) &_SVP_fastPDist, 2},
     {"_SVP_fusiondist", (DL_FUNC) &_SVP_fusiondist, 4},
+    {"_SVP_CalMoransiPermParallel", (DL_FUNC) &_SVP_CalMoransiPermParallel, 3},
     {"_SVP_parallelCalRWR", (DL_FUNC) &_SVP_parallelCalRWR, 5},
     {NULL, NULL, 0}
 };

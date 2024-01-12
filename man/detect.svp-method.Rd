@@ -151,7 +151,7 @@ default is \code{SerialParam()}, meaning no parallel. You can use \code{BiocPara
 to parallel it, the \code{workers} of \code{MulticoreParam} is the number of cores used, see also
 \code{\link[BiocParallel]{MulticoreParam}}. default is \code{SerialParam()}.}
 
-\item{run.sv}{logical whether run the identication of SV features using \code{kldSVG}, if it is \code{FALSE}, the identification
+\item{run.sv}{logical whether run the identication of SV features using \code{runKldSVG}, if it is \code{FALSE}, the identification
 of SV features will not be done, default is TRUE.}
 
 \item{cells}{Vector specifying the subset of cells to be used for the calculation of the activaty score or identification
@@ -198,6 +198,6 @@ each features.
 }
 }
 \seealso{
-\code{\link{sc.rwr}} to calculate the activity score of gene sets and \code{\link{kldSVG}} to identify the spatiall variable or specified
+\code{\link{runSGSA}} to calculate the activity score of gene sets and \code{\link{runKldSVG}} to identify the spatiall variable or specified
 cell gene sets or a features.
 }
