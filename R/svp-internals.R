@@ -426,7 +426,7 @@ pairDist <- function(x, y){
   x, 
   coords, 
   method = 'moransi',
-  permutation = 100, 
+  permutation = 1, 
   scaled = FALSE,
   alternative = 'two.sided',
   p.adjust.method = 'BH',
@@ -437,18 +437,19 @@ pairDist <- function(x, y){
   coords.dist <- pairDist(coords, coords)
   
   if (method == 'moransi'){
-      if (permutation <= 1 || is.null(permutation)){
-          res <- CalMoransiParallel(x, coords.dist, scaled)
-          if (alternative == "two.sided")
-              res[,4] <- ifelse(res[,1] <= res[,2], 2 * res[,4], 2 * (1 - res[,4]))
-          if (alternative == "greater")
-              res[,4] <- 1 - res[,4]
-          colnames(res) <- c('obs', 'expect.moransi', 'sd.moransi', 'pvalue')
-      }else{
-          res <- CalMoransiPermParallel(x, coords.dist, permutation)
-          colnames(res) <- c("obs", "pvalue")
-      }
+      if (is.null(permutation)){permutation <- 1}
+      res <- CalMoransiParallel(x, coords.dist, scaled, permutation)
+      colnames(res) <- c('obs', 'expect.moransi', 'sd.moransi', 'pvalue')
+  }else if (method == 'gearysc'){
+      if (is.null(permutation)){permutation <- 100}
+      res <- CalGearyscParallel(x, coords.dist, permutation)
+      colnames(res) <- c('obs', 'expect.gearysc', 'sd.gearysc', 'pvalue')
   }
+
+  if (alternative == "two.sided")
+      res[,4] <- ifelse(res[,1] <= res[,2], 2 * res[,4], 2 * (1 - res[,4]))
+  if (alternative == "greater")
+      res[,4] <- 1 - res[,4]
 
   rownames(res) <- rownames(x)
   res <- cbind(res,

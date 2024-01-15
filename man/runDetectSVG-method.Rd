@@ -12,11 +12,11 @@
 runDetectSVG(
   data,
   assay.type = "logcounts",
-  method = c("moransi", "geary"),
+  method = c("moransi", "gearysc"),
   sv.runWKDE = FALSE,
   sv.used.reduction = c("UMAP", "TSNE"),
   sv.grid.n = 100,
-  sv.permutation = 1,
+  sv.permutation = NULL,
   sv.p.adjust.method = "BH",
   verbose = TRUE,
   gsvaexp = NULL,
@@ -27,11 +27,11 @@ runDetectSVG(
 \S4method{runDetectSVG}{SingleCellExperiment}(
   data,
   assay.type = "logcounts",
-  method = c("moransi", "geary"),
+  method = c("moransi", "gearysc"),
   sv.runWKDE = FALSE,
   sv.used.reduction = c("UMAP", "TSNE"),
   sv.grid.n = 100,
-  sv.permutation = 1,
+  sv.permutation = NULL,
   sv.p.adjust.method = "BH",
   verbose = TRUE,
   gsvaexp = NULL,
@@ -42,11 +42,11 @@ runDetectSVG(
 \S4method{runDetectSVG}{SVPExperiment}(
   data,
   assay.type = "logcounts",
-  method = c("moransi", "geary"),
+  method = c("moransi", "gearysc"),
   sv.runWKDE = FALSE,
   sv.used.reduction = c("UMAP", "TSNE"),
   sv.grid.n = 100,
-  sv.permutation = 1,
+  sv.permutation = NULL,
   sv.p.adjust.method = "BH",
   verbose = TRUE,
   gsvaexp = NULL,
@@ -61,7 +61,7 @@ or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} ob
 
 \item{assay.type}{which expressed data to be pulled to run, default is \code{logcounts}.}
 
-\item{method}{character one of \code{'morans'} and \code{"geary"}, default is \code{'morans'}.}
+\item{method}{character one of \code{'moransi'} and \code{"gearysc"}, default is \code{'moransi'}.}
 
 \item{sv.runWKDE}{logical whether perform the 2D weighted kernel density estimation firstly,
 default is FALSE.}
@@ -73,7 +73,7 @@ if \code{data} has \code{spatialCoords}, which will be used as spatial coordinat
 density, default is 100.}
 
 \item{sv.permutation}{integer the number to permutation test for the calculation of Moran's I, default
-is 1.}
+is NULL.}
 
 \item{sv.p.adjust.method}{character the method to adjust the pvalue of the result, default is \code{BY}.}
 

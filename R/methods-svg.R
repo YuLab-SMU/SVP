@@ -230,7 +230,7 @@ setMethod('runKldSVG', 'SVPExperiment',
 #' or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} object with specified
 #' \code{gsvaexp} argument.
 #' @param assay.type which expressed data to be pulled to run, default is \code{logcounts}.
-#' @param method character one of \code{'morans'} and \code{"geary"}, default is \code{'morans'}.
+#' @param method character one of \code{'moransi'} and \code{"gearysc"}, default is \code{'moransi'}.
 #' @param sv.runWKDE logical whether perform the 2D weighted kernel density estimation firstly, 
 #' default is FALSE.
 #' @param sv.used.reduction character used as spatial coordinates to detect SVG, default is \code{UMAP},
@@ -238,7 +238,7 @@ setMethod('runKldSVG', 'SVPExperiment',
 #' @param sv.grid.n numeric number of grid points in the two directions to estimate 2D weighted kernel
 #' density, default is 100.
 #' @param sv.permutation integer the number to permutation test for the calculation of Moran's I, default
-#' is 1.
+#' is NULL.
 #' @param sv.p.adjust.method character the method to adjust the pvalue of the result, default is \code{BY}.
 #' @param verbose logical whether print the intermediate message when running the program, default is TRUE.
 #' @param gsvaexp which gene set variation experiment will be pulled to run, this only work when \code{data} is a
@@ -254,11 +254,11 @@ setMethod('runKldSVG', 'SVPExperiment',
 setGeneric("runDetectSVG", function(
     data,
     assay.type = 'logcounts',
-    method = c("moransi", "geary"),
+    method = c("moransi", "gearysc"),
     sv.runWKDE = FALSE,
     sv.used.reduction = c('UMAP', 'TSNE'),
     sv.grid.n = 100,
-    sv.permutation = 1,
+    sv.permutation = NULL,
     sv.p.adjust.method = "BH",
     verbose = TRUE,
     gsvaexp = NULL,
@@ -275,11 +275,11 @@ setMethod('runDetectSVG', 'SingleCellExperiment',
   function(
     data,
     assay.type = 'logcounts',
-    method = c("moransi", "geary"),
+    method = c("moransi", "gearysc"),
     sv.runWKDE = FALSE,
     sv.used.reduction = c('UMAP', 'TSNE'),
     sv.grid.n = 100,
-    sv.permutation = 1,
+    sv.permutation = NULL,
     sv.p.adjust.method = "BH",
     verbose = TRUE,
     gsvaexp = NULL,
@@ -358,11 +358,11 @@ setMethod('runDetectSVG', 'SVPExperiment',
   function(
     data,
     assay.type = 'logcounts',
-    method = c("moransi", "geary"),
+    method = c("moransi", "gearysc"),
     sv.runWKDE = FALSE,
     sv.used.reduction = c('UMAP', 'TSNE'),
     sv.grid.n = 100,
-    sv.permutation = 1,
+    sv.permutation = NULL,
     sv.p.adjust.method = "BH",
     verbose = TRUE,
     gsvaexp = NULL,

@@ -15,6 +15,10 @@ ExtractFeatureScoreCpp <- function(x, rnm, cnm, g) {
     .Call('_SVP_ExtractFeatureScoreCpp', PACKAGE = 'SVP', x, rnm, cnm, g)
 }
 
+CalGearyscParallel <- function(x, weight, permutation = 999L) {
+    .Call('_SVP_CalGearyscParallel', PACKAGE = 'SVP', x, weight, permutation)
+}
+
 #' Find Interval Numbers or Indices in C++
 #' @param x numeric vector (orignial).
 #' @param breaks numeric vector (new).
@@ -103,8 +107,8 @@ MCAStep2 <- function(Z, V, Dc) {
     .Call('_SVP_MCAStep2', PACKAGE = 'SVP', Z, V, Dc)
 }
 
-CalMoransiParallel <- function(x, weight, scaled = FALSE) {
-    .Call('_SVP_CalMoransiParallel', PACKAGE = 'SVP', x, weight, scaled)
+CalMoransiParallel <- function(x, weight, scaled = FALSE, permutation = 999L) {
+    .Call('_SVP_CalMoransiParallel', PACKAGE = 'SVP', x, weight, scaled, permutation)
 }
 
 #' Obtain the pair distance of row between \code{Ar} and \code{Br} matrix
@@ -117,10 +121,6 @@ fastPDist <- function(Ar, Br) {
 
 fusiondist <- function(s, p, alpha = 0.2, beta = 0.1) {
     .Call('_SVP_fusiondist', PACKAGE = 'SVP', s, p, alpha, beta)
-}
-
-CalMoransiPermParallel <- function(x, weight, permutation = 999L) {
-    .Call('_SVP_CalMoransiPermParallel', PACKAGE = 'SVP', x, weight, permutation)
 }
 
 #' Computer the affinity score of all nodes in a graph to a seeds 
