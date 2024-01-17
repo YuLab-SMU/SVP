@@ -241,7 +241,7 @@ setMethod('runSGSA',
   
   #gset.score.cells <- gset.score.cells[Matrix::rowSums(gset.score.cells) > 0,]
   features.expr <- assay(data, assay.type)
-  
+  features.expr <- features.expr[features, cells] 
   if (hyper.test.weighted != 'none'){ 
       #cells.gene.num <- colSums(as.matrix(features.expr) > 0)
       if (hyper.test.by.expr){

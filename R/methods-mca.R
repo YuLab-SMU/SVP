@@ -50,6 +50,8 @@ setMethod('runMCA', 'SingleCellExperiment',
   if (!assay.type %in% assayNames(data)){
       cli::cli_abort("the {.var assay.type} = {assay.type} is not present in the assays of {.cls {class(data)}}.")
   }
+
+  
   
   if (!is.null(subset.row)){
       data <- data[subset.row,]
@@ -60,6 +62,7 @@ setMethod('runMCA', 'SingleCellExperiment',
   }
 
   x <- assay(data, assay.type)
+  x <- x[Matrix::rowSums(x) > 0,]
 
   flag.coords <- .check_element_obj(data, key = 'spatialCoords', basefun = int_colData, namefun = names)
   if (flag.coords && consider.spcoord){
