@@ -30,7 +30,7 @@ Imports:
   stats,
   withr,
   Matrix,
-  matrixStats
+  DelayedMatrixStats
 Suggests:
   BiocNeighbors,
   broman,

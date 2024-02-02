@@ -11,6 +11,28 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// CalParallelCor
+NumericMatrix CalParallelCor(arma::sp_mat& x);
+RcppExport SEXP _SVP_CalParallelCor(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(CalParallelCor(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// CalParallelBiCor
+arma::mat CalParallelBiCor(arma::sp_mat& x);
+RcppExport SEXP _SVP_CalParallelBiCor(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(CalParallelBiCor(x));
+    return rcpp_result_gen;
+END_RCPP
+}
 // corCpp
 arma::mat corCpp(arma::sp_mat a, arma::sp_mat b);
 RcppExport SEXP _SVP_corCpp(SEXP aSEXP, SEXP bSEXP) {
@@ -225,6 +247,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_SVP_CalParallelCor", (DL_FUNC) &_SVP_CalParallelCor, 1},
+    {"_SVP_CalParallelBiCor", (DL_FUNC) &_SVP_CalParallelBiCor, 1},
     {"_SVP_corCpp", (DL_FUNC) &_SVP_corCpp, 2},
     {"_SVP_ExtractFeatureScoreCpp", (DL_FUNC) &_SVP_ExtractFeatureScoreCpp, 4},
     {"_SVP_CalGearyscParallel", (DL_FUNC) &_SVP_CalGearyscParallel, 3},

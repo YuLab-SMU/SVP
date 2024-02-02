@@ -88,10 +88,9 @@ pairDist <- function(x, y){
     return(adj.m)
 }
 
-#' @importFrom matrixStats colRanks
+#' @importFrom DelayedMatrixStats colRanks
 .build.adj.m_by_expr <- function(x, top.n = 600, weighted.distance = FALSE){
-    expr.rank.dist <- suppressWarnings(1 - (matrixStats::colRanks(as.matrix(x), 
-								  preserveShape=TRUE) / (nrow(x) + 1)))
+    expr.rank.dist <- suppressWarnings(1 - (DelayedMatrixStats::colRanks(x, preserveShape=TRUE, useNames=TRUE) / (nrow(x) + 1)))
     adj.m <- .build.adj.m(expr.rank.dist, top.n, weighted.distance)
     if (weighted.distance){
         adj.m@x <- .normalize_dist(adj.m@x)
