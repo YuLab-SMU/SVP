@@ -90,7 +90,9 @@ pairDist <- function(x, y){
 
 #' @importFrom DelayedMatrixStats colRanks
 .build.adj.m_by_expr <- function(x, top.n = 600, weighted.distance = FALSE){
-    expr.rank.dist <- suppressWarnings(1 - (DelayedMatrixStats::colRanks(x, preserveShape=TRUE, useNames=TRUE) / (nrow(x) + 1)))
+    expr.rank.dist <- 1 - (DelayedMatrixStats::colRanks(x, preserveShape=TRUE) / (nrow(x) + 1))
+    rownames(expr.rank.dist) <- rownames(x)
+    colnames(expr.rank.dist) <- colnames(x)
     adj.m <- .build.adj.m(expr.rank.dist, top.n, weighted.distance)
     if (weighted.distance){
         adj.m@x <- .normalize_dist(adj.m@x)
@@ -411,9 +413,11 @@ pairDist <- function(x, y){
 #' @importFrom S4Vectors DataFrame List
 .extract.features.rank <- function(x, y, features, gset.idx.list){
   y <- y[features %in% rownames(y), ,drop=FALSE]
-  keep.gset <- corCpp(Matrix::t(x), Matrix::t(y))
-  rownames(keep.gset) <- rownames(x)
-  colnames(keep.gset) <- rownames(y)
+  #keep.gset <- corCpp(Matrix::t(x), Matrix::t(y))
+  keep.gset <- fast_cor(x, y, method='spearman')
+  keep.gset <- keep.gset$r
+  #rownames(keep.gset) <- rownames(x)
+  #colnames(keep.gset) <- rownames(y)
   keep.gset.list <- gset.idx.list[names(gset.idx.list) %in% rownames(keep.gset)]
   res <- ExtractFeatureScoreCpp(keep.gset, rownames(keep.gset), colnames(keep.gset), keep.gset.list)
   res <- DataFrame(features.score = List(res))

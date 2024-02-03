@@ -15,13 +15,6 @@ NumericVector SortNv(NumericVector x, bool decreasing = true) {
     return y;
 }
 
-//[[Rcpp::export]]
-arma::mat corCpp(arma::sp_mat a, arma::sp_mat b){
-    arma::mat z = arma::cor(arma::conv_to<mat>::from(a), arma::conv_to<mat>::from(b));
-    return(z);
-}
-
-
 //' Extract the score of gene in each gene sets
 //' @param x the score sparse matrix of gene for each gene sets.
 //' @param rnm the row names of x matrix.

@@ -9,7 +9,8 @@ fast_cor(
   y = NULL,
   combine = FALSE,
   method = c("pearson", "spearman", "bicorr"),
-  alternative = c("two.sided", "less", "greater")
+  alternative = c("two.sided", "less", "greater"),
+  add.pvalue = FALSE
 )
 }
 \arguments{
@@ -28,6 +29,9 @@ One of \code{"pearson"} (default), \code{"spearman"} and \code{"bicorr"}.}
 the initial letter \code{"two.sided"}, \code{"less"} and \code{"greater"}.
 \code{"greater"} corresponds to positive association, \code{"less"} to negative
 association, default is \code{"two.sided"}.}
+
+\item{add.pvalue}{logical whether calculate the pvalue of correlation using t
+test, default is FALSE.}
 }
 \value{
 a list containing the matrix of correlation and matrix of pvalue.
@@ -37,7 +41,9 @@ Calculation of correlations and associated p-values
 }
 \examples{
 set.seed(123)
-x <- matrix(rnorm(500), ncol=10) 
+x <- matrix(rnorm(500), ncol=10)
+rownames(x) <- paste0('row', seq(nrow(x)))
+colnames(x) <- paste0('col', seq(ncol(x)))
 x <- Matrix::Matrix(x, sparse = TRUE)
 x1 <- x[seq(10),]
 x2 <- x[seq(11, 50),]

@@ -10,12 +10,16 @@
 #' the initial letter \code{"two.sided"}, \code{"less"} and \code{"greater"}.  
 #' \code{"greater"} corresponds to positive association, \code{"less"} to negative 
 #' association, default is \code{"two.sided"}.
+#' @param add.pvalue logical whether calculate the pvalue of correlation using t 
+#' test, default is FALSE.
 #' @return a list containing the matrix of correlation and matrix of pvalue.
 #' @importFrom stats pt
 #' @export
 #' @examples
 #' set.seed(123)
-#' x <- matrix(rnorm(500), ncol=10) 
+#' x <- matrix(rnorm(500), ncol=10)
+#' rownames(x) <- paste0('row', seq(nrow(x)))
+#' colnames(x) <- paste0('col', seq(ncol(x)))
 #' x <- Matrix::Matrix(x, sparse = TRUE)
 #' x1 <- x[seq(10),]
 #' x2 <- x[seq(11, 50),]
@@ -23,63 +27,82 @@
 #' res$r |> dim()
 #' res2 <- fast_cor(x = x1, y = x2, combine = TRUE)
 #' res2$r |> dim()
-fast_cor <- function(x, 
-                     y = NULL, 
-                     combine = FALSE,
-                     method = c('pearson', 'spearman', 'bicorr'), 
-                     alternative = c("two.sided", "less", "greater")
-                     ){
+fast_cor <- function(
+    x, 
+    y = NULL, 
+    combine = FALSE,
+    method = c('pearson', 'spearman', 'bicorr'), 
+    alternative = c("two.sided", "less", "greater"),
+    add.pvalue = FALSE
+){
 
     method <- match.arg(method)
-    ia = match.arg(alternative)
-    ny <- 0
+    ia <- match.arg(alternative)
     indx <- !is.na(x)
     np <- NULL 
     if (!is.null(y)){
-        indy <- !is.na(y)
-        x <- Matrix::rbind2(x, y)
-        if (!combine){
+        if (combine){
+            x <- Matrix::rbind2(x, y)
+        }else{
             indy <- !is.na(y)
-            ny <- nrow(y)
             np <- indx %*% Matrix::t(indy) |> as.matrix()
-        }
+	}
     }
         
     if (is.null(np)){
         indx <- !is.na(x)
         np <- indx %*% Matrix::t(indx) |> as.matrix()
     }
-    nx <- nrow(x)
-    nx <- nx - ny
     if (method == 'spearman'){
         x <- DelayedMatrixStats::rowRanks(x, ties.method = 'average', useNames=TRUE) 
         x <- Matrix::Matrix(x, sparse=TRUE)
+        if (!is.null(y) && !combine){
+            y <- DelayedMatrixStats::rowRanks(y, ties.method = 'average', useNames=TRUE)
+            y <- Matrix::Matrix(y, sparse=TRUE)
+	}
     }
+
     if (method == 'bicorr'){
-        mc <- CalParallelBiCor(x)
+        if (!is.null(y) && !combine){
+            mc <- CalParallelBiCorTwoMatrix(x, y)
+            rownames(mc) <- rownames(x)
+            colnames(mc) <- rownames(y) 
+        }else{
+            mc <- CalParallelBiCor(x)
+            rownames(mc) <- colnames(mc) <- rownames(x)
+	}
     }else{
-        mc <- CalParallelCor(x)
+        if (!is.null(y) && !combine){
+            mc <- corCpp(Matrix::t(x), Matrix::t(y))
+            rownames(mc) <- rownames(x)
+            colnames(mc) <- rownames(y)
+	}else{
+            mc <- CalParallelCor(x)
+	    rownames(mc) <- colnames(mc) <- rownames(x)
+        }
     }
 
-    rownames(mc) <- colnames(mc) <- rownames(x)
-
-    if (!is.null(y) && nx != nrow(x)){
-        mc <- mc[seq(nx), seq(nx+1, nx+ny)]
+    if (add.pvalue){
+        p <- .cal_cor_p(mc, ia, np)
+    }else{
+        p <- NULL
     }
+    
+    return(list(r=mc, pval=p))
+}
+
+.cal_cor_p <- function(mc, ia, np){
     lower.tail <- FALSE
-    mc2 <- mc
-    if (ia == "two.sided") {
-        mc2 <- abs(mc)
+    if (ia == "two.sided"){
+        mc <- abs(mc)
     }else if (ia == 'less'){
         lower.tail <- TRUE
     }
-    t.val = sqrt(np - 2) * mc2/sqrt(1 - mc2^2)
+    t.val = sqrt(np - 2) * mc/sqrt(1 - mc^2)
     p = pt(t.val, np - 2, lower.tail = lower.tail)
     if (ia == 'two.sided'){
         p <- 2 * p
     }
 
-    return(list(r=mc, pval=p))
+    return(p)
 }
-
-
