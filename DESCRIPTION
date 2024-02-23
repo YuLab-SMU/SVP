@@ -12,6 +12,8 @@ Description: SVP uses the distance between cells and cells, features and feature
   estimation to process the score of gene sets (or expression of genes) and uses Kullback–Leibler 
   divergence to identify the signal features based on permutation test. SVP is developed based on 
   SingleCellExperiment class, which can be interoperable with the existing computing ecosystem.
+Depends:
+  R (>= 2.10)
 Imports:
   Rcpp,
   RcppParallel,
@@ -55,3 +57,4 @@ LinkingTo:
   RcppArmadillo,
   RcppParallel
 Config/testthat/edition: 3
+LazyData: true
