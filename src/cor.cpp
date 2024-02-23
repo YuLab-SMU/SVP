@@ -49,9 +49,9 @@ struct cal_bicor : public Worker {
 struct cal_bicor2 : public Worker {
     const arma::mat& mat1;
     const arma::mat& mat2;
-    const int nc2;
+    const size_t nc2;
     arma::mat& rmat;
-    cal_bicor2(const arma::mat& mat1, const arma::mat& mat2, const int nc2,
+    cal_bicor2(const arma::mat& mat1, const arma::mat& mat2, const size_t nc2,
             arma::mat& rmat):
         mat1(mat1), mat2(mat2), nc2(nc2), rmat(rmat){ }
 
@@ -176,8 +176,8 @@ arma::mat CalBiCor(const arma::mat& mat){
 }
 
 arma::mat CalBiCorTwoMatrix(const arma::mat& mat1, const arma::mat& mat2){
-    int nc1 = mat1.n_cols;
-    int nc2 = mat2.n_cols;
+    size_t nc1 = mat1.n_cols;
+    size_t nc2 = mat2.n_cols;
     arma::mat res(nc1, nc2);
     cal_bicor2 cal_bicor2(mat1, mat2, nc2, res);
     parallelFor(0, nc1, cal_bicor2);

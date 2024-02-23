@@ -14,7 +14,7 @@ fast_cor(
 )
 }
 \arguments{
-\item{x}{sparse Matrix}
+\item{x}{sparse Matrix which rows are the features and columns are the samples.}
 
 \item{y}{sparse Matrix which has the same column length of \code{x},
 default is NULL.}
@@ -34,7 +34,8 @@ association, default is \code{"two.sided"}.}
 test, default is FALSE.}
 }
 \value{
-a list containing the matrix of correlation and matrix of pvalue.
+a list containing the matrix of correlation and matrix of pvalue (if
+\code{add.pvalue} is FALSE (default), the matrix of pvalue will be NULL).
 }
 \description{
 Calculation of correlations and associated p-values

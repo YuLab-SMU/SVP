@@ -1,5 +1,5 @@
 #' Calculation of correlations and associated p-values
-#' @param x sparse Matrix
+#' @param x sparse Matrix which rows are the features and columns are the samples.
 #' @param y sparse Matrix which has the same column length of \code{x},
 #' default is NULL.
 #' @param combine logical whether combine the correlation of \code{x} and \code{y}
@@ -12,7 +12,8 @@
 #' association, default is \code{"two.sided"}.
 #' @param add.pvalue logical whether calculate the pvalue of correlation using t 
 #' test, default is FALSE.
-#' @return a list containing the matrix of correlation and matrix of pvalue.
+#' @return a list containing the matrix of correlation and matrix of pvalue (if 
+#' \code{add.pvalue} is FALSE (default), the matrix of pvalue will be NULL).
 #' @importFrom stats pt
 #' @export
 #' @examples
@@ -35,18 +36,26 @@ fast_cor <- function(
     alternative = c("two.sided", "less", "greater"),
     add.pvalue = FALSE
 ){
-
+    if (!inherits(x, 'dgCMatrix')){
+        x <- suppressWarnings(Matrix::Matrix(as.matrix(x), sparse=TRUE))
+    }
     method <- match.arg(method)
     ia <- match.arg(alternative)
     indx <- !is.na(x)
     np <- NULL 
     if (!is.null(y)){
+        if (ncol(x) != ncol(y)){
+            cli::cli_abort("The column number of {.var x} and {.var y} should be equal when {.var y} is provided!")
+        }
+        if (!inherits(y, 'dgCMatrix')){
+            y <- suppressWarnings(Matrix::Matrix(as.matrix(y), sparse=TRUE))
+        }
         if (combine){
             x <- Matrix::rbind2(x, y)
         }else{
             indy <- !is.na(y)
             np <- indx %*% Matrix::t(indy) |> as.matrix()
-	}
+        }
     }
         
     if (is.null(np)){
@@ -59,7 +68,7 @@ fast_cor <- function(
         if (!is.null(y) && !combine){
             y <- DelayedMatrixStats::rowRanks(y, ties.method = 'average', useNames=TRUE)
             y <- Matrix::Matrix(y, sparse=TRUE)
-	}
+        }
     }
 
     if (method == 'bicorr'){
@@ -70,15 +79,15 @@ fast_cor <- function(
         }else{
             mc <- CalParallelBiCor(x)
             rownames(mc) <- colnames(mc) <- rownames(x)
-	}
+        }
     }else{
         if (!is.null(y) && !combine){
             mc <- corCpp(Matrix::t(x), Matrix::t(y))
             rownames(mc) <- rownames(x)
             colnames(mc) <- rownames(y)
-	}else{
+        }else{
             mc <- CalParallelCor(x)
-	    rownames(mc) <- colnames(mc) <- rownames(x)
+            rownames(mc) <- colnames(mc) <- rownames(x)
         }
     }
 
