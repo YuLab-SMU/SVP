@@ -1,4 +1,5 @@
-#' Calculate the activity of gene sets in spatial or single-cell data with restart walk with restart.
+#' Calculate the activity of gene sets in spatial or single-cell data with restart walk with restart
+#' and hyper test weighted.
 #' @description 
 #' First, we calculated the distance between cells and between genes, between cells and genes in space
 #' of \code{MCA}. Because the closer gene is to a cell, the more specific to such the cell it can 
@@ -9,8 +10,9 @@
 #' space of cells and genes directly, but this method can not combine the spatial physical space.(see also 
 #' details). Next, we build a starting seed matrix (which each column measures the initial probability 
 #' distribution of each gene set in graph nodes) for random walk with restart using the gene set and all
-#' nodes of the graph, Finally we use restart walk with restart to calculate the affinity score for each
-#' gene set or pathway.
+#' nodes of the graph. Finally, we employ the restart walk with restart algorithm to compute the affinity 
+#' score for each gene set or pathway, which is then further weighted using the hypergeometric test result 
+#' from the original expression matrix.
 #'
 #' @rdname runSGSA-method
 #' @param data a \linkS4class{SingleCellExperiment} object normalized and have the result of 
@@ -24,7 +26,8 @@
 #' @param gene.occurrence.rate the occurrence proportion of the gene set in the input object,
 #' default is 0.4.
 #' @param assay.type which expressed data to be pulled to build KNN Graph, default is \code{logcounts}.
-#' @param knn.consider.spcoord logical whether consider the spatial coordinates to run MCA, default is FALSE.
+#' @param knn.consider.spcoord logical whether consider the spatial coordinates to run MCA. Note this is 
+#' experimental when it is TRUE, default is FALSE.
 #' @param sp.alpha.add.weight only work when \code{knn.consider.spcoord=TRUE} and \code{knn.combined.cell.feature=FALSE},
 #' which is weight of spatial space of the additive term in single cell and spatial space funsion formula, default is 0.2.
 #' @param sp.beta.add.mp.weight only work when \code{knn.consider.spcoord=TRUE} and \code{knn.combined.cell.feature=FALSE},

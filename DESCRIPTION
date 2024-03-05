@@ -7,11 +7,14 @@ Authors@R: c(
 Description: SVP uses the distance between cells and cells, features and features, cells and 
   features in the space of MCA to build nearest neighbor graph, then uses random walk with 
   restart algorithm to calculate the activity score of gene sets (such as kegg pathway, signatures, 
-  go term, gene modules, transcription factor, ...). In addition, to detect the spatially or single 
-  cell variable gene sets or (other features) accurately, SVP uses the 2d weighted kernel density 
-  estimation to process the score of gene sets (or expression of genes) and uses Kullback–Leibler 
-  divergence to identify the signal features based on permutation test. SVP is developed based on 
-  SingleCellExperiment class, which can be interoperable with the existing computing ecosystem.
+  go term, gene modules, transcription factor, ...), which is then further weighted using the 
+  hypergeometric test results from the original expression matrix. In addition, to detect the 
+  spatially or single cell variable gene sets or (other features) accurately, SVP uses the 2d weighted
+  kernel density estimation to process the score of gene sets (or expression of genes) and uses 
+  Kullback–Leibler divergence to identify the spatial variable features based on permutation test. 
+  SVP also provides Geary’s and Morans'I that measure spatial autocorrelation to identify the spatial 
+  variable features efficiently based on Rcpp and RcppParallel. SVP is developed based on SingleCellExperiment 
+  class, which can be interoperable with the existing computing ecosystem.
 Depends:
   R (>= 2.10)
 Imports:
@@ -46,7 +49,7 @@ Suggests:
 License: GPL-3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 biocViews: SingleCell, Software, Spatial, Transcriptomics,
   GeneExpression, GeneSetEnrichment, Transcription, GO, KEGG
 SystemRequirements: GNU make

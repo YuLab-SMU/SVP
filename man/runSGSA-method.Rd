@@ -4,7 +4,8 @@
 \alias{runSGSA}
 \alias{runSGSA,SingleCellExperiment-method}
 \alias{runSGSA,SingleCellExperiment}
-\title{Calculate the activity of gene sets in spatial or single-cell data with restart walk with restart.}
+\title{Calculate the activity of gene sets in spatial or single-cell data with restart walk with restart
+and hyper test weighted.}
 \usage{
 runSGSA(
   data,
@@ -81,7 +82,8 @@ default is 0.4.}
 
 \item{assay.type}{which expressed data to be pulled to build KNN Graph, default is \code{logcounts}.}
 
-\item{knn.consider.spcoord}{logical whether consider the spatial coordinates to run MCA, default is FALSE.}
+\item{knn.consider.spcoord}{logical whether consider the spatial coordinates to run MCA. Note this is
+experimental when it is TRUE, default is FALSE.}
 
 \item{sp.alpha.add.weight}{only work when \code{knn.consider.spcoord=TRUE} and \code{knn.combined.cell.feature=FALSE},
 which is weight of spatial space of the additive term in single cell and spatial space funsion formula, default is 0.2.}
@@ -145,8 +147,9 @@ matrix of all cells and genes. Another method is that we build the network using
 space of cells and genes directly, but this method can not combine the spatial physical space.(see also
 details). Next, we build a starting seed matrix (which each column measures the initial probability
 distribution of each gene set in graph nodes) for random walk with restart using the gene set and all
-nodes of the graph, Finally we use restart walk with restart to calculate the affinity score for each
-gene set or pathway.
+nodes of the graph. Finally, we employ the restart walk with restart algorithm to compute the affinity
+score for each gene set or pathway, which is then further weighted using the hypergeometric test result
+from the original expression matrix.
 }
 \details{
 if input is a \linkS4class{SVPExperiment}, output will be also a \linkS4class{SVPExperiment}, the activity score of gene sets
