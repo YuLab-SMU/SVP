@@ -67,7 +67,7 @@ setReplaceMethod("names", "SCEByColumn", function(x, value) {
         internals[, index]
     }, error = function(err) {
         cli::cli_abort(c(paste0("invalid subscript '", substr, "' in '", funstr,
-            "{.cls {class(x)}}, type=\"character\", ...)':\n  ",
+            "({.cls {class(x)}}, type=\"character\", ...)':\n  ",
             "'", index, "' not in '", namestr, "{.cls {class(x)}}.")))
     })
 }

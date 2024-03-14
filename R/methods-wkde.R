@@ -104,11 +104,12 @@ setMethod('runWKDE', 'SVPExperiment',
     gsvaexp.assay.type = NULL,
     ...){
 
+    reduction <- match.arg(reduction) 
     if (!is.null(gsvaexp)){
        if (verbose){
           cli::cli_inform("The {.var gsvaexp} was specified, the specified {.var gsvaExp} will be used to calculate density.")
        }
-       da2 <- gsvaExp(data, gsvaexp, withSpatialCoords=TRUE, withReducedDim=TRUE)
+       da2 <- gsvaExp(data, gsvaexp, withSpatialCoords=TRUE, withReducedDim=TRUE, withColData = FALSE)
        da2 <- runWKDE(da2, 
                    assay.type = gsvaexp.assay.type, 
                    reduction = reduction, 

@@ -195,7 +195,7 @@ setMethod('runKldSVG', 'SVPExperiment',
        if (verbose){
           cli::cli_inform("The {.var gsvaexp} was specified, the specified {.var gsvaExp} will be used to detect 'svg'.")
        }        
-       da2 <- gsvaExp(data, gsvaexp, withSpatialCoords = TRUE, withReducedDim = TRUE)
+       da2 <- gsvaExp(data, gsvaexp, withSpatialCoords = TRUE, withReducedDim = TRUE, withColData = FALSE)
        da2 <- runKldSVG(da2, 
                      gsvaexp.assay.type, 
                      sv.used.reduction, 
@@ -206,7 +206,7 @@ setMethod('runKldSVG', 'SVPExperiment',
                      verbose, 
                      random.seed, 
                      ...)
-       gsvaExp(data, gsvaexp, withSpatialCoords = FALSE, withReducedDim = FALSE) <- da2
+       gsvaExp(data, gsvaexp) <- da2
     }else{
        data <- callNextMethod()
     }
@@ -366,14 +366,14 @@ setMethod('runDetectSVG', 'SVPExperiment',
     sv.p.adjust.method = "BH",
     verbose = TRUE,
     gsvaexp = NULL,
-    gsvaexp.assay.type = NULL,    
+    gsvaexp.assay.type = NULL,
     ...){
 
     if (!is.null(gsvaexp)){
        if (verbose){
           cli::cli_inform("The {.var gsvaexp} was specified, the specified {.var gsvaExp} will be used to detect 'svg'.")
        }
-       da2 <- gsvaExp(data, gsvaexp, withSpatialCoords = TRUE, withReducedDim = TRUE)
+       da2 <- gsvaExp(data, gsvaexp, withSpatialCoords = TRUE, withReducedDim = TRUE, withColData = FALSE)
        da2 <- runDetectSVG(da2,
                      gsvaexp.assay.type,
                      method,
@@ -384,7 +384,7 @@ setMethod('runDetectSVG', 'SVPExperiment',
                      sv.p.adjust.method,
                      verbose,
                      ...)
-       gsvaExp(data, gsvaexp, withSpatialCoords = FALSE, withReducedDim = FALSE) <- da2
+       gsvaExp(data, gsvaexp) <- da2
     }else{
        data <- callNextMethod()
     }

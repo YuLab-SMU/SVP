@@ -73,7 +73,7 @@ setMethod(
     
     if (!is.null(gsvaexp)){
        cli::cli_inform("The {.var gsvaexp} was specified, the specified {.var gsvaExp} will be used to clusting and assign.")
-       da2 <- gsvaExp(data, gsvaexp)
+       da2 <- gsvaExp(data, gsvaexp, withColData = FALSE, withSpatialCoords=FALSE, withImageData = FALSE)
        da2 <- cluster.assign(da2, assay.type = gsvaexp.assay.type, assign, ...)
        gsvaExp(data, gsvaexp) <- da2
     }else{
