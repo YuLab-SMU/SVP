@@ -2,6 +2,7 @@
 // Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 #include <RcppArmadillo.h>
+#include <RcppEigen.h>
 #include <Rcpp.h>
 
 using namespace Rcpp;
@@ -11,6 +12,18 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// MatMultCpp
+SEXP MatMultCpp(const Eigen::Map<Eigen::MatrixXd> A, Eigen::Map<Eigen::MatrixXd> B);
+RcppExport SEXP _SVP_MatMultCpp(SEXP ASEXP, SEXP BSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type A(ASEXP);
+    Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type B(BSEXP);
+    rcpp_result_gen = Rcpp::wrap(MatMultCpp(A, B));
+    return rcpp_result_gen;
+END_RCPP
+}
 // corCpp
 arma::mat corCpp(arma::sp_mat x, arma::sp_mat y);
 RcppExport SEXP _SVP_corCpp(SEXP xSEXP, SEXP ySEXP) {
@@ -259,6 +272,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_SVP_MatMultCpp", (DL_FUNC) &_SVP_MatMultCpp, 2},
     {"_SVP_corCpp", (DL_FUNC) &_SVP_corCpp, 2},
     {"_SVP_CalParallelCor", (DL_FUNC) &_SVP_CalParallelCor, 1},
     {"_SVP_CalParallelBiCor", (DL_FUNC) &_SVP_CalParallelBiCor, 1},

@@ -41,8 +41,8 @@ fast_cor <- function(
     }
     method <- match.arg(method)
     ia <- match.arg(alternative)
-    indx <- !is.na(x)
-    np <- NULL 
+    #indx <- !is.na(x)
+    np <- NULL
     if (!is.null(y)){
         if (ncol(x) != ncol(y)){
             cli::cli_abort("The column number of {.var x} and {.var y} should be equal when {.var y} is provided!")
@@ -53,15 +53,20 @@ fast_cor <- function(
         if (combine){
             x <- Matrix::rbind2(x, y)
         }else{
-            indy <- !is.na(y)
-            np <- indx %*% Matrix::t(indy) |> as.matrix()
+            if (add.pvalue){
+                #indy <- !is.na(y)
+                #np <- indx %*% Matrix::t(indy) |> as.matrix()
+                np <- .mat_mult(x, y)
+	    }
         }
     }
         
-    if (is.null(np)){
-        indx <- !is.na(x)
-        np <- indx %*% Matrix::t(indx) |> as.matrix()
+    if (is.null(np) && add.pvalue){
+        #indx <- !is.na(x)
+        #np <- indx %*% Matrix::t(indx) |> as.matrix()
+        np <- .mat_mult(x)
     }
+
     if (method == 'spearman'){
         x <- DelayedMatrixStats::rowRanks(x, ties.method = 'average', useNames=TRUE) 
         x <- Matrix::Matrix(x, sparse=TRUE)
@@ -114,4 +119,22 @@ fast_cor <- function(
     }
 
     return(p)
+}
+
+.mat_mult <- function(x, y = NULL){
+    x <- .convert_flag(x)
+    if (!is.null(y)){
+        y <- .convert_flag(y)
+        res <- MatMultCpp(x, t(y))
+    }else{
+        res <- MatMultCpp(x, t(x))
+    }
+    return(res)
+}
+
+.convert_flag <- function(x){
+    x <- as.matrix(!is.na(x))
+    x[x] <- 1
+    x[!x] <- 0
+    return(x)
 }

@@ -1,9 +1,11 @@
 // This script refer to the https://systematicinvestor.github.io/Correlation-Rcpp
 #include <RcppParallel.h>
 #include <RcppArmadillo.h>
+#include <RcppEigen.h>
 
 using namespace Rcpp;
 using namespace RcppParallel;
+using namespace RcppEigen;
 using namespace arma;
 using namespace std;
 
@@ -18,6 +20,13 @@ arma::vec CalWeight(const arma::vec& x){
     arma::vec w = pow((1 - pow(ui, 2)), 2) % I;
     //w.replace(datum::nan, 0.0001);
     return (w);
+}
+
+// [[Rcpp::export]]
+SEXP MatMultCpp(const Eigen::Map<Eigen::MatrixXd> A, Eigen::Map<Eigen::MatrixXd> B){
+    Eigen::MatrixXd C = A * B;
+
+    return Rcpp::wrap(C);
 }
 
 struct cal_bicor : public Worker {
