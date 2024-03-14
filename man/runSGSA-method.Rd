@@ -29,6 +29,7 @@ runSGSA(
   rwr.threads = 2L,
   hyper.test.weighted = c("Hypergeometric", "Wallenius", "none"),
   hyper.test.by.expr = TRUE,
+  add.cor.features = FALSE,
   cells = NULL,
   features = NULL,
   verbose = TRUE,
@@ -57,6 +58,7 @@ runSGSA(
   rwr.threads = 2L,
   hyper.test.weighted = c("Hypergeometric", "Wallenius", "none"),
   hyper.test.by.expr = TRUE,
+  add.cor.features = FALSE,
   cells = NULL,
   features = NULL,
   verbose = TRUE,
@@ -121,6 +123,9 @@ default is FALSE.}
 
 \item{hyper.test.by.expr}{logical whether using the expression matrix to find the nearest genes of cells, default is \code{TRUE},
 if it is \code{FALSE}, meaning using the result of reduction to find the nearest genes of cells to perfrom the \code{hyper.test.weighted}.}
+
+\item{add.cor.features}{logical whether calculate the corrlelation between the new features and orginal featuers (genes), default
+is FALSE. If it is TRUE the corrleation result will be kept in fscoreDf which can be extracted using \code{fscoreDf()} function.}
 
 \item{cells}{Vector specifying the subset of cells to be used for the calculation of the activaty score or identification
 of SV features. This can be a character vector of cell names, an integer vector of column indices or a logical vector,

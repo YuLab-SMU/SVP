@@ -52,6 +52,8 @@
 #' "none", default is "Hypergeometric".
 #' @param hyper.test.by.expr logical whether using the expression matrix to find the nearest genes of cells, default is \code{TRUE},
 #' if it is \code{FALSE}, meaning using the result of reduction to find the nearest genes of cells to perfrom the \code{hyper.test.weighted}.
+#' @param add.cor.features logical whether calculate the corrlelation between the new features and orginal featuers (genes), default
+#' is FALSE. If it is TRUE the corrleation result will be kept in fscoreDf which can be extracted using \code{fscoreDf()} function.
 #' @param cells Vector specifying the subset of cells to be used for the calculation of the activaty score or identification 
 #' of SV features. This can be a character vector of cell names, an integer vector of column indices or a logical vector, 
 #' default is NULL, meaning all cells to be used for the calculation of the activaty score or identification of SV features. 
@@ -128,6 +130,7 @@ setGeneric('runSGSA',
     rwr.threads = 2L,
     hyper.test.weighted = c("Hypergeometric", "Wallenius", "none"),
     hyper.test.by.expr = TRUE,
+    add.cor.features = FALSE,
     cells = NULL,
     features = NULL,
     verbose = TRUE, 
@@ -166,6 +169,7 @@ setMethod('runSGSA',
     rwr.threads = 2L,
     hyper.test.weighted = c("Hypergeometric", "Wallenius", "none"),
     hyper.test.by.expr = TRUE,
+    add.cor.features = FALSE,
     cells = NULL,
     features = NULL,
     verbose = TRUE,
@@ -261,7 +265,8 @@ setMethod('runSGSA',
                            top.n = knn.k.use,
                            combined.cell.feature = knn.combined.cell.feature,
                            weighted.distance = knn.graph.weighted,
-                           method = hyper.test.weighted
+                           method = hyper.test.weighted,
+                           threads = rwr.threads
                   ))
       gset.score.cells <- gset.score.cells * gset.hgt
       #if (rwr.prop.normalize && ncol(gset.score.cells) > 1){
@@ -271,21 +276,24 @@ setMethod('runSGSA',
   }
   
   gset.score.cells <- Matrix::Matrix(gset.score.cells, sparse = TRUE)
-  gset.score.features <- .extract.features.rank(
-                             gset.score.cells,
-                             features.expr,
-                             features,
-                             gset.idx.list
-                          )  
  
   x <- SingleCellExperiment(assays = list(affi.score = gset.score.cells))
   rowData(x) <- gset.num[rownames(x), ,drop=FALSE]
-  
-  x <- .add.int.rowdata(sce=x, getfun=fscoreDfs, 
-                        setfun1 = `fscoreDfs<-`, 
-                        setfun2 = `fscoreDf<-`, 
-                        namestr = "rwr.score", 
-                        val = gset.score.features)
+
+  if (add.cor.features){
+      gset.score.features <- .extract.features.rank(
+                                 gset.score.cells,
+                                 features.expr,
+                                 features,
+                                 gset.idx.list
+                              )
+      
+      x <- .add.int.rowdata(sce=x, getfun=fscoreDfs, 
+                            setfun1 = `fscoreDfs<-`, 
+                            setfun2 = `fscoreDf<-`, 
+                            namestr = "rwr.score", 
+                            val = gset.score.features)
+  }
   da <- .sce_to_svpe(data) 
   gsvaExp(da, gsvaExp.name) <- x
   new.reduced <- .build.new.reduced(rd.df, cells, features, rd.f.nm)

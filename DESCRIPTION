@@ -58,6 +58,7 @@ VignetteBuilder: knitr
 LinkingTo: 
   Rcpp,
   RcppArmadillo,
-  RcppParallel
+  RcppParallel,
+  RcppEigen
 Config/testthat/edition: 3
 LazyData: true

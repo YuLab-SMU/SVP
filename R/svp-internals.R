@@ -137,7 +137,7 @@ pairDist <- function(x, y){
                      fs2gset.adj, 
                      gene.set.list, 
                      cells.gene.num = NULL,
-		     m = NULL,
+                     m = NULL,
                      top.n = 600, 
                      combined.cell.feature = FALSE,
                      weighted.distance = FALSE,
@@ -166,6 +166,8 @@ pairDist <- function(x, y){
     if (combined.cell.feature){
         k <- Matrix::colSums(fs2cell.adj)
     }
+    tic()
+    cli::cli_inform("ORA analysis ...")
     if (method == 'Hypergeometric'){
         res <- mapply(phyper, q = q, m = m, n = n, MoreArgs=list(k=k, lower.tail = FALSE))
     }else if (method == 'Wallenius'){
@@ -174,6 +176,7 @@ pairDist <- function(x, y){
         res <- mapply(.internal.pWNCHypergeo, x = q, m1 = m, m2 = n, n = k,
                       odds = odds, MoreArgs=list(lower.tail = FALSE)) 
     }
+    toc()
     rownames(res) <- rownames(q)
     colnames(res) <- colnames(fs2gset.adj)
     res[res==0] <- 1e-10
