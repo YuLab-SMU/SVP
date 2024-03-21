@@ -47,12 +47,13 @@ setMethod('runMCA', 'SingleCellExperiment',
                    subset.col = NULL, 
                    consider.spcoord = FALSE,
                    ...){
+  if (is.numeric(assay.type)){
+      assay.type <- assayNames(data)[assay.type]
+  }
   if (!assay.type %in% assayNames(data)){
       cli::cli_abort("the {.var assay.type} = {assay.type} is not present in the assays of {.cls {class(data)}}.")
   }
 
-  
-  
   if (!is.null(subset.row)){
       data <- data[subset.row,]
   }
