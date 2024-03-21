@@ -265,8 +265,8 @@ setMethod('runSGSA',
                            top.n = knn.k.use,
                            combined.cell.feature = knn.combined.cell.feature,
                            weighted.distance = knn.graph.weighted,
-                           method = hyper.test.weighted,
-                           threads = rwr.threads
+                           method = hyper.test.weighted#,
+                           #threads = rwr.threads
                   ))
       gset.score.cells <- gset.score.cells * gset.hgt
       #if (rwr.prop.normalize && ncol(gset.score.cells) > 1){
