@@ -21,12 +21,12 @@ arma::rowvec cal_moransi_p_noperm(
         double S1, 
         double S2
   ){
-  double s_sq = pow(s, 2);
+  double s_sq = pow(s, 2.0);
 
-  double k = (accu(pow(y,4))/n)/pow(v/n, 2);
-  double sdi = sqrt((n * ((pow(n, 2) - 3 * n + 3) * S1 - n * S2 + 3 * s_sq) -
-              k * (n * (n - 1) * S1 - 2 * n * S2 + 6 * s_sq))/
-          ((n - 1) * (n - 2) * (n - 3) * s_sq) - 1/(pow(n - 1, 2)));
+  double k = (accu(pow(y, 4.0))/n)/pow(v/n, 2.0);
+  double sdi = sqrt((n * ((pow(n, 2.0) - 3 * n + 3) * S1 - n * S2 + 3 * s_sq) -
+              k * (n * (n - 1.0) * S1 - 2 * n * S2 + 6 * s_sq))/
+          ((n - 1.0) * (n - 2.0) * (n - 3.0) * s_sq) - 1/(pow(n - 1.0, 2.0)));
 
   double pv = R::pnorm(obs, ei, sdi, 1, 0);
   arma::rowvec res = {obs, ei, sdi, pv};
