@@ -127,12 +127,12 @@ CalMoransiParallel <- function(x, weight, scaled = FALSE, permutation = 999L) {
     .Call('_SVP_CalMoransiParallel', PACKAGE = 'SVP', x, weight, scaled, permutation)
 }
 
-#' Obtain the pair distance of row between \code{Ar} and \code{Br} matrix
-#' @param Ar matrix which number of column should be equal to column number of \code{Br}.
-#' @param Br matrix which number of column should be equal to column number of \code{Ar}.
-#' @return a distance matrix of row feature in \code{Ar} and \code{Br}.
-fastPDist <- function(Ar, Br) {
-    .Call('_SVP_fastPDist', PACKAGE = 'SVP', Ar, Br)
+#' Obtain the pair distance of row between \code{A} and \code{B} matrix
+#' @param A matrix which number of column should be equal to column number of \code{B}.
+#' @param B matrix which number of column should be equal to column number of \code{A}.
+#' @return a distance matrix of row feature in \code{A} and \code{B}.
+fastPDist <- function(A, B) {
+    .Call('_SVP_fastPDist', PACKAGE = 'SVP', A, B)
 }
 
 fusiondist <- function(s, p, alpha = 0.2, beta = 0.1) {

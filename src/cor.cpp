@@ -5,7 +5,7 @@
 
 using namespace Rcpp;
 using namespace RcppParallel;
-using namespace RcppEigen;
+using namespace Eigen;
 using namespace arma;
 using namespace std;
 

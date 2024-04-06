@@ -2,18 +2,18 @@
 % Please edit documentation in R/RcppExports.R
 \name{fastPDist}
 \alias{fastPDist}
-\title{Obtain the pair distance of row between \code{Ar} and \code{Br} matrix}
+\title{Obtain the pair distance of row between \code{A} and \code{B} matrix}
 \usage{
-fastPDist(Ar, Br)
+fastPDist(A, B)
 }
 \arguments{
-\item{Ar}{matrix which number of column should be equal to column number of \code{Br}.}
+\item{A}{matrix which number of column should be equal to column number of \code{B}.}
 
-\item{Br}{matrix which number of column should be equal to column number of \code{Ar}.}
+\item{B}{matrix which number of column should be equal to column number of \code{A}.}
 }
 \value{
-a distance matrix of row feature in \code{Ar} and \code{Br}.
+a distance matrix of row feature in \code{A} and \code{B}.
 }
 \description{
-Obtain the pair distance of row between \code{Ar} and \code{Br} matrix
+Obtain the pair distance of row between \code{A} and \code{B} matrix
 }

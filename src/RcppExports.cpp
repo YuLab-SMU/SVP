@@ -230,14 +230,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // fastPDist
-NumericMatrix fastPDist(NumericMatrix Ar, NumericMatrix Br);
-RcppExport SEXP _SVP_fastPDist(SEXP ArSEXP, SEXP BrSEXP) {
+SEXP fastPDist(Eigen::Map<Eigen::MatrixXd> A, Eigen::Map<Eigen::MatrixXd> B);
+RcppExport SEXP _SVP_fastPDist(SEXP ASEXP, SEXP BSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type Ar(ArSEXP);
-    Rcpp::traits::input_parameter< NumericMatrix >::type Br(BrSEXP);
-    rcpp_result_gen = Rcpp::wrap(fastPDist(Ar, Br));
+    Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type A(ASEXP);
+    Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type B(BSEXP);
+    rcpp_result_gen = Rcpp::wrap(fastPDist(A, B));
     return rcpp_result_gen;
 END_RCPP
 }
