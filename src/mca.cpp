@@ -1,13 +1,14 @@
 //// This was from the CelliD package,
-//// modified to support sparse matrix as input.
+//// modified to support sparse matrix as input,
+//// and speed up using Eigen library.
 #include <RcppArmadillo.h>
+#include <RcppEigen.h>
 using namespace Rcpp;
-using namespace RcppArmadillo;
 using namespace arma;
+using namespace Eigen;
 
 // [[Rcpp::export]]
-List MCAStep1(arma::sp_mat& X) {
-    ////arma::mat AM = arma::mat(X.begin(), X.rows(), X.cols(), true);
+List MCAStep1(const arma::sp_mat& X) {
     arma::mat AM = conv_to<arma::mat>::from(X);
     arma::colvec rmin = arma::min(AM,1);
     arma::colvec rmax = arma::max(AM,1);
@@ -26,16 +27,25 @@ List MCAStep1(arma::sp_mat& X) {
                         Named("Dc") = wrap(Dc));
 }
 
-// [[Rcpp::export]]
-List MCAStep2(NumericMatrix Z, NumericMatrix V, NumericVector Dc) {
-    arma::mat AV = arma::mat(V.begin(), V.rows(), V.cols(),  true);
-    arma::mat AZ = arma::mat(Z.begin(), Z.rows(), Z.cols(),  true);
-    arma::colvec ADc = arma::colvec(Dc);
-    arma::mat FeaturesCoordinates =  AZ * AV;
-    int AZcol = AZ.n_cols;
-    AZ.clear();
-    FeaturesCoordinates.each_col() %= ADc;
-    ADc.clear();
-    return List::create(Named("cellsCoordinates") = wrap(std::sqrt(AZcol) * AV),
-                        Named("featuresCoordinates") = wrap(FeaturesCoordinates.head_rows(FeaturesCoordinates.n_rows/2)));
+//[[Rcpp::export]]
+List MCAStep2(const Eigen::MatrixXd Z, const Eigen::MatrixXd V, const Eigen::VectorXd Dc){
+    Eigen::MatrixXd FeaturesCoordinates = Z * V;
+    int Zcol = Z.cols();
+    FeaturesCoordinates = FeaturesCoordinates.array().colwise() * Dc.array();
+    return List::create(Named("cellsCoordinates") = wrap(std::sqrt(Zcol) * V),
+            Named("featuresCoordinates") = wrap(FeaturesCoordinates.topRows(FeaturesCoordinates.rows()/2)));
 }
+
+
+// //[[Rcpp::export]]
+// List RunSVD(arma::mat x, int nv, int nu){
+//     arma::mat U;
+//     arma::vec s;
+//     arma::mat V;
+// 
+//     svd(U, s, V, x);
+//     return List::create(Named("d") = s.head(nv), 
+//                         Named("u") = U.head_cols(nu), 
+//                         Named("v") = V.head_cols(nv));
+// 
+// }

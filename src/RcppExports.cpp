@@ -192,25 +192,25 @@ BEGIN_RCPP
 END_RCPP
 }
 // MCAStep1
-List MCAStep1(arma::sp_mat& X);
+List MCAStep1(const arma::sp_mat& X);
 RcppExport SEXP _SVP_MCAStep1(SEXP XSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::sp_mat& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const arma::sp_mat& >::type X(XSEXP);
     rcpp_result_gen = Rcpp::wrap(MCAStep1(X));
     return rcpp_result_gen;
 END_RCPP
 }
 // MCAStep2
-List MCAStep2(NumericMatrix Z, NumericMatrix V, NumericVector Dc);
+List MCAStep2(const Eigen::MatrixXd Z, const Eigen::MatrixXd V, const Eigen::VectorXd Dc);
 RcppExport SEXP _SVP_MCAStep2(SEXP ZSEXP, SEXP VSEXP, SEXP DcSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericMatrix >::type Z(ZSEXP);
-    Rcpp::traits::input_parameter< NumericMatrix >::type V(VSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type Dc(DcSEXP);
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd >::type Z(ZSEXP);
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd >::type V(VSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd >::type Dc(DcSEXP);
     rcpp_result_gen = Rcpp::wrap(MCAStep2(Z, V, Dc));
     return rcpp_result_gen;
 END_RCPP

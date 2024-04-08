@@ -39,13 +39,14 @@ Imports:
 Suggests:
   BiocNeighbors,
   broman,
-  irlba,
+  RSpectra,
   BiasedUrn,
   knitr,
   ks,
   rmarkdown,
   igraph,
-  testthat (>= 3.0.0)
+  testthat (>= 3.0.0),
+  scuttle
 License: GPL-3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

@@ -22,6 +22,16 @@
 #' @return a \linkS4class{SingleCellExperiment} and the reduction result of \code{MCA}
 #' can be extracted using \code{reducedDim()} function.
 #' @export
+#' @examples
+#' library(scuttle)
+#' library(SingleCellExperiment)
+#' small.sce <- mockSCE()
+#' small.sce <- logNormCounts(small.sce)
+#' small.sce <- runMCA(small.sce, assay.type = 'logcounts',
+#'                     reduction.name = 'MCA', ncomponents = 20) 
+#' # The MCA result can be extracted using reducedDim of SingleCellExperiment
+#' mca.res <- reducedDim(small.sce, 'MCA')
+#' mca.res |> str()
 setGeneric('runMCA', function(data, 
                               assay.type = 'logcounts', 
                               reduction.name = "MCA", 
