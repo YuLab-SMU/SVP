@@ -75,3 +75,32 @@ NA
 #' @examples
 #' data(SenMayoSymbol)
 NA
+
+#' @title a subset data of pbmck3 from SeuratData
+#'
+#' @description
+#' a small SingleCellExperiment data set from pbmck3 which
+#' contains 1304 genes and 800 cells (extract randomly)
+#' 
+#' @name data_sceSubPbmc
+#' @aliases sceSubPbmc
+#' @docType data
+#' @keywords data
+#' @examples
+#' data(sceSubPbmc)
+NA
+
+#' @title the Cell Cycle gene set
+#' 
+#' @description
+#' the S and G2M gene list are from the Seurat which refer to this article (doi:10.1126/science.aad050),
+#' the G1 gene list is from the G1_PHASE of Human Gene Set in MSigDB, but remove the duplicated records 
+#' with S and G2M gene list.
+#' 
+#' @name CellCycle.Hs
+#' @aliases data_CellCycle.Hs
+#' @docType data
+#' @keywords data
+#' @examples
+#' data(CellCycle.Hs)
+NA

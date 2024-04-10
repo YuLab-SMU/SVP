@@ -13,7 +13,7 @@ runSGSA(
   gsvaExp.name = "gset1.rwr",
   min.sz = 10,
   max.sz = Inf,
-  gene.occurrence.rate = 0.4,
+  gene.occurrence.rate = 0.2,
   assay.type = "logcounts",
   knn.consider.spcoord = FALSE,
   sp.alpha.add.weight = 0.2,
@@ -26,7 +26,7 @@ runSGSA(
   rwr.normalize.adj.method = c("laplacian", "row", "column", "none"),
   rwr.normalize.affinity = FALSE,
   rwr.prop.normalize = FALSE,
-  rwr.threads = 2L,
+  rwr.threads = NULL,
   hyper.test.weighted = c("Hypergeometric", "Wallenius", "none"),
   hyper.test.by.expr = TRUE,
   add.cor.features = FALSE,
@@ -42,7 +42,7 @@ runSGSA(
   gsvaExp.name = "gset1.rwr",
   min.sz = 10,
   max.sz = Inf,
-  gene.occurrence.rate = 0.4,
+  gene.occurrence.rate = 0.2,
   assay.type = "logcounts",
   knn.consider.spcoord = FALSE,
   sp.alpha.add.weight = 0.2,
@@ -55,7 +55,7 @@ runSGSA(
   rwr.normalize.adj.method = c("laplacian", "row", "column", "none"),
   rwr.normalize.affinity = FALSE,
   rwr.prop.normalize = FALSE,
-  rwr.threads = 2L,
+  rwr.threads = NULL,
   hyper.test.weighted = c("Hypergeometric", "Wallenius", "none"),
   hyper.test.by.expr = TRUE,
   add.cor.features = FALSE,
@@ -80,7 +80,7 @@ smaller than \code{min.sz} will be ignored.}
 larger than \code{max.sz} will be ignored.}
 
 \item{gene.occurrence.rate}{the occurrence proportion of the gene set in the input object,
-default is 0.4.}
+default is 0.2.}
 
 \item{assay.type}{which expressed data to be pulled to build KNN Graph, default is \code{logcounts}.}
 
@@ -116,7 +116,8 @@ default is FALSE.}
 \item{rwr.prop.normalize}{logical whether divide the specific activity score by total activity score for a sample,
 default is FALSE.}
 
-\item{rwr.threads}{the threads to run Random Walk With Restart (RWR), default is 2L.}
+\item{rwr.threads}{the threads to run Random Walk With Restart (RWR), default is NULL, which will initialize with the default
+number of threads, you can also set this using \code{RcppParallel::setThreadOptions(numThreads=10)}.}
 
 \item{hyper.test.weighted}{character which method to weight the activity score of cell, should is one of "Hypergeometric", "Wallenius",
 "none", default is "Hypergeometric".}
@@ -184,6 +185,33 @@ of adjacency matrix of graph, \eqn{r} is the the global restart probability, \eq
 each iteration. After several iterations, the difference between \eqn{P_{t+1}} and \eqn{P_{t}} becomes negligible, the stationary probability
 distribution is reached, and the elements for each gene set represent a proximity measure from every graph node. Iterations are stoped when the
 difference between \eqn{P_{t+1}} and \eqn{P_{t}} falls below 1e-6.
+}
+\examples{
+data(sceSubPbmc)
+library(SingleCellExperiment) |> suppressPackageStartupMessages()
+library(scuttle) |> suppressPackageStartupMessages()
+sceSubPbmc <- scuttle::logNormCounts(sceSubPbmc)
+# the using runMCA to perform MCA (Multiple Correspondence Analysis)
+# this is refer to the CelliD, but we using the Eigen to speed up.
+# You can view the help information of runMCA using ?runMCA.
+sceSubPbmc <- runMCA(sceSubPbmc, assay.type = 'logcounts')
+
+# Next, we can calculate the activity score of gene sets provided.
+# Here, we use the Cell Cycle gene set from the Seurat 
+# You can use other gene set, such as KEGG pathway, GO, Hallmark of MSigDB
+# or TFs gene sets etc.
+data(CellCycle.Hs)
+sceSubPbmc <- runSGSA(gset.idx.list = CellCycle.Hs, gsvaExp.name = 'CellCycle')
+# Then a SVPE class which inherits SingleCellExperiment, is return.
+sceSubPbmc
+
+# You can obtaion the score matrix by following the commond
+sceSubPbmc |> gsvaExp('CellCycle') 
+sceSubPbmc |> gsvaExp("CellCycle") |> assay() |> t() |> head()
+
+# Then you can use the ggsc or other package to visulize,
+# and you can try to use the findMarkers of scran or other packages to identify 
+# the different gene sets. 
 }
 \references{
 \enumerate{

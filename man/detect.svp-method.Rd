@@ -12,7 +12,7 @@ detect.svp(
   gsvaExp.name = "gset1.rwr",
   min.sz = 10,
   max.sz = Inf,
-  gene.occurrence.rate = 0.4,
+  gene.occurrence.rate = 0.2,
   assay.type = "logcounts",
   knn.consider.spcoord = FALSE,
   sp.alpha.add.weight = 0.2,
@@ -25,7 +25,7 @@ detect.svp(
   rwr.normalize.adj.method = c("laplacian", "row", "column", "none"),
   rwr.normalize.affinity = FALSE,
   rwr.prop.normalize = FALSE,
-  rwr.threads = 2L,
+  rwr.threads = NULL,
   hyper.test.weighted = c("Hypergeometric", "Wallenius", "none"),
   hyper.test.by.expr = TRUE,
   sv.used.reduction = c("UMAP", "TSNE"),
@@ -47,7 +47,7 @@ detect.svp(
   gsvaExp.name = "gset1.rwr",
   min.sz = 10,
   max.sz = Inf,
-  gene.occurrence.rate = 0.4,
+  gene.occurrence.rate = 0.2,
   assay.type = "logcounts",
   knn.consider.spcoord = FALSE,
   sp.alpha.add.weight = 0.2,
@@ -60,7 +60,7 @@ detect.svp(
   rwr.normalize.adj.method = c("laplacian", "row", "column", "none"),
   rwr.normalize.affinity = FALSE,
   rwr.prop.normalize = FALSE,
-  rwr.threads = 2L,
+  rwr.threads = NULL,
   hyper.test.weighted = c("Hypergeometric", "Wallenius", "none"),
   hyper.test.by.expr = TRUE,
   sv.used.reduction = c("UMAP", "TSNE"),
@@ -91,7 +91,7 @@ smaller than \code{min.sz} will be ignored.}
 larger than \code{max.sz} will be ignored.}
 
 \item{gene.occurrence.rate}{the occurrence proportion of the gene set in the input object,
-default is 0.4.}
+default is 0.2.}
 
 \item{assay.type}{which expressed data to be pulled to build KNN Graph, default is \code{logcounts}.}
 
@@ -128,7 +128,8 @@ default is FALSE.}
 \item{rwr.prop.normalize}{logical whether divide the specific activity score by total activity score for a sample,
 default is FALSE.}
 
-\item{rwr.threads}{the threads to run Random Walk With Restart (RWR), default is 2L.}
+\item{rwr.threads}{integer the threads to run Random Walk With Restart (RWR), default is NULL, which will initialize with the default
+number of threads, you can also set this using \code{RcppParallel::setThreadOptions(numThreads=10)}}
 
 \item{hyper.test.weighted}{character which method to weight the activity score of cell, should is one of "Hypergeometric", "Wallenius",
 "none", default is "Hypergeometric".}
