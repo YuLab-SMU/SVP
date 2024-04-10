@@ -13,14 +13,50 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // MatMultCpp
-SEXP MatMultCpp(const Eigen::Map<Eigen::MatrixXd> A, Eigen::Map<Eigen::MatrixXd> B);
+Eigen::MatrixXd MatMultCpp(const Eigen::Map<Eigen::MatrixXd> A, const Eigen::Map<Eigen::MatrixXd> B);
 RcppExport SEXP _SVP_MatMultCpp(SEXP ASEXP, SEXP BSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type A(ASEXP);
-    Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type B(BSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type B(BSEXP);
     rcpp_result_gen = Rcpp::wrap(MatMultCpp(A, B));
+    return rcpp_result_gen;
+END_RCPP
+}
+// SpMatElemMultiMat
+arma::sp_mat SpMatElemMultiMat(const arma::sp_mat x, const arma::mat y);
+RcppExport SEXP _SVP_SpMatElemMultiMat(SEXP xSEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::sp_mat >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const arma::mat >::type y(ySEXP);
+    rcpp_result_gen = Rcpp::wrap(SpMatElemMultiMat(x, y));
+    return rcpp_result_gen;
+END_RCPP
+}
+// SpMatElemMultiSpMat
+arma::sp_mat SpMatElemMultiSpMat(const arma::sp_mat x, const arma::sp_mat y);
+RcppExport SEXP _SVP_SpMatElemMultiSpMat(SEXP xSEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::sp_mat >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const arma::sp_mat >::type y(ySEXP);
+    rcpp_result_gen = Rcpp::wrap(SpMatElemMultiSpMat(x, y));
+    return rcpp_result_gen;
+END_RCPP
+}
+// MatElemMultiMat
+arma::mat MatElemMultiMat(const arma::mat x, const arma::mat y);
+RcppExport SEXP _SVP_MatElemMultiMat(SEXP xSEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const arma::mat >::type y(ySEXP);
+    rcpp_result_gen = Rcpp::wrap(MatElemMultiMat(x, y));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -255,6 +291,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// ParallelColOrder
+NumericMatrix ParallelColOrder(const arma::mat& x, int top_n);
+RcppExport SEXP _SVP_ParallelColOrder(SEXP xSEXP, SEXP top_nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< int >::type top_n(top_nSEXP);
+    rcpp_result_gen = Rcpp::wrap(ParallelColOrder(x, top_n));
+    return rcpp_result_gen;
+END_RCPP
+}
 // parallelCalRWR
 NumericMatrix parallelCalRWR(arma::sp_mat& x, arma::sp_mat& v, double restart, double stop_delta, int stop_step);
 RcppExport SEXP _SVP_parallelCalRWR(SEXP xSEXP, SEXP vSEXP, SEXP restartSEXP, SEXP stop_deltaSEXP, SEXP stop_stepSEXP) {
@@ -273,6 +321,9 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_SVP_MatMultCpp", (DL_FUNC) &_SVP_MatMultCpp, 2},
+    {"_SVP_SpMatElemMultiMat", (DL_FUNC) &_SVP_SpMatElemMultiMat, 2},
+    {"_SVP_SpMatElemMultiSpMat", (DL_FUNC) &_SVP_SpMatElemMultiSpMat, 2},
+    {"_SVP_MatElemMultiMat", (DL_FUNC) &_SVP_MatElemMultiMat, 2},
     {"_SVP_corCpp", (DL_FUNC) &_SVP_corCpp, 2},
     {"_SVP_CalParallelCor", (DL_FUNC) &_SVP_CalParallelCor, 1},
     {"_SVP_CalParallelBiCor", (DL_FUNC) &_SVP_CalParallelBiCor, 1},
@@ -290,6 +341,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_SVP_CalMoransiParallel", (DL_FUNC) &_SVP_CalMoransiParallel, 4},
     {"_SVP_fastPDist", (DL_FUNC) &_SVP_fastPDist, 2},
     {"_SVP_fusiondist", (DL_FUNC) &_SVP_fusiondist, 4},
+    {"_SVP_ParallelColOrder", (DL_FUNC) &_SVP_ParallelColOrder, 2},
     {"_SVP_parallelCalRWR", (DL_FUNC) &_SVP_parallelCalRWR, 5},
     {NULL, NULL, 0}
 };

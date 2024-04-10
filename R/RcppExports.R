@@ -5,6 +5,18 @@ MatMultCpp <- function(A, B) {
     .Call('_SVP_MatMultCpp', PACKAGE = 'SVP', A, B)
 }
 
+SpMatElemMultiMat <- function(x, y) {
+    .Call('_SVP_SpMatElemMultiMat', PACKAGE = 'SVP', x, y)
+}
+
+SpMatElemMultiSpMat <- function(x, y) {
+    .Call('_SVP_SpMatElemMultiSpMat', PACKAGE = 'SVP', x, y)
+}
+
+MatElemMultiMat <- function(x, y) {
+    .Call('_SVP_MatElemMultiMat', PACKAGE = 'SVP', x, y)
+}
+
 corCpp <- function(x, y) {
     .Call('_SVP_corCpp', PACKAGE = 'SVP', x, y)
 }
@@ -137,6 +149,10 @@ fastPDist <- function(A, B) {
 
 fusiondist <- function(s, p, alpha = 0.2, beta = 0.1) {
     .Call('_SVP_fusiondist', PACKAGE = 'SVP', s, p, alpha, beta)
+}
+
+ParallelColOrder <- function(x, top_n) {
+    .Call('_SVP_ParallelColOrder', PACKAGE = 'SVP', x, top_n)
 }
 
 #' Computer the affinity score of all nodes in a graph to a seeds 

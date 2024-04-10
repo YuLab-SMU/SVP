@@ -24,7 +24,7 @@
 #' @param max.sz integer the maximum gene set number, default is Inf, the number of gene sets
 #' larger than \code{max.sz} will be ignored.
 #' @param gene.occurrence.rate the occurrence proportion of the gene set in the input object,
-#' default is 0.4.
+#' default is 0.2.
 #' @param assay.type which expressed data to be pulled to build KNN Graph, default is \code{logcounts}.
 #' @param knn.consider.spcoord logical whether consider the spatial coordinates to run MCA. Note this is 
 #' experimental when it is TRUE, default is FALSE.
@@ -47,7 +47,8 @@
 #' default is FALSE.
 #' @param rwr.prop.normalize logical whether divide the specific activity score by total activity score for a sample,
 #' default is FALSE. 
-#' @param rwr.threads the threads to run Random Walk With Restart (RWR), default is 2L.
+#' @param rwr.threads the threads to run Random Walk With Restart (RWR), default is NULL, which will initialize with the default 
+#' number of threads, you can also set this using \code{RcppParallel::setThreadOptions(numThreads=10)}.
 #' @param hyper.test.weighted character which method to weight the activity score of cell, should is one of "Hypergeometric", "Wallenius", 
 #' "none", default is "Hypergeometric".
 #' @param hyper.test.by.expr logical whether using the expression matrix to find the nearest genes of cells, default is \code{TRUE},
@@ -107,6 +108,32 @@
 #' spatiall variable or specified cell gene sets or a features.
 #' @author Shuangbin Xu
 #' @export
+#' @examples
+#' data(sceSubPbmc)
+#' library(SingleCellExperiment) |> suppressPackageStartupMessages()
+#' library(scuttle) |> suppressPackageStartupMessages()
+#' sceSubPbmc <- scuttle::logNormCounts(sceSubPbmc)
+#' # the using runMCA to perform MCA (Multiple Correspondence Analysis)
+#' # this is refer to the CelliD, but we using the Eigen to speed up.
+#' # You can view the help information of runMCA using ?runMCA.
+#' sceSubPbmc <- runMCA(sceSubPbmc, assay.type = 'logcounts')
+#'
+#' # Next, we can calculate the activity score of gene sets provided.
+#' # Here, we use the Cell Cycle gene set from the Seurat 
+#' # You can use other gene set, such as KEGG pathway, GO, Hallmark of MSigDB
+#' # or TFs gene sets etc.
+#' data(CellCycle.Hs)
+#' sceSubPbmc <- runSGSA(gset.idx.list = CellCycle.Hs, gsvaExp.name = 'CellCycle')
+#' # Then a SVPE class which inherits SingleCellExperiment, is return.
+#' sceSubPbmc
+#' 
+#' # You can obtaion the score matrix by following the commond
+#' sceSubPbmc |> gsvaExp('CellCycle') 
+#' sceSubPbmc |> gsvaExp("CellCycle") |> assay() |> t() |> head()
+#' 
+#' # Then you can use the ggsc or other package to visulize,
+#' # and you can try to use the findMarkers of scran or other packages to identify 
+#' # the different gene sets. 
 setGeneric('runSGSA', 
   function(
     data, 
@@ -114,7 +141,7 @@ setGeneric('runSGSA',
     gsvaExp.name = 'gset1.rwr',
     min.sz = 10,
     max.sz = Inf,
-    gene.occurrence.rate = .4,
+    gene.occurrence.rate = .2,
     assay.type = 'logcounts',
     knn.consider.spcoord = FALSE,
     sp.alpha.add.weight = .2,
@@ -127,7 +154,7 @@ setGeneric('runSGSA',
     rwr.normalize.adj.method = c("laplacian", "row", "column", "none"),
     rwr.normalize.affinity = FALSE,
     rwr.prop.normalize = FALSE,
-    rwr.threads = 2L,
+    rwr.threads = NULL,
     hyper.test.weighted = c("Hypergeometric", "Wallenius", "none"),
     hyper.test.by.expr = TRUE,
     add.cor.features = FALSE,
@@ -153,7 +180,7 @@ setMethod('runSGSA',
     gsvaExp.name = 'gset1.rwr',
     min.sz = 10, 
     max.sz = Inf,
-    gene.occurrence.rate = .4,
+    gene.occurrence.rate = .2,
     assay.type = 'logcounts',
     knn.consider.spcoord = FALSE,
     sp.alpha.add.weight = .2,
@@ -166,7 +193,7 @@ setMethod('runSGSA',
     rwr.normalize.adj.method = c("laplacian", "row", "column", "none"),
     rwr.normalize.affinity = FALSE,
     rwr.prop.normalize = FALSE,
-    rwr.threads = 2L,
+    rwr.threads = NULL,
     hyper.test.weighted = c("Hypergeometric", "Wallenius", "none"),
     hyper.test.by.expr = TRUE,
     add.cor.features = FALSE,
@@ -259,7 +286,8 @@ setMethod('runSGSA',
       gset.hgt <- suppressWarnings(.run_hgt(
                            knn.gh,
                            seedstart.m[features,],
-                           gset.idx.list,
+                           rownames(gset.score.cells),
+                           #gset.idx.list,
                            #cells.gene.num,
                            m = gset.num[,'exp.gene.num'],
                            top.n = knn.k.use,
@@ -268,11 +296,7 @@ setMethod('runSGSA',
                            method = hyper.test.weighted#,
                            #threads = rwr.threads
                   ))
-      gset.score.cells <- gset.score.cells * gset.hgt
-      #if (rwr.prop.normalize && ncol(gset.score.cells) > 1){
-      #    gset.score.cells <- gset.score.cells |> prop.table(1) 
-      #    gset.score.cells[is.na(gset.score.cells)] <- 0
-      #}
+      gset.score.cells <- .weighted_by_hgt(gset.score.cells, gset.hgt)
   }
   
   gset.score.cells <- Matrix::Matrix(gset.score.cells, sparse = TRUE)

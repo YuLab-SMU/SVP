@@ -79,12 +79,14 @@ pairDist <- function(x, y){
     cnm <- colnames(x)
     
     top.n <- min(nrow(x), top.n)
-    i <- apply(x, 2, order)[seq(top.n), ]
+    i <- ParallelColOrder(x, top.n)
     j <- rep(seq(ncol(x)), each = top.n)
     adj.m <- Matrix::sparseMatrix(i, j, x = 1, dims = c(length(rnm),
         length(cnm)), dimnames = list(rnm, cnm))
     if (weighted.distance){
-        adj.m <- adj.m * x
+        adj.m <- SpMatElemMultiMat(adj.m, x)
+        rownames(adj.m) <- rnm
+        colnames(adj.m) <- cnm
     }
     return(adj.m)
 }
@@ -206,7 +208,6 @@ pairDist <- function(x, y){
         x <- pairDist(cells.rd, features.rd)
         
         #cell.dist <- pairDist(cells.rd, cells.rd)
-        
         cell.dist <- .fusion.sc.sp.dist(
                        cells.rd, 
                        cells.sp.coord, 
@@ -214,16 +215,19 @@ pairDist <- function(x, y){
                        sp.alpha.add.weight, 
                        sp.beta.add.mp.weight
         )
-
+        
         fs.dist <- pairDist(features.rd, features.rd)
+        
         top.n <- min(top.n, nrow(features.rd))
         top.n.cell <- min(max(50, round(top.n/10)), nrow(cells.rd)) + 1
         top.n.fs <- min(max(50, round(top.n/10)), nrow(features.rd)) + 1
+
         adj.m.list <- BiocParallel::bpmapply(.build.adj.m, list(x, cell.dist, fs.dist), 
                                              list(top.n, top.n.cell, top.n.fs), 
                                              MoreArgs=list(weighted.distance),
                                              BPPARAM = BPPARAM
         ) 
+
         adj.m <- do.call(.join.adj.m, adj.m.list)
         Matrix::diag(adj.m) <- 0
     }else{
@@ -378,6 +382,11 @@ pairDist <- function(x, y){
                 )
     rownames(gene.num) <- names(gset.idx.list)
     gene.num <- gene.num[gene.num$gset.gene.num >= min.sz & gene.num$gene.occurrence.rate >= gene.occurrence.rate,]
+    if (nrow(gene.num)==0){
+        cli::cli_abort(c("All gene set list was removed since they did not meet these conditions: ",
+			  "{.var min.sz} >= {min.sz} and {.var gene.occurrence.rate} >= {gene.occurrence.rate}"), 
+		       call = NULL)
+    }
 
     return(as.matrix(gene.num))
 
@@ -520,4 +529,12 @@ pairDist <- function(x, y){
 .normalize.coords <- function(x){
   range_all <- max(apply(x, 2, function(col) diff(range(col))))
   x <- apply(x, 2, function(col) (col - min(col)) / range_all)
+}
+
+.weighted_by_hgt <- function(x, y){
+  keep.names <- intersect(rownames(x), rownames(y))
+  x <- MatElemMultiMat(x[keep.names,,drop=FALSE], y[keep.names,,drop=FALSE])
+  rownames(x) <- keep.names
+  colnames(x) <- colnames(y)
+  return(x)
 }

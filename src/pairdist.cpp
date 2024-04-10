@@ -1,6 +1,8 @@
+#include <RcppParallel.h>
 #include <RcppArmadillo.h>
 #include <RcppEigen.h>
 using namespace Rcpp;
+using namespace RcppParallel;
 using namespace Eigen;
 using namespace arma;
 
@@ -31,4 +33,27 @@ arma::mat fusiondist(
   double beta_s = 1.0 - beta;
   arma::mat z = beta_s * (alpha_s * s + alpha * p) + beta * s % p;
   return (z);
+}
+
+
+struct colorder : public Worker{
+  const arma::mat& x;
+  arma::umat& result;
+
+  colorder(const arma::mat& x, arma::umat& result):
+      x(x), result(result){}
+
+  void operator()(std::size_t begin, std::size_t end){
+      for (uword i = begin; i < end; i++){
+          result.col(i) = arma::sort_index(x.col(i), "ascend") + 1;
+      }
+  }
+};
+
+// [[Rcpp::export]]
+NumericMatrix ParallelColOrder(const arma::mat& x, int top_n){
+    arma::umat ordmat = arma::umat(x.n_rows, x.n_cols);
+    colorder runcolorder(x, ordmat);
+    parallelFor(0, x.n_cols, runcolorder);
+    return wrap(ordmat.head_rows(top_n));
 }

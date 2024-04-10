@@ -12,7 +12,7 @@
 #' @param max.sz integer the maximum gene set number, default is Inf, the number of gene sets
 #' larger than \code{max.sz} will be ignored.
 #' @param gene.occurrence.rate the occurrence proportion of the gene set in the input object,
-#' default is 0.4.
+#' default is 0.2.
 #' @param assay.type which expressed data to be pulled to build KNN Graph, default is \code{logcounts}.
 #' @param knn.consider.spcoord logical whether combine the space of \code{MCA} and the spatial physical 
 #' space, default is FALSE. It only works when the input \code{data} has spatial coordinates and the
@@ -36,7 +36,8 @@
 #' default is FALSE.
 #' @param rwr.prop.normalize logical whether divide the specific activity score by total activity score for a sample,
 #' default is FALSE.
-#' @param rwr.threads the threads to run Random Walk With Restart (RWR), default is 2L.
+#' @param rwr.threads integer the threads to run Random Walk With Restart (RWR), default is NULL, which will initialize with the default
+#' number of threads, you can also set this using \code{RcppParallel::setThreadOptions(numThreads=10)}
 #' @param hyper.test.weighted character which method to weight the activity score of cell, should is one of "Hypergeometric", "Wallenius",
 #' "none", default is "Hypergeometric".
 #' @param hyper.test.by.expr logical whether using the expression matrix to find the nearest genes of cells, default is \code{TRUE},
@@ -93,7 +94,7 @@ setGeneric('detect.svp',
     gsvaExp.name = 'gset1.rwr',
     min.sz = 10,
     max.sz = Inf,
-    gene.occurrence.rate = .4,
+    gene.occurrence.rate = .2,
     assay.type = 'logcounts',
     knn.consider.spcoord = FALSE,
     sp.alpha.add.weight = .2,
@@ -106,7 +107,7 @@ setGeneric('detect.svp',
     rwr.normalize.adj.method = c("laplacian", "row", "column", "none"),
     rwr.normalize.affinity = FALSE,
     rwr.prop.normalize = FALSE,
-    rwr.threads = 2L,
+    rwr.threads = NULL,
     hyper.test.weighted = c("Hypergeometric", "Wallenius", "none"),
     hyper.test.by.expr = TRUE,
     sv.used.reduction = c('UMAP', 'TSNE'),
@@ -138,7 +139,7 @@ setMethod('detect.svp',
     gsvaExp.name = 'gset1.rwr',
     min.sz = 10, 
     max.sz = Inf,
-    gene.occurrence.rate = .4,
+    gene.occurrence.rate = .2,
     assay.type = 'logcounts',
     knn.consider.spcoord = FALSE,
     sp.alpha.add.weight = .2,
@@ -151,7 +152,7 @@ setMethod('detect.svp',
     rwr.normalize.adj.method = c("laplacian", "row", "column", "none"),
     rwr.normalize.affinity = FALSE,
     rwr.prop.normalize = FALSE,
-    rwr.threads = 2L,
+    rwr.threads = NULL,
     hyper.test.weighted = c("Hypergeometric", "Wallenius", "none"),
     hyper.test.by.expr = TRUE,
     sv.used.reduction = c('UMAP', 'TSNE'),

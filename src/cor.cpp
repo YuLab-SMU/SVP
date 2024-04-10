@@ -23,10 +23,28 @@ arma::vec CalWeight(const arma::vec& x){
 }
 
 // [[Rcpp::export]]
-SEXP MatMultCpp(const Eigen::Map<Eigen::MatrixXd> A, Eigen::Map<Eigen::MatrixXd> B){
+Eigen::MatrixXd MatMultCpp(const Eigen::Map<Eigen::MatrixXd> A, const Eigen::Map<Eigen::MatrixXd> B){
     Eigen::MatrixXd C = A * B;
 
-    return Rcpp::wrap(C);
+    return (C);
+}
+
+// [[Rcpp::export]]
+arma::sp_mat SpMatElemMultiMat(const arma::sp_mat x, const arma::mat y){
+    arma::sp_mat res = x % y;
+    return (res);
+}
+
+// [[Rcpp::export]]
+arma::sp_mat SpMatElemMultiSpMat(const arma::sp_mat x, const arma::sp_mat y){
+    arma::sp_mat res = x % y;
+    return (res);
+}
+
+// [[Rcpp::export]]
+arma::mat MatElemMultiMat(const arma::mat x, const arma::mat y){
+    arma::mat res = x % y;
+    return(res);
 }
 
 struct cal_bicor : public Worker {
