@@ -123,7 +123,7 @@
 #' # You can use other gene set, such as KEGG pathway, GO, Hallmark of MSigDB
 #' # or TFs gene sets etc.
 #' data(CellCycle.Hs)
-#' sceSubPbmc <- runSGSA(gset.idx.list = CellCycle.Hs, gsvaExp.name = 'CellCycle')
+#' sceSubPbmc <- runSGSA(sceSubPbmc, gset.idx.list = CellCycle.Hs, gsvaExp.name = 'CellCycle')
 #' # Then a SVPE class which inherits SingleCellExperiment, is return.
 #' sceSubPbmc
 #' 
@@ -131,9 +131,34 @@
 #' sceSubPbmc |> gsvaExp('CellCycle') 
 #' sceSubPbmc |> gsvaExp("CellCycle") |> assay() |> t() |> head()
 #' 
-#' # Then you can use the ggsc or other package to visulize,
-#' # and you can try to use the findMarkers of scran or other packages to identify 
-#' # the different gene sets. 
+#' # Then you can use the ggsc or other package to visulize
+#' # and you can try to use the findMarkers of scran or other packages to identify
+#' # the different gene sets.   
+#' \dontrun{
+#'   library(ggplot2)
+#'   library(ggsc)
+#'   sceSubPbmc <- sceSubPbmc |> 
+#'                 scater::runPCA(assay.type = 'logcounts', ntop = 600) |>
+#'                 scater::runUMAP(dimred = 'PCA')
+#'   # withReducedDim = TRUE, the original reducetion results from original gene features
+#'   # will be add the colData in the sce.cellcycle.
+#'   sce.cellcycle <- sceSubPbmc |> gsvaExp('CellCycle', withReducedDim=TRUE)
+#'   sce.cellcycle
+#'   sce.cellcycle |> sc_violin(
+#'                       features = rownames(sce.cellcycle), 
+#'                       mapping = aes(x=seurat_annotations, fill = seurat_annotations)
+#'                    ) + 
+#'                    scale_x_discrete(guide=guide_axis(angle=-45))
+#'   sce.cellcycle |> sc_feature(features= "S", reduction='UMAP')
+#'   library(scran)
+#'   cellcycle.test.res <- sce.cellcycle |> findMarkers(
+#'                      group = sce.cellcycle$seurat_annotations, 
+#'                      test.type = 'wilcox', 
+#'                      assay.type = 'affi.score', 
+#'                      add.summary = TRUE
+#'                   )
+#'   cellcycle.test.res$B
+#' }
 setGeneric('runSGSA', 
   function(
     data, 
@@ -273,11 +298,9 @@ setMethod('runSGSA',
 
   gset.score.cells <- gset.score[, cells, drop=FALSE]
   
-  #gset.score.cells <- gset.score.cells[Matrix::rowSums(gset.score.cells) > 0,]
   features.expr <- assay(data, assay.type)
   features.expr <- features.expr[features, cells] 
   if (hyper.test.weighted != 'none'){ 
-      #cells.gene.num <- colSums(as.matrix(features.expr) > 0)
       if (hyper.test.by.expr){
           knn.gh <- .build.adj.m_by_expr(features.expr, top.n = knn.k.use, weighted.distance = knn.graph.weighted)
       }else{
@@ -287,26 +310,24 @@ setMethod('runSGSA',
                            knn.gh,
                            seedstart.m[features,],
                            rownames(gset.score.cells),
-                           #gset.idx.list,
-                           #cells.gene.num,
                            m = gset.num[,'exp.gene.num'],
                            top.n = knn.k.use,
                            combined.cell.feature = knn.combined.cell.feature,
                            weighted.distance = knn.graph.weighted,
-                           method = hyper.test.weighted#,
-                           #threads = rwr.threads
+                           method = hyper.test.weighted
                   ))
       gset.score.cells <- .weighted_by_hgt(gset.score.cells, gset.hgt)
+      assay.res <- list(affi.score = as(gset.score.cells,'dgCMatrix'), hyper.weighted = as(gset.hgt,'dgCMatrix'))
+  }else{
+      assay.res <- list(affi.score = as(gset.score.cells, 'dgCMatrix'))
   }
   
-  gset.score.cells <- Matrix::Matrix(gset.score.cells, sparse = TRUE)
- 
-  x <- SingleCellExperiment(assays = list(affi.score = gset.score.cells))
+  x <- SingleCellExperiment(assays = assay.res)
   rowData(x) <- gset.num[rownames(x), ,drop=FALSE]
 
   if (add.cor.features){
       gset.score.features <- .extract.features.rank(
-                                 gset.score.cells,
+                                 assay(x),
                                  features.expr,
                                  features,
                                  gset.idx.list

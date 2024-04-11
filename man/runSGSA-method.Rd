@@ -201,7 +201,7 @@ sceSubPbmc <- runMCA(sceSubPbmc, assay.type = 'logcounts')
 # You can use other gene set, such as KEGG pathway, GO, Hallmark of MSigDB
 # or TFs gene sets etc.
 data(CellCycle.Hs)
-sceSubPbmc <- runSGSA(gset.idx.list = CellCycle.Hs, gsvaExp.name = 'CellCycle')
+sceSubPbmc <- runSGSA(sceSubPbmc, gset.idx.list = CellCycle.Hs, gsvaExp.name = 'CellCycle')
 # Then a SVPE class which inherits SingleCellExperiment, is return.
 sceSubPbmc
 
@@ -209,9 +209,34 @@ sceSubPbmc
 sceSubPbmc |> gsvaExp('CellCycle') 
 sceSubPbmc |> gsvaExp("CellCycle") |> assay() |> t() |> head()
 
-# Then you can use the ggsc or other package to visulize,
-# and you can try to use the findMarkers of scran or other packages to identify 
-# the different gene sets. 
+# Then you can use the ggsc or other package to visulize
+# and you can try to use the findMarkers of scran or other packages to identify
+# the different gene sets.   
+\dontrun{
+  library(ggplot2)
+  library(ggsc)
+  sceSubPbmc <- sceSubPbmc |> 
+                scater::runPCA(assay.type = 'logcounts', ntop = 600) |>
+                scater::runUMAP(dimred = 'PCA')
+  # withReducedDim = TRUE, the original reducetion results from original gene features
+  # will be add the colData in the sce.cellcycle.
+  sce.cellcycle <- sceSubPbmc |> gsvaExp('CellCycle', withReducedDim=TRUE)
+  sce.cellcycle
+  sce.cellcycle |> sc_violin(
+                      features = rownames(sce.cellcycle), 
+                      mapping = aes(x=seurat_annotations, fill = seurat_annotations)
+                   ) + 
+                   scale_x_discrete(guide=guide_axis(angle=-45))
+  sce.cellcycle |> sc_feature(features= "S", reduction='UMAP')
+  library(scran)
+  cellcycle.test.res <- sce.cellcycle |> findMarkers(
+                     group = sce.cellcycle$seurat_annotations, 
+                     test.type = 'wilcox', 
+                     assay.type = 'affi.score', 
+                     add.summary = TRUE
+                  )
+  cellcycle.test.res$B
+}
 }
 \references{
 \enumerate{
