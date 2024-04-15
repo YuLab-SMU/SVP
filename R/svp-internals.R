@@ -93,7 +93,7 @@ pairDist <- function(x, y){
 
 #' @importFrom DelayedMatrixStats colRanks
 .build.adj.m_by_expr <- function(x, top.n = 600, weighted.distance = FALSE){
-    expr.rank.dist <- 1 - (DelayedMatrixStats::colRanks(x, preserveShape=TRUE) / (nrow(x) + 1))
+    expr.rank.dist <- 1 - (DelayedMatrixStats::colRanks(x, useNames=FALSE, preserveShape=TRUE) / (nrow(x) + 1))
     rownames(expr.rank.dist) <- rownames(x)
     colnames(expr.rank.dist) <- colnames(x)
     adj.m <- .build.adj.m(expr.rank.dist, top.n, weighted.distance)
