@@ -316,8 +316,10 @@ setMethod('runSGSA',
                            weighted.distance = knn.graph.weighted,
                            method = hyper.test.weighted
                   ))
-      gset.score.cells <- .weighted_by_hgt(gset.score.cells, gset.hgt)
-      assay.res <- list(affi.score = as(gset.score.cells,'dgCMatrix'), hyper.weighted = as(gset.hgt,'dgCMatrix'))
+      gset.score.cells2 <- .weighted_by_hgt(gset.score.cells, gset.hgt)
+      assay.res <- list(affi.score = as(gset.score.cells2,'dgCMatrix'),
+                        rwr.score = as(gset.score.cells[rownames(gset.score.cells2),,drop=FALSE], 'dgCMatrix'),
+                        hyper.weighted = as(gset.hgt,'dgCMatrix'))
   }else{
       assay.res <- list(affi.score = as(gset.score.cells, 'dgCMatrix'))
   }

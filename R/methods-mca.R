@@ -73,7 +73,7 @@ setMethod('runMCA', 'SingleCellExperiment',
   }
 
   x <- assay(data, assay.type)
-  x <- x[Matrix::rowSums(x) > 0,]
+  x <- x[DelayedMatrixStats::rowVars(x) != 0,]
 
   flag.coords <- .check_element_obj(data, key = 'spatialCoords', basefun = int_colData, namefun = names)
   if (flag.coords && consider.spcoord){

@@ -51,7 +51,7 @@ arma::uvec findIntervalCpp(arma::vec x, arma::vec breaks) {
     pos = std::upper_bound(breaks.begin(), breaks.end(), *it);
     *out_it = std::distance(breaks.begin(), pos);
   }
-  return (out - 1);
+  return (out);
 }
 
 arma::vec Kde2dWeightedCpp(

@@ -104,3 +104,17 @@ NA
 #' @examples
 #' data(CellCycle.Hs)
 NA
+
+
+#' @title an example of result of runSGSA by extracting with gsvaExp
+#'
+#' @description
+#' The result of runSGSA with HPDA A sample from (doi:10.1038/s41587-019-0392-8) 
+#'
+#' @name data_hpda_spe_cell_dec
+#' @aliases hpda_spe_cell_dec
+#' @docType data
+#' @keywords data
+#' @examples
+#' data(hpda_spe_cell_dec)
+NA

@@ -46,7 +46,9 @@ Suggests:
   rmarkdown,
   igraph,
   testthat (>= 3.0.0),
-  scuttle
+  scuttle,
+  magrittr,
+  multimode 
 License: GPL-3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
