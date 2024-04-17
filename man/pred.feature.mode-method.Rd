@@ -92,16 +92,19 @@ the location of modes and antimodes with the expression or activity score.
 }
 \examples{
 library(SpatialExperiment)
-# This result can be extract from the
-# result of runSGSA with gsvaExp(svpe)
+# This example data was extracted from the
+# result of runSGSA with gsvaExp function.
 data(hpda_spe_cell_dec)
-assay
+assays(hpda_spe_cell_dec)
 hpda_spe_cell_dec <- hpda_spe_cell_dec |> 
    pred.feature.mode(assay.type = 'rwr.score', 
      mod0 = 2, 
      BPPARAM=BiocParallel::MulticoreParam(workers=2,progressbar=TRUE)
    )
+# The result will be saved in assays of hpda_spe_cell_dec
+# and it can be extracted using assay function.
 assays(hpda_spe_cell_dec)
+assay(hpda_spe_cell_dec, 'ModeFlag') |> t() |> head()
 # We extract the activity mode of Cancer clone A and Cancer clone B, then visualize them
 assay(hpda_spe_cell_dec, 'ModeFlag') |> t() |> 
  magrittr::extract(,c(2, 3)) |> 
@@ -134,7 +137,6 @@ assay(hpda_spe_cell_dec, 'ModeFlag') |> t() |>
   ) + 
   scale_bg_color_manual(values=c('black')) 
   f1
-  
   f2 <- sc_spatial(hpda_spe_cell_dec, features="Cancer clone B",
              mapping=aes(x=x,y=y),
              pointsize=10

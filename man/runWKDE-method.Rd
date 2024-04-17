@@ -79,3 +79,34 @@ a \linkS4class{SVPExperiment} or \linkS4class{SingleCellExperiment}
 \description{
 Calculating the 2D Weighted Kernel Density Estimation
 }
+\examples{
+library(SpatialExperiment)
+data(hpda_spe_cell_dec)
+hpda_spe_cell_dec <- hpda_spe_cell_dec |> runWKDE(assay.type = 'affi.score')
+# The result is saved in the assays (affi.score.density name) of SVPExperiment
+# which can be extracted using assay and visualized using ggsc or
+# other packages
+assays(hpda_spe_cell_dec)
+\dontrun{
+    library(ggsc)
+    
+    f1 <- sc_spatial(hpda_spe_cell_dec, features="Cancer clone A",
+               mapping=aes(x=x,y=y),
+               slot = 'affi.score.density',
+               pointsize=10
+    ) +
+    scale_bg_color_manual(values=c('black'))
+    f1
+    
+    f2 <- sc_spatial(hpda_spe_cell_dec, features="Cancer clone B",
+               mapping=aes(x=x,y=y),
+               pointsize=10,
+               slot = 'affi.score.density'
+    ) +
+    scale_bg_color_manual(values=c('black'))
+    f2
+}
+}
+\author{
+Shuangbin Xu
+}

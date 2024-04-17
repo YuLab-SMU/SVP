@@ -97,9 +97,37 @@ are more likely to express a gene based on their neighbouring cells (first refer
 Moran's I or Geary's C to detect the signal genes in a low-dimensional space (\code{UMAP} or \code{TSNE}
 for single cell omics data) or a physical space (for spatial omics data).
 }
+\examples{
+# This example dataset is extracted from the
+# result of runSGSA with gsvaExp(svpe).
+data(hpda_spe_cell_dec)
+
+hpda_spe_cell_dec <-
+    hpda_spe_cell_dec |>
+    runDetectSVG(
+      assay.type = 'affi.score',
+      method = 'moransi'
+    )
+# The result also is saved in the svDfs in the SVPExample object
+# which can be extrated with svDf 
+svDfs(hpda_spe_cell_dec)
+
+hpda_spe_cell_dec |> svDf("sv.moransi") |> data.frame() |> dplyr::arrange(rank)
+
+hpda_spe_cell_dec <-
+    hpda_spe_cell_dec |>
+    runDetectSVG(assay.type ='affi.score', method = 'gearysc')
+
+svDfs(hpda_spe_cell_dec)
+
+hpda_spe_cell_dec |> svDf("sv.gearysc") |> data.frame() |> dplyr::arrange(rank)
+}
 \references{
 \enumerate{
 \item Jose Alquicira-Hernandez, Joseph E Powell, Nebulosa recovers single-cell gene expression signals by kernel density estimation.
 Bioinformatics, 37, 2485–2487(2021), https://doi.org/10.1093/bioinformatics/btab003.
 }
+}
+\author{
+Shuangbin Xu
 }

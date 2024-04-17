@@ -144,6 +144,24 @@ divergence for each feature is normally distributed in the following:
 
 where \eqn{\mu} is the average value of random Kullback-Leibler divergence, and \eqn{\sigma} is standard deviation.
 }
+\examples{
+# This example dataset is extracted from the
+# result of runSGSA with gsvaExp(svpe).
+data(hpda_spe_cell_dec)
+
+hpda_spe_cell_dec <-
+    hpda_spe_cell_dec |>
+    runKldSVG(
+      assay.type = 'affi.score'
+    )
+
+# The result can be extracted svDf()
+hpda_spe_cell_dec |> svDf() |> data.frame() |> dplyr::arrange(rank)
+# the Acinar cells, Cancer clone A, Cancer clone B etc have
+# significant spatial variable.
+# Then we can use pred.feature.mode to predict the activity
+# mode in spatial domain.
+}
 \references{
 \enumerate{
 \item Jose Alquicira-Hernandez, Joseph E Powell, Nebulosa recovers single-cell gene expression signals by kernel density estimation.
@@ -155,4 +173,7 @@ data. Nat Commun, 11, 4318 (2020). https://doi.org/10.1038/s41467-020-17900-3
 }
 \seealso{
 \code{\link{runSGSA}} to calculate the activity score of gene sets.
+}
+\author{
+Shuangbin Xu
 }
