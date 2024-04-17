@@ -8,6 +8,14 @@
 \description{
 SVP uses the distance between cells and cells, features and features, cells and features in the space of MCA to build nearest neighbor graph, then uses random walk with restart algorithm to calculate the activity score of gene sets (such as kegg pathway, signatures, go term, gene modules, transcription factor, ...), which is then further weighted using the hypergeometric test results from the original expression matrix. In addition, to detect the spatially or single cell variable gene sets or (other features) accurately, SVP uses the 2d weighted kernel density estimation to process the score of gene sets (or expression of genes) and uses Kullback–Leibler divergence to identify the spatial variable features based on permutation test. SVP also provides Geary’s and Morans'I that measure spatial autocorrelation to identify the spatial variable features efficiently based on Rcpp and RcppParallel. SVP is developed based on SingleCellExperiment class, which can be interoperable with the existing computing ecosystem.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/YuLab-SMU/SVP}
+  \item Report bugs at \url{https://github.com/YuLab-SMU/SVP/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Shuangbin Xu \email{xshuangbin@163.com} (\href{https://orcid.org/0000-0003-3513-5362}{ORCID})
 
