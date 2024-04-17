@@ -6,10 +6,10 @@ using namespace RcppParallel;
 using namespace Eigen;
 using namespace arma;
 
-//' Obtain the pair distance of row between \code{A} and \code{B} matrix
-//' @param A matrix which number of column should be equal to column number of \code{B}.
-//' @param B matrix which number of column should be equal to column number of \code{A}.
-//' @return a distance matrix of row feature in \code{A} and \code{B}.
+// Obtain the pair distance of row between \code{A} and \code{B} matrix
+// param A matrix which number of column should be equal to column number of \code{B}.
+// param B matrix which number of column should be equal to column number of \code{A}.
+// return a distance matrix of row feature in \code{A} and \code{B}.
 //[[Rcpp::export]]
 SEXP fastPDist(Eigen::Map<Eigen::MatrixXd> A, Eigen::Map<Eigen::MatrixXd> B){
     Eigen::VectorXd An = A.array().square().rowwise().sum();

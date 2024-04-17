@@ -38,16 +38,16 @@ struct calrwr : public Worker{
 };
 
 
-//' Computer the affinity score of all nodes in a graph to a seeds 
-//' using Random Walk with Restart
-//' @param x a adjacency matrix of a graph.
-//' @param v a matrix define sets of starting seeds, each column 
-//' corresponds to one set of seeds that a walker starts.
-//' @param restart the restart probability used for RWR, it must be 
-//' between 0 and 1, default is .75.
-//' @param stop_delta minimum threshold to stop RWR, default is 1e-10.
-//' @param stop_step step number to stop RWR, default is 50.
-//' @return a matrix of affinity score of all nodes in a graph
+// Computer the affinity score of all nodes in a graph to a seeds 
+// using Random Walk with Restart
+// param x a adjacency matrix of a graph.
+// param v a matrix define sets of starting seeds, each column 
+// corresponds to one set of seeds that a walker starts.
+// param restart the restart probability used for RWR, it must be 
+// between 0 and 1, default is .75.
+// param stop_delta minimum threshold to stop RWR, default is 1e-10.
+// param stop_step step number to stop RWR, default is 50.
+// return a matrix of affinity score of all nodes in a graph
 // [[Rcpp::export]]
 NumericMatrix parallelCalRWR(
               arma::sp_mat& x,
