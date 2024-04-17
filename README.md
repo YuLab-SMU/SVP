@@ -20,14 +20,14 @@ variable features efficiently based on Rcpp and RcppParallel. SVP is
 developed based on SingleCellExperiment class, which can be
 interoperable with the existing computing ecosystem.
 
-## :writing\_hand: Author
+## :writing_hand: Author
 
 [Shuangbin Xu](https://github.com/xiangpin) and [Guangchuang
 Yu](https://guangchuangyu.github.io)
 
 School of Basic Medical Sciences, Southern Medical University
 
-## :arrow\_double\_down: Installation
+## :arrow_double_down: Installation
 
 The development version from `github`:
 
@@ -37,8 +37,18 @@ if (!requireNamespace("remotes", quietly=TRUE))
 remotes::install_github("xiangpin/SVP")
 ```
 
-## :sparkling\_heart: Contributing
+To enhance performance, it is **strongly recommended** to connect your R
+BLAS library with the
+[OpenBLAS](https://github.com/OpenMathLib/OpenBLAS) library for matrix
+calculations. This can be accomplished using the
+[ropenblas](https://prdm0.github.io/ropenblas/) package. Or you can
+install [OpenBLAS](https://github.com/OpenMathLib/OpenBLAS) and link the
+library to R library by
+`ln -s your_openblas_installed_path_libopenblas.so your_R_install_path_libRblas.so`
+manually.
 
-We welcome any contributions\! By participating in this project you
-agree to abide by the terms outlined in the [Contributor Code of
+## :sparkling_heart: Contributing
+
+We welcome any contributions! By participating in this project you agree
+to abide by the terms outlined in the [Contributor Code of
 Conduct](CONDUCT.md).

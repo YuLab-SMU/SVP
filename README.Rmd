@@ -35,6 +35,13 @@ if (!requireNamespace("remotes", quietly=TRUE))
 remotes::install_github("xiangpin/SVP")
 ```
 
+To enhance performance, it is **strongly recommended** to connect your R BLAS library with the 
+[OpenBLAS](https://github.com/OpenMathLib/OpenBLAS) library for matrix calculations.
+This can be accomplished using the [ropenblas](https://prdm0.github.io/ropenblas/) package.
+Or you can install [OpenBLAS](https://github.com/OpenMathLib/OpenBLAS) and link the library 
+to R BLAS library by `ln -s your_openblas_installed_path_libopenblas.so your_R_install_path_libRblas.so`
+manually.
+
 ## :sparkling_heart: Contributing
 
 We welcome any contributions! By participating in this project you agree to abide
