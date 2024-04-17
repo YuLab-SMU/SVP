@@ -94,14 +94,19 @@ dim(counts(sce))
 rownames(sce) <- paste0("gene", seq(nrow(sce)))
 colnames(sce) <- paste0("cell", seq(ncol(sce)))
 # Mocking up some result of spatially variable gene or high variable gene
-da1 <- data.frame(kld = abs(rnorm(0.4, nrow(sce))), pvalue = abs(rnorm(0.001, nrow(sce)))) |> as.matrix() 
+da1 <- data.frame(kld = abs(rnorm(nrow(sce), .4)), 
+                  pvalue = abs(rnorm(nrow(sce), .001))) |> 
+       as.matrix() 
 rownames(da1) <- rownames(sce)
-da2 <- data.frame(moransi = abs(rnorm(0.4, nrow(sce))), pvalue = abs(rnorm(0.001, nrow(sce))))
+da2 <- data.frame(moransi = abs(rnorm(nrow(sce), .4)), 
+                  pvalue = abs(rnorm(nrow(sce), .001))) |> 
+       as.matrix()
 rownames(da2) <- rownames(sce)
+svDfs(sce) <- list()
 svDf(sce, "kld") <- da1 
 svDf(sce, "moransi") <- da2
 svDfs(sce)
-svDfsNames(sce)
+svDfNames(sce)
 svDf(sce, "kld") |> head()
 svDf(sce, "moransi") |> head()
 svDf(sce, 2) |> head()

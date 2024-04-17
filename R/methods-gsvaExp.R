@@ -159,10 +159,10 @@
 #' dim(counts(svpe))
 #' 
 #' # Mocking up some GSVA Experiments
-#' sce1 <- SingleCellExperiment(matrix(rpois(1000, 5), ncol=ncol(se)))
+#' sce1 <- SingleCellExperiment(matrix(rpois(1000, 5), ncol=ncol(svpe)))
 #' rownames(sce1) <- paste0("GO:",seq(nrow(sce1)))
 #' colnames(sce1) <- colnames(svpe)
-#' sce2 <- SingleCellExperiment(matrix(rpois(1000, 5), ncol=ncol(se)))
+#' sce2 <- SingleCellExperiment(matrix(rpois(1000, 5), ncol=ncol(svpe)))
 #' rownames(sce2) <- paste0("KEGG:", seq(nrow(sce2)))
 #' colnames(sce2) <- colnames(svpe)
 #' 

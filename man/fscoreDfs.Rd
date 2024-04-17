@@ -95,27 +95,29 @@ dim(counts(svpe))
 rownames(svpe) <- paste0("gene", seq(nrow(svpe)))
 colnames(svpe) <- paste0("cell", seq(ncol(svpe)))
 # Mocking up some GSVA Experiments
-sce1 <- SingleCellExperiment(matrix(rpois(1000, 5), ncol=ncol(se)))
+sce1 <- SingleCellExperiment(matrix(rpois(1000, 5), ncol=ncol(svpe)))
 rownames(sce1) <- paste0("GO:",seq(nrow(sce1)))
 colnames(sce1) <- colnames(svpe)
-sce2 <- SingleCellExperiment(matrix(rpois(1000, 5), ncol=ncol(se)))
+sce2 <- SingleCellExperiment(matrix(rpois(1000, 5), ncol=ncol(svpe)))
 rownames(sce2) <- paste0("KEGG:", seq(nrow(sce2)))
 colnames(sce2) <- colnames(svpe)
 
 # Mocking up some relationship score between new feature and gene
-fscore1 <- lapply(seq(nrow(sce)), function(i) abs(rnorm(5, 0.5)) |> setNames(sample(rownames(sce),5))) |> 
+fscore1 <- lapply(seq(nrow(sce1)), function(i) abs(rnorm(5, 0.5)) |> setNames(sample(rownames(svpe),5))) |> 
             List() |>  
             DataFrame() |> setNames("rwr_score") 
 rownames(fscore1) <- rownames(sce1)
-fscore2 <- lapply(seq(nrow(sce)), function(i) abs(rnorm(5, 0.8)) |> setNames(sample(rownames(sce),5))) |> 
+fscore2 <- lapply(seq(nrow(sce2)), function(i) abs(rnorm(5, 0.8)) |> setNames(sample(rownames(svpe),5))) |> 
            List() |>  DataFrame() |> setNames("hyper_test")
 # Setting the score
+fscoreDfs(sce1) <- list()
+fscoreDfs(sce2) <- list()
 fscoreDf(sce1, "rwr_score") <- fscore1
 fscoreDf(sce2, "hyper_test") <-fscore2
 
 # Setting the GSVA Experiments
 gsvaExp(svpe, "GO1") <- sce1
-gsvaExp(svep, "KEGG1") <- sce2
+gsvaExp(svpe, "KEGG1") <- sce2
 
 # Getting the GSVA Experiment data
 fscoreDf(gsvaExp(svpe), "rwr_score")
