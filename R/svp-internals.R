@@ -501,8 +501,8 @@ pairDist <- function(x, y){
   gx <- seq.int(lims[1], lims[2], length.out = n)
   gy <- seq.int(lims[3], lims[4], length.out = n)
 
-  indx <- findIntervalCpp(coords[, 1], gx)
-  indy <- findIntervalCpp(coords[, 2], gy)
+  indx <- findIntervalCpp(coords[, 1], gx) - 1
+  indy <- findIntervalCpp(coords[, 2], gy) - 1
 
   axm <- outergrid(gx, coords[, 1]) 
   aym <- outergrid(gy, coords[, 2])

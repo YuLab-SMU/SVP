@@ -262,8 +262,8 @@ arma::sp_mat CalWkdeParallel(arma::mat& x, arma::sp_mat& w, arma::vec& l, Nullab
   }
 
   //mapping to original coords
-  arma::uvec indx = findIntervalCpp(x.col(0), gx);
-  arma::uvec indy = findIntervalCpp(x.col(1), gy);
+  arma::uvec indx = findIntervalCpp(x.col(0), gx) - 1;
+  arma::uvec indy = findIntervalCpp(x.col(1), gy) - 1;
 
   arma::mat ax = outergrid(gx, x.col(0));
   arma::mat ay = outergrid(gy, x.col(1));
