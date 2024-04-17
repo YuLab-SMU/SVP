@@ -44,7 +44,7 @@ setMethod(
         threshold = NULL,
         gsvaexp = NULL,
         gsvaexp.assay.type = NULL,
-	pred.col.name = 'pred.cell.sign',
+        pred.col.name = 'pred.cell.sign',
         ...
     ){
   if (is.null(assay.type)){
@@ -75,7 +75,7 @@ setMethod(
     ){
     
     if (!is.null(gsvaexp)){
-       cli::cli_inform("The {.var gsvaexp} was specified, the specified {.var gsvaExp} will be used to predict the cell signature.")
+       cli::cli_inform("The {.var gsvaexp} = {gsvaexp} was specified, the specified gsva Experiment will be used to predict the cell signature.")
        da2 <- gsvaExp(data, gsvaexp, withColData=FALSE, withSpatialCoords=FALSE, withImageData = FALSE)
        da2 <- pred.cell.signature(da2, assay.type = gsvaexp.assay.type, threshold = threshold, pred.col.name = pred.col.name, ...)
        gsvaExp(data, gsvaexp) <- da2
@@ -260,7 +260,7 @@ setMethod(
         gsvaexp.assay.type = NULL,
         mod0 = 2,
         BPPARAM = SerialParam(),
-	name = "ModeFlag",
+        name = "ModeFlag",
         features = NULL,
         cells = NULL,
         ...
@@ -271,7 +271,7 @@ setMethod(
     }
 
     if (!is.null(gsvaexp)){
-       cli::cli_inform("The {.var gsvaexp} was specified, the specified {.var gsvaExp} will be used to predict the features mode.")
+       cli::cli_inform("The {.var gsvaexp} = {gsvaexp} was specified, the specified gsva Experiments will be used to predict the features mode.")
  
        da2 <- gsvaExp(data, gsvaexp, withColData=FALSE, withSpatialCoords=FALSE, withImageData = FALSE)
        da2 <- pred.feature.mode(da2, assay.type = gsvaexp.assay.type, mod0 = mod0, 

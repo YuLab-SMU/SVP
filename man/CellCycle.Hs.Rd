@@ -5,6 +5,9 @@
 \alias{CellCycle.Hs}
 \alias{data_CellCycle.Hs}
 \title{the Cell Cycle gene set}
+\value{
+a list object
+}
 \description{
 the S and G2M gene list are from the Seurat which refer to this article (doi:10.1126/science.aad050),
 the G1 gene list is from the G1_PHASE of Human Gene Set in MSigDB, but remove the duplicated records

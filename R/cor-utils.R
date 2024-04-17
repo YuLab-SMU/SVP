@@ -57,7 +57,7 @@ fast_cor <- function(
                 #indy <- !is.na(y)
                 #np <- indx %*% Matrix::t(indy) |> as.matrix()
                 np <- .mat_mult(x, y)
-	    }
+            }
         }
     }
         

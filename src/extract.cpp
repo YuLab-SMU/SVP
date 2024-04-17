@@ -15,12 +15,12 @@ NumericVector SortNv(NumericVector x, bool decreasing = true) {
     return y;
 }
 
-//' Extract the score of gene in each gene sets
-//' @param x the score sparse matrix of gene for each gene sets.
-//' @param rnm the row names of x matrix.
-//' @param cnm the col names of x matrix.
-//' @param g a list of gene set.
-//' @return a list contained the score of gene in each gene sets
+// Extract the score of gene in each gene sets
+// param x the score sparse matrix of gene for each gene sets.
+// param rnm the row names of x matrix.
+// param cnm the col names of x matrix.
+// param g a list of gene set.
+// return a list contained the score of gene in each gene sets
 //[[Rcpp::export]]
 List ExtractFeatureScoreCpp(NumericMatrix& x,
               CharacterVector& rnm,

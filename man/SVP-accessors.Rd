@@ -28,3 +28,11 @@ matrix or character or print the information of object.
 \description{
 Some accessor funtions to get the internal slots of SVPExperiment
 }
+\examples{
+library(SpatialExperiment) |> suppressPackageStartupMessages()
+library(DropletUtils) |> suppressPackageStartupMessages()
+example(read10xVisium, echo = FALSE)
+svpe <- as(spe, 'SVPExperiment')
+svpe
+spatialCoords(svpe) |> head()
+}

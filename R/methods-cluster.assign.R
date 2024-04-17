@@ -18,6 +18,15 @@
 #' gene set or pathway to the each cell. If \code{assign = FALSE}, the max affinity of gene set or pathway will be kept.
 #' @seealso to calculate the activity score of gene sets or pathway: [`runSGSA`].
 #' @export
+#' @examples
+#' library(SpatialExperiment)
+#' # This example data was extracted from the
+#' # result of runSGSA with gsvaExp function.
+#' data(hpda_spe_cell_dec)
+#' assays(hpda_spe_cell_dec)
+#' hpda_spe_cell_dec <- hpda_spe_cell_dec |>
+#'    cluster.assign(assay.type = 'rwr.score')
+#' hpda_spe_cell_dec 
 setGeneric('cluster.assign', 
   function(
     data, 
@@ -39,7 +48,7 @@ setMethod(
     function(
         data, 
         assay.type = 'affi.score',
-	assign = FALSE,
+        assign = FALSE,
         gsvaexp = NULL,
         gsvaexp.assay.type = NULL,
         ...

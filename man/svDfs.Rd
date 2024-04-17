@@ -86,3 +86,23 @@ This should be of length equal to the number of results currently in \code{x}.
 }
 }
 
+\examples{
+# Using the SingleCellExperiment class example
+library(SingleCellExperiment) |> suppressPackageStartupMessages()
+example(SingleCellExperiment, echo = FALSE)
+dim(counts(sce))
+rownames(sce) <- paste0("gene", seq(nrow(sce)))
+colnames(sce) <- paste0("cell", seq(ncol(sce)))
+# Mocking up some result of spatially variable gene or high variable gene
+da1 <- data.frame(kld = abs(rnorm(0.4, nrow(sce))), pvalue = abs(rnorm(0.001, nrow(sce)))) |> as.matrix() 
+rownames(da1) <- rownames(sce)
+da2 <- data.frame(moransi = abs(rnorm(0.4, nrow(sce))), pvalue = abs(rnorm(0.001, nrow(sce))))
+rownames(da2) <- rownames(sce)
+svDf(sce, "kld") <- da1 
+svDf(sce, "moransi") <- da2
+svDfs(sce)
+svDfsNames(sce)
+svDf(sce, "kld") |> head()
+svDf(sce, "moransi") |> head()
+svDf(sce, 2) |> head()
+}

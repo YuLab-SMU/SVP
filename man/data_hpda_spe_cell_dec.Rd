@@ -5,6 +5,9 @@
 \alias{data_hpda_spe_cell_dec}
 \alias{hpda_spe_cell_dec}
 \title{an example of result of runSGSA by extracting with gsvaExp}
+\value{
+a \linkS4class{SpatialExperiment} object
+}
 \description{
 The result of runSGSA with HPDA A sample from (doi:10.1038/s41587-019-0392-8)
 }

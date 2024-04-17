@@ -18,6 +18,10 @@
 #' @param ... additional parameters.
 #' @return a list, which contains features and named with clusters of \code{group.by}.
 #' @export
+#' @examples
+#' example(runMCA, echo = FALSE)
+#' small.sce |> runDetectMarker(group.by='Cell_Cycle', ntop=20, 
+#'               present.prop=.9, consider.unique.in.group=TRUE)
 setGeneric('runDetectMarker',
   function(
     data,

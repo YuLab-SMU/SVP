@@ -198,6 +198,9 @@ each features.
 \item \code{rank} the order of significant spatial variable features based on \code{padj} and \code{sp.kld}.
 }
 }
+\examples{
+example(runSGSA, echo = FALSE)
+}
 \seealso{
 \code{\link{runSGSA}} to calculate the activity score of gene sets and \code{\link{runKldSVG}} to identify the spatiall variable or specified
 cell gene sets or a features.

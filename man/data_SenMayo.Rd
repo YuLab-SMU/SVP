@@ -9,6 +9,9 @@ pathways across tissues}
 \source{
 \url{https://static-content.springer.com/esm/art\%3A10.1038\%2Fs41467-022-32552-1/MediaObjects/41467_2022_32552_MOESM4_ESM.xlsx}
 }
+\value{
+a list object
+}
 \description{
 SenMayoSymbol is a gene symbol list that can be used to identify senescent cells and predicts
 senescence-associated pathways across tissues

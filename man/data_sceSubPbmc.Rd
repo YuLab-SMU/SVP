@@ -5,6 +5,9 @@
 \alias{data_sceSubPbmc}
 \alias{sceSubPbmc}
 \title{a subset data of pbmck3 from SeuratData}
+\value{
+a \linkS4class{SingleCellExperiment} object
+}
 \description{
 a small SingleCellExperiment data set from pbmck3 which
 contains 1304 genes and 800 cells (extract randomly)

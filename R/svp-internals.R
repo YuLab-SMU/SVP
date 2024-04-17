@@ -384,8 +384,8 @@ pairDist <- function(x, y){
     gene.num <- gene.num[gene.num$gset.gene.num >= min.sz & gene.num$gene.occurrence.rate >= gene.occurrence.rate,]
     if (nrow(gene.num)==0){
         cli::cli_abort(c("All gene set list was removed since they did not meet these conditions: ",
-			  "{.var min.sz} >= {min.sz} and {.var gene.occurrence.rate} >= {gene.occurrence.rate}"), 
-		       call = NULL)
+                         "{.var min.sz} >= {min.sz} and {.var gene.occurrence.rate} >= {gene.occurrence.rate}"), 
+                          call = NULL)
     }
 
     return(as.matrix(gene.num))

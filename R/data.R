@@ -37,6 +37,7 @@
 #'    \item{Stemness}{Cancer cells with high stemness fuel the growth of cancer.}
 #'  }
 #' @docType data
+#' @return a list object
 #' @keywords data
 #' @references Yuan, H., Yan, M., Zhang, G., Liu, W., Deng, C., Liao, G., Xu, L., Luo, T., Yan, H., 
 #' Long, Z., Shi, A., Zhao, T., Xiao, Y., & Li, X. (2019). CancerSEA: a cancer single-cell state atlas. 
@@ -67,6 +68,7 @@ NA
 #' @aliases SenMayoSymbol
 #' @docType data
 #' @keywords data
+#' @return a list object
 #' @references Saul, D., Kosinsky, R.L., Atkinson, E.J. et al. A new gene set identifies senescent 
 #' cells and predicts senescence-associated pathways across tissues. Nat Commun 13, 4827 (2022). 
 #' https://doi.org/10.1038/s41467-022-32552-1
@@ -86,6 +88,7 @@ NA
 #' @aliases sceSubPbmc
 #' @docType data
 #' @keywords data
+#' @return a \linkS4class{SingleCellExperiment} object
 #' @examples
 #' data(sceSubPbmc)
 NA
@@ -101,6 +104,7 @@ NA
 #' @aliases data_CellCycle.Hs
 #' @docType data
 #' @keywords data
+#' @return a list object
 #' @examples
 #' data(CellCycle.Hs)
 NA
@@ -115,6 +119,7 @@ NA
 #' @aliases hpda_spe_cell_dec
 #' @docType data
 #' @keywords data
+#' @return a \linkS4class{SpatialExperiment} object
 #' @examples
 #' data(hpda_spe_cell_dec)
 NA

@@ -164,3 +164,32 @@ This may also be \code{NULL} if no name is specified.
 }
 }
 
+\examples{
+# Using the class example
+example(SVPExperiment, echo = FALSE)
+dim(counts(svpe))
+
+# Mocking up some GSVA Experiments
+sce1 <- SingleCellExperiment(matrix(rpois(1000, 5), ncol=ncol(se)))
+rownames(sce1) <- paste0("GO:",seq(nrow(sce1)))
+colnames(sce1) <- colnames(svpe)
+sce2 <- SingleCellExperiment(matrix(rpois(1000, 5), ncol=ncol(se)))
+rownames(sce2) <- paste0("KEGG:", seq(nrow(sce2)))
+colnames(sce2) <- colnames(svpe)
+
+# Setting the GSVA Experiments
+gsvaExp(svpe, "GO") <- sce1
+gsvaExp(svpe, "KEGG") <- sce2
+
+# Getting the GSVA Experiment data
+gsvaExp(svpe, "GO")
+gsvaExp(svpe, "KEGG")
+gsvaExp(svpe, 2)
+gsvaExpNames(svpe)
+gsvaExps(svpe)
+
+# Setting the names of GSVA Experiments
+gsvaExpNames(svpe) <- c("GO1", "KEGG1")
+svpe
+gsvaExpNames(svpe)[1] <- "Test"
+}

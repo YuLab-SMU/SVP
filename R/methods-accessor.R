@@ -7,6 +7,13 @@
 #' @aliases spatialCoords,SVPExperiment-method
 #' @return matrix or character or print the information of object.
 #' @export
+#' @examples
+#' library(SpatialExperiment) |> suppressPackageStartupMessages()
+#' library(DropletUtils) |> suppressPackageStartupMessages()
+#' example(read10xVisium, echo = FALSE)
+#' svpe <- as(spe, 'SVPExperiment')
+#' svpe
+#' spatialCoords(svpe) |> head()
 setMethod('spatialCoords', 'SVPExperiment', function(x){
     flag <- .check_element_obj(x, key = 'spatialCoords', basefun = int_colData, namefun = names)
     if (flag){

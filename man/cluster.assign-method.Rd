@@ -64,6 +64,16 @@ clusting and assign the label for each feature(especifily the gene sets).
 when use \code{runSGSA} to calculated the gene set activity of cell, if \code{assign = TRUE} we will assign the max affinity of
 gene set or pathway to the each cell. If \code{assign = FALSE}, the max affinity of gene set or pathway will be kept.
 }
+\examples{
+library(SpatialExperiment)
+# This example data was extracted from the
+# result of runSGSA with gsvaExp function.
+data(hpda_spe_cell_dec)
+assays(hpda_spe_cell_dec)
+hpda_spe_cell_dec <- hpda_spe_cell_dec |>
+   cluster.assign(assay.type = 'rwr.score')
+hpda_spe_cell_dec 
+}
 \seealso{
 to calculate the activity score of gene sets or pathway: \code{\link{runSGSA}}.
 }

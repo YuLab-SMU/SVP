@@ -65,3 +65,8 @@ a list, which contains features and named with clusters of \code{group.by}.
 \description{
 Detecting the specific cell features with nearest distance of cells in MCA space
 }
+\examples{
+example(runMCA, echo = FALSE)
+small.sce |> runDetectMarker(group.by='Cell_Cycle', ntop=20, 
+              present.prop=.9, consider.unique.in.group=TRUE)
+}

@@ -87,6 +87,8 @@
 #' @seealso [`runSGSA`] to calculate the activity score of gene sets and [`runKldSVG`] to identify the spatiall variable or specified 
 #' cell gene sets or a features.
 #' @export
+#' @examples
+#' example(runSGSA, echo = FALSE)
 setGeneric('detect.svp', 
   function(
     data, 

@@ -33,12 +33,6 @@ CalParallelBiCorTwoMatrix <- function(x, y) {
     .Call('_SVP_CalParallelBiCorTwoMatrix', PACKAGE = 'SVP', x, y)
 }
 
-#' Extract the score of gene in each gene sets
-#' @param x the score sparse matrix of gene for each gene sets.
-#' @param rnm the row names of x matrix.
-#' @param cnm the col names of x matrix.
-#' @param g a list of gene set.
-#' @return a list contained the score of gene in each gene sets
 ExtractFeatureScoreCpp <- function(x, rnm, cnm, g) {
     .Call('_SVP_ExtractFeatureScoreCpp', PACKAGE = 'SVP', x, rnm, cnm, g)
 }
@@ -47,82 +41,26 @@ CalGearyscParallel <- function(x, weight, permutation = 999L) {
     .Call('_SVP_CalGearyscParallel', PACKAGE = 'SVP', x, weight, permutation)
 }
 
-#' Find Interval Numbers or Indices in C++
-#' @param x numeric vector (orignial).
-#' @param breaks numeric vector (new).
-#' @return the vector of length \code{length(x)} with values in \code{0:N}
-#' this is like \code{findInterval()} of R base, but result of this is can be used 
-#' to the C++
 findIntervalCpp <- function(x, breaks) {
     .Call('_SVP_findIntervalCpp', PACKAGE = 'SVP', x, breaks)
 }
 
-#' Obtaion the difference between the grid points and original points
-#' @param grid the grid points in one direction
-#' @param x the original points in one direction
-#' @return a matrix of the difference between the grid points and original points
 outergrid <- function(grid, x) {
     .Call('_SVP_outergrid', PACKAGE = 'SVP', grid, x)
 }
 
-#' Compute the Kullback–Leibler Divergence by permutating a weight vector.
-#' @param w the weight vector (the expression of gene or score of pathway).
-#' @param bg the kernel density of background (the result of CalBgSpatialKld).
-#' @param axm matrix the difference between the original point and grid points in x direction.
-#' @param aym matrix the difference between the original point and grid points in y direction.
-#' @param h The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
-#' (see bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
-#' @param indx the index of original point by mapping to the grid points in x direction.
-#' @param indy the index of original point by mapping to the grid points in y direction.
-#' @param random_times the permutation numbers for each weight to test whether
-#' it is significantly, default is 200.
-#' @param seed The random seed to use to evaluate, default 123.
-#' @return a vector of Kullback–Leibler Divergence with permutation.
 CalRandSpatialKld <- function(w, bg, axm, aym, h, indx, indy, random_times = 100L, seed = 1024.0) {
     .Call('_SVP_CalRandSpatialKld', PACKAGE = 'SVP', w, bg, axm, aym, h, indx, indy, random_times, seed)
 }
 
-#' Compute Background 2D Kernel Density
-#' @param coords coordinate matrix.
-#' @param axm matrix the difference between the original point and grid points in x direction.
-#' @param aym matrix the difference between the original point and grid points in y direction.
-#' @param h The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
-#' @param indx the index of original point by mapping to the grid points in x direction.
-#' @param indy the index of original point by mapping to the grid points in y direction.
-#' (see MASS::bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
-#' @return a vector of 2D weighted kernel density value of background without spatial variability. 
 CalBgSpatialKld <- function(coords, axm, aym, h, indx, indy) {
     .Call('_SVP_CalBgSpatialKld', PACKAGE = 'SVP', coords, axm, aym, h, indx, indy)
 }
 
-#' Compute the Kullback–Leibler Divergence using 2D Kernel Density Estimation 
-#' With Weighted and Statistical Test With Permutation for single weight vector.
-#' @param d the weight vector (the expression of gene or score of pathway).
-#' @param bgkld the kernel density of background (the result of CalBgSpatialKld).
-#' @param axm matrix the difference between the original point and grid points in x direction. 
-#' @param aym matrix the difference between the original point and grid points in y direction.
-#' @param h The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
-#' (see bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
-#' @param indx the index of original point by mapping to the grid points in x direction.
-#' @param indy the index of original point by mapping to the grid points in y direction.
-#' @param random_times the permutation numbers for each weight to test whether 
-#' it is significantly, default is 200.
-#' @param seed The random seed to use to evaluate, default 123.
-#' @return a vector of input features about the statistical test value with 2D weighted kernel density 
-#'  and Kullback–Leibler Divergence.
 CalSpatialKld <- function(d, bgkld, axm, aym, h, indx, indy, random_times = 100L, seed = 1024.0) {
     .Call('_SVP_CalSpatialKld', PACKAGE = 'SVP', d, bgkld, axm, aym, h, indx, indy, random_times, seed)
 }
 
-#' Two-Dimensional Weighted Kernel Density Estimation And Mapping the Result To Original Dimension
-#' @param x The 2-D coordinate matrix
-#' @param w The weighted sparse matrix, the number columns the same than the number rows than x.
-#' @param l The limits of the rectangle covered by the grid as c(xl, xu, yl, yu)
-#' @param h The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
-#' (see bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
-#' @param adjust numeric value to adjust to bandwidth, default is 1.
-#' @param n number of grid points in the two directions, default is 400.
-#' @return a matrix of 2D Weighted Kernel Density Estimation
 CalWkdeParallel <- function(x, w, l, h, adjust = 1.0, n = 400L) {
     .Call('_SVP_CalWkdeParallel', PACKAGE = 'SVP', x, w, l, h, adjust, n)
 }
@@ -139,10 +77,6 @@ CalMoransiParallel <- function(x, weight, scaled = FALSE, permutation = 999L) {
     .Call('_SVP_CalMoransiParallel', PACKAGE = 'SVP', x, weight, scaled, permutation)
 }
 
-#' Obtain the pair distance of row between \code{A} and \code{B} matrix
-#' @param A matrix which number of column should be equal to column number of \code{B}.
-#' @param B matrix which number of column should be equal to column number of \code{A}.
-#' @return a distance matrix of row feature in \code{A} and \code{B}.
 fastPDist <- function(A, B) {
     .Call('_SVP_fastPDist', PACKAGE = 'SVP', A, B)
 }
@@ -155,16 +89,6 @@ ParallelColOrder <- function(x, top_n) {
     .Call('_SVP_ParallelColOrder', PACKAGE = 'SVP', x, top_n)
 }
 
-#' Computer the affinity score of all nodes in a graph to a seeds 
-#' using Random Walk with Restart
-#' @param x a adjacency matrix of a graph.
-#' @param v a matrix define sets of starting seeds, each column 
-#' corresponds to one set of seeds that a walker starts.
-#' @param restart the restart probability used for RWR, it must be 
-#' between 0 and 1, default is .75.
-#' @param stop_delta minimum threshold to stop RWR, default is 1e-10.
-#' @param stop_step step number to stop RWR, default is 50.
-#' @return a matrix of affinity score of all nodes in a graph
 parallelCalRWR <- function(x, v, restart = 0.75, stop_delta = 1e-10, stop_step = 50L) {
     .Call('_SVP_parallelCalRWR', PACKAGE = 'SVP', x, v, restart, stop_delta, stop_step)
 }

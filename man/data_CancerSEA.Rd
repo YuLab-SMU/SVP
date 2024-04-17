@@ -40,6 +40,9 @@ progression.}
 \source{
 \url{http://biocc.hrbmu.edu.cn/CancerSEA/goDownload}
 }
+\value{
+a list object
+}
 \description{
 CancerSEA is the first dedicated database that aims to
 comprehensively decode distinct functional states of cancer cells at
