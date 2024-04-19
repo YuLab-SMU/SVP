@@ -16,7 +16,6 @@ runKldSVG(
   sv.grid.n = 100,
   sv.permutation = 100,
   sv.p.adjust.method = "BY",
-  sv.BPPARAM = SerialParam(),
   verbose = TRUE,
   random.seed = 1024,
   gsvaexp = NULL,
@@ -31,7 +30,6 @@ runKldSVG(
   sv.grid.n = 100,
   sv.permutation = 100,
   sv.p.adjust.method = "BY",
-  sv.BPPARAM = SerialParam(),
   verbose = TRUE,
   random.seed = 1024,
   gsvaexp = NULL,
@@ -46,7 +44,6 @@ runKldSVG(
   sv.grid.n = 100,
   sv.permutation = 100,
   sv.p.adjust.method = "BY",
-  sv.BPPARAM = SerialParam(),
   verbose = TRUE,
   random.seed = 1024,
   gsvaexp = NULL,
@@ -71,11 +68,6 @@ density, default is 100.}
 signicantly spatially or single cell variable features, default is 100.}
 
 \item{sv.p.adjust.method}{character the method to adjust the pvalue of the result, default is \code{BY}.}
-
-\item{sv.BPPARAM}{A BiocParallelParam object specifying whether the identification of SV features should be parallelized
-default is \code{SerialParam()}, meaning no parallel. You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=T)}
-to parallel it, the \code{workers} of \code{MulticoreParam} is the number of cores used, see also
-\code{\link[BiocParallel]{MulticoreParam}}. default is \code{SerialParam()}.}
 
 \item{verbose}{logical whether print the intermediate message when running the program, default is TRUE.}
 

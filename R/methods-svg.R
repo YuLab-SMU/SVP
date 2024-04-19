@@ -20,10 +20,6 @@
 #' @param sv.permutation numeric the number of permutation for each single feature to detect the 
 #' signicantly spatially or single cell variable features, default is 100.
 #' @param sv.p.adjust.method character the method to adjust the pvalue of the result, default is \code{BY}.
-#' @param sv.BPPARAM A BiocParallelParam object specifying whether the identification of SV features should be parallelized
-#' default is \code{SerialParam()}, meaning no parallel. You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=T)}
-#' to parallel it, the \code{workers} of \code{MulticoreParam} is the number of cores used, see also
-#' \code{\link[BiocParallel]{MulticoreParam}}. default is \code{SerialParam()}.
 #' @param verbose logical whether print the intermediate message when running the program, default is TRUE.
 #' @param random.seed numeric random seed number to repeatability, default is 1024.
 #' @param gsvaexp which gene set variation experiment will be pulled to run, this only work when \code{data} is a
@@ -114,7 +110,7 @@ setGeneric('runKldSVG',
     sv.grid.n = 100,
     sv.permutation = 100,
     sv.p.adjust.method = "BY",
-    sv.BPPARAM = SerialParam(),
+    #sv.BPPARAM = SerialParam(),
     verbose = TRUE,
     random.seed = 1024,
     gsvaexp = NULL,
@@ -135,7 +131,7 @@ setMethod('runKldSVG', 'SingleCellExperiment',
     sv.grid.n = 100,
     sv.permutation = 100,
     sv.p.adjust.method = "BY",
-    sv.BPPARAM = SerialParam(),
+    #sv.BPPARAM = SerialParam(),
     verbose = TRUE,
     random.seed = 1024,
     gsvaexp = NULL,
@@ -173,7 +169,7 @@ setMethod('runKldSVG', 'SingleCellExperiment',
                         n = sv.grid.n,
                         permutation = sv.permutation,
                         p.adjust.method = sv.p.adjust.method,
-                        BPPARAM = sv.BPPARAM,
+                        #BPPARAM = sv.BPPARAM,
                         random.seed = random.seed,
                         ...)
 
@@ -202,7 +198,7 @@ setMethod('runKldSVG', 'SVPExperiment',
     sv.grid.n = 100,
     sv.permutation = 100,
     sv.p.adjust.method = "BY",
-    sv.BPPARAM = SerialParam(),
+    #sv.BPPARAM = SerialParam(),
     verbose = TRUE,
     random.seed = 1024,
     gsvaexp = NULL,
@@ -220,7 +216,7 @@ setMethod('runKldSVG', 'SVPExperiment',
                      sv.grid.n, 
                      sv.permutation, 
                      sv.p.adjust.method, 
-                     sv.BPPARAM, 
+                     #sv.BPPARAM, 
                      verbose, 
                      random.seed, 
                      ...)

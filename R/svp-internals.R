@@ -487,7 +487,7 @@ pairDist <- function(x, y){
                           n = 100, 
                           permutation = 100, 
                           p.adjust.method="fdr",
-                          BPPARAM = SerialParam(),
+                          #BPPARAM = SerialParam(),
                           random.seed = 123
                           ){
 
@@ -498,22 +498,23 @@ pairDist <- function(x, y){
   lims <- c(range(coords[,1]), range(coords[,2]))
   h <- c(ks::hpi(coords[,1]), ks::hpi(coords[,2]))
  
-  gx <- seq.int(lims[1], lims[2], length.out = n)
-  gy <- seq.int(lims[3], lims[4], length.out = n)
+  #gx <- seq.int(lims[1], lims[2], length.out = n)
+  #gy <- seq.int(lims[3], lims[4], length.out = n)
 
-  indx <- findIntervalCpp(coords[, 1], gx) - 1
-  indy <- findIntervalCpp(coords[, 2], gy) - 1
+  #indx <- findIntervalCpp(coords[, 1], gx) - 1
+  #indy <- findIntervalCpp(coords[, 2], gy) - 1
 
-  axm <- outergrid(gx, coords[, 1]) 
-  aym <- outergrid(gy, coords[, 2])
+  #axm <- outergrid(gx, coords[, 1]) 
+  #aym <- outergrid(gy, coords[, 2])
  
-  bgkld <- CalBgSpatialKld(coords, axm, aym, h, indx, indy)
+  #bgkld <- CalBgSpatialKld(coords, axm, aym, h, indx, indy)
 
-  res <- bplapply(seq(nrow(x)), function(i){
-            withr::with_seed(random.seed, CalSpatialKld(x[i, ], bgkld, axm, aym, h, indx, indy, permutation, random.seed))
-         }, BPPARAM = BPPARAM)
+  #res <- bplapply(seq(nrow(x)), function(i){
+  #          withr::with_seed(random.seed, CalSpatialKld(x[i, ], bgkld, axm, aym, h, indx, indy, permutation, random.seed))
+  #       }, BPPARAM = BPPARAM)
 
-  res <- do.call('rbind', res)
+  #res <- do.call('rbind', res)
+  res <- withr::with_seed(random.seed, CalSpatialKldCpp(coords, x, lims, h, n, permutation))
 
   rownames(res) <- rownames(x)
   colnames(res) <- c("sp.kld", "boot.sp.kld.mean", "boot.sp.kld.sd", "pvalue")

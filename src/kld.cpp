@@ -1,5 +1,7 @@
+#define ARMA_USE_CXX11_RNG
 #include <RcppArmadillo.h>
 #include <RcppParallel.h>
+#include <omp.h>
 using namespace RcppParallel;
 using namespace arma;
 using namespace Rcpp;
@@ -232,6 +234,41 @@ arma::rowvec CalSpatialKld(
     return(res);
 }
 
+struct SpatialKldCalWorker : public Worker{
+  const arma::mat& w;
+  const arma::vec& bgkld;
+  const arma::mat& axm;
+  const arma::mat& aym;
+  const arma::vec& H;
+  const arma::uvec& indx;
+  const arma::uvec& indy;
+  const int& random_times = 100;
+  const double& seed = 1024.0;
+  //arma::vec& bootkld;
+  mat& result;
+
+  SpatialKldCalWorker(const arma::mat& w, const arma::vec& bgkld,
+      const arma::mat& axm, const arma::mat& aym, const arma::vec& H, const arma::uvec& indx,
+         const arma::uvec& indy, const int& random_times, const double& seed,
+         //arma::vec& bootkld,
+         mat& result)
+  : w(w), bgkld(bgkld), axm(axm), aym(aym), H(H), indx(indx), indy(indy), random_times(random_times),
+    seed(seed), //bootkld(bootkld),
+    result(result) { }
+
+  void operator()(std::size_t begin, std::size_t end){
+    for (uword i = begin; i < end; i++){
+        arma::vec z = Kde2dWeightedCpp(w.row(i), axm, aym, H, indx, indy);
+        double kld = log(sum(z % log(z / bgkld)));
+
+        arma::vec bootkld = CalRandSpatialKld(w.row(i), bgkld, axm, aym, H, indx, indy, random_times, seed);
+
+        result.row(i) = CalKldPvalue(bootkld, kld);
+    }
+  }
+};
+
+
 // Two-Dimensional Weighted Kernel Density Estimation And Mapping the Result To Original Dimension
 // param x The 2-D coordinate matrix
 // param w The weighted sparse matrix, the number columns the same than the number rows than x.
@@ -278,52 +315,56 @@ arma::sp_mat CalWkdeParallel(arma::mat& x, arma::sp_mat& w, arma::vec& l, Nullab
 }
 
 
-//// Compute the Kullback–Leibler Divergence using 2D Kernel Density Estimation 
-//// With Weighted And Statistical Test With Permutation.
-//// param coords coordinate matrix.
-//// param d matrix (the expression of gene or score of pathway).
-//// param l The limits of the rectangle covered by the grid as c(xl, xu, yl, yu).
-//// param h The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
-//// (see bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
-//// param n the Number of grid points in each direction, default is 100.
-//// param random_times the permutation numbers for each weight to test whether
-//// it is significantly, default is 100.
-//// param seed The random seed to use to evaluate, default 123.
-//// [[Rcpp::export]]
-//arma::mat CalSpatialKldCpp(arma::mat coords, arma::sp_mat d, arma::vec l, Nullable<NumericVector> h,
-//        int n = 100, int random_times = 100, double seed = 1024.0){
-//
-//    arma::mat w = conv_to<arma::mat>::from(d);
-//
-//    arma::mat gx = arma::linspace(l[0], l[1], n);
-//    arma::mat gy = arma::linspace(l[2], l[3], n);
-//
-//    arma::vec H(coords.n_cols);
-//    if (h.isNull()){
-//      for (uword j=0; j < coords.n_cols;j ++){
-//         H[j] = BandwidthNrdCpp(coords.col(j)) / 4;
-//      }
-//    }else{
-//      H = as<arma::vec>(h);
-//    }
-//
-//    uword num = w.n_rows;
-//
-//    arma::mat result(num, 4);
-//
-//    //mapping to original coords
-//    arma::uvec indx = findIntervalCpp(coords.col(0), gx);
-//    arma::uvec indy = findIntervalCpp(coords.col(1), gy);
-//
-//    arma::mat axm = outergrid(gx, coords.col(0));
-//    arma::mat aym = outergrid(gy, coords.col(1));
-//
-//    arma::vec bgkld = CalBgSpatialKld(coords, axm, aym, H, indx, indy);
-//
-//    for (uword i = 0; i < num; i++){
-//       result.row(i) = CalSpatialKld(w.row(i), bgkld, axm, aym, H, indx, indy, random_times, seed);
-//    }
-//
-//    return (result);
-//}
+// Compute the Kullback–Leibler Divergence using 2D Kernel Density Estimation 
+// With Weighted And Statistical Test With Permutation.
+// param coords coordinate matrix.
+// param d matrix (the expression of gene or score of pathway).
+// param l The limits of the rectangle covered by the grid as c(xl, xu, yl, yu).
+// param h The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
+// (see bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
+// param n the Number of grid points in each direction, default is 100.
+// param random_times the permutation numbers for each weight to test whether
+// it is significantly, default is 100.
+// param seed The random seed to use to evaluate, default 123.
+// [[Rcpp::export]]
+arma::mat CalSpatialKldCpp(arma::mat coords, arma::sp_mat d, arma::vec l, Nullable<NumericVector> h,
+        int n = 100, int random_times = 100, double seed = 1024.0){
+
+    arma::mat w = conv_to<arma::mat>::from(d);
+
+    arma::mat gx = arma::linspace(l[0], l[1], n);
+    arma::mat gy = arma::linspace(l[2], l[3], n);
+
+    arma::vec H(coords.n_cols);
+    if (h.isNull()){
+      for (uword j=0; j < coords.n_cols;j ++){
+         H[j] = BandwidthNrdCpp(coords.col(j)) / 4;
+      }
+    }else{
+      H = as<arma::vec>(h);
+    }
+
+    uword num = w.n_rows;
+
+    arma::mat result(num, 4);
+
+    //mapping to original coords
+    arma::uvec indx = findIntervalCpp(coords.col(0), gx) - 1;
+    arma::uvec indy = findIntervalCpp(coords.col(1), gy) - 1;
+
+    arma::mat axm = outergrid(gx, coords.col(0));
+    arma::mat aym = outergrid(gy, coords.col(1));
+
+    arma::vec bgkld = CalBgSpatialKld(coords, axm, aym, H, indx, indy);
+
+    //SpatialKldCalWorker spatialKldCalWorker(w, bgkld, axm, aym, H, indx, indy, random_times, seed, result);
+    //parallelFor(0, num, spatialKldCalWorker);
+    
+    #pragma omp parallel for schedule(static)
+    for (uword i = 0; i < num; i++){
+        result.row(i) = CalSpatialKld(w.row(i), bgkld, axm, aym, H, indx, indy, random_times, seed);
+    }
+
+    return (result);
+}
 

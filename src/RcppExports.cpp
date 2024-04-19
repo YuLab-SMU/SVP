@@ -227,6 +227,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// CalSpatialKldCpp
+arma::mat CalSpatialKldCpp(arma::mat coords, arma::sp_mat d, arma::vec l, Nullable<NumericVector> h, int n, int random_times, double seed);
+RcppExport SEXP _SVP_CalSpatialKldCpp(SEXP coordsSEXP, SEXP dSEXP, SEXP lSEXP, SEXP hSEXP, SEXP nSEXP, SEXP random_timesSEXP, SEXP seedSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type coords(coordsSEXP);
+    Rcpp::traits::input_parameter< arma::sp_mat >::type d(dSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type l(lSEXP);
+    Rcpp::traits::input_parameter< Nullable<NumericVector> >::type h(hSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< int >::type random_times(random_timesSEXP);
+    Rcpp::traits::input_parameter< double >::type seed(seedSEXP);
+    rcpp_result_gen = Rcpp::wrap(CalSpatialKldCpp(coords, d, l, h, n, random_times, seed));
+    return rcpp_result_gen;
+END_RCPP
+}
 // MCAStep1
 List MCAStep1(const arma::sp_mat& X);
 RcppExport SEXP _SVP_MCAStep1(SEXP XSEXP) {
@@ -336,6 +353,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_SVP_CalBgSpatialKld", (DL_FUNC) &_SVP_CalBgSpatialKld, 6},
     {"_SVP_CalSpatialKld", (DL_FUNC) &_SVP_CalSpatialKld, 9},
     {"_SVP_CalWkdeParallel", (DL_FUNC) &_SVP_CalWkdeParallel, 6},
+    {"_SVP_CalSpatialKldCpp", (DL_FUNC) &_SVP_CalSpatialKldCpp, 7},
     {"_SVP_MCAStep1", (DL_FUNC) &_SVP_MCAStep1, 1},
     {"_SVP_MCAStep2", (DL_FUNC) &_SVP_MCAStep2, 3},
     {"_SVP_CalMoransiParallel", (DL_FUNC) &_SVP_CalMoransiParallel, 4},

@@ -65,6 +65,10 @@ CalWkdeParallel <- function(x, w, l, h, adjust = 1.0, n = 400L) {
     .Call('_SVP_CalWkdeParallel', PACKAGE = 'SVP', x, w, l, h, adjust, n)
 }
 
+CalSpatialKldCpp <- function(coords, d, l, h, n = 100L, random_times = 100L, seed = 1024.0) {
+    .Call('_SVP_CalSpatialKldCpp', PACKAGE = 'SVP', coords, d, l, h, n, random_times, seed)
+}
+
 MCAStep1 <- function(X) {
     .Call('_SVP_MCAStep1', PACKAGE = 'SVP', X)
 }
