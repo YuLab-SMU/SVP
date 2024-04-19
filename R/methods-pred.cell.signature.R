@@ -106,7 +106,7 @@ setMethod(
 #' @param data A \linkS4class{SVPExperiment}, which has run \code{runSGSA} or \code{detect.svp}, or
 #' a \linkS4class{SingleCellExperiment} which was extracted from \linkS4class{SVPExperiment} using
 #' \code{gsvaExp} function.
-#' @param assay.type which expressed data to be pulled to run, default is \code{affi.score}.
+#' @param assay.type which expressed data to be pulled to run, default is \code{rwr.score}.
 #' @param gsvaexp which gene set variation experiment will be pulled to run, this only work when \code{data} is a
 #' \linkS4class{SVPExperiment}, default is NULL.
 #' @param gsvaexp.assay.type which assay data in the specified \code{gsvaexp} will be used to run, default is NULL.
@@ -214,7 +214,7 @@ setMethod(
     'SingleCellExperiment',
     function(
         data,
-        assay.type = 'affi.score',
+        assay.type = 'rwr.score',
         gsvaexp = NULL,
         gsvaexp.assay.type = NULL,
         mod0 = 2,
@@ -255,7 +255,7 @@ setMethod(
     'SVPExperiment',
     function(
         data,
-        assay.type = 'affi.score',
+        assay.type = 'rwr.score',
         gsvaexp = NULL,
         gsvaexp.assay.type = NULL,
         mod0 = 2,
@@ -307,14 +307,26 @@ setMethod(
                         display = FALSE,
                         ...))
 
-    nm <- length(res$location) 
-    if (nm %% 2 != 0){
-        nm <- nm - 1 
+    nmod <- res$cbw$nmodes
+
+    nm <- length(res$location)
+
+    index <- seq(1, nm, by = 2)
+    if (nmod > 1){
+        index <- seq(2, nm, by = 2)
     }
+    
+    #if (nm %% 2 != 0){
+    #    nm <- nm - 1 
+    #}
      
-    index <- (seq(nm) %% 2) == 0
+    #index <- (seq(nm) %% 2) == 0
     
     mode.values <- res$location[index]
+    mode.values <- mode.values[!is.na(mode.values)]
+    if (length(mode.values)==0){
+        res <- rep(0, length(x))
+    }
     res <- findIntervalCpp(x, mode.values) |> as.vector()
     return(res)
 

@@ -24,7 +24,7 @@ pred.feature.mode(
 
 \S4method{pred.feature.mode}{SingleCellExperiment}(
   data,
-  assay.type = "affi.score",
+  assay.type = "rwr.score",
   gsvaexp = NULL,
   gsvaexp.assay.type = NULL,
   mod0 = 2,
@@ -37,7 +37,7 @@ pred.feature.mode(
 
 \S4method{pred.feature.mode}{SVPExperiment}(
   data,
-  assay.type = "affi.score",
+  assay.type = "rwr.score",
   gsvaexp = NULL,
   gsvaexp.assay.type = NULL,
   mod0 = 2,
@@ -53,7 +53,7 @@ pred.feature.mode(
 a \linkS4class{SingleCellExperiment} which was extracted from \linkS4class{SVPExperiment} using
 \code{gsvaExp} function.}
 
-\item{assay.type}{which expressed data to be pulled to run, default is \code{affi.score}.}
+\item{assay.type}{which expressed data to be pulled to run, default is \code{rwr.score}.}
 
 \item{gsvaexp}{which gene set variation experiment will be pulled to run, this only work when \code{data} is a
 \linkS4class{SVPExperiment}, default is NULL.}

@@ -16,7 +16,7 @@ Description: SVP uses the distance between cells and cells, features and feature
   variable features efficiently based on Rcpp and RcppParallel. SVP is developed based on SingleCellExperiment 
   class, which can be interoperable with the existing computing ecosystem.
 Depends:
-  R (>= 2.10)
+  R (>= 4.3.0)
 Imports:
   Rcpp,
   RcppParallel,
@@ -67,4 +67,3 @@ LinkingTo:
   RcppParallel,
   RcppEigen
 Config/testthat/edition: 3
-LazyData: true

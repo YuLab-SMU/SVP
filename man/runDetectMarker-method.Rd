@@ -68,5 +68,5 @@ Detecting the specific cell features with nearest distance of cells in MCA space
 \examples{
 example(runMCA, echo = FALSE)
 small.sce |> runDetectMarker(group.by='Cell_Cycle', ntop=20, 
-              present.prop=.9, consider.unique.in.group=TRUE)
+              present.prop=.9, consider.unique.in.group=FALSE)
 }

@@ -21,7 +21,7 @@
 #' @examples
 #' example(runMCA, echo = FALSE)
 #' small.sce |> runDetectMarker(group.by='Cell_Cycle', ntop=20, 
-#'               present.prop=.9, consider.unique.in.group=TRUE)
+#'               present.prop=.9, consider.unique.in.group=FALSE)
 setGeneric('runDetectMarker',
   function(
     data,
@@ -60,7 +60,13 @@ setMethod(
   
     type <- match.arg(type)
     rd <- reducedDim(data, reduction)
-    rd.f.nm <- switch(reduction, MCA='genesCoordinates', PCA='rotation')
+    if (grepl("MCA", reduction, ignore.case=TRUE)){
+        rd.f.nm <- "genesCoordinates"
+    }
+    if (grepl("PCA", reduction, ignore.case=TRUE)){
+        rd.f.nm <- "rotation"
+    }
+
     f.rd <- attr(rd, rd.f.nm)
     if(length(dims)==1){
         dims <- seq(min(ncol(rd), dims))
