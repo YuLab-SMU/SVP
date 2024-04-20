@@ -18,6 +18,7 @@ runDetectSVG(
   sv.grid.n = 100,
   sv.permutation = NULL,
   sv.p.adjust.method = "BH",
+  random.seed = 1024,
   verbose = TRUE,
   gsvaexp = NULL,
   gsvaexp.assay.type = NULL,
@@ -33,6 +34,7 @@ runDetectSVG(
   sv.grid.n = 100,
   sv.permutation = NULL,
   sv.p.adjust.method = "BH",
+  random.seed = 1024,
   verbose = TRUE,
   gsvaexp = NULL,
   gsvaexp.assay.type = NULL,
@@ -48,6 +50,7 @@ runDetectSVG(
   sv.grid.n = 100,
   sv.permutation = NULL,
   sv.p.adjust.method = "BH",
+  random.seed = 1024,
   verbose = TRUE,
   gsvaexp = NULL,
   gsvaexp.assay.type = NULL,
@@ -76,6 +79,8 @@ density, default is 100.}
 is NULL.}
 
 \item{sv.p.adjust.method}{character the method to adjust the pvalue of the result, default is \code{BY}.}
+
+\item{random.seed}{numeric random seed number to repeatability, default is 1024.}
 
 \item{verbose}{logical whether print the intermediate message when running the program, default is TRUE.}
 

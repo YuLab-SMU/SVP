@@ -254,6 +254,7 @@ setMethod('runKldSVG', 'SVPExperiment',
 #' @param sv.permutation integer the number to permutation test for the calculation of Moran's I, default
 #' is NULL.
 #' @param sv.p.adjust.method character the method to adjust the pvalue of the result, default is \code{BY}.
+#' @param random.seed numeric random seed number to repeatability, default is 1024.
 #' @param verbose logical whether print the intermediate message when running the program, default is TRUE.
 #' @param gsvaexp which gene set variation experiment will be pulled to run, this only work when \code{data} is a
 #' \linkS4class{SVPExperiment}, default is NULL.
@@ -299,6 +300,7 @@ setGeneric("runDetectSVG", function(
     sv.grid.n = 100,
     sv.permutation = NULL,
     sv.p.adjust.method = "BH",
+    random.seed = 1024,
     verbose = TRUE,
     gsvaexp = NULL,
     gsvaexp.assay.type = NULL,
@@ -320,6 +322,7 @@ setMethod('runDetectSVG', 'SingleCellExperiment',
     sv.grid.n = 100,
     sv.permutation = NULL,
     sv.p.adjust.method = "BH",
+    random.seed = 1024,
     verbose = TRUE,
     gsvaexp = NULL,
     gsvaexp.assay.type = NULL,
@@ -374,6 +377,7 @@ setMethod('runDetectSVG', 'SingleCellExperiment',
                         method = method,
                         permutation = sv.permutation,
                         p.adjust.method = sv.p.adjust.method,
+                        random.seed = random.seed,
                         ...)
 
       data <- .add.int.rowdata(sce = data,
@@ -403,6 +407,7 @@ setMethod('runDetectSVG', 'SVPExperiment',
     sv.grid.n = 100,
     sv.permutation = NULL,
     sv.p.adjust.method = "BH",
+    random.seed = 1024,
     verbose = TRUE,
     gsvaexp = NULL,
     gsvaexp.assay.type = NULL,
@@ -421,6 +426,7 @@ setMethod('runDetectSVG', 'SVPExperiment',
                      sv.grid.n,
                      sv.permutation,
                      sv.p.adjust.method,
+                     random.seed,
                      verbose,
                      ...)
        gsvaExp(data, gsvaexp) <- da2

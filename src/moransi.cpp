@@ -1,5 +1,9 @@
 #include <RcppParallel.h>
 #include <RcppArmadillo.h>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+#include "buildrand.h"
 using namespace RcppParallel;
 using namespace Rcpp;
 using namespace arma;
@@ -62,15 +66,18 @@ arma::rowvec cal_moransi_p_perm(
         arma::rowvec x,
         arma::mat weight,
         arma::rowvec rowsumw,
+        arma::umat rmat,
         double s,
         int n,
-        bool scaled = false,
-        int permutation = 999
+        bool scaled = false
         ){
+    int permutation = rmat.n_rows;
     double obs = cal_moransi(x, weight, rowsumw, s, n, scaled);
     arma::vec xmr = arma::vec(permutation, arma::fill::zeros);
     for (int i = 0; i < permutation; i++){
-        xmr(i) = cal_moransi(arma::shuffle(x), weight, rowsumw, s, n, scaled);
+        arma::vec z = x(rmat.row(i));
+        arma::rowvec zz = arma::conv_to<rowvec>::from(z);
+        xmr(i) = cal_moransi(zz, weight, rowsumw, s, n, scaled);
     }
     
     double expv = mean(xmr);
@@ -87,15 +94,16 @@ arma::rowvec moransi(
         arma::rowvec x, 
         arma::mat weight,
         arma::rowvec rowsumw,
+        arma::umat rmat,
         double S1,
         double S2, 
         double s,
         int n,
         double ei,
-        bool scaled = false,
-        int permutation = 999
+        bool scaled = false
         ){
-  
+
+  int permutation = rmat.n_rows;  
   double m = mean(x);
   arma::rowvec y = x - m;
   arma::mat ym = outerdot(y);
@@ -112,7 +120,7 @@ arma::rowvec moransi(
   if (permutation <= 10){
       res = cal_moransi_p_noperm(obs, ei, s, y, v, n, S1, S2);
   }else{
-      res = cal_moransi_p_perm(x, weight, rowsumw, s, n, scaled, permutation);
+      res = cal_moransi_p_perm(x, weight, rowsumw, rmat, s, n, scaled);
   }
   return(res);
 }
@@ -122,24 +130,24 @@ struct RunMoransi : public Worker{
   const arma::mat& x;
   const arma::mat& weight;
   const arma::rowvec& rowsumw;
+  const arma::umat& rmat;
   const double S1;
   const double S2;
   const double s;
   const int n;
   const double ei;
   const bool scaled;
-  const int permutation;
   arma::mat& result;
 
-  RunMoransi(const arma::mat& x, const arma::mat& weight, const arma::rowvec& rowsumw,
-          const double S1, const double S2, const double s, const int n, const double ei,
-          const bool scaled, const int permutation, mat& result):
-      x(x), weight(weight), rowsumw(rowsumw), S1(S1), S2(S2), s(s), n(n), ei(ei), 
-      scaled(scaled), permutation(permutation), result(result) { }
+  RunMoransi(const arma::mat& x, const arma::mat& weight, const arma::rowvec& rowsumw, 
+          const arma::umat& rmat, const double S1, const double S2, const double s, 
+          const int n, const double ei, const bool scaled, mat& result):
+      x(x), weight(weight), rowsumw(rowsumw), rmat(rmat), S1(S1), S2(S2), s(s), n(n), ei(ei), 
+      scaled(scaled), result(result) { }
 
   void operator()(std::size_t begin, std::size_t end){
     for (uword i = begin; i < end; i++){
-        result.row(i) = moransi(x.row(i), weight, rowsumw, S1, S2, s, n, ei, scaled, permutation);
+        result.row(i) = moransi(x.row(i), weight, rowsumw, rmat, S1, S2, s, n, ei, scaled);
     }
   }
 };
@@ -164,10 +172,20 @@ arma::mat CalMoransiParallel(arma::sp_mat& x, arma::mat& weight, bool scaled = f
   double S2 = accu(pow(rowsumw2 + colsumw, 2));
   double s = accu(weight);
 
+  arma::umat rmat = generate_random_permuation(m, permutation);
   arma::mat result(n, 4);
-  RunMoransi runmoransi(xm, weight, rowsumw2, S1, S2, s, m, ei, scaled, permutation, result);
 
-  parallelFor(0, n, runmoransi);
+  //RunMoransi runmoransi(xm, weight, rowsumw2, rmat, S1, S2, s, m, ei, scaled, result);
+
+  //parallelFor(0, n, runmoransi);
+  
+
+  #ifdef _OPENMP
+  #pragma omp parallel for schedule(static)
+  #endif  
+  for (uword i = 0; i < n; i++){
+      result.row(i) = moransi(xm.row(i), weight, rowsumw2, rmat, S1, S2, s, m, ei, scaled);
+  }
 
   return(result);
 

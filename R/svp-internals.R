@@ -446,19 +446,22 @@ pairDist <- function(x, y){
   scaled = FALSE,
   alternative = 'two.sided',
   p.adjust.method = 'BH',
+  random.seed = 1024,
   ...
   ){
-  
+
+  rlang::check_installed("withr", "is required to reproducible in the identification of SVG or SVP.")  
+
   coords <- .normalize.coords(coords)
   coords.dist <- pairDist(coords, coords)
   
   if (method == 'moransi'){
       if (is.null(permutation)){permutation <- 1}
-      res <- CalMoransiParallel(x, coords.dist, scaled, permutation)
+      res <- withr::with_seed(random.seed, CalMoransiParallel(x, coords.dist, scaled, permutation))
       colnames(res) <- c('obs', 'expect.moransi', 'sd.moransi', 'pvalue')
   }else if (method == 'gearysc'){
       if (is.null(permutation)){permutation <- 100}
-      res <- CalGearyscParallel(x, coords.dist, permutation)
+      res <- withr::with_seed(random.seed, CalGearyscParallel(x, coords.dist, permutation))
       colnames(res) <- c('obs', 'expect.gearysc', 'sd.gearysc', 'pvalue')
   }
 
@@ -487,7 +490,6 @@ pairDist <- function(x, y){
                           n = 100, 
                           permutation = 100, 
                           p.adjust.method="fdr",
-                          #BPPARAM = SerialParam(),
                           random.seed = 123
                           ){
 

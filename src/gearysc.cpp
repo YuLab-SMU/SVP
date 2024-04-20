@@ -1,5 +1,10 @@
 #include <RcppParallel.h>
 #include <RcppArmadillo.h>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+#include "buildrand.h"
+
 using namespace RcppParallel;
 using namespace Rcpp;
 using namespace arma;
@@ -32,14 +37,17 @@ double cal_gearysc(
 arma::rowvec cal_gearysc_p_perm(
         arma::rowvec x,
         arma::mat weight,
+        arma::umat rmat,
         double s,
-        int n,
-        int permutation = 999
+        int n
         ){
+    int permutation = rmat.n_rows;
     double obs = cal_gearysc(x, weight, s, n);
     arma::vec xmr = arma::vec(permutation, arma::fill::zeros);
     for (int i = 0; i < permutation; i++){
-        xmr(i) = cal_gearysc(arma::shuffle(x), weight, s, n);
+        arma::vec z = x(rmat.row(i));
+        arma::rowvec zz = arma::conv_to<rowvec>::from(z);
+        xmr(i) = cal_gearysc(zz, weight, s, n);
     }
     
     double expv = mean(xmr);
@@ -55,18 +63,18 @@ arma::rowvec cal_gearysc_p_perm(
 struct RunGearysc : public Worker{
   const arma::mat& x;
   const arma::mat& weight;
+  const arma::umat& rmat;
   const double s;
   const int n;
-  const int permutation;
   arma::mat& result;
 
-  RunGearysc(const arma::mat& x, const arma::mat& weight, const double s, const int n,
-             const int permutation, mat& result):
-      x(x), weight(weight), s(s), n(n), permutation(permutation), result(result) { }
+  RunGearysc(const arma::mat& x, const arma::mat& weight, const arma::umat& rmat, 
+             const double s, const int n, mat& result):
+      x(x), weight(weight), rmat(rmat), s(s), n(n), result(result) { }
 
   void operator()(std::size_t begin, std::size_t end){
     for (uword i = begin; i < end; i++){
-        result.row(i) = cal_gearysc_p_perm(x.row(i), weight, s, n, permutation);
+        result.row(i) = cal_gearysc_p_perm(x.row(i), weight, rmat, s, n);
     }
   }
 };
@@ -85,10 +93,18 @@ arma::mat CalGearyscParallel(arma::sp_mat& x, arma::mat& weight, int permutation
 
   double s = accu(weight);
 
-  arma::mat result(n, 4);
-  RunGearysc rungearysc(xm, weight, s, m, permutation, result);
+  arma::umat rmat = generate_random_permuation(m, permutation);
 
-  parallelFor(0, n, rungearysc);
+  arma::mat result(n, 4);
+  //RunGearysc rungearysc(xm, weight, rmat, s, m, result);
+  //parallelFor(0, n, rungearysc);
+
+  #ifdef _OPENMP
+  #pragma omp parallel for schedule(static)
+  #endif
+  for (unsigned int i = 0; i < n; i++){
+      result.row(i) = cal_gearysc_p_perm(xm.row(i), weight, rmat, s, m);
+  }
 
   return(result);
 

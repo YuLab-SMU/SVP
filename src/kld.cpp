@@ -1,7 +1,9 @@
-#define ARMA_USE_CXX11_RNG
 #include <RcppArmadillo.h>
 #include <RcppParallel.h>
+#ifdef _OPENMP
 #include <omp.h>
+#endif
+#include "buildrand.h"
 using namespace RcppParallel;
 using namespace arma;
 using namespace Rcpp;
@@ -130,7 +132,6 @@ arma::mat outergrid(arma::vec grid, arma::vec x){
 // param indy the index of original point by mapping to the grid points in y direction.
 // param random_times the permutation numbers for each weight to test whether
 // it is significantly, default is 200.
-// param seed The random seed to use to evaluate, default 123.
 // return a vector of Kullback–Leibler Divergence with permutation.
 //[[Rcpp::export]]
 arma::vec CalRandSpatialKld(
@@ -141,17 +142,15 @@ arma::vec CalRandSpatialKld(
     arma::vec h,
     arma::uvec indx,
     arma::uvec indy,
-    int random_times = 100,
-    double seed = 1024.0
+    arma::umat rmat
     ){
+    int nr = rmat.n_rows;
+    arma::vec bootkld(nr);
 
-    //arma_rng::set_seed(seed);
-
-    arma::vec bootkld(random_times);
-
-    for (int j = 0; j < random_times; j++){
-        arma::rowvec s = shuffle(w);
-        arma::vec z = Kde2dWeightedCpp(s, axm, aym, h, indx, indy);
+    for (int j = 0; j < nr; j++){
+        arma::vec s = w(rmat.row(j));
+        arma::rowvec ss = arma::conv_to<rowvec>::from(s);
+        arma::vec z = Kde2dWeightedCpp(ss, axm, aym, h, indx, indy);
         z = z + 1e-300;
         bootkld[j] = log(sum(z % log(z / bg)));
     }
@@ -166,7 +165,6 @@ arma::rowvec CalKldPvalue(arma::vec boot, double x){
 
     return (res);
 }
-
 
 // Compute Background 2D Kernel Density
 // param coords coordinate matrix.
@@ -205,7 +203,6 @@ arma::vec CalBgSpatialKld(
 // param indy the index of original point by mapping to the grid points in y direction.
 // param random_times the permutation numbers for each weight to test whether 
 // it is significantly, default is 200.
-// param seed The random seed to use to evaluate, default 123.
 // return a vector of input features about the statistical test value with 2D weighted kernel density 
 //  and Kullback–Leibler Divergence.
 // [[Rcpp::export]]
@@ -217,17 +214,16 @@ arma::rowvec CalSpatialKld(
                         arma::vec h,
                         arma::uvec indx,
                         arma::uvec indy,
-                        int random_times = 100,
-                        double seed = 1024.0
+                        arma::umat rmat
                       ){
 
     arma::vec z = Kde2dWeightedCpp(d, axm, aym, h, indx, indy);
     z = z + 1e-300;
     double kld = log(sum(z % log(z / bgkld)));
 
-    arma::vec bootkld(random_times);
+    arma::vec bootkld(rmat.n_rows);
 
-    bootkld = CalRandSpatialKld(d, bgkld, axm, aym, h, indx, indy, random_times, seed);
+    bootkld = CalRandSpatialKld(d, bgkld, axm, aym, h, indx, indy, rmat);
 
     arma::rowvec res = CalKldPvalue(bootkld, kld);
 
@@ -242,18 +238,13 @@ struct SpatialKldCalWorker : public Worker{
   const arma::vec& H;
   const arma::uvec& indx;
   const arma::uvec& indy;
-  const int& random_times = 100;
-  const double& seed = 1024.0;
-  //arma::vec& bootkld;
+  const arma::umat& rmat;
   mat& result;
 
   SpatialKldCalWorker(const arma::mat& w, const arma::vec& bgkld,
       const arma::mat& axm, const arma::mat& aym, const arma::vec& H, const arma::uvec& indx,
-         const arma::uvec& indy, const int& random_times, const double& seed,
-         //arma::vec& bootkld,
-         mat& result)
-  : w(w), bgkld(bgkld), axm(axm), aym(aym), H(H), indx(indx), indy(indy), random_times(random_times),
-    seed(seed), //bootkld(bootkld),
+         const arma::uvec& indy, const arma::umat& rmat, mat& result)
+  : w(w), bgkld(bgkld), axm(axm), aym(aym), H(H), indx(indx), indy(indy), rmat(rmat),
     result(result) { }
 
   void operator()(std::size_t begin, std::size_t end){
@@ -261,7 +252,7 @@ struct SpatialKldCalWorker : public Worker{
         arma::vec z = Kde2dWeightedCpp(w.row(i), axm, aym, H, indx, indy);
         double kld = log(sum(z % log(z / bgkld)));
 
-        arma::vec bootkld = CalRandSpatialKld(w.row(i), bgkld, axm, aym, H, indx, indy, random_times, seed);
+        arma::vec bootkld = CalRandSpatialKld(w.row(i), bgkld, axm, aym, H, indx, indy, rmat);
 
         result.row(i) = CalKldPvalue(bootkld, kld);
     }
@@ -325,10 +316,9 @@ arma::sp_mat CalWkdeParallel(arma::mat& x, arma::sp_mat& w, arma::vec& l, Nullab
 // param n the Number of grid points in each direction, default is 100.
 // param random_times the permutation numbers for each weight to test whether
 // it is significantly, default is 100.
-// param seed The random seed to use to evaluate, default 123.
 // [[Rcpp::export]]
 arma::mat CalSpatialKldCpp(arma::mat coords, arma::sp_mat d, arma::vec l, Nullable<NumericVector> h,
-        int n = 100, int random_times = 100, double seed = 1024.0){
+        int n = 100, int random_times = 100){
 
     arma::mat w = conv_to<arma::mat>::from(d);
 
@@ -357,12 +347,17 @@ arma::mat CalSpatialKldCpp(arma::mat coords, arma::sp_mat d, arma::vec l, Nullab
 
     arma::vec bgkld = CalBgSpatialKld(coords, axm, aym, H, indx, indy);
 
-    //SpatialKldCalWorker spatialKldCalWorker(w, bgkld, axm, aym, H, indx, indy, random_times, seed, result);
+    arma::umat rmat = generate_random_permuation(w.n_cols, random_times);
+
+    //SpatialKldCalWorker spatialKldCalWorker(w, bgkld, axm, aym, H, indx, indy, rmat, result);
     //parallelFor(0, num, spatialKldCalWorker);
-    
+
+
+    #ifdef _OPENMP
     #pragma omp parallel for schedule(static)
+    #endif
     for (uword i = 0; i < num; i++){
-        result.row(i) = CalSpatialKld(w.row(i), bgkld, axm, aym, H, indx, indy, random_times, seed);
+        result.row(i) = CalSpatialKld(w.row(i), bgkld, axm, aym, H, indx, indy, rmat);
     }
 
     return (result);

@@ -49,24 +49,24 @@ outergrid <- function(grid, x) {
     .Call('_SVP_outergrid', PACKAGE = 'SVP', grid, x)
 }
 
-CalRandSpatialKld <- function(w, bg, axm, aym, h, indx, indy, random_times = 100L, seed = 1024.0) {
-    .Call('_SVP_CalRandSpatialKld', PACKAGE = 'SVP', w, bg, axm, aym, h, indx, indy, random_times, seed)
+CalRandSpatialKld <- function(w, bg, axm, aym, h, indx, indy, rmat) {
+    .Call('_SVP_CalRandSpatialKld', PACKAGE = 'SVP', w, bg, axm, aym, h, indx, indy, rmat)
 }
 
 CalBgSpatialKld <- function(coords, axm, aym, h, indx, indy) {
     .Call('_SVP_CalBgSpatialKld', PACKAGE = 'SVP', coords, axm, aym, h, indx, indy)
 }
 
-CalSpatialKld <- function(d, bgkld, axm, aym, h, indx, indy, random_times = 100L, seed = 1024.0) {
-    .Call('_SVP_CalSpatialKld', PACKAGE = 'SVP', d, bgkld, axm, aym, h, indx, indy, random_times, seed)
+CalSpatialKld <- function(d, bgkld, axm, aym, h, indx, indy, rmat) {
+    .Call('_SVP_CalSpatialKld', PACKAGE = 'SVP', d, bgkld, axm, aym, h, indx, indy, rmat)
 }
 
 CalWkdeParallel <- function(x, w, l, h, adjust = 1.0, n = 400L) {
     .Call('_SVP_CalWkdeParallel', PACKAGE = 'SVP', x, w, l, h, adjust, n)
 }
 
-CalSpatialKldCpp <- function(coords, d, l, h, n = 100L, random_times = 100L, seed = 1024.0) {
-    .Call('_SVP_CalSpatialKldCpp', PACKAGE = 'SVP', coords, d, l, h, n, random_times, seed)
+CalSpatialKldCpp <- function(coords, d, l, h, n = 100L, random_times = 100L) {
+    .Call('_SVP_CalSpatialKldCpp', PACKAGE = 'SVP', coords, d, l, h, n, random_times)
 }
 
 MCAStep1 <- function(X) {
