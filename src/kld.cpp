@@ -1,8 +1,8 @@
 #include <RcppArmadillo.h>
 #include <RcppParallel.h>
-#ifdef _OPENMP
-#include <omp.h>
-#endif
+//#ifdef _OPENMP
+//#include <omp.h>
+//#endif
 #include "buildrand.h"
 using namespace RcppParallel;
 using namespace arma;
@@ -349,16 +349,16 @@ arma::mat CalSpatialKldCpp(arma::mat coords, arma::sp_mat d, arma::vec l, Nullab
 
     arma::umat rmat = generate_random_permuation(w.n_cols, random_times);
 
-    //SpatialKldCalWorker spatialKldCalWorker(w, bgkld, axm, aym, H, indx, indy, rmat, result);
-    //parallelFor(0, num, spatialKldCalWorker);
+    SpatialKldCalWorker spatialKldCalWorker(w, bgkld, axm, aym, H, indx, indy, rmat, result);
+    parallelFor(0, num, spatialKldCalWorker);
 
 
-    #ifdef _OPENMP
-    #pragma omp parallel for schedule(static)
-    #endif
-    for (uword i = 0; i < num; i++){
-        result.row(i) = CalSpatialKld(w.row(i), bgkld, axm, aym, H, indx, indy, rmat);
-    }
+    //#ifdef _OPENMP
+    //#pragma omp parallel for schedule(static)
+    //#endif
+    //for (uword i = 0; i < num; i++){
+    //    result.row(i) = CalSpatialKld(w.row(i), bgkld, axm, aym, H, indx, indy, rmat);
+    //}
 
     return (result);
 }

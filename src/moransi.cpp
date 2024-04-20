@@ -1,8 +1,8 @@
 #include <RcppParallel.h>
 #include <RcppArmadillo.h>
-#ifdef _OPENMP
-#include <omp.h>
-#endif
+//#ifdef _OPENMP
+//#include <omp.h>
+//#endif
 #include "buildrand.h"
 using namespace RcppParallel;
 using namespace Rcpp;
@@ -175,17 +175,17 @@ arma::mat CalMoransiParallel(arma::sp_mat& x, arma::mat& weight, bool scaled = f
   arma::umat rmat = generate_random_permuation(m, permutation);
   arma::mat result(n, 4);
 
-  //RunMoransi runmoransi(xm, weight, rowsumw2, rmat, S1, S2, s, m, ei, scaled, result);
+  RunMoransi runmoransi(xm, weight, rowsumw2, rmat, S1, S2, s, m, ei, scaled, result);
 
-  //parallelFor(0, n, runmoransi);
+  parallelFor(0, n, runmoransi);
   
 
-  #ifdef _OPENMP
-  #pragma omp parallel for schedule(static)
-  #endif  
-  for (uword i = 0; i < n; i++){
-      result.row(i) = moransi(xm.row(i), weight, rowsumw2, rmat, S1, S2, s, m, ei, scaled);
-  }
+  //#ifdef _OPENMP
+  //#pragma omp parallel for schedule(static)
+  //#endif  
+  //for (uword i = 0; i < n; i++){
+  //    result.row(i) = moransi(xm.row(i), weight, rowsumw2, rmat, S1, S2, s, m, ei, scaled);
+  //}
 
   return(result);
 

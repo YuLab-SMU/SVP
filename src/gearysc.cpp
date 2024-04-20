@@ -1,8 +1,8 @@
 #include <RcppParallel.h>
 #include <RcppArmadillo.h>
-#ifdef _OPENMP
-#include <omp.h>
-#endif
+//#ifdef _OPENMP
+//#include <omp.h>
+//#endif
 #include "buildrand.h"
 
 using namespace RcppParallel;
@@ -96,15 +96,15 @@ arma::mat CalGearyscParallel(arma::sp_mat& x, arma::mat& weight, int permutation
   arma::umat rmat = generate_random_permuation(m, permutation);
 
   arma::mat result(n, 4);
-  //RunGearysc rungearysc(xm, weight, rmat, s, m, result);
-  //parallelFor(0, n, rungearysc);
+  RunGearysc rungearysc(xm, weight, rmat, s, m, result);
+  parallelFor(0, n, rungearysc);
 
-  #ifdef _OPENMP
-  #pragma omp parallel for schedule(static)
-  #endif
-  for (unsigned int i = 0; i < n; i++){
-      result.row(i) = cal_gearysc_p_perm(xm.row(i), weight, rmat, s, m);
-  }
+  //#ifdef _OPENMP
+  //#pragma omp parallel for schedule(static)
+  //#endif
+  //for (unsigned int i = 0; i < n; i++){
+  //    result.row(i) = cal_gearysc_p_perm(xm.row(i), weight, rmat, s, m);
+  //}
 
   return(result);
 
