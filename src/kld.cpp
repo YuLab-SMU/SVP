@@ -1,12 +1,14 @@
 #include <RcppArmadillo.h>
 #include <RcppParallel.h>
-//#ifdef _OPENMP
-//#include <omp.h>
-//#endif
+#include <algorithm>
+#include <xoshiro.h>
+#include <convert_seed.h>
+#include <R_randgen.h>
 #include "buildrand.h"
 using namespace RcppParallel;
 using namespace arma;
 using namespace Rcpp;
+using namespace std;
 
 arma::vec Quantile(arma::vec x, arma::vec probs) {
   const size_t n=x.n_elem, np=probs.n_elem;
@@ -133,7 +135,7 @@ arma::mat outergrid(arma::vec grid, arma::vec x){
 // param random_times the permutation numbers for each weight to test whether
 // it is significantly, default is 200.
 // return a vector of Kullback–Leibler Divergence with permutation.
-//[[Rcpp::export]]
+////[[Rcpp::export]]
 arma::vec CalRandSpatialKld(
     arma::rowvec w,
     arma::vec bg,
@@ -142,15 +144,16 @@ arma::vec CalRandSpatialKld(
     arma::vec h,
     arma::uvec indx,
     arma::uvec indy,
-    arma::umat rmat
+    dqrng::xoshiro256plus rng,
+    int random_times
     ){
-    int nr = rmat.n_rows;
-    arma::vec bootkld(nr);
+    
+    arma::vec bootkld(random_times);
 
-    for (int j = 0; j < nr; j++){
-        arma::vec s = w(rmat.row(j));
-        arma::rowvec ss = arma::conv_to<rowvec>::from(s);
-        arma::vec z = Kde2dWeightedCpp(ss, axm, aym, h, indx, indy);
+    for (int j = 0; j < random_times; j++){
+        arma::rowvec s = w;
+        std::shuffle(std::begin(s), std::end(s), rng);
+        arma::vec z = Kde2dWeightedCpp(s, axm, aym, h, indx, indy);
         z = z + 1e-300;
         bootkld[j] = log(sum(z % log(z / bg)));
     }
@@ -195,40 +198,41 @@ arma::vec CalBgSpatialKld(
 // With Weighted and Statistical Test With Permutation for single weight vector.
 // param d the weight vector (the expression of gene or score of pathway).
 // param bgkld the kernel density of background (the result of CalBgSpatialKld).
-// param axm matrix the difference between the original point and grid points in x direction. 
-// param aym matrix the difference between the original point and grid points in y direction.
-// param h The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
-// (see bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
-// param indx the index of original point by mapping to the grid points in x direction.
-// param indy the index of original point by mapping to the grid points in y direction.
-// param random_times the permutation numbers for each weight to test whether 
-// it is significantly, default is 200.
-// return a vector of input features about the statistical test value with 2D weighted kernel density 
-//  and Kullback–Leibler Divergence.
-// [[Rcpp::export]]
-arma::rowvec CalSpatialKld(
-                        arma::rowvec d,
-                        arma::vec bgkld,
-                        arma::mat axm,
-                        arma::mat aym,
-                        arma::vec h,
-                        arma::uvec indx,
-                        arma::uvec indy,
-                        arma::umat rmat
-                      ){
-
-    arma::vec z = Kde2dWeightedCpp(d, axm, aym, h, indx, indy);
-    z = z + 1e-300;
-    double kld = log(sum(z % log(z / bgkld)));
-
-    arma::vec bootkld(rmat.n_rows);
-
-    bootkld = CalRandSpatialKld(d, bgkld, axm, aym, h, indx, indy, rmat);
-
-    arma::rowvec res = CalKldPvalue(bootkld, kld);
-
-    return(res);
-}
+// // param axm matrix the difference between the original point and grid points in x direction. 
+// // param aym matrix the difference between the original point and grid points in y direction.
+// // param h The vector of bandwidths for x and y directions, defaults to normal reference bandwidth
+// // (see bandwidth.nrd), A scalar value will be taken to apply to both directions (see ks::hpi).
+// // param indx the index of original point by mapping to the grid points in x direction.
+// // param indy the index of original point by mapping to the grid points in y direction.
+// // param random_times the permutation numbers for each weight to test whether 
+// // it is significantly, default is 200.
+// // return a vector of input features about the statistical test value with 2D weighted kernel density 
+// //  and Kullback–Leibler Divergence.
+// // [[Rcpp::export]]
+// arma::rowvec CalSpatialKld(
+//                         arma::rowvec d,
+//                         arma::vec bgkld,
+//                         arma::mat axm,
+//                         arma::mat aym,
+//                         arma::vec h,
+//                         arma::uvec indx,
+//                         arma::uvec indy,
+//                         dqrng::xoshiro256plus rng,
+//                         int random_times,
+//                       ){
+// 
+//     arma::vec z = Kde2dWeightedCpp(d, axm, aym, h, indx, indy);
+//     z = z + 1e-300;
+//     double kld = log(sum(z % log(z / bgkld)));
+// 
+//     arma::vec bootkld(rmat.n_rows);
+// 
+//     bootkld = CalRandSpatialKld(d, bgkld, axm, aym, h, indx, indy, rng, random_times);
+// 
+//     arma::rowvec res = CalKldPvalue(bootkld, kld);
+// 
+//     return(res);
+// }
 
 struct SpatialKldCalWorker : public Worker{
   const arma::mat& w;
@@ -238,21 +242,24 @@ struct SpatialKldCalWorker : public Worker{
   const arma::vec& H;
   const arma::uvec& indx;
   const arma::uvec& indy;
-  const arma::umat& rmat;
+  const uint64_t seed;
+  const int random_times;
   mat& result;
 
   SpatialKldCalWorker(const arma::mat& w, const arma::vec& bgkld,
       const arma::mat& axm, const arma::mat& aym, const arma::vec& H, const arma::uvec& indx,
-         const arma::uvec& indy, const arma::umat& rmat, mat& result)
-  : w(w), bgkld(bgkld), axm(axm), aym(aym), H(H), indx(indx), indy(indy), rmat(rmat),
-    result(result) { }
+         const arma::uvec& indy, const uint64_t seed, const int random_times, mat& result)
+  : w(w), bgkld(bgkld), axm(axm), aym(aym), H(H), indx(indx), indy(indy), seed(seed),
+    random_times(random_times), result(result) { }
 
   void operator()(std::size_t begin, std::size_t end){
+    dqrng::xoshiro256plus rng(seed);  
     for (uword i = begin; i < end; i++){
         arma::vec z = Kde2dWeightedCpp(w.row(i), axm, aym, H, indx, indy);
         double kld = log(sum(z % log(z / bgkld)));
-
-        arma::vec bootkld = CalRandSpatialKld(w.row(i), bgkld, axm, aym, H, indx, indy, rmat);
+        dqrng::xoshiro256plus lrng(rng);
+        lrng.long_jump(i + 1);
+        arma::vec bootkld = CalRandSpatialKld(w.row(i), bgkld, axm, aym, H, indx, indy, lrng, random_times);
 
         result.row(i) = CalKldPvalue(bootkld, kld);
     }
@@ -347,9 +354,11 @@ arma::mat CalSpatialKldCpp(arma::mat coords, arma::sp_mat d, arma::vec l, Nullab
 
     arma::vec bgkld = CalBgSpatialKld(coords, axm, aym, H, indx, indy);
 
-    arma::umat rmat = generate_random_permuation(w.n_cols, random_times);
+    //arma::umat rmat = generate_random_permuation(w.n_cols, random_times);
+    Rcpp::IntegerVector seed(2, dqrng::R_random_int);
+    uint64_t seed2 = dqrng::convert_seed<uint64_t>(seed);
 
-    SpatialKldCalWorker spatialKldCalWorker(w, bgkld, axm, aym, H, indx, indy, rmat, result);
+    SpatialKldCalWorker spatialKldCalWorker(w, bgkld, axm, aym, H, indx, indy, seed2, random_times, result);
     parallelFor(0, num, spatialKldCalWorker);
 
 

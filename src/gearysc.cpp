@@ -1,8 +1,9 @@
 #include <RcppParallel.h>
 #include <RcppArmadillo.h>
-//#ifdef _OPENMP
-//#include <omp.h>
-//#endif
+#include <algorithm>
+#include <xoshiro.h>
+#include <convert_seed.h>
+#include <R_randgen.h>
 #include "buildrand.h"
 
 using namespace RcppParallel;
@@ -37,17 +38,17 @@ double cal_gearysc(
 arma::rowvec cal_gearysc_p_perm(
         arma::rowvec x,
         arma::mat weight,
-        arma::umat rmat,
+        dqrng::xoshiro256plus rng,
+        int permutation,
         double s,
         int n
         ){
-    int permutation = rmat.n_rows;
     double obs = cal_gearysc(x, weight, s, n);
     arma::vec xmr = arma::vec(permutation, arma::fill::zeros);
     for (int i = 0; i < permutation; i++){
-        arma::vec z = x(rmat.row(i));
-        arma::rowvec zz = arma::conv_to<rowvec>::from(z);
-        xmr(i) = cal_gearysc(zz, weight, s, n);
+        arma::rowvec z = x;
+        std::shuffle(std::begin(z), std::end(z), rng);
+        xmr(i) = cal_gearysc(z, weight, s, n);
     }
     
     double expv = mean(xmr);
@@ -63,18 +64,23 @@ arma::rowvec cal_gearysc_p_perm(
 struct RunGearysc : public Worker{
   const arma::mat& x;
   const arma::mat& weight;
-  const arma::umat& rmat;
+  const uint64_t seed;
+  const int permutation;
   const double s;
   const int n;
   arma::mat& result;
 
-  RunGearysc(const arma::mat& x, const arma::mat& weight, const arma::umat& rmat, 
-             const double s, const int n, mat& result):
-      x(x), weight(weight), rmat(rmat), s(s), n(n), result(result) { }
+  RunGearysc(const arma::mat& x, const arma::mat& weight, const uint64_t seed, 
+          const int permutation, const double s, const int n, mat& result):
+      x(x), weight(weight), seed(seed), permutation(permutation), s(s),
+      n(n), result(result) { }
 
   void operator()(std::size_t begin, std::size_t end){
+    dqrng::xoshiro256plus rng(seed);
     for (uword i = begin; i < end; i++){
-        result.row(i) = cal_gearysc_p_perm(x.row(i), weight, rmat, s, n);
+        dqrng::xoshiro256plus lrng(rng);
+        lrng.long_jump(i + 1);
+        result.row(i) = cal_gearysc_p_perm(x.row(i), weight, lrng, permutation, s, n);
     }
   }
 };
@@ -93,10 +99,11 @@ arma::mat CalGearyscParallel(arma::sp_mat& x, arma::mat& weight, int permutation
 
   double s = accu(weight);
 
-  arma::umat rmat = generate_random_permuation(m, permutation);
+  Rcpp::IntegerVector seed(2, dqrng::R_random_int);
+  uint64_t seed2 = dqrng::convert_seed<uint64_t>(seed);
 
   arma::mat result(n, 4);
-  RunGearysc rungearysc(xm, weight, rmat, s, m, result);
+  RunGearysc rungearysc(xm, weight, seed2, permutation, s, m, result);
   parallelFor(0, n, rungearysc);
 
   //#ifdef _OPENMP

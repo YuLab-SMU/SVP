@@ -65,5 +65,6 @@ LinkingTo:
   Rcpp,
   RcppArmadillo,
   RcppParallel,
-  RcppEigen
+  RcppEigen,
+  dqrng
 Config/testthat/edition: 3
