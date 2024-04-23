@@ -67,7 +67,7 @@ or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} ob
 \item{method}{character one of \code{'moransi'} and \code{"gearysc"}, default is \code{'moransi'}.}
 
 \item{sv.runWKDE}{logical whether perform the 2D weighted kernel density estimation firstly,
-default is FALSE.}
+default is FALSE, it is experimental parameter.}
 
 \item{sv.used.reduction}{character used as spatial coordinates to detect SVG, default is \code{UMAP},
 if \code{data} has \code{spatialCoords}, which will be used as spatial coordinates.}

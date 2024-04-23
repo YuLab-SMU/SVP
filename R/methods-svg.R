@@ -158,7 +158,7 @@ setMethod('runKldSVG', 'SingleCellExperiment',
       }
       tic()
       if (verbose){
-          cli::cli_inform("Identifying the spatially variable gene sets (pathway) based on
+          cli::cli_inform("Identifying the spatially variable gene sets (pathway) or genes based on
                            Kullback-Leibler divergence of 2D Weighted Kernel Density ...")
 
       }
@@ -246,7 +246,7 @@ setMethod('runKldSVG', 'SVPExperiment',
 #' @param assay.type which expressed data to be pulled to run, default is \code{logcounts}.
 #' @param method character one of \code{'moransi'} and \code{"gearysc"}, default is \code{'moransi'}.
 #' @param sv.runWKDE logical whether perform the 2D weighted kernel density estimation firstly, 
-#' default is FALSE.
+#' default is FALSE, it is experimental parameter.
 #' @param sv.used.reduction character used as spatial coordinates to detect SVG, default is \code{UMAP},
 #' if \code{data} has \code{spatialCoords}, which will be used as spatial coordinates.
 #' @param sv.grid.n numeric number of grid points in the two directions to estimate 2D weighted kernel

@@ -5,6 +5,7 @@
 #include <convert_seed.h>
 #include <R_randgen.h>
 #include "buildrand.h"
+#include "progress.h"
 using namespace RcppParallel;
 using namespace Rcpp;
 using namespace arma;
@@ -131,6 +132,7 @@ struct RunMoransi : public Worker{
   const arma::mat& x;
   const arma::mat& weight;
   const arma::rowvec& rowsumw;
+  simple_progress& p;
   const uint64_t seed;
   const int permutation;
   const double S1;
@@ -141,10 +143,10 @@ struct RunMoransi : public Worker{
   const bool scaled;
   arma::mat& result;
 
-  RunMoransi(const arma::mat& x, const arma::mat& weight, const arma::rowvec& rowsumw, 
+  RunMoransi(const arma::mat& x, const arma::mat& weight, const arma::rowvec& rowsumw, simple_progress& p,
           const uint64_t seed, const int permutation, const double S1, const double S2, 
           const double s, const int n, const double ei, const bool scaled, mat& result):
-      x(x), weight(weight), rowsumw(rowsumw), seed(seed), permutation(permutation), 
+      x(x), weight(weight), rowsumw(rowsumw), p(p), seed(seed), permutation(permutation), 
       S1(S1), S2(S2), s(s), n(n), ei(ei), scaled(scaled), result(result) { }
 
   void operator()(std::size_t begin, std::size_t end){
@@ -153,6 +155,7 @@ struct RunMoransi : public Worker{
         dqrng::xoshiro256plus lrng(rng);
         lrng.long_jump(i + 1);
         result.row(i) = moransi(x.row(i), weight, rowsumw, lrng, permutation, S1, S2, s, n, ei, scaled);
+        p.increment();
     }
   }
 };
@@ -182,7 +185,9 @@ arma::mat CalMoransiParallel(arma::sp_mat& x, arma::mat& weight, bool scaled = f
 
   arma::mat result(n, 4);
 
-  RunMoransi runmoransi(xm, weight, rowsumw2, seed2, permutation, S1, S2, s, m, ei, scaled, result);
+  simple_progress p(n);
+
+  RunMoransi runmoransi(xm, weight, rowsumw2, p, seed2, permutation, S1, S2, s, m, ei, scaled, result);
 
   parallelFor(0, n, runmoransi);
 

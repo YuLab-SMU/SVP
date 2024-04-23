@@ -5,7 +5,7 @@
 #include <convert_seed.h>
 #include <R_randgen.h>
 #include "buildrand.h"
-
+#include "progress.h"
 using namespace RcppParallel;
 using namespace Rcpp;
 using namespace arma;
@@ -64,15 +64,16 @@ arma::rowvec cal_gearysc_p_perm(
 struct RunGearysc : public Worker{
   const arma::mat& x;
   const arma::mat& weight;
+  simple_progress& p;
   const uint64_t seed;
   const int permutation;
   const double s;
   const int n;
   arma::mat& result;
 
-  RunGearysc(const arma::mat& x, const arma::mat& weight, const uint64_t seed, 
+  RunGearysc(const arma::mat& x, const arma::mat& weight, simple_progress& p, const uint64_t seed, 
           const int permutation, const double s, const int n, mat& result):
-      x(x), weight(weight), seed(seed), permutation(permutation), s(s),
+      x(x), weight(weight), p(p), seed(seed), permutation(permutation), s(s),
       n(n), result(result) { }
 
   void operator()(std::size_t begin, std::size_t end){
@@ -81,6 +82,7 @@ struct RunGearysc : public Worker{
         dqrng::xoshiro256plus lrng(rng);
         lrng.long_jump(i + 1);
         result.row(i) = cal_gearysc_p_perm(x.row(i), weight, lrng, permutation, s, n);
+        p.increment();
     }
   }
 };
@@ -102,8 +104,9 @@ arma::mat CalGearyscParallel(arma::sp_mat& x, arma::mat& weight, int permutation
   Rcpp::IntegerVector seed(2, dqrng::R_random_int);
   uint64_t seed2 = dqrng::convert_seed<uint64_t>(seed);
 
+  simple_progress p(n);
   arma::mat result(n, 4);
-  RunGearysc rungearysc(xm, weight, seed2, permutation, s, m, result);
+  RunGearysc rungearysc(xm, weight, p, seed2, permutation, s, m, result);
   parallelFor(0, n, rungearysc);
 
   //#ifdef _OPENMP
