@@ -4,7 +4,6 @@
 #include <xoshiro.h>
 #include <convert_seed.h>
 #include <R_randgen.h>
-#include "buildrand.h"
 #include "progress.h"
 using namespace RcppParallel;
 using namespace Rcpp;
