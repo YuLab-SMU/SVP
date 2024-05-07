@@ -121,15 +121,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // CalGearyscParallel
-arma::mat CalGearyscParallel(arma::sp_mat& x, arma::mat& weight, int permutation);
-RcppExport SEXP _SVP_CalGearyscParallel(SEXP xSEXP, SEXP weightSEXP, SEXP permutationSEXP) {
+arma::mat CalGearyscParallel(arma::sp_mat& x, arma::mat& weight, int permutation, int lower_tail);
+RcppExport SEXP _SVP_CalGearyscParallel(SEXP xSEXP, SEXP weightSEXP, SEXP permutationSEXP, SEXP lower_tailSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::sp_mat& >::type x(xSEXP);
     Rcpp::traits::input_parameter< arma::mat& >::type weight(weightSEXP);
     Rcpp::traits::input_parameter< int >::type permutation(permutationSEXP);
-    rcpp_result_gen = Rcpp::wrap(CalGearyscParallel(x, weight, permutation));
+    Rcpp::traits::input_parameter< int >::type lower_tail(lower_tailSEXP);
+    rcpp_result_gen = Rcpp::wrap(CalGearyscParallel(x, weight, permutation, lower_tail));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -230,8 +231,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // CalMoransiParallel
-arma::mat CalMoransiParallel(arma::sp_mat& x, arma::mat& weight, bool scaled, int permutation);
-RcppExport SEXP _SVP_CalMoransiParallel(SEXP xSEXP, SEXP weightSEXP, SEXP scaledSEXP, SEXP permutationSEXP) {
+arma::mat CalMoransiParallel(arma::sp_mat& x, arma::mat& weight, bool scaled, int permutation, int lower_tail);
+RcppExport SEXP _SVP_CalMoransiParallel(SEXP xSEXP, SEXP weightSEXP, SEXP scaledSEXP, SEXP permutationSEXP, SEXP lower_tailSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -239,7 +240,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::mat& >::type weight(weightSEXP);
     Rcpp::traits::input_parameter< bool >::type scaled(scaledSEXP);
     Rcpp::traits::input_parameter< int >::type permutation(permutationSEXP);
-    rcpp_result_gen = Rcpp::wrap(CalMoransiParallel(x, weight, scaled, permutation));
+    Rcpp::traits::input_parameter< int >::type lower_tail(lower_tailSEXP);
+    rcpp_result_gen = Rcpp::wrap(CalMoransiParallel(x, weight, scaled, permutation, lower_tail));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -307,7 +309,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_SVP_CalParallelBiCor", (DL_FUNC) &_SVP_CalParallelBiCor, 1},
     {"_SVP_CalParallelBiCorTwoMatrix", (DL_FUNC) &_SVP_CalParallelBiCorTwoMatrix, 2},
     {"_SVP_ExtractFeatureScoreCpp", (DL_FUNC) &_SVP_ExtractFeatureScoreCpp, 4},
-    {"_SVP_CalGearyscParallel", (DL_FUNC) &_SVP_CalGearyscParallel, 3},
+    {"_SVP_CalGearyscParallel", (DL_FUNC) &_SVP_CalGearyscParallel, 4},
     {"_SVP_findIntervalCpp", (DL_FUNC) &_SVP_findIntervalCpp, 2},
     {"_SVP_outergrid", (DL_FUNC) &_SVP_outergrid, 2},
     {"_SVP_CalBgSpatialKld", (DL_FUNC) &_SVP_CalBgSpatialKld, 6},
@@ -315,7 +317,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_SVP_CalSpatialKldCpp", (DL_FUNC) &_SVP_CalSpatialKldCpp, 6},
     {"_SVP_MCAStep1", (DL_FUNC) &_SVP_MCAStep1, 1},
     {"_SVP_MCAStep2", (DL_FUNC) &_SVP_MCAStep2, 3},
-    {"_SVP_CalMoransiParallel", (DL_FUNC) &_SVP_CalMoransiParallel, 4},
+    {"_SVP_CalMoransiParallel", (DL_FUNC) &_SVP_CalMoransiParallel, 5},
     {"_SVP_fastPDist", (DL_FUNC) &_SVP_fastPDist, 2},
     {"_SVP_fusiondist", (DL_FUNC) &_SVP_fusiondist, 4},
     {"_SVP_ParallelColOrder", (DL_FUNC) &_SVP_ParallelColOrder, 2},

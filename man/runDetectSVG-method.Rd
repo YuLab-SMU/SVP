@@ -13,6 +13,8 @@ runDetectSVG(
   data,
   assay.type = "logcounts",
   method = c("moransi", "gearysc"),
+  weight = NULL,
+  weight.method = c("knn", "tri2nb", "none"),
   sv.runWKDE = FALSE,
   sv.used.reduction = c("UMAP", "TSNE"),
   sv.grid.n = 100,
@@ -29,6 +31,8 @@ runDetectSVG(
   data,
   assay.type = "logcounts",
   method = c("moransi", "gearysc"),
+  weight = NULL,
+  weight.method = c("knn", "tri2nb", "none"),
   sv.runWKDE = FALSE,
   sv.used.reduction = c("UMAP", "TSNE"),
   sv.grid.n = 100,
@@ -45,6 +49,8 @@ runDetectSVG(
   data,
   assay.type = "logcounts",
   method = c("moransi", "gearysc"),
+  weight = NULL,
+  weight.method = c("knn", "tri2nb", "none"),
   sv.runWKDE = FALSE,
   sv.used.reduction = c("UMAP", "TSNE"),
   sv.grid.n = 100,
@@ -65,6 +71,15 @@ or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} ob
 \item{assay.type}{which expressed data to be pulled to run, default is \code{logcounts}.}
 
 \item{method}{character one of \code{'moransi'} and \code{"gearysc"}, default is \code{'moransi'}.}
+
+\item{weight}{object, which can be \code{nb}, \code{listw} or \code{Graph} object, default is NULL.}
+
+\item{weight.method}{character the method to build the spatial neighbours weights, default
+is \code{knn} (k nearest neighbours). Other method, which requires coord matrix as input and returns
+\code{nb}, \code{listw} or \code{Graph} object, also is avaiable, such as \code{'tri2nb'}, \code{"knearneigh"},
+\code{'dnearneigh'}, \code{"gabrielneigh"}, \code{"relativeneigh"}, which are from \code{spdep} package.
+default is \code{knn}, if it is \code{"none"}, meaning the distance weight of each spot is used to
+the weight.}
 
 \item{sv.runWKDE}{logical whether perform the 2D weighted kernel density estimation firstly,
 default is FALSE, it is experimental parameter.}

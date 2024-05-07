@@ -245,6 +245,13 @@ setMethod('runKldSVG', 'SVPExperiment',
 #' \code{gsvaexp} argument.
 #' @param assay.type which expressed data to be pulled to run, default is \code{logcounts}.
 #' @param method character one of \code{'moransi'} and \code{"gearysc"}, default is \code{'moransi'}.
+#' @param weight object, which can be \code{nb}, \code{listw} or \code{Graph} object, default is NULL.
+#' @param weight.method character the method to build the spatial neighbours weights, default 
+#' is \code{knn} (k nearest neighbours). Other method, which requires coord matrix as input and returns
+#' \code{nb}, \code{listw} or \code{Graph} object, also is avaiable, such as \code{'tri2nb'}, \code{"knearneigh"},
+#' \code{'dnearneigh'}, \code{"gabrielneigh"}, \code{"relativeneigh"}, which are from \code{spdep} package.
+#' default is \code{knn}, if it is \code{"none"}, meaning the distance weight of each spot is used to
+#' the weight.
 #' @param sv.runWKDE logical whether perform the 2D weighted kernel density estimation firstly, 
 #' default is FALSE, it is experimental parameter.
 #' @param sv.used.reduction character used as spatial coordinates to detect SVG, default is \code{UMAP},
@@ -295,6 +302,8 @@ setGeneric("runDetectSVG", function(
     data,
     assay.type = 'logcounts',
     method = c("moransi", "gearysc"),
+    weight = NULL,
+    weight.method = c("knn", "tri2nb", "none"),
     sv.runWKDE = FALSE,
     sv.used.reduction = c('UMAP', 'TSNE'),
     sv.grid.n = 100,
@@ -317,6 +326,8 @@ setMethod('runDetectSVG', 'SingleCellExperiment',
     data,
     assay.type = 'logcounts',
     method = c("moransi", "gearysc"),
+    weight = NULL,
+    weight.method = c("knn", "tri2nb", "none"),
     sv.runWKDE = FALSE,
     sv.used.reduction = c('UMAP', 'TSNE'),
     sv.grid.n = 100,
@@ -374,6 +385,8 @@ setMethod('runDetectSVG', 'SingleCellExperiment',
       res.sv <- .identify.svg.by.autocorrelation(
                         x,
                         coords = coords,
+                        weight = weight,
+                        weight.method = weight.method,
                         method = method,
                         permutation = sv.permutation,
                         p.adjust.method = sv.p.adjust.method,
@@ -402,6 +415,8 @@ setMethod('runDetectSVG', 'SVPExperiment',
     data,
     assay.type = 'logcounts',
     method = c("moransi", "gearysc"),
+    weight = NULL,
+    weight.method = c("knn", "tri2nb", "none"),
     sv.runWKDE = FALSE,
     sv.used.reduction = c('UMAP', 'TSNE'),
     sv.grid.n = 100,
@@ -421,6 +436,8 @@ setMethod('runDetectSVG', 'SVPExperiment',
        da2 <- runDetectSVG(da2,
                      gsvaexp.assay.type,
                      method,
+                     weight,
+                     weight.method,
                      sv.runWKDE,
                      sv.used.reduction,
                      sv.grid.n,

@@ -37,8 +37,8 @@ ExtractFeatureScoreCpp <- function(x, rnm, cnm, g) {
     .Call('_SVP_ExtractFeatureScoreCpp', PACKAGE = 'SVP', x, rnm, cnm, g)
 }
 
-CalGearyscParallel <- function(x, weight, permutation = 999L) {
-    .Call('_SVP_CalGearyscParallel', PACKAGE = 'SVP', x, weight, permutation)
+CalGearyscParallel <- function(x, weight, permutation = 999L, lower_tail = 1L) {
+    .Call('_SVP_CalGearyscParallel', PACKAGE = 'SVP', x, weight, permutation, lower_tail)
 }
 
 findIntervalCpp <- function(x, breaks) {
@@ -69,8 +69,8 @@ MCAStep2 <- function(Z, V, Dc) {
     .Call('_SVP_MCAStep2', PACKAGE = 'SVP', Z, V, Dc)
 }
 
-CalMoransiParallel <- function(x, weight, scaled = FALSE, permutation = 999L) {
-    .Call('_SVP_CalMoransiParallel', PACKAGE = 'SVP', x, weight, scaled, permutation)
+CalMoransiParallel <- function(x, weight, scaled = FALSE, permutation = 999L, lower_tail = 1L) {
+    .Call('_SVP_CalMoransiParallel', PACKAGE = 'SVP', x, weight, scaled, permutation, lower_tail)
 }
 
 fastPDist <- function(A, B) {

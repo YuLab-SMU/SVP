@@ -439,48 +439,158 @@ pairDist <- function(x, y){
 }
 
 .identify.svg.by.autocorrelation <- function(
-  x, 
-  coords, 
+  x,
+  coords,
+  weight = NULL,
+  weight.method = c("knn", "tri2nb", "none"), 
   method = 'moransi',
   permutation = 1, 
   scaled = FALSE,
-  alternative = 'two.sided',
+  alternative = c('two.sided', 'greater', 'less'),
   p.adjust.method = 'BH',
   random.seed = 1024,
   ...
   ){
 
-  rlang::check_installed("withr", "is required to reproducible in the identification of SVG or SVP.")  
+  rlang::check_installed("withr", "is required to be reproducible in the identification of SVG or SVP.")  
 
   coords <- .normalize.coords(coords)
-  coords.dist <- pairDist(coords, coords)
-  
-  if (method == 'moransi'){
-      if (is.null(permutation)){permutation <- 1}
-      res <- withr::with_seed(random.seed, CalMoransiParallel(x, coords.dist, scaled, permutation))
-      colnames(res) <- c('obs', 'expect.moransi', 'sd.moransi', 'pvalue')
-  }else if (method == 'gearysc'){
-      if (is.null(permutation)){permutation <- 100}
-      res <- withr::with_seed(random.seed, CalGearyscParallel(x, coords.dist, permutation))
-      colnames(res) <- c('obs', 'expect.gearysc', 'sd.gearysc', 'pvalue')
+  params <- list(...)
+ 
+  if ('alternative' %in% names(params)){
+      alternative <- params$alternative
+      params$alternative <- NULL
+  }else{
+      if (method == 'gearysc'){
+          alternative <- "less"
+      }
+      if (method == 'moransi'){
+          alternative <- "greater"
+      }
   }
 
+  alternative <- match.arg(alternative)
+  
+  if ('scaled' %in% names(params)){
+      scaled <- params$scaled
+      params$scaled <- NULL
+  }
+
+  if (alternative == 'greater'){
+      lower.tail <- 0
+  }else{
+      lower.tail <- 1
+  }
+
+  
+  if (length(weight.method) > 1){
+      weight.method <- match.arg(weight.method)
+  }
+  
+  if (is.null(weight) && weight.method %in% c('none', 'knn')){
+      coords.dist <- pairDist(coords, coords)
+      if (weight.method == 'knn'){
+          if ("k" %in% names(params) && is.numeric(params$k)){
+               k <- round(params$k)
+	  }else{
+               k <- 10
+          }
+          coords.dist <- .build.adj.m(coords.dist, k) |> as.matrix()
+      }
+      coords.dist <- coords.dist * (1/rowSums(coords.dist))
+  }
+
+  if (inherits(weight, "listw") || inherits(weight, "nb")){
+      coords.dist <- .convert_to_distmt(weight)
+  }
+
+  if (is.null(weight) && !weight.method %in% c("none", "knn")){
+      rlang::check_installed("spdep", paste0("is required to identify SVG or SVP with `", weight.method,"` ."))
+      coords.dist <- do.call(weight.method, c(list(coords), params))
+      coords.dist <- .convert_to_distmt(coords.dist)
+  }
+
+  if (is.null(permutation)){
+      permutation <- 1
+  }
+  
+  if (method == 'moransi'){
+      res <- withr::with_seed(random.seed, CalMoransiParallel(x, coords.dist, scaled, permutation, lower.tail))
+      colnames(res) <- c('obs', 'expect.moransi', 'sd.moransi', 'pvalue')
+  }else if (method == 'gearysc'){
+      res <- withr::with_seed(random.seed, CalGearyscParallel(x, coords.dist, permutation, lower.tail))
+      colnames(res) <- c('obs', 'expect.gearysc', 'sd.gearysc', 'pvalue')
+  }
+  
   if (alternative == "two.sided")
       res[,4] <- ifelse(res[,1] <= res[,2], 2 * res[,4], 2 * (1 - res[,4]))
-  if (alternative == "greater")
-      res[,4] <- 1 - res[,4]
 
   rownames(res) <- rownames(x)
   res <- cbind(res,
                padj = p.adjust(res[, "pvalue"], method = p.adjust.method)
             ) |> as.data.frame(check.names=FALSE)
-  res <- res |> dplyr::arrange(.data$padj, .data$obs) |>
+  if (method == 'moransi'){
+      res <- res |> dplyr::arrange(.data$padj, .data$pvalue, dplyr::desc(abs(.data$obs))) 
+  }else{
+      res <- res |> dplyr::arrange(.data$padj, .data$pvalue, dplyr::desc(abs(.data$obs - 1)))
+  }
+  res <- res |>
          dplyr::mutate(rank = seq(nrow(res))) |> as.matrix()
   res <- res[match(rownames(x), rownames(res)), ]  
   return(res)
 }
 
 
+.convert_to_distmt <- function(x){
+  if (inherits(x, "Graph")){
+      res <- .convert_to_distmt.Graph(x)
+  }  
+  if (inherits(x, 'nb') && !inherits(x, "listw")){
+      res <- .convert_to_distmt.nb(x)
+  }
+  if (inherits(x, "listw")){
+      res <- .convert_to_distmt.listw(x)
+  }
+  return(res)
+}
+
+.convert_to_distmt.nb <- function(x, w = NULL){
+  times <- unlist(lapply(x, length))
+  i <- rep(seq(length(x)), times = times)
+  j <- unlist(x)
+  ind <- j!=0
+  j <- j[ind]
+  i <- i[ind]
+  n <- length(x)
+  region_id <- attr(x, "region.id")
+  if (is.null(w)){
+      w <- rep(1/times, times = times) 
+      w <- w[ind]
+  }
+  res <- sparseMatrix(i = i, j = j, x = w, 
+		      dims = rep(n, 2), 
+		      dimnames = list(region_id, region_id)) |> 
+         as.matrix()
+  return(res)
+}
+
+.convert_to_distmt.listw <- function(x, w = NULL){
+  w <- unlist(x$weights)
+  res <- .convert_to_distmt.nb(x$neighbours, w = w)
+  return(res)
+}
+
+.convert_to_distmt.Graph <- function(x){
+  w <- unname(table(x$from))
+  w <- rep(1/w, times = w)
+  region_id <- x$x |> attr("names")
+  res <- sparseMatrix(i=x$from, 
+                      j=x$to, x=w, 
+                      dims=rep(x$np, 2), 
+                      dimnames = list(region_id, region_id)) |> 
+         as.matrix()
+  return(res)
+}
 
 #' @importFrom rlang .data
 #' @importFrom stats p.adjust
