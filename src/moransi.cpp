@@ -34,8 +34,10 @@ arma::rowvec cal_moransi_p_noperm(
               k * (n * (n - 1.0) * S1 - 2 * n * S2 + 6 * s_sq))/
           ((n - 1.0) * (n - 2.0) * (n - 3.0) * s_sq) - 1/(pow(n - 1.0, 2.0)));
 
+  double z = (obs - ei)/sdi;
+
   double pv = R::pnorm(obs, ei, sdi, lower_tail, 0);
-  arma::rowvec res = {obs, ei, sdi, pv};
+  arma::rowvec res = {obs, ei, sdi, z, pv};
   return(res);
 }
 
@@ -86,9 +88,11 @@ arma::rowvec cal_moransi_p_perm(
     double expv = mean(xmr);
     double sdv = stddev(xmr);
 
+    double z = (obs - expv) / sdv;
+
     double pv = R::pnorm(obs, expv, sdv, lower_tail, 0);
 
-    arma::rowvec res = {obs, expv, sdv, pv};
+    arma::rowvec res = {obs, expv, sdv, z, pv};
     return(res);
   
 }
@@ -120,7 +124,7 @@ arma::rowvec moransi(
     obs = obs/imax;
   }
 
-  arma::rowvec res(4);
+  arma::rowvec res(5);
   if (permutation <= 10){
       res = cal_moransi_p_noperm(obs, ei, s, y, v, n, S1, S2, lower_tail);
   }else{
@@ -172,10 +176,6 @@ arma::mat CalMoransiParallel(arma::sp_mat& x, arma::mat& weight, bool scaled = f
   int m = x.n_cols;
   double ei = -(1.0 / (m - 1));
   
-  //arma::colvec rowsumw = sum(weight, 1);
-  //rowsumw.replace(0, 1.0);
-  //weight = weight.each_col() / rowsumw;
-
   arma::rowvec colsumw = sum(weight, 0);
   arma::colvec rowsumw = sum(weight, 1);
   arma::rowvec rowsumw2 = conv_to<arma::rowvec>::from(rowsumw);
@@ -187,7 +187,7 @@ arma::mat CalMoransiParallel(arma::sp_mat& x, arma::mat& weight, bool scaled = f
   Rcpp::IntegerVector seed(2, dqrng::R_random_int);
   uint64_t seed2 = dqrng::convert_seed<uint64_t>(seed);
 
-  arma::mat result(n, 4);
+  arma::mat result(n, 5);
 
   simple_progress p(n);
 

@@ -41,6 +41,10 @@ CalGearyscParallel <- function(x, weight, permutation = 999L, lower_tail = 1L) {
     .Call('_SVP_CalGearyscParallel', PACKAGE = 'SVP', x, weight, permutation, lower_tail)
 }
 
+CalGetisOrdParallel <- function(x, weight, lower_tail = 1L) {
+    .Call('_SVP_CalGetisOrdParallel', PACKAGE = 'SVP', x, weight, lower_tail)
+}
+
 findIntervalCpp <- function(x, breaks) {
     .Call('_SVP_findIntervalCpp', PACKAGE = 'SVP', x, breaks)
 }

@@ -12,7 +12,7 @@
 runDetectSVG(
   data,
   assay.type = "logcounts",
-  method = c("moransi", "gearysc"),
+  method = c("moransi", "gearysc", "getisord"),
   weight = NULL,
   weight.method = c("knn", "tri2nb", "none"),
   sv.runWKDE = FALSE,
@@ -30,7 +30,7 @@ runDetectSVG(
 \S4method{runDetectSVG}{SingleCellExperiment}(
   data,
   assay.type = "logcounts",
-  method = c("moransi", "gearysc"),
+  method = c("moransi", "gearysc", "getisord"),
   weight = NULL,
   weight.method = c("knn", "tri2nb", "none"),
   sv.runWKDE = FALSE,
@@ -70,7 +70,7 @@ or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} ob
 
 \item{assay.type}{which expressed data to be pulled to run, default is \code{logcounts}.}
 
-\item{method}{character one of \code{'moransi'} and \code{"gearysc"}, default is \code{'moransi'}.}
+\item{method}{character one of \code{'moransi'}, \code{"gearysc"} or \code{"getisord"}, default is \code{'moransi'}.}
 
 \item{weight}{object, which can be \code{nb}, \code{listw} or \code{Graph} object, default is NULL.}
 
@@ -122,6 +122,8 @@ for single cell omics data) or a physical space (for spatial omics data).
 # result of runSGSA with gsvaExp(svpe).
 data(hpda_spe_cell_dec)
 
+# using Moran's I test
+######################
 hpda_spe_cell_dec <-
     hpda_spe_cell_dec |>
     runDetectSVG(
@@ -134,6 +136,8 @@ svDfs(hpda_spe_cell_dec)
 
 hpda_spe_cell_dec |> svDf("sv.moransi") |> data.frame() |> dplyr::arrange(rank)
 
+# using Geary's C test 
+#######################
 hpda_spe_cell_dec <-
     hpda_spe_cell_dec |>
     runDetectSVG(assay.type ='affi.score', method = 'gearysc')
@@ -141,11 +145,20 @@ hpda_spe_cell_dec <-
 svDfs(hpda_spe_cell_dec)
 
 hpda_spe_cell_dec |> svDf("sv.gearysc") |> data.frame() |> dplyr::arrange(rank)
+
+# using Global G test (Getis-Ord)
+#################################
+hpda_spe_cell_dec <- hpda_spe_cell_dec |>
+    runDetectSVG(assay.type = 1, method = 'getisord')
+
+svDfs(hpda_spe_cell_dec)
+
+hpda_spe_cell_dec |> svDf(3) |> data.frame() |> dplyr::arrange(rank)
 }
 \references{
 \enumerate{
-\item Jose Alquicira-Hernandez, Joseph E Powell, Nebulosa recovers single-cell gene expression signals by kernel density estimation.
-Bioinformatics, 37, 2485–2487(2021), https://doi.org/10.1093/bioinformatics/btab003.
+\item Bivand, R.S., Wong, D.W.S. Comparing implementations of global and local indicators of spatial association. TEST 27,
+716–748 (2018). https://doi.org/10.1007/s11749-018-0599-x
 }
 }
 \author{

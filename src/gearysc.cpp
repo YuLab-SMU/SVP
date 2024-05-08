@@ -16,26 +16,35 @@ arma::mat outersubtractdot(arma::rowvec x){
   return (res);
 }
 
+arma::rowvec scaleCpp(arma::rowvec x){
+  double f = sqrt(accu(pow(x, 2.0))/max(1.0, x.n_elem - 1.0));
+  if (f > 0.0){
+     x = x / f;
+  }
+  return(x);
+}
+
 double cal_gearysc(
           arma::rowvec x,
           arma::mat weight,
-          arma::rowvec rowsumw,
           double s,
           int n
         ){
 
     double m = mean(x);
     arma::rowvec y = x - m;
+    //y = scaleCpp(y);
     arma::mat ym = outersubtractdot(x);
     double cv = accu(weight % ym);
-    double v = accu(pow(y, 2));
-    double obs = ((n - 1) * cv)/(s * v);
+    double v = accu(pow(y, 2.0));
+    double obs = ((n - 1.0) * cv)/(2.0 * s * v);
 
     return(obs);
 }
 
 
 arma::rowvec cal_gearysc_p_perm(
+        double obs,
         arma::rowvec x,
         arma::mat weight,
         arma::rowvec rowsumw,
@@ -45,35 +54,38 @@ arma::rowvec cal_gearysc_p_perm(
         int n,
         int lower_tail
         ){
-    double obs = cal_gearysc(x, weight, rowsumw, s, n);
     arma::vec xmr = arma::vec(permutation, arma::fill::zeros);
     for (int i = 0; i < permutation; i++){
         arma::rowvec z = x;
         std::shuffle(std::begin(z), std::end(z), rng);
-        xmr(i) = cal_gearysc(z, weight, rowsumw, s, n);
+        xmr(i) = cal_gearysc(z, weight, s, n);
     }
     
     double expv = mean(xmr);
     double sdv = stddev(xmr);
 
+    double z = (expv - obs) / sdv;
+
     double pv = R::pnorm(obs, expv, sdv, lower_tail, 0);
 
-    arma::rowvec res = {obs, expv, sdv, pv};
+    arma::rowvec res = {obs, expv, sdv, z, pv};
     return(res);
-  
 }
 
 arma::rowvec cal_gearysc_p_noperm(
         double obs,
+        arma::rowvec x,
         double ei,
         double s,
-        arma::rowvec y,
-        double v,
         int n,
         double S1,
         double S2,
         int lower_tail
     ){
+    
+    arma::rowvec y = x - mean(x);
+    double v = accu(pow(y, 2.0));
+
     double s_sq = pow(s, 2.0);
     double n2 = pow(n, 2.0);
 
@@ -83,8 +95,10 @@ arma::rowvec cal_gearysc_p_noperm(
     sdi = sdi + s_sq * (n2 - 3.0 - pow(n - 1, 2.0) * k);
     sdi = sqrt(sdi/(n * (n - 2.0) * (n - 3.0) * s_sq));
 
+    double z = (ei - obs)/sdi;
+
     double pv = R::pnorm(obs, ei, sdi, lower_tail, 0);
-    arma::rowvec res = {obs, ei, sdi, pv};
+    arma::rowvec res = {obs, ei, sdi, z, pv};
     return (res);
 }
 
@@ -103,19 +117,13 @@ arma::rowvec gearysc(
 	int lower_tail = 1
         ){
 
-  double m = mean(x);
-  arma::rowvec y = x - m;
-  arma::mat ym = outersubtractdot(y);
-  double cv = accu(weight % ym);
-  double v = accu(pow(y, 2));
-  double obs = ((n - 1) * cv)/(s * v);
+  double obs = cal_gearysc(x, weight, s, n);
 
-
-  arma::rowvec res(4);
+  arma::rowvec res(5);
   if (permutation < 100){
-      res = cal_gearysc_p_noperm(obs, ei, s, y, v, n, S1, S2, lower_tail);
+      res = cal_gearysc_p_noperm(obs, x, ei, s, n, S1, S2, lower_tail);
   }else{
-      res = cal_gearysc_p_perm(x, weight, rowsumw, rng, permutation, s, n, lower_tail);
+      res = cal_gearysc_p_perm(obs, x, weight, rowsumw, rng, permutation, s, n, lower_tail);
   }
   return(res);
 }
@@ -160,10 +168,6 @@ arma::mat CalGearyscParallel(arma::sp_mat& x, arma::mat& weight, int permutation
   int m = x.n_cols;
   double ei = 1.0;
  
-  //arma::colvec rowsumw = sum(weight, 1);
-  //rowsumw.replace(0, 1.0);
-  //weight = weight.each_col() / rowsumw;
-
   arma::rowvec colsumw = sum(weight, 0);
   arma::colvec rowsumw = sum(weight, 1);
   arma::rowvec rowsumw2 = conv_to<arma::rowvec>::from(rowsumw);
@@ -176,7 +180,7 @@ arma::mat CalGearyscParallel(arma::sp_mat& x, arma::mat& weight, int permutation
   uint64_t seed2 = dqrng::convert_seed<uint64_t>(seed);
 
   simple_progress p(n);
-  arma::mat result(n, 4);
+  arma::mat result(n, 5);
   RunGearysc rungearysc(xm, weight, rowsumw2, p, seed2, permutation, S1, S2, s, m, ei, lower_tail, result);
   parallelFor(0, n, rungearysc);
 

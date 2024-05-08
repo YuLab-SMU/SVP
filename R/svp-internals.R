@@ -464,7 +464,7 @@ pairDist <- function(x, y){
       if (method == 'gearysc'){
           alternative <- "less"
       }
-      if (method == 'moransi'){
+      if (method %in% c('moransi', "getisord")){
           alternative <- "greater"
       }
   }
@@ -516,10 +516,13 @@ pairDist <- function(x, y){
   
   if (method == 'moransi'){
       res <- withr::with_seed(random.seed, CalMoransiParallel(x, coords.dist, scaled, permutation, lower.tail))
-      colnames(res) <- c('obs', 'expect.moransi', 'sd.moransi', 'pvalue')
+      colnames(res) <- c('obs', 'expect.moransi', 'sd.moransi', "Z.moransi", 'pvalue')
   }else if (method == 'gearysc'){
       res <- withr::with_seed(random.seed, CalGearyscParallel(x, coords.dist, permutation, lower.tail))
-      colnames(res) <- c('obs', 'expect.gearysc', 'sd.gearysc', 'pvalue')
+      colnames(res) <- c('obs', 'expect.gearysc', 'sd.gearysc', "Z.gearysc", 'pvalue')
+  }else if (method == 'getisord'){
+      res <- CalGetisOrdParallel(x, coords.dist, lower.tail)
+      colnames(res) <- c("obs", "expect.G", "sd.G", "Z.G", "pvalue")
   }
   
   if (alternative == "two.sided")
@@ -529,7 +532,7 @@ pairDist <- function(x, y){
   res <- cbind(res,
                padj = p.adjust(res[, "pvalue"], method = p.adjust.method)
             ) |> as.data.frame(check.names=FALSE)
-  if (method == 'moransi'){
+  if (method != 'gearysc'){
       res <- res |> dplyr::arrange(.data$padj, .data$pvalue, dplyr::desc(abs(.data$obs))) 
   }else{
       res <- res |> dplyr::arrange(.data$padj, .data$pvalue, dplyr::desc(abs(.data$obs - 1)))
@@ -610,22 +613,6 @@ pairDist <- function(x, y){
   lims <- c(range(coords[,1]), range(coords[,2]))
   h <- c(ks::hpi(coords[,1]), ks::hpi(coords[,2]))
  
-  #gx <- seq.int(lims[1], lims[2], length.out = n)
-  #gy <- seq.int(lims[3], lims[4], length.out = n)
-
-  #indx <- findIntervalCpp(coords[, 1], gx) - 1
-  #indy <- findIntervalCpp(coords[, 2], gy) - 1
-
-  #axm <- outergrid(gx, coords[, 1]) 
-  #aym <- outergrid(gy, coords[, 2])
- 
-  #bgkld <- CalBgSpatialKld(coords, axm, aym, h, indx, indy)
-
-  #res <- bplapply(seq(nrow(x)), function(i){
-  #          withr::with_seed(random.seed, CalSpatialKld(x[i, ], bgkld, axm, aym, h, indx, indy, permutation, random.seed))
-  #       }, BPPARAM = BPPARAM)
-
-  #res <- do.call('rbind', res)
   res <- withr::with_seed(random.seed, CalSpatialKldCpp(coords, x, lims, h, n, permutation))
 
   rownames(res) <- rownames(x)

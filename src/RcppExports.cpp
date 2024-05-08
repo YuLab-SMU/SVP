@@ -134,6 +134,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// CalGetisOrdParallel
+arma::mat CalGetisOrdParallel(arma::sp_mat& x, arma::mat& weight, int lower_tail);
+RcppExport SEXP _SVP_CalGetisOrdParallel(SEXP xSEXP, SEXP weightSEXP, SEXP lower_tailSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type weight(weightSEXP);
+    Rcpp::traits::input_parameter< int >::type lower_tail(lower_tailSEXP);
+    rcpp_result_gen = Rcpp::wrap(CalGetisOrdParallel(x, weight, lower_tail));
+    return rcpp_result_gen;
+END_RCPP
+}
 // findIntervalCpp
 arma::uvec findIntervalCpp(arma::vec x, arma::vec breaks);
 RcppExport SEXP _SVP_findIntervalCpp(SEXP xSEXP, SEXP breaksSEXP) {
@@ -310,6 +323,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_SVP_CalParallelBiCorTwoMatrix", (DL_FUNC) &_SVP_CalParallelBiCorTwoMatrix, 2},
     {"_SVP_ExtractFeatureScoreCpp", (DL_FUNC) &_SVP_ExtractFeatureScoreCpp, 4},
     {"_SVP_CalGearyscParallel", (DL_FUNC) &_SVP_CalGearyscParallel, 4},
+    {"_SVP_CalGetisOrdParallel", (DL_FUNC) &_SVP_CalGetisOrdParallel, 3},
     {"_SVP_findIntervalCpp", (DL_FUNC) &_SVP_findIntervalCpp, 2},
     {"_SVP_outergrid", (DL_FUNC) &_SVP_outergrid, 2},
     {"_SVP_CalBgSpatialKld", (DL_FUNC) &_SVP_CalBgSpatialKld, 6},
