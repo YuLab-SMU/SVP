@@ -5,43 +5,11 @@
 #include <convert_seed.h>
 #include <R_randgen.h>
 #include "progress.h"
+#include "autocorutils.h"
 using namespace RcppParallel;
 using namespace Rcpp;
 using namespace arma;
 using namespace std;
-
-arma::mat outersubtractdot(arma::rowvec x){
-  arma::mat xm = repelem(x, x.n_elem, 1);
-  arma::mat res = pow(xm - xm.t(), 2.0);
-  return (res);
-}
-
-arma::rowvec scaleCpp(arma::rowvec x){
-  double f = sqrt(accu(pow(x, 2.0))/max(1.0, x.n_elem - 1.0));
-  if (f > 0.0){
-     x = x / f;
-  }
-  return(x);
-}
-
-double cal_gearysc(
-          arma::rowvec x,
-          arma::mat weight,
-          double s,
-          int n
-        ){
-
-    double m = mean(x);
-    arma::rowvec y = x - m;
-    //y = scaleCpp(y);
-    arma::mat ym = outersubtractdot(x);
-    double cv = accu(weight % ym);
-    double v = accu(pow(y, 2.0));
-    double obs = ((n - 1.0) * cv)/(2.0 * s * v);
-
-    return(obs);
-}
-
 
 arma::rowvec cal_gearysc_p_perm(
         double obs,

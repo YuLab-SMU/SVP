@@ -5,16 +5,12 @@
 #include <convert_seed.h>
 #include <R_randgen.h>
 #include "progress.h"
+#include "autocorutils.h"
 using namespace RcppParallel;
 using namespace Rcpp;
 using namespace arma;
 using namespace std;
 
-arma::mat outerdot(arma::rowvec x){
-  arma::mat xm = repelem(x, x.n_elem, 1);
-  arma::mat res = xm % xm.t();
-  return (res);
-}
 
 arma::rowvec cal_moransi_p_noperm(
         double obs, 
@@ -40,31 +36,6 @@ arma::rowvec cal_moransi_p_noperm(
   arma::rowvec res = {obs, ei, sdi, z, pv};
   return(res);
 }
-
-double cal_moransi(
-          arma::rowvec x,
-          arma::mat weight,
-          arma::rowvec rowsumw,
-          double s,
-          int n,
-          bool scaled = false
-        ){
-
-    double m = mean(x);
-    arma::rowvec y = x - m;
-    arma::mat ym = outerdot(y);
-    double cv = accu(weight % ym);
-    double v = accu(pow(y, 2));
-    double obs = (n/s) * (cv/v);
-
-    if (scaled){
-      double imax = (n/s) * (stddev(rowsumw % y)/sqrt(v/(n -1)));
-      obs = obs/imax;
-    }
-
-    return(obs);
-}
-
 
 arma::rowvec cal_moransi_p_perm(
         arma::rowvec x,

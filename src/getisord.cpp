@@ -1,17 +1,11 @@
 #include <RcppParallel.h>
 #include <RcppArmadillo.h>
 #include "progress.h"
+#include "autocorutils.h"
 using namespace RcppParallel;
 using namespace Rcpp;
 using namespace arma;
 using namespace std;
-
-arma::mat outermultidot(arma::rowvec x){
-  arma::mat xm = repelem(x, x.n_elem, 1);
-  xm.diag().fill(0.0);
-  arma::mat res = xm % xm.t();
-  return (res);
-}
 
 arma::rowvec cal_getisord_p_noperm(
     arma::rowvec x,
@@ -49,18 +43,6 @@ arma::rowvec cal_getisord_p_noperm(
 
   arma::rowvec res = {obs, ei, sdi, z, pv};
   return(res);
-}
-
-double cal_getisord(
-  arma::rowvec x,
-  arma::mat weight
-  ){
-  arma::mat ym = outermultidot(x);
-  double cv = accu(weight % ym);
-  double v = accu(ym);
-  double obs = cv/v;
-
-  return(obs);
 }
 
 arma::rowvec getisord(
