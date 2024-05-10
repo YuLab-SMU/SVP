@@ -482,46 +482,20 @@ pairDist <- function(x, y){
       lower.tail <- 1
   }
 
-  
-  if (length(weight.method) > 1){
-      weight.method <- match.arg(weight.method)
-  }
-  
-  if (is.null(weight) && weight.method %in% c('none', 'knn')){
-      coords.dist <- pairDist(coords, coords)
-      if (weight.method == 'knn'){
-          if ("k" %in% names(params) && is.numeric(params$k)){
-               k <- round(params$k)
-	  }else{
-               k <- 10
-          }
-          coords.dist <- .build.adj.m(coords.dist, k) |> as.matrix()
-      }
-      coords.dist <- coords.dist * (1/rowSums(coords.dist))
-  }
-
-  if (inherits(weight, "listw") || inherits(weight, "nb")){
-      coords.dist <- .convert_to_distmt(weight)
-  }
-
-  if (is.null(weight) && !weight.method %in% c("none", "knn")){
-      rlang::check_installed("spdep", paste0("is required to identify SVG or SVP with `", weight.method,"` ."))
-      coords.dist <- do.call(weight.method, c(list(coords), params))
-      coords.dist <- .convert_to_distmt(coords.dist)
-  }
+  wm <- .obtain.weight(coords, weight, weight.method, ...)
 
   if (is.null(permutation)){
       permutation <- 1
   }
   
   if (method == 'moransi'){
-      res <- withr::with_seed(random.seed, CalMoransiParallel(x, coords.dist, scaled, permutation, lower.tail))
+      res <- withr::with_seed(random.seed, CalMoransiParallel(x, wm, scaled, permutation, lower.tail))
       colnames(res) <- c('obs', 'expect.moransi', 'sd.moransi', "Z.moransi", 'pvalue')
   }else if (method == 'gearysc'){
-      res <- withr::with_seed(random.seed, CalGearyscParallel(x, coords.dist, permutation, lower.tail))
+      res <- withr::with_seed(random.seed, CalGearyscParallel(x, wm, permutation, lower.tail))
       colnames(res) <- c('obs', 'expect.gearysc', 'sd.gearysc', "Z.gearysc", 'pvalue')
   }else if (method == 'getisord'){
-      res <- CalGetisOrdParallel(x, coords.dist, lower.tail)
+      res <- CalGetisOrdParallel(x, wm, lower.tail)
       colnames(res) <- c("obs", "expect.G", "sd.G", "Z.G", "pvalue")
   }
   
@@ -593,6 +567,47 @@ pairDist <- function(x, y){
                       dimnames = list(region_id, region_id)) |> 
          as.matrix()
   return(res)
+}
+
+
+.obtain.weight <- function(
+     coords,
+     weight = NULL,
+     weight.method = c("knn", "tri2nb", "none"),
+     ...
+  ){
+  params <- list(...)
+
+  if (is.integer(coords)) coords <- coords * 1.0
+
+  if (length(weight.method) > 1){
+      weight.method <- match.arg(weight.method)
+  }
+
+  if (is.null(weight) && weight.method %in% c('none', 'knn')){
+      weight.mat <- pairDist(coords, coords)
+      if (weight.method == 'knn'){
+          if ("k" %in% names(params) && is.numeric(params$k)){
+               k <- round(params$k)
+          }else{
+               k <- 10
+          }
+          weight.mat <- .build.adj.m(weight.mat, k) |> as.matrix()
+      }
+      weight.mat <- weight.mat * (1/rowSums(weight.mat))
+  }
+
+  if (inherits(weight, "listw") || inherits(weight, "nb")){
+      weight.mat <- .convert_to_distmt(weight)
+  }
+
+  if (is.null(weight) && !weight.method %in% c("none", "knn")){
+      rlang::check_installed("spdep", paste0("is required to identify SVG or SVP with `", weight.method,"` ."))
+      weight.mat <- do.call(weight.method, c(list(coords), params))
+      weight.mat <- .convert_to_distmt(weight.mat)
+  }
+
+  return(weight.mat)
 }
 
 #' @importFrom rlang .data
