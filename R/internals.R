@@ -1,8 +1,8 @@
 .gsva_key <- 'gsvaExps'
 
-.fscore_key <- 'fscoreDF'
+.fscore_key <- 'fscoreDfs'
 
-.sv_key <- 'svDF'
+.sv_key <- 'svDfs'
 
 #' @importFrom BiocGenerics updateObject 
 # refering to the internal functions of SingleCellExperiment
@@ -279,3 +279,45 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
     }
 }
 
+
+.check_sample_id <- function(x, sampleid){
+    sampleid <- unique(sampleid)
+    allsample <- .extract_sampleid(x)
+    if (is.null(allsample) || sampleid == ".ALLCELL"){
+        return(".ALLCELL")
+    }
+    if (length(sampleid)==1 && sampleid == 'all'){
+        return(allsample)
+    }
+    
+    ids <- intersect(sampleid, allsample)
+
+    if (length(ids) < 1){
+        cli::cli_abort("The `sample_id` is/are not present in the object.
+                        Please check the `sample_id`.", call=NULL)
+    }
+
+    if (length(ids) != length(sampleid)){
+        cli::cli_inform("Some sample_id are not present in the object.
+                        Only using the sample_id, which is/are in the object.")
+    }
+    return(ids)
+}
+
+.extract_sampleid <- function(x){
+    unique(colData(x)$sample_id)
+}
+
+.tidy_sv_result <- function(x){
+    rlang::check_installed(c("tidyr", "tibble"))
+    if (length(x) == 1){
+        return(x[[1]])
+    }
+
+    x <- lapply(x,function(i) i |> tibble::rownames_to_column(var="features")) |>
+    dplyr::bind_rows(.id='sample_id') |> 
+    dplyr::group_by(.data$features) |> 
+    tidyr::nest() |> 
+    dplyr::ungroup()
+    return(x)
+}

@@ -19,6 +19,7 @@ runLISA(
   action = c("get", "add", "only"),
   alternative = "two.sided",
   BPPARAM = SerialParam(),
+  verbose = TRUE,
   ...
 )
 
@@ -35,6 +36,7 @@ runLISA(
   action = c("get", "add", "only"),
   alternative = "two.sided",
   BPPARAM = SerialParam(),
+  verbose = TRUE,
   ...
 )
 }
@@ -79,7 +81,9 @@ a \linkS4class{SimpleList}.}
 \code{BiocParallel} default is \code{SerialParam()}, meaning no parallel.
 You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=T)} to parallel it,
 the \code{workers} of \code{MulticoreParam} is the number of cores used, see also
-\code{\link[BiocParallel]{MulticoreParam}}. default is \code{SerialParam()}..}
+\code{\link[BiocParallel]{MulticoreParam}}. default is \code{SerialParam()}.}
+
+\item{verbose}{logical whether print the help information, default is TRUE.}
 
 \item{...}{additional parameters the parameters which are from the weight.method function.}
 }

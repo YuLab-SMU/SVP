@@ -32,7 +32,8 @@
 #' \code{BiocParallel} default is \code{SerialParam()}, meaning no parallel.
 #' You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=T)} to parallel it,
 #' the \code{workers} of \code{MulticoreParam} is the number of cores used, see also
-#' \code{\link[BiocParallel]{MulticoreParam}}. default is \code{SerialParam()}..
+#' \code{\link[BiocParallel]{MulticoreParam}}. default is \code{SerialParam()}.
+#' @param verbose logical whether print the help information, default is TRUE.
 #' @param ... additional parameters the parameters which are from the weight.method function.
 #' @return if \code{action = 'get'} (in default), the SimpleList object (like list object) will be return, 
 #' if \code{action = 'only'}, the data.frame will be return. if \code{action = 'add'}, the result of LISA is 
@@ -139,6 +140,7 @@ setGeneric('runLISA',
     action = c("get", "add", "only"),
     alternative = 'two.sided',
     BPPARAM = SerialParam(),
+    verbose = TRUE,
     ...
   )
   standardGeneric('runLISA')
@@ -160,6 +162,7 @@ setMethod("runLISA", "SingleCellExperiment", function(
     action = c("get", "add", "only"),
     alternative = 'two.sided',
     BPPARAM = SerialParam(),
+    verbose = TRUE,
     ...
   ){
   
@@ -228,6 +231,10 @@ setMethod("runLISA", "SingleCellExperiment", function(
   }
 
   if (action == 'add'){
+      if (verbose){
+          cli::cli_inform(c("The result is added to the input object, which can be extracted using",
+                           paste0("`LISAResult()` with `type='", method, ".SVP'`, and a specified `features`.")))
+      }
       data <- .add_LISA_res(data, res, method)
       return(data)
   }
