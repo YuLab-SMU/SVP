@@ -63,3 +63,13 @@
     return(x)
 }
 
+.tidy_lisa_res <- function(res){
+    if (length(res)==1){
+        return(res[[1]])
+    }
+    
+    res <- unlist(unname(res), recursive=FALSE)
+    nm <- names(res) |> unique()
+    res <- lapply(nm, function(x)dplyr::bind_rows(res[names(res)==x]))
+    names(res) <- nm
+}

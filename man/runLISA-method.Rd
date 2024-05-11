@@ -10,6 +10,7 @@ runLISA(
   data,
   features,
   assay.type = "logcounts",
+  sample_id = "all",
   method = c("localG", "localmoran"),
   weight = NULL,
   weight.method = c("knn", "tri2nb"),
@@ -25,6 +26,7 @@ runLISA(
   data,
   features,
   assay.type = "logcounts",
+  sample_id = "all",
   method = c("localG", "localmoran"),
   weight = NULL,
   weight.method = c("knn", "tri2nb"),
@@ -45,9 +47,16 @@ or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} ob
 
 \item{assay.type}{which expressed data to be pulled to run, default is \code{logcounts}.}
 
+\item{sample_id}{character the sample(s) in the \linkS4class{SpatialExperiment} object whose cells/spots to use.
+Can be \code{all} to compute metric for all samples; the metric is computed separately for each sample.
+default is \code{"all"}.}
+
 \item{method}{character one of \code{'localG'}, \code{"localmoran"}, default is \code{'localG'}.}
 
-\item{weight}{object, which can be \code{nb}, \code{listw} or \code{Graph} object, default is NULL.}
+\item{weight}{object, which can be \code{nb}, \code{listw} or \code{Graph} object, default is NULL,
+meaning the spatail neighbours weights will be calculated using the \code{weight.method}.
+if the \code{data} contains multiple samples, and the \code{sample_id} is specified, it should be
+provided as a list object with names (using \code{sample_id}).}
 
 \item{weight.method}{character the method to build the spatial neighbours weights, default
 is \code{knn} (k nearest neighbours). Other method, which requires coord matrix as input and returns
@@ -84,9 +93,97 @@ stored in the \code{localResults} column of \code{int_colData} (internal column 
 This function use the local indicators of spatial association (LISA) to identify the hotspot
 in the spatial space.
 }
+\examples{
+library(SpatialExperiment)
+# This example data was extracted from the
+# result of runSGSA with gsvaExp() function.
+data(hpda_spe_cell_dec)
+# using global spatial autocorrelation test to identify the spatial 
+# variable features.
+svres <- runDetectSVG(hpda_spe_cell_dec, assay.type = 'affi.score', 
+           method = 'moransi', action = 'only') 
+svres |> dplyr::arrange(rank) |> head()
+# In this example, we found the `Cancer clone A` and `Cancer clone B`
+# have significant spatial autocorrelation. Next, we use the `runLISA()`
+# to explore the spatial hotspots for the features.
+lisa.res12 <- hpda_spe_cell_dec |>
+   runLISA(
+     features = c(1, 2, 3), 
+     assay.type = 'affi.score',
+     weight.method = "knn",
+     k = 10,
+     action = 'get',
+   )
+lisa.res12
+lisa.res12[['Acinar cells']] |> head()
+lisa.res12[["Cancer clone A"]] |> head()
+colData(hpda_spe_cell_dec)$`cluster.test.Cancer.A` <- lisa.res12[["Cancer clone A"]] |>
+dplyr::pull(cluster.test)
+colData(hpda_spe_cell_dec)$`cluster.test.Acinar` <- lisa.res12[["Acinar cells"]] |>
+dplyr::pull(cluster.test)
+colData(hpda_spe_cell_dec)$`cluster.test.Cancer.B` <- lisa.res12[["Cancer clone B"]] |>
+dplyr::pull(cluster.test)
+# Then using ggsc to visualize the result
+\dontrun{
+  library(ggplot2)
+  library(ggsc)
+  p1 <- sc_spatial(hpda_spe_cell_dec,
+             features = rownames(hpda_spe_cell_dec),
+             mapping = aes(x=x, y=y, color=cluster.test.Cancer.A),
+             plot.pie = T,
+             pie.radius.scale = .8,
+             bg_circle_radius = 1.1,
+             color=NA,
+             linewidth=2
+  ) +
+  scale_color_manual(values=c('white', "grey", 'black'))
+  p1
+  f1 <- sc_spatial(hpda_spe_cell_dec, features="Cancer clone A",
+             mapping=aes(x=x,y=y),
+             pointsize=10
+  ) +
+  geom_scattermore2(
+    mapping = aes(bg_color=cluster.test.Cancer.A, subset=cluster.test.Cancer.A=="High"),
+    bg_line_width = .15,
+    gap_line_width = .02,
+    pointsize = 7
+  ) +
+  scale_bg_color_manual(values=c('black'))
+  f1
+  f2 <- sc_spatial(hpda_spe_cell_dec, features="Acinar cells",
+             mapping=aes(x=x,y=y),
+             pointsize=10
+  ) +
+  geom_scattermore2(
+    mapping = aes(bg_color=cluster.test.Acinar, subset=cluster.test.Acinar=="High"),
+    bg_line_width = .15,
+    gap_line_width = .02,
+    pointsize = 7
+  ) +
+  scale_bg_color_manual(values=c('black'))
+  f2
+  f3 <- sc_spatial(hpda_spe_cell_dec, features="Cancer clone B",
+             mapping=aes(x=x,y=y),
+             pointsize=10
+  ) +
+  geom_scattermore2(
+    mapping = aes(bg_color=cluster.test.Cancer.B, subset=cluster.test.Cancer.B=="High"),
+    bg_line_width = .18,
+    gap_line_width = .06,
+    pointsize = 8
+  ) +
+  scale_bg_color_manual(values=c('black'))
+}
+}
 \references{
 \enumerate{
 \item Bivand, R.S., Wong, D.W.S. Comparing implementations of global and local indicators of spatial association. TEST 27,
 716–748 (2018). https://doi.org/10.1007/s11749-018-0599-x
 }
+}
+\seealso{
+\code{\link{runDetectSVG}} and \code{\link{runKldSVG}} to identify the spatial variable features.
+}
+\author{
+Shuangbin Xu
 }
