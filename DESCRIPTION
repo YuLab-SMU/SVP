@@ -48,8 +48,9 @@ Suggests:
   testthat (>= 3.0.0),
   scuttle,
   magrittr,
-  multimode,
-  DropletUtils 
+  DropletUtils,
+  tibble,
+  tidyr 
 License: GPL-3
 BugReports: https://github.com/YuLab-SMU/SVP/issues
 URL: https://github.com/YuLab-SMU/SVP
