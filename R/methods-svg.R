@@ -13,14 +13,21 @@
 #' or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} object with specified
 #' \code{gsvaexp} argument.
 #' @param assay.type which expressed data to be pulled to run, default is \code{logcounts}.
-#' @param sv.used.reduction character used as spatial coordinates to detect SVG, default is \code{UMAP}, 
+#' @param reduction.used character used as spatial coordinates to detect SVG, default is \code{UMAP}, 
 #' if \code{data} has \code{spatialCoords}, which will be used as spatial coordinates.
-#' @param sv.grid.n numeric number of grid points in the two directions to estimate 2D weighted kernel 
+#' @param sample_id character the sample(s) in the \linkS4class{SpatialExperiment} object whose cells/spots to use.
+#' Can be \code{all} to compute metric for all samples; the metric is computed separately for each sample.
+#' default is \code{"all"}.
+#' @param grid.n numeric number of grid points in the two directions to estimate 2D weighted kernel 
 #' density, default is 100.
-#' @param sv.permutation numeric the number of permutation for each single feature to detect the 
+#' @param permutation numeric the number of permutation for each single feature to detect the 
 #' signicantly spatially or single cell variable features, default is 100.
-#' @param sv.p.adjust.method character the method to adjust the pvalue of the result, default is \code{BY}.
+#' @param p.adjust.method character the method to adjust the pvalue of the result, default is \code{BY}.
 #' @param verbose logical whether print the intermediate message when running the program, default is TRUE.
+#' @param action character control the type of output, if \code{action='add'}, the result of identification
+#' will add the original object, if \code{action = 'get'}, the result will return a \linkS4class{SimpleList},
+#' if \code{action = 'only'}, the result will return a \linkS4class{DataFrame} by merging the result of all
+#' sample, default is \code{add}.
 #' @param random.seed numeric random seed number to repeatability, default is 1024.
 #' @param gsvaexp which gene set variation experiment will be pulled to run, this only work when \code{data} is a
 #' \linkS4class{SVPExperiment}, default is NULL.
@@ -42,7 +49,7 @@
 #'      each features.
 #'   \item \code{pvalue} the pvalue is calculated using the real \code{sp.kld} and the permutation \code{boot.sp.kld.mean} and
 #'      \code{boot.sp.kld.sd} based on the normal distribution.
-#'   \item \code{padj} the adjusted pvalue based on the speficied \code{sv.p.adjust.method}, default is \code{BY}.
+#'   \item \code{padj} the adjusted pvalue based on the speficied \code{p.adjust.method}, default is \code{BY}.
 #'   \item \code{rank} the order of significant spatial variable features based on \code{padj} and \code{sp.kld}.
 #' }
 #' 
@@ -82,7 +89,8 @@
 #' 
 #' 3. https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence
 #'
-#' @seealso [`runSGSA`] to calculate the activity score of gene sets.
+#' @seealso [`runSGSA`] to calculate the activity score of gene sets, [`runLISA`] to explore the hotspot for 
+#' specified features in the spatial space.
 #' @export
 #' @author Shuangbin Xu
 #' @examples
@@ -106,12 +114,13 @@ setGeneric('runKldSVG',
   function(
     data,
     assay.type = 'logcounts',
-    sv.used.reduction = c('UMAP', 'TSNE'),
-    sv.grid.n = 100,
-    sv.permutation = 100,
-    sv.p.adjust.method = "BY",
-    #sv.BPPARAM = SerialParam(),
+    reduction.used = c('UMAP', 'TSNE'),
+    sample_id = 'all',
+    grid.n = 100,
+    permutation = 100,
+    p.adjust.method = "BY",
     verbose = TRUE,
+    action = c('add', 'only', 'get'),
     random.seed = 1024,
     gsvaexp = NULL,
     gsvaexp.assay.type = NULL,
@@ -120,6 +129,7 @@ setGeneric('runKldSVG',
   standardGeneric('runKldSVG')
 )
 
+#' @importFrom S4Vectors SimpleList
 #' @rdname runKldSVG-method
 #' @aliases runKldSVG,SingleCellExperiment
 #' @export runKldSVG
@@ -127,62 +137,94 @@ setMethod('runKldSVG', 'SingleCellExperiment',
   function(
     data,
     assay.type = 'logcounts',
-    sv.used.reduction = c('UMAP', 'TSNE'),
-    sv.grid.n = 100,
-    sv.permutation = 100,
-    sv.p.adjust.method = "BY",
-    #sv.BPPARAM = SerialParam(),
+    reduction.used = c('UMAP', 'TSNE'),
+    sample_id = 'all',
+    grid.n = 100,
+    permutation = 100,
+    p.adjust.method = "BY",
     verbose = TRUE,
+    action = c('add', 'only', 'get'),
     random.seed = 1024,
     gsvaexp = NULL,
     gsvaexp.assay.type = NULL,
     ...
   ){
+  action <- match.arg(action)
   if (is.null(assay.type)){
     assay.type <- assayNames(data)[1]
   }
 
+  sample_id <- .check_sample_id(data, sample_id)
+
   x <- assay(data, assay.type)
 
   flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
-
-  flag2 <- any(sv.used.reduction %in% reducedDimNames(data))
-
+  flag2 <- any(reduction.used %in% reducedDimNames(data))
   if((flag1 || flag2)){
       if (flag2){
-          coords <- reducedDim(data, sv.used.reduction)
+          coords <- reducedDim(data, reduction.used)
           coords <- coords[,c(1, 2)]
       }
       if (flag1){
           coords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
       }
-      tic()
-      if (verbose){
-          cli::cli_inform("Identifying the spatially variable gene sets (pathway) or genes based on
-                           Kullback-Leibler divergence of 2D Weighted Kernel Density ...")
-
-      }
-
-      res.sv <- .identify.svg(
-                        x,
-                        coords = coords,
-                        n = sv.grid.n,
-                        permutation = sv.permutation,
-                        p.adjust.method = sv.p.adjust.method,
-                        #BPPARAM = sv.BPPARAM,
-                        random.seed = random.seed,
-                        ...)
-
-      data <- .add.int.rowdata(sce = data,
-                            getfun = svDfs,
-                            setfun1 = `svDfs<-`,
-                            setfun2 = `svDf<-`,
-                            namestr = 'sv.kld',
-                            val = res.sv)
-      toc()
   }else{
       cli::cli_abort("The {.cls {class(data)}} should have 'spatialCoords' or the reduction result of 'UMAP' or 'TSNE'.")
   }
+      
+  tic()
+  if (verbose){
+      cli::cli_inform("Identifying the spatially variable gene sets (pathway) or genes based on
+                       Kullback-Leibler divergence of 2D Weighted Kernel Density ...")
+
+  }
+  res.sv <- lapply(sample_id, function(sid){
+              if (sid == ".ALLCELL"){
+                 ind <- seq(ncol(x))
+              }else{
+                 ind <- colData(data)$sample_id == sid
+              }
+              xi <- x[, ind, drop=FALSE]
+              xi <- xi[DelayedMatrixStats::rowVars(xi)!=0,]
+              coordsi <- coords[ind,, drop=FALSE]
+              grid.ni <- if(length(grid.n) > 1){grid.n[names(grid.n)==sid]}else{grid.n[1]}
+              res.sv <- .identify.svg(
+                                xi,
+                                coords = coordsi,
+                                n = grid.ni,
+                                permutation = permutation,
+                                p.adjust.method = p.adjust.method,
+                                random.seed = random.seed,
+                                ...)
+            })
+  toc()
+
+  names(res.sv) <- sample_id
+
+  if (action == 'get'){
+      res.sv <- SimpleList(res.sv)
+      return(res.sv)
+  }
+
+  res.sv <- .tidy_sv_result(res.sv)
+  if (action == 'only'){
+      return(res.sv)
+  }
+    
+  if (verbose){
+      cli::cli_inform(c("The result is added to the input object, which can be extracted using",
+                       "`svDf()` with type='kld' for `SingleCellExperiment` or `SpatialExperiment`.", 
+                       "If input object is `SVPExperiment`, and `gsvaexp` is specified, the result",
+                       "can be extracted by `gsvaExp()` (return a `SingleCellExperiment` or ",
+                       "`SpatialExperiment`, then also use `svDf()` to extract."))
+  }
+
+  data <- .add.int.rowdata(sce = data,
+                        getfun = svDfs,
+                        setfun1 = `svDfs<-`,
+                        setfun2 = `svDf<-`,
+                        namestr = 'sv.kld',
+                        val = res.sv)
 
   return(data)
 })
@@ -194,12 +236,13 @@ setMethod('runKldSVG', 'SVPExperiment',
   function(
     data,
     assay.type = 'logcounts',
-    sv.used.reduction = c('UMAP', 'TSNE'),
-    sv.grid.n = 100,
-    sv.permutation = 100,
-    sv.p.adjust.method = "BY",
-    #sv.BPPARAM = SerialParam(),
+    reduction.used = c('UMAP', 'TSNE'),
+    sample_id = 'all',
+    grid.n = 100,
+    permutation = 100,
+    p.adjust.method = "BY",
     verbose = TRUE,
+    action = c('add', 'only', 'get'),
     random.seed = 1024,
     gsvaexp = NULL,
     gsvaexp.assay.type = NULL,
@@ -212,12 +255,13 @@ setMethod('runKldSVG', 'SVPExperiment',
        da2 <- gsvaExp(data, gsvaexp, withSpatialCoords = TRUE, withReducedDim = TRUE, withColData = FALSE, withImgData=FALSE)
        da2 <- runKldSVG(da2, 
                      gsvaexp.assay.type, 
-                     sv.used.reduction, 
-                     sv.grid.n, 
-                     sv.permutation, 
-                     sv.p.adjust.method, 
-                     #sv.BPPARAM, 
-                     verbose, 
+                     reduction.used,
+                     sample_id, 
+                     grid.n, 
+                     permutation, 
+                     p.adjust.method, 
+                     verbose,
+                     action, 
                      random.seed, 
                      ...)
        gsvaExp(data, gsvaexp) <- da2
@@ -229,15 +273,11 @@ setMethod('runKldSVG', 'SVPExperiment',
 )
 
 
-#' Detecting the spatially or single cell variable features with Moran's I or Geary's C of
-#' 2D weighted kernel density estimation
+#' Detecting the spatially or single cell variable features with Moran's I or Geary's C 
 #' @description
-#' To resolve the sparsity of single cell or spatial omics data, we use kernel function smoothing cell
-#' density weighted by the gene expression in a low-dimensional space or physical space. This method had
-#' reported that it can better represent the gene expression, it can also recover the signal from cells that
-#' are more likely to express a gene based on their neighbouring cells (first reference). Next, we use
-#' Moran's I or Geary's C to detect the signal genes in a low-dimensional space (\code{UMAP} or \code{TSNE}
-#' for single cell omics data) or a physical space (for spatial omics data).
+#' This function use Moran's I, Geary's C or global G test to detect the signal genes in 
+#' a low-dimensional space (\code{UMAP} or \code{TSNE} for single cell omics data) or 
+#' a physical space (for spatial omics data).
 #'
 #' @rdname runDetectSVG-method
 #' @param data a \linkS4class{SingleCellExperiment} object with contains \code{UMAP} or \code{TSNE},
@@ -245,34 +285,41 @@ setMethod('runKldSVG', 'SVPExperiment',
 #' \code{gsvaexp} argument.
 #' @param assay.type which expressed data to be pulled to run, default is \code{logcounts}.
 #' @param method character one of \code{'moransi'}, \code{"gearysc"} or \code{"getisord"}, default is \code{'moransi'}.
-#' @param weight object, which can be \code{nb}, \code{listw} or \code{Graph} object, default is NULL.
+#' @param weight object, which can be \code{nb}, \code{listw} or \code{Graph} object, default is NULL,
+#' meaning the spatail neighbours weights will be calculated using the \code{weight.method}.
+#' if the \code{data} contains multiple samples, and the \code{sample_id} is specified, it should be 
+#' provided as a list object with names (using \code{sample_id}).
 #' @param weight.method character the method to build the spatial neighbours weights, default 
 #' is \code{knn} (k nearest neighbours). Other method, which requires coord matrix as input and returns
 #' \code{nb}, \code{listw} or \code{Graph} object, also is avaiable, such as \code{'tri2nb'}, \code{"knearneigh"},
 #' \code{'dnearneigh'}, \code{"gabrielneigh"}, \code{"relativeneigh"}, which are from \code{spdep} package.
 #' default is \code{knn}, if it is \code{"none"}, meaning the distance weight of each spot is used to
 #' the weight.
-#' @param sv.runWKDE logical whether perform the 2D weighted kernel density estimation firstly, 
-#' default is FALSE, it is experimental parameter.
-#' @param sv.used.reduction character used as spatial coordinates to detect SVG, default is \code{UMAP},
+#' @param sample_id character the sample(s) in the \linkS4class{SpatialExperiment} object whose cells/spots to use. 
+#' Can be \code{all} to compute metric for all samples; the metric is computed separately for each sample. 
+#' default is \code{"all"}.
+#' @param reduction.used character used as spatial coordinates to detect SVG, default is \code{UMAP},
 #' if \code{data} has \code{spatialCoords}, which will be used as spatial coordinates.
-#' @param sv.grid.n numeric number of grid points in the two directions to estimate 2D weighted kernel
-#' density, default is 100.
-#' @param sv.permutation integer the number to permutation test for the calculation of Moran's I, default
-#' is NULL.
-#' @param sv.p.adjust.method character the method to adjust the pvalue of the result, default is \code{BY}.
+#' @param permutation integer the number to permutation test for the calculation of Moran's I, default
+#' is NULL. Because we do not recommend using this parameter, as the permutation test is too slow.
+#' @param p.adjust.method character the method to adjust the pvalue of the result, default is \code{BY}.
 #' @param random.seed numeric random seed number to repeatability, default is 1024.
 #' @param verbose logical whether print the intermediate message when running the program, default is TRUE.
+#' @param action character control the type of output, if \code{action='add'}, the result of identification 
+#' will add the original object, if \code{action = 'get'}, the result will return a \linkS4class{SimpleList},
+#' if \code{action = 'only'}, the result will return a \linkS4class{DataFrame} by merging the result of all 
+#' sample, default is \code{add}.
 #' @param gsvaexp which gene set variation experiment will be pulled to run, this only work when \code{data} is a
 #' \linkS4class{SVPExperiment}, default is NULL.
 #' @param gsvaexp.assay.type which assay data in the specified \code{gsvaexp} will be used to run, default is NULL.
 #' @param ... additional parameters
-#' @return a \linkS4class{SVPExperiment} or a \linkS4class{SingleCellExperiment}, see details.
+#' @return a \linkS4class{SVPExperiment} or a \linkS4class{SingleCellExperiment}, see \code{action} parameter details.
 #' @references
 #' 1. Bivand, R.S., Wong, D.W.S. Comparing implementations of global and local indicators of spatial association. TEST 27, 
 #'    716–748 (2018). https://doi.org/10.1007/s11749-018-0599-x
 #' @export
 #' @author Shuangbin Xu
+#' @seealso [`runLISA`] to explore the hotspot for specified features in the spatial space.
 #' @examples
 #' # This example dataset is extracted from the
 #' # result of runSGSA with gsvaExp(svpe).
@@ -316,13 +363,13 @@ setGeneric("runDetectSVG", function(
     method = c("moransi", "gearysc", "getisord"),
     weight = NULL,
     weight.method = c("knn", "tri2nb", "none"),
-    sv.runWKDE = FALSE,
-    sv.used.reduction = c('UMAP', 'TSNE'),
-    sv.grid.n = 100,
-    sv.permutation = NULL,
-    sv.p.adjust.method = "BH",
+    sample_id = "all",
+    reduction.used = c('UMAP', 'TSNE'),
+    permutation = NULL,
+    p.adjust.method = "BH",
     random.seed = 1024,
     verbose = TRUE,
+    action = c('add', 'only', 'get'),
     gsvaexp = NULL,
     gsvaexp.assay.type = NULL,
     ...
@@ -340,81 +387,103 @@ setMethod('runDetectSVG', 'SingleCellExperiment',
     method = c("moransi", "gearysc", "getisord"),
     weight = NULL,
     weight.method = c("knn", "tri2nb", "none"),
-    sv.runWKDE = FALSE,
-    sv.used.reduction = c('UMAP', 'TSNE'),
-    sv.grid.n = 100,
-    sv.permutation = NULL,
-    sv.p.adjust.method = "BH",
+    sample_id = "all",
+    reduction.used = c('UMAP', 'TSNE'),
+    permutation = NULL,
+    p.adjust.method = "BH",
     random.seed = 1024,
     verbose = TRUE,
+    action = c('add', 'only', 'get'),
     gsvaexp = NULL,
     gsvaexp.assay.type = NULL,
     ...
   ){
   method <- match.arg(method)
+  action <- match.arg(action)
   if (is.null(assay.type)){
     assay.type <- assayNames(data)[1]
   }else if (is.numeric(assay.type)){
     assay.type <- assayNames(data)[assay.type]
   }
-  if (sv.runWKDE){
-    new.assay.nm <- paste0(assay.type, ".density")
-    if (!new.assay.nm %in% assayNames(data)){
-      data <- runWKDE(
-        data, 
-        assay.type = assay.type,
-        reduction = sv.used.reduction,
-        grid.n = sv.grid.n,
-        adjust = 1,
-        bandwidths = NULL,
-        verbose = verbose
-      )
-    }
-    x <- assay(data, new.assay.nm)
-  }else{
-    x <- assay(data, assay.type)
-  }
+  
+  x <- assay(data, assay.type)
+
+  sample_id <- .check_sample_id(data, sample_id)
 
   flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
 
-  flag2 <- any(sv.used.reduction %in% reducedDimNames(data))
-
-  if((flag1 || flag2)){
+  flag2 <- any(reduction.used %in% reducedDimNames(data))
+  coords <- NULL
+  if((flag1 || flag2) && is.null(weight)){
       if (flag2){
-          coords <- reducedDim(data, sv.used.reduction)
+          coords <- reducedDim(data, reduction.used)
           coords <- coords[,c(1, 2)]
       }
       if (flag1){
           coords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
       }
-      tic()
-      if (verbose && sv.runWKDE){
-          cli::cli_inform("Identifying the spatially variable gene sets (pathway) based on
-                           Moran's Index of 2D Weighted Kernel Density ...")
-
+  }else{
+      cli::cli_abort("The {.cls {class(data)}} should have 'spatialCoords' or the reduction result of 'UMAP' or 'TSNE'.",
+                      "Or the `weight` should be provided.")
+  }
+  
+  tic()
+  if (verbose){
+      cli::cli_inform(paste0("Identifying the spatially variable gene sets (pathway) based on ", method))
+  }
+  
+  res.sv <- lapply(sample_id, function(sid){
+      if (sid == ".ALLCELL"){
+          ind <- seq(ncol(x))
+      }else{
+          ind <- colData(data)$sample_id == sid
       }
-
-      res.sv <- .identify.svg.by.autocorrelation(
-                        x,
-                        coords = coords,
-                        weight = weight,
+      xi <- x[, ind, drop=FALSE]
+      xi <- xi[DelayedMatrixStats::rowVars(xi)!=0,]
+      coordsi <- if(!is.null(coords)){coords[ind, , drop=FALSE]}else{NULL}
+      weighti <- if(length(weight) > 1){weight[names(weight) == sid]}else{weight}
+      res <- .identify.svg.by.autocorrelation(
+                        xi,
+                        coords = coordsi,
+                        weight = weighti,
                         weight.method = weight.method,
                         method = method,
-                        permutation = sv.permutation,
-                        p.adjust.method = sv.p.adjust.method,
+                        permutation = permutation,
+                        p.adjust.method = p.adjust.method,
                         random.seed = random.seed,
                         ...)
+      return(res)
+  })
 
-      data <- .add.int.rowdata(sce = data,
-                            getfun = svDfs,
-                            setfun1 = `svDfs<-`,
-                            setfun2 = `svDf<-`,
-                            namestr = paste0('sv.', method),
-                            val = res.sv)
-      toc()
-  }else{
-      cli::cli_abort("The {.cls {class(data)}} should have 'spatialCoords' or the reduction result of 'UMAP' or 'TSNE'.")
+  toc()
+
+  names(res.sv) <- sample_id
+
+  if (action == 'get'){
+      res.sv <- SimpleList(res.sv)
+      return(res.sv)
   }
+
+  res.sv <- .tidy_sv_result(res.sv)
+  if (action == 'only'){
+      return(res.sv)
+  }
+  nmstr <- paste0("sv.", method)
+  if (verbose){
+      cli::cli_inform(c("The result is added to the input object, which can be extracted using",
+                       paste0("`svDf()` with type='", nmstr, "' for `SingleCellExperiment` or
+                       `SpatialExperiment`."), 
+		       "If input object is `SVPExperiment`, and `gsvaexp` is specified", 
+		       "the result can be extracted by `gsvaExp()` (return a `SingleCellExperiment`",
+		       " or `SpatialExperiment`),then also using `svDf()` to extract."))
+  }
+
+  data <- .add.int.rowdata(sce = data,
+                        getfun = svDfs,
+                        setfun1 = `svDfs<-`,
+                        setfun2 = `svDf<-`,
+                        namestr = paste0('sv.', method),
+                        val = res.sv)
 
   return(data)  
 })
@@ -429,13 +498,13 @@ setMethod('runDetectSVG', 'SVPExperiment',
     method = c("moransi", "gearysc"),
     weight = NULL,
     weight.method = c("knn", "tri2nb", "none"),
-    sv.runWKDE = FALSE,
-    sv.used.reduction = c('UMAP', 'TSNE'),
-    sv.grid.n = 100,
-    sv.permutation = NULL,
-    sv.p.adjust.method = "BH",
+    sample_id = 'all',
+    reduction.used = c('UMAP', 'TSNE'),
+    permutation = NULL,
+    p.adjust.method = "BH",
     random.seed = 1024,
     verbose = TRUE,
+    action = c('add', 'only', 'get'),
     gsvaexp = NULL,
     gsvaexp.assay.type = NULL,
     ...){
@@ -450,13 +519,13 @@ setMethod('runDetectSVG', 'SVPExperiment',
                      method,
                      weight,
                      weight.method,
-                     sv.runWKDE,
-                     sv.used.reduction,
-                     sv.grid.n,
-                     sv.permutation,
-                     sv.p.adjust.method,
+                     sample_id,
+                     reduction.used,
+                     permutation,
+                     p.adjust.method,
                      random.seed,
                      verbose,
+                     action,
                      ...)
        gsvaExp(data, gsvaexp) <- da2
     }else{

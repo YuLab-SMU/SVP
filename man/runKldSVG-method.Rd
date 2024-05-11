@@ -12,11 +12,13 @@
 runKldSVG(
   data,
   assay.type = "logcounts",
-  sv.used.reduction = c("UMAP", "TSNE"),
-  sv.grid.n = 100,
-  sv.permutation = 100,
-  sv.p.adjust.method = "BY",
+  reduction.used = c("UMAP", "TSNE"),
+  sample_id = "all",
+  grid.n = 100,
+  permutation = 100,
+  p.adjust.method = "BY",
   verbose = TRUE,
+  action = c("add", "only", "get"),
   random.seed = 1024,
   gsvaexp = NULL,
   gsvaexp.assay.type = NULL,
@@ -26,11 +28,13 @@ runKldSVG(
 \S4method{runKldSVG}{SingleCellExperiment}(
   data,
   assay.type = "logcounts",
-  sv.used.reduction = c("UMAP", "TSNE"),
-  sv.grid.n = 100,
-  sv.permutation = 100,
-  sv.p.adjust.method = "BY",
+  reduction.used = c("UMAP", "TSNE"),
+  sample_id = "all",
+  grid.n = 100,
+  permutation = 100,
+  p.adjust.method = "BY",
   verbose = TRUE,
+  action = c("add", "only", "get"),
   random.seed = 1024,
   gsvaexp = NULL,
   gsvaexp.assay.type = NULL,
@@ -40,11 +44,13 @@ runKldSVG(
 \S4method{runKldSVG}{SVPExperiment}(
   data,
   assay.type = "logcounts",
-  sv.used.reduction = c("UMAP", "TSNE"),
-  sv.grid.n = 100,
-  sv.permutation = 100,
-  sv.p.adjust.method = "BY",
+  reduction.used = c("UMAP", "TSNE"),
+  sample_id = "all",
+  grid.n = 100,
+  permutation = 100,
+  p.adjust.method = "BY",
   verbose = TRUE,
+  action = c("add", "only", "get"),
   random.seed = 1024,
   gsvaexp = NULL,
   gsvaexp.assay.type = NULL,
@@ -58,18 +64,27 @@ or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} ob
 
 \item{assay.type}{which expressed data to be pulled to run, default is \code{logcounts}.}
 
-\item{sv.used.reduction}{character used as spatial coordinates to detect SVG, default is \code{UMAP},
+\item{reduction.used}{character used as spatial coordinates to detect SVG, default is \code{UMAP},
 if \code{data} has \code{spatialCoords}, which will be used as spatial coordinates.}
 
-\item{sv.grid.n}{numeric number of grid points in the two directions to estimate 2D weighted kernel
+\item{sample_id}{character the sample(s) in the \linkS4class{SpatialExperiment} object whose cells/spots to use.
+Can be \code{all} to compute metric for all samples; the metric is computed separately for each sample.
+default is \code{"all"}.}
+
+\item{grid.n}{numeric number of grid points in the two directions to estimate 2D weighted kernel
 density, default is 100.}
 
-\item{sv.permutation}{numeric the number of permutation for each single feature to detect the
+\item{permutation}{numeric the number of permutation for each single feature to detect the
 signicantly spatially or single cell variable features, default is 100.}
 
-\item{sv.p.adjust.method}{character the method to adjust the pvalue of the result, default is \code{BY}.}
+\item{p.adjust.method}{character the method to adjust the pvalue of the result, default is \code{BY}.}
 
 \item{verbose}{logical whether print the intermediate message when running the program, default is TRUE.}
+
+\item{action}{character control the type of output, if \code{action='add'}, the result of identification
+will add the original object, if \code{action = 'get'}, the result will return a \linkS4class{SimpleList},
+if \code{action = 'only'}, the result will return a \linkS4class{DataFrame} by merging the result of all
+sample, default is \code{add}.}
 
 \item{random.seed}{numeric random seed number to repeatability, default is 1024.}
 
@@ -106,7 +121,7 @@ background distribution without spatial variability.
 each features.
 \item \code{pvalue} the pvalue is calculated using the real \code{sp.kld} and the permutation \code{boot.sp.kld.mean} and
 \code{boot.sp.kld.sd} based on the normal distribution.
-\item \code{padj} the adjusted pvalue based on the speficied \code{sv.p.adjust.method}, default is \code{BY}.
+\item \code{padj} the adjusted pvalue based on the speficied \code{p.adjust.method}, default is \code{BY}.
 \item \code{rank} the order of significant spatial variable features based on \code{padj} and \code{sp.kld}.
 }
 
@@ -164,7 +179,8 @@ data. Nat Commun, 11, 4318 (2020). https://doi.org/10.1038/s41467-020-17900-3
 }
 }
 \seealso{
-\code{\link{runSGSA}} to calculate the activity score of gene sets.
+\code{\link{runSGSA}} to calculate the activity score of gene sets, \code{\link{runLISA}} to explore the hotspot for
+specified features in the spatial space.
 }
 \author{
 Shuangbin Xu

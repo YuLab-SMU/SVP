@@ -6,8 +6,7 @@
 \alias{runDetectSVG,SingleCellExperiment}
 \alias{runDetectSVG,SVPExperiment-method}
 \alias{runDetectSVG,SVPExperiment}
-\title{Detecting the spatially or single cell variable features with Moran's I or Geary's C of
-2D weighted kernel density estimation}
+\title{Detecting the spatially or single cell variable features with Moran's I or Geary's C}
 \usage{
 runDetectSVG(
   data,
@@ -15,13 +14,13 @@ runDetectSVG(
   method = c("moransi", "gearysc", "getisord"),
   weight = NULL,
   weight.method = c("knn", "tri2nb", "none"),
-  sv.runWKDE = FALSE,
-  sv.used.reduction = c("UMAP", "TSNE"),
-  sv.grid.n = 100,
-  sv.permutation = NULL,
-  sv.p.adjust.method = "BH",
+  sample_id = "all",
+  reduction.used = c("UMAP", "TSNE"),
+  permutation = NULL,
+  p.adjust.method = "BH",
   random.seed = 1024,
   verbose = TRUE,
+  action = c("add", "only", "get"),
   gsvaexp = NULL,
   gsvaexp.assay.type = NULL,
   ...
@@ -33,13 +32,13 @@ runDetectSVG(
   method = c("moransi", "gearysc", "getisord"),
   weight = NULL,
   weight.method = c("knn", "tri2nb", "none"),
-  sv.runWKDE = FALSE,
-  sv.used.reduction = c("UMAP", "TSNE"),
-  sv.grid.n = 100,
-  sv.permutation = NULL,
-  sv.p.adjust.method = "BH",
+  sample_id = "all",
+  reduction.used = c("UMAP", "TSNE"),
+  permutation = NULL,
+  p.adjust.method = "BH",
   random.seed = 1024,
   verbose = TRUE,
+  action = c("add", "only", "get"),
   gsvaexp = NULL,
   gsvaexp.assay.type = NULL,
   ...
@@ -51,13 +50,13 @@ runDetectSVG(
   method = c("moransi", "gearysc"),
   weight = NULL,
   weight.method = c("knn", "tri2nb", "none"),
-  sv.runWKDE = FALSE,
-  sv.used.reduction = c("UMAP", "TSNE"),
-  sv.grid.n = 100,
-  sv.permutation = NULL,
-  sv.p.adjust.method = "BH",
+  sample_id = "all",
+  reduction.used = c("UMAP", "TSNE"),
+  permutation = NULL,
+  p.adjust.method = "BH",
   random.seed = 1024,
   verbose = TRUE,
+  action = c("add", "only", "get"),
   gsvaexp = NULL,
   gsvaexp.assay.type = NULL,
   ...
@@ -72,7 +71,10 @@ or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} ob
 
 \item{method}{character one of \code{'moransi'}, \code{"gearysc"} or \code{"getisord"}, default is \code{'moransi'}.}
 
-\item{weight}{object, which can be \code{nb}, \code{listw} or \code{Graph} object, default is NULL.}
+\item{weight}{object, which can be \code{nb}, \code{listw} or \code{Graph} object, default is NULL,
+meaning the spatail neighbours weights will be calculated using the \code{weight.method}.
+if the \code{data} contains multiple samples, and the \code{sample_id} is specified, it should be
+provided as a list object with names (using \code{sample_id}).}
 
 \item{weight.method}{character the method to build the spatial neighbours weights, default
 is \code{knn} (k nearest neighbours). Other method, which requires coord matrix as input and returns
@@ -81,23 +83,26 @@ is \code{knn} (k nearest neighbours). Other method, which requires coord matrix 
 default is \code{knn}, if it is \code{"none"}, meaning the distance weight of each spot is used to
 the weight.}
 
-\item{sv.runWKDE}{logical whether perform the 2D weighted kernel density estimation firstly,
-default is FALSE, it is experimental parameter.}
+\item{sample_id}{character the sample(s) in the \linkS4class{SpatialExperiment} object whose cells/spots to use.
+Can be \code{all} to compute metric for all samples; the metric is computed separately for each sample.
+default is \code{"all"}.}
 
-\item{sv.used.reduction}{character used as spatial coordinates to detect SVG, default is \code{UMAP},
+\item{reduction.used}{character used as spatial coordinates to detect SVG, default is \code{UMAP},
 if \code{data} has \code{spatialCoords}, which will be used as spatial coordinates.}
 
-\item{sv.grid.n}{numeric number of grid points in the two directions to estimate 2D weighted kernel
-density, default is 100.}
+\item{permutation}{integer the number to permutation test for the calculation of Moran's I, default
+is NULL. Because we do not recommend using this parameter, as the permutation test is too slow.}
 
-\item{sv.permutation}{integer the number to permutation test for the calculation of Moran's I, default
-is NULL.}
-
-\item{sv.p.adjust.method}{character the method to adjust the pvalue of the result, default is \code{BY}.}
+\item{p.adjust.method}{character the method to adjust the pvalue of the result, default is \code{BY}.}
 
 \item{random.seed}{numeric random seed number to repeatability, default is 1024.}
 
 \item{verbose}{logical whether print the intermediate message when running the program, default is TRUE.}
+
+\item{action}{character control the type of output, if \code{action='add'}, the result of identification
+will add the original object, if \code{action = 'get'}, the result will return a \linkS4class{SimpleList},
+if \code{action = 'only'}, the result will return a \linkS4class{DataFrame} by merging the result of all
+sample, default is \code{add}.}
 
 \item{gsvaexp}{which gene set variation experiment will be pulled to run, this only work when \code{data} is a
 \linkS4class{SVPExperiment}, default is NULL.}
@@ -107,15 +112,12 @@ is NULL.}
 \item{...}{additional parameters}
 }
 \value{
-a \linkS4class{SVPExperiment} or a \linkS4class{SingleCellExperiment}, see details.
+a \linkS4class{SVPExperiment} or a \linkS4class{SingleCellExperiment}, see \code{action} parameter details.
 }
 \description{
-To resolve the sparsity of single cell or spatial omics data, we use kernel function smoothing cell
-density weighted by the gene expression in a low-dimensional space or physical space. This method had
-reported that it can better represent the gene expression, it can also recover the signal from cells that
-are more likely to express a gene based on their neighbouring cells (first reference). Next, we use
-Moran's I or Geary's C to detect the signal genes in a low-dimensional space (\code{UMAP} or \code{TSNE}
-for single cell omics data) or a physical space (for spatial omics data).
+This function use Moran's I, Geary's C or global G test to detect the signal genes in
+a low-dimensional space (\code{UMAP} or \code{TSNE} for single cell omics data) or
+a physical space (for spatial omics data).
 }
 \examples{
 # This example dataset is extracted from the
@@ -160,6 +162,9 @@ hpda_spe_cell_dec |> svDf(3) |> data.frame() |> dplyr::arrange(rank)
 \item Bivand, R.S., Wong, D.W.S. Comparing implementations of global and local indicators of spatial association. TEST 27,
 716–748 (2018). https://doi.org/10.1007/s11749-018-0599-x
 }
+}
+\seealso{
+\code{\link{runLISA}} to explore the hotspot for specified features in the spatial space.
 }
 \author{
 Shuangbin Xu

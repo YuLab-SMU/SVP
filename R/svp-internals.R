@@ -512,7 +512,7 @@ pairDist <- function(x, y){
       res <- res |> dplyr::arrange(.data$padj, .data$pvalue, dplyr::desc(abs(.data$obs - 1)))
   }
   res <- res |>
-         dplyr::mutate(rank = seq(nrow(res))) |> as.matrix()
+         dplyr::mutate(rank = seq(nrow(res)))
   res <- res[match(rownames(x), rownames(res)), ]  
   return(res)
 }
@@ -571,20 +571,20 @@ pairDist <- function(x, y){
 
 
 .obtain.weight <- function(
-     coords,
+     coords = NULL,
      weight = NULL,
      weight.method = c("knn", "tri2nb", "none"),
      ...
   ){
   params <- list(...)
 
-  if (is.integer(coords)) coords <- coords * 1.0
 
   if (length(weight.method) > 1){
       weight.method <- match.arg(weight.method)
   }
 
   if (is.null(weight) && weight.method %in% c('none', 'knn')){
+      coords <- .normalize.coords(coords)
       weight.mat <- pairDist(coords, coords)
       if (weight.method == 'knn'){
           if ("k" %in% names(params) && is.numeric(params$k)){
@@ -618,10 +618,11 @@ pairDist <- function(x, y){
                           n = 100, 
                           permutation = 100, 
                           p.adjust.method="fdr",
-                          random.seed = 123
+                          random.seed = 123,
+                          ...
                           ){
 
-  rlang::check_installed("withr", "is required to reproducible in the identification of SVG or SVP.")
+  rlang::check_installed(c("withr", "ks"), "is required to reproducible in the identification of SVG or SVP.")
 
   coords <- .normalize.coords(coords)
   
@@ -636,7 +637,7 @@ pairDist <- function(x, y){
                padj = p.adjust(res[, "pvalue"], method = p.adjust.method)
             ) |> data.frame()
   res <- res |> dplyr::arrange(.data$padj, dplyr::desc(.data$sp.kld)) |>
-         dplyr::mutate(rank = seq(nrow(res))) |> as.matrix()
+         dplyr::mutate(rank = seq(nrow(res)))
   res <- res[match(rownames(x), rownames(res)), ]
   return(res)
 }
