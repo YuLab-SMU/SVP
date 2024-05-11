@@ -15,6 +15,8 @@ default is NULL.}
 
 \item{features}{character or index which have been specified in \code{features} of
 \verb{code\{runLISA()\}} and \code{action='add'}, default is NULL.}
+
+\item{...}{additional parameter, meaningless now.}
 }
 \value{
 a data.frame or SimpleList.
