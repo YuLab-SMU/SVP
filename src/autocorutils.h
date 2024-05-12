@@ -20,6 +20,26 @@ double cal_moransi(arma::rowvec x, arma::mat weight,
 
 double cal_getisord(arma::rowvec x, arma::mat weight);
 
-double cal_gearysc(arma::rowvec x, arma::mat weight, double s, int n);
+double cal_permutation_p(
+   arma::vec x,
+   double obs,
+   int permutation,
+   int alternative = 3
+);
+
+double cal_gearysc(
+   arma::rowvec x, 
+   arma::mat weight, 
+   double s, 
+   int n
+);
+
+double cal_global_lee(
+  arma::rowvec x, 
+  arma::rowvec y, 
+  arma::mat weight, 
+  double S2, 
+  int n
+);
 
 #endif

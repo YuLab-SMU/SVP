@@ -38,6 +38,83 @@ arma::vec lagCpp(arma::mat w, arma::vec x){
     return(res);
 }
 
+arma::rowvec lagCpp2(arma::mat w, arma::rowvec x){
+    arma::mat xm = repelem(x, x.n_elem, 1);
+    xm.diag().fill(0.0);
+    w = w % xm;
+    arma::vec res = sum(w, 1);
+    return(res.t());
+}
+
+double cal_global_lee(
+    arma::rowvec x, 
+    arma::rowvec y, 
+    arma::mat weight, 
+    double S2,
+    int n
+    ){
+    
+    arma::rowvec dx = x - mean(x);
+    arma::rowvec dy = y - mean(y);
+    
+    double dx2 = accu(pow(dx, 2.0));
+    double dy2 = accu(pow(dy, 2.0));
+
+    arma::rowvec ldx = lagCpp2(weight, dx);
+    arma::rowvec ldy = lagCpp2(weight, dy);
+
+    double L = (n/S2) * (sum(ldx % ldy))/(sqrt(dx2) * sqrt(dy2));
+    
+    return(L);
+}
+
+double cal_permutation_p(
+        arma::vec x,
+        double obs,
+        int permutation,
+        int alternative = 3
+  ){
+  double pv = 0.0;
+  arma::vec abx = arma::abs(x);
+  double n = 0.0;
+
+  if (alternative == 1){
+      n = sum(std::abs(obs) > abx);
+      pv = 1.0 - n/permutation;
+      return(pv);
+  }else if (alternative == 3){
+      n = sum(x > obs);
+  }else{
+      n = sum(x < obs);
+  }
+
+  pv = n / permutation;
+  return(pv);
+}
+
+arma::rowvec cal_local_lee(
+    arma::rowvec x,
+    arma::rowvec y,
+    arma::mat weight,
+    double S2,
+    int n
+    ){
+
+    arma::rowvec dx = x - mean(x);
+    arma::rowvec dy = y - mean(y);
+
+    double dx2 = accu(pow(dx, 2.0));
+    double dy2 = accu(pow(dy, 2.0));
+
+    arma::rowvec ldx = lagCpp2(weight, dx);
+    arma::rowvec ldy = lagCpp2(weight, dy);
+
+    arma::rowvec l = (n * ldx % ldy)/(sqrt(dx2) * sqrt(dy2));
+
+    return(l);
+}
+
+
 double cal_moransi(
           arma::rowvec x,
           arma::mat weight,

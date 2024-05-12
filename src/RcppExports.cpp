@@ -12,6 +12,23 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// CalGlobalLeeParallel
+arma::mat CalGlobalLeeParallel(arma::sp_mat x, arma::mat w, arma::uvec f1, arma::uvec f2, int permutation, int alternative, bool cal_pvalue);
+RcppExport SEXP _SVP_CalGlobalLeeParallel(SEXP xSEXP, SEXP wSEXP, SEXP f1SEXP, SEXP f2SEXP, SEXP permutationSEXP, SEXP alternativeSEXP, SEXP cal_pvalueSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::sp_mat >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type w(wSEXP);
+    Rcpp::traits::input_parameter< arma::uvec >::type f1(f1SEXP);
+    Rcpp::traits::input_parameter< arma::uvec >::type f2(f2SEXP);
+    Rcpp::traits::input_parameter< int >::type permutation(permutationSEXP);
+    Rcpp::traits::input_parameter< int >::type alternative(alternativeSEXP);
+    Rcpp::traits::input_parameter< bool >::type cal_pvalue(cal_pvalueSEXP);
+    rcpp_result_gen = Rcpp::wrap(CalGlobalLeeParallel(x, w, f1, f2, permutation, alternative, cal_pvalue));
+    return rcpp_result_gen;
+END_RCPP
+}
 // MatMultCpp
 Eigen::MatrixXd MatMultCpp(const Eigen::Map<Eigen::MatrixXd> A, const Eigen::Map<Eigen::MatrixXd> B);
 RcppExport SEXP _SVP_MatMultCpp(SEXP ASEXP, SEXP BSEXP) {
@@ -343,6 +360,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_SVP_CalGlobalLeeParallel", (DL_FUNC) &_SVP_CalGlobalLeeParallel, 7},
     {"_SVP_MatMultCpp", (DL_FUNC) &_SVP_MatMultCpp, 2},
     {"_SVP_SpMatElemMultiMat", (DL_FUNC) &_SVP_SpMatElemMultiMat, 2},
     {"_SVP_SpMatElemMultiSpMat", (DL_FUNC) &_SVP_SpMatElemMultiSpMat, 2},
