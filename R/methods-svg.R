@@ -422,9 +422,10 @@ setMethod('runDetectSVG', 'SingleCellExperiment',
       if (flag1){
           coords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
       }
-  }else{
-      cli::cli_abort("The {.cls {class(data)}} should have 'spatialCoords' or the reduction result of 'UMAP' or 'TSNE'.",
-                      "Or the `weight` should be provided.")
+  }
+  if (all(!flag1, !flag2) && is.null(weight)){
+      cli::cli_abort(c("The {.cls {class(data)}} should have 'spatialCoords' or the reduction result of 'UMAP' or 'TSNE'.",
+                      "Or the `weight` should be provided."))
   }
   
   tic()
@@ -441,7 +442,7 @@ setMethod('runDetectSVG', 'SingleCellExperiment',
       xi <- x[, ind, drop=FALSE]
       xi <- xi[DelayedMatrixStats::rowVars(xi)!=0,]
       coordsi <- if(!is.null(coords)){coords[ind, , drop=FALSE]}else{NULL}
-      weighti <- if(length(weight) > 1){weight[names(weight) == sid]}else{weight}
+      weighti <- if(inherits(weight, "list")){weight[names(weight) == sid]}else{weight}
       res <- .identify.svg.by.autocorrelation(
                         xi,
                         coords = coordsi,
@@ -472,10 +473,9 @@ setMethod('runDetectSVG', 'SingleCellExperiment',
   if (verbose){
       cli::cli_inform(c("The result is added to the input object, which can be extracted using",
                        paste0("`svDf()` with type='", nmstr, "' for `SingleCellExperiment` or
-                       `SpatialExperiment`."), 
-		       "If input object is `SVPExperiment`, and `gsvaexp` is specified", 
-		       "the result can be extracted by `gsvaExp()` (return a `SingleCellExperiment`",
-		       " or `SpatialExperiment`),then also using `svDf()` to extract."))
+                       `SpatialExperiment`."), "If input object is `SVPExperiment`, and `gsvaexp` is specified", 
+                       "the result can be extracted by `gsvaExp()` (return a `SingleCellExperiment`",
+                       " or `SpatialExperiment`),then also using `svDf()` to extract."))
   }
 
   data <- .add.int.rowdata(sce = data,

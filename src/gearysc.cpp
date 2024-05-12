@@ -52,12 +52,13 @@ arma::rowvec cal_gearysc_p_noperm(
     ){
     
     arma::rowvec y = x - mean(x);
+    //y = scaleCpp(y);
     double v = accu(pow(y, 2.0));
 
     double s_sq = pow(s, 2.0);
     double n2 = pow(n, 2.0);
 
-    double k = (accu(pow(y, 4.0))/n)/pow(v/n, 2.0);
+    double k = (n * accu(pow(y, 4.0)))/pow(v, 2.0);
     double sdi = (n - 1.0) * S1 * (n2 - 3.0 * n + 3.0 - (n - 1.0) *k);
     sdi = sdi - (0.25 * (n - 1.0) * S2 * (n2 + 3.0 * n - 6.0 - (k * (n2 - n + 2.0))));
     sdi = sdi + s_sq * (n2 - 3.0 - pow(n - 1, 2.0) * k);

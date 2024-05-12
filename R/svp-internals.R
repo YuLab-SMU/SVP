@@ -453,8 +453,7 @@ pairDist <- function(x, y){
   ){
 
   rlang::check_installed("withr", "is required to be reproducible in the identification of SVG or SVP.")  
-
-  coords <- .normalize.coords(coords)
+  
   params <- list(...)
  
   if ('alternative' %in% names(params)){

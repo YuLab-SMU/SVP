@@ -195,9 +195,9 @@ setMethod("runLISA", "SingleCellExperiment", function(
       if (flag1 ){
           coords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
       }
-  }else if (all(flag1, flag2) && is.null(weight)){
-      cli::cli_abort("The {.cls {class(data)}} should have 'spatialCoords' or the reduction result of 'UMAP' or 'TSNE'.
-                     Or the `weight` should be provided.")
+  }else if (all(!flag1, !flag2) && is.null(weight)){
+      cli::cli_abort(c("The {.cls {class(data)}} should have 'spatialCoords' or the reduction result of 'UMAP' or 'TSNE'.
+                     Or the `weight` should be provided."))
   }
 
   res <- lapply(sample_id, function(sid){
@@ -207,7 +207,7 @@ setMethod("runLISA", "SingleCellExperiment", function(
                       ind <- colData(data)$sample_id == sid
                   }
                   coordsi <- if(!is.null(coords)){coords[ind, ,drop=FALSE]}else{NULL}
-                  weighti <- if(length(weight) > 1){weight[names(weight) == sid]}else{weight}
+                  weighti <- if(inherits(weight, 'list')){weight[names(weight) == sid]}else{weight}
                   xi <- x[, ind, drop=FALSE]
                   wm <- .obtain.weight(coordsi, weight = weighti, weight.method = weight.method, ...)
                   n <- nrow(wm)
