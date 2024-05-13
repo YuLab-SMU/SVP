@@ -6,7 +6,9 @@
 #' @param data a \linkS4class{SingleCellExperiment} object with contains \code{UMAP} or \code{TSNE},
 #' or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} object with specified
 #' \code{gsvaexp} argument.
-#' @param features the feature name or index of data object, which are required.
+#' @param features the feature name or index of data object, which are required. If \code{gsvaexp} is
+#' provided and \code{data} is \linkS4class{SingleCellExperiment}, it should be the features from
+#' `rownames(gsvaExp(data, gsvaexp))`.
 #' @param assay.type which expressed data to be pulled to run, default is \code{logcounts}.
 #' @param sample_id character the sample(s) in the \linkS4class{SpatialExperiment} object whose cells/spots to use.
 #' Can be \code{all} to compute metric for all samples; the metric is computed separately for each sample.
@@ -34,6 +36,9 @@
 #' the \code{workers} of \code{MulticoreParam} is the number of cores used, see also
 #' \code{\link[BiocParallel]{MulticoreParam}}. default is \code{SerialParam()}.
 #' @param verbose logical whether print the help information, default is TRUE.
+#' @param gsvaexp which gene set variation experiment will be pulled to run, this only work when \code{data} is a
+#' \linkS4class{SVPExperiment}, default is NULL.
+#' @param gsvaexp.assay.type which assay data in the specified \code{gsvaexp} will be used to run, default is NULL.
 #' @param ... additional parameters the parameters which are from the weight.method function.
 #' @return if \code{action = 'get'} (in default), the SimpleList object (like list object) will be return, 
 #' if \code{action = 'only'}, the data.frame will be return. if \code{action = 'add'}, the result of LISA is 
@@ -141,6 +146,8 @@ setGeneric('runLISA',
     alternative = 'two.sided',
     BPPARAM = SerialParam(),
     verbose = TRUE,
+    gsvaexp = NULL,
+    gsvaexp.assay.type = NULL,
     ...
   )
   standardGeneric('runLISA')
@@ -163,6 +170,8 @@ setMethod("runLISA", "SingleCellExperiment", function(
     alternative = 'two.sided',
     BPPARAM = SerialParam(),
     verbose = TRUE,
+    gsvaexp = NULL,
+    gsvaexp.assay.type = NULL,
     ...
   ){
   
@@ -170,7 +179,7 @@ setMethod("runLISA", "SingleCellExperiment", function(
   weight.method <- match.arg(weight.method)
   method <- match.arg(method)
   sample_id <- .check_sample_id(data, sample_id)
-
+  
   if (is.null(assay.type)){
       assay.type <- 1
   }
@@ -227,3 +236,60 @@ setMethod("runLISA", "SingleCellExperiment", function(
   return(res)
 })
 
+
+
+#' @rdname runLISA-method
+#' @aliases runLISA,SVPExperiment
+#' @export runLISA
+setMethod("runLISA", "SVPExperiment", function(
+    data,
+    features,
+    assay.type = "logcounts",
+    sample_id = 'all',
+    method = c("localG", "localmoran"),
+    weight = NULL,
+    weight.method = c("knn", "tri2nb"),
+    reduction.used = NULL,
+    cells = NULL,
+    action = c("get", "add", "only"),
+    alternative = 'two.sided',
+    BPPARAM = SerialParam(),
+    verbose = TRUE,
+    gsvaexp = NULL,
+    gsvaexp.assay.type = NULL,
+    ...
+  ){
+    method <- match.arg(method)
+    action <- match.arg(action)
+    if (!is.null(gsvaexp)){
+        if (verbose){
+            cli::cli_inform(c("The {.var gsvaexp} was specified, the specified {.var gsvaExp} will be used to perform LISA."))
+        }
+        da2 <- gsvaExp(data, gsvaexp, withSpatialCoords = TRUE, withReducedDim = TRUE, withColData = FALSE, withImgData = FALSE)
+        da2 <- runLISA(da2,
+                       features,
+                       gsvaexp.assay.type,
+                       sample_id,
+                       method,
+                       weight,
+                       weight.method,
+                       reduction.used,
+                       cells,
+                       action,
+                       alternative,
+                       BPPARAM,       
+                       verbose,
+                      ...)
+        if (action!='add'){
+            return(da2)
+        }
+	if (verbose){
+            cli::cli_inform(c("The `action = 'add'`, If you want to extract the results, you need to",
+                              "use `gsvaExp(data, gsvaexp)` to extract the internal object firstly."))
+        }
+        gsvaExp(data, gsvaexp) <- da2
+    }else{
+        data <- callNextMethod()
+    }
+    return(data)
+})

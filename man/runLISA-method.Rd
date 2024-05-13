@@ -4,6 +4,8 @@
 \alias{runLISA}
 \alias{runLISA,SingleCellExperiment-method}
 \alias{runLISA,SingleCellExperiment}
+\alias{runLISA,SVPExperiment-method}
+\alias{runLISA,SVPExperiment}
 \title{Local indicators of spatial association analysis}
 \usage{
 runLISA(
@@ -20,6 +22,8 @@ runLISA(
   alternative = "two.sided",
   BPPARAM = SerialParam(),
   verbose = TRUE,
+  gsvaexp = NULL,
+  gsvaexp.assay.type = NULL,
   ...
 )
 
@@ -37,6 +41,27 @@ runLISA(
   alternative = "two.sided",
   BPPARAM = SerialParam(),
   verbose = TRUE,
+  gsvaexp = NULL,
+  gsvaexp.assay.type = NULL,
+  ...
+)
+
+\S4method{runLISA}{SVPExperiment}(
+  data,
+  features,
+  assay.type = "logcounts",
+  sample_id = "all",
+  method = c("localG", "localmoran"),
+  weight = NULL,
+  weight.method = c("knn", "tri2nb"),
+  reduction.used = NULL,
+  cells = NULL,
+  action = c("get", "add", "only"),
+  alternative = "two.sided",
+  BPPARAM = SerialParam(),
+  verbose = TRUE,
+  gsvaexp = NULL,
+  gsvaexp.assay.type = NULL,
   ...
 )
 }
@@ -45,7 +70,9 @@ runLISA(
 or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} object with specified
 \code{gsvaexp} argument.}
 
-\item{features}{the feature name or index of data object, which are required.}
+\item{features}{the feature name or index of data object, which are required. If \code{gsvaexp} is
+provided and \code{data} is \linkS4class{SingleCellExperiment}, it should be the features from
+\code{rownames(gsvaExp(data, gsvaexp))}.}
 
 \item{assay.type}{which expressed data to be pulled to run, default is \code{logcounts}.}
 
@@ -84,6 +111,11 @@ the \code{workers} of \code{MulticoreParam} is the number of cores used, see als
 \code{\link[BiocParallel]{MulticoreParam}}. default is \code{SerialParam()}.}
 
 \item{verbose}{logical whether print the help information, default is TRUE.}
+
+\item{gsvaexp}{which gene set variation experiment will be pulled to run, this only work when \code{data} is a
+\linkS4class{SVPExperiment}, default is NULL.}
+
+\item{gsvaexp.assay.type}{which assay data in the specified \code{gsvaexp} will be used to run, default is NULL.}
 
 \item{...}{additional parameters the parameters which are from the weight.method function.}
 }
