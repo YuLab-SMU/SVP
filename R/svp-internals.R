@@ -582,8 +582,8 @@ pairDist <- function(x, y){
       weight.method <- match.arg(weight.method)
   }
 
-  if (is.null(weight) && weight.method %in% c('none', 'knn')){
-      coords <- .normalize.coords(coords)
+  if (is.null(weight) && (weight.method %in% c('none', 'knn'))){
+      if (is.integer(coords)) coords <- coords * 1.0
       weight.mat <- pairDist(coords, coords)
       if (weight.method == 'knn'){
           if ("k" %in% names(params) && is.numeric(params$k)){

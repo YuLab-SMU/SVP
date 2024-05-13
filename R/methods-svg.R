@@ -479,7 +479,10 @@ setMethod('runDetectSVG', 'SVPExperiment',
     gsvaexp = NULL,
     gsvaexp.assay.type = NULL,
     ...){
-
+    method <- match.arg(method)
+    weight.method <- match.arg(weight.method)
+    reduction.used <- match.arg(reduction.used)
+    action <- match.arg(action)
     if (!is.null(gsvaexp)){
        if (verbose){
           cli::cli_inform("The {.var gsvaexp} was specified, the specified {.var gsvaExp} will be used to detect 'svg'.")
@@ -498,6 +501,9 @@ setMethod('runDetectSVG', 'SVPExperiment',
                      verbose,
                      action,
                      ...)
+       if (action != 'add'){
+           return(da2)
+       }
        gsvaExp(data, gsvaexp) <- da2
     }else{
        data <- callNextMethod()
