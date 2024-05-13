@@ -321,3 +321,39 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
     dplyr::ungroup()
     return(x)
 }
+
+.check_features <- function(x, y, prefix){
+  x <- unique(x)
+  f1 <- match(x, y)
+  f1 <- f1[!is.na(f1)]
+  if (length(f1) < 1){
+      cli::cli_abort(paste0("The `", prefix[1],"` is/are not present in the row names."))
+  }
+  return(f1)
+}
+
+
+.check_coords <- function(data, 
+			  reduction.used, 
+			  weight = NULL, 
+			  prefix="Or the `weight` should be provided."
+  ){
+  flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
+
+  flag2 <- any(reduction.used %in% reducedDimNames(data))
+  coords <- NULL
+  if((flag1 || flag2) && is.null(weight)){
+      if (flag2){
+          coords <- reducedDim(data, reduction.used)
+          coords <- coords[,c(1, 2)]
+      }
+      if (flag1 ){
+          coords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
+      }
+  }else if (all(!flag1, !flag2) && is.null(weight)){
+      cli::cli_abort(c("The {.cls {class(data)}} should have 'spatialCoords' or the",
+		       paste("reduction result of 'UMAP' or 'TSNE'.", prefix)))
+  }
+
+  return(coords)
+}

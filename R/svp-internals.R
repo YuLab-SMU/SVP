@@ -591,7 +591,8 @@ pairDist <- function(x, y){
           }else{
                k <- 10
           }
-          weight.mat <- .build.adj.m(weight.mat, k) |> as.matrix()
+          weight.mat <- .build.adj.m(weight.mat, k + 1) |> as.matrix() |> t()
+          diag(weight.mat) <- 0
       }
       weight.mat <- weight.mat * (1/rowSums(weight.mat))
   }

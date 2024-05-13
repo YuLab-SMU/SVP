@@ -183,22 +183,7 @@ setMethod("runLISA", "SingleCellExperiment", function(
 
   x <- x[features, ,drop=FALSE]
 
-  flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
-
-  flag2 <- any(reduction.used %in% reducedDimNames(data))
-  coords <- NULL
-  if((flag1 || flag2) && is.null(weight)){
-      if (flag2){
-          coords <- reducedDim(data, reduction.used)
-          coords <- coords[,c(1, 2)]
-      }
-      if (flag1 ){
-          coords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
-      }
-  }else if (all(!flag1, !flag2) && is.null(weight)){
-      cli::cli_abort(c("The {.cls {class(data)}} should have 'spatialCoords' or the reduction result of 'UMAP' or 'TSNE'.
-                     Or the `weight` should be provided."))
-  }
+  coords <- .check_coords(data, reduction.used, weight)
 
   res <- lapply(sample_id, function(sid){
                   if (sid == ".ALLCELL"){

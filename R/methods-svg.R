@@ -157,21 +157,9 @@ setMethod('runKldSVG', 'SingleCellExperiment',
   sample_id <- .check_sample_id(data, sample_id)
 
   x <- assay(data, assay.type)
+  
+  coords <- .check_coords(data, reduction.used, prefix="")
 
-  flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
-  flag2 <- any(reduction.used %in% reducedDimNames(data))
-  if((flag1 || flag2)){
-      if (flag2){
-          coords <- reducedDim(data, reduction.used)
-          coords <- coords[,c(1, 2)]
-      }
-      if (flag1){
-          coords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
-      }
-  }else{
-      cli::cli_abort("The {.cls {class(data)}} should have 'spatialCoords' or the reduction result of 'UMAP' or 'TSNE'.")
-  }
-      
   tic()
   if (verbose){
       cli::cli_inform("Identifying the spatially variable gene sets (pathway) or genes based on
@@ -410,24 +398,7 @@ setMethod('runDetectSVG', 'SingleCellExperiment',
 
   sample_id <- .check_sample_id(data, sample_id)
 
-  flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
-
-  flag2 <- any(reduction.used %in% reducedDimNames(data))
-  coords <- NULL
-  if((flag1 || flag2) && is.null(weight)){
-      if (flag2){
-          coords <- reducedDim(data, reduction.used)
-          coords <- coords[,c(1, 2)]
-      }
-      if (flag1){
-          coords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
-      }
-  }
-  if (all(!flag1, !flag2) && is.null(weight)){
-      cli::cli_abort(c("The {.cls {class(data)}} should have 'spatialCoords' or the reduction result of 'UMAP' or 'TSNE'.",
-                      "Or the `weight` should be provided."))
-  }
-  
+  coords <- .check_coords(data, reduction.used, weight) 
   tic()
   if (verbose){
       cli::cli_inform(paste0("Identifying the spatially variable gene sets (pathway) based on ", method))

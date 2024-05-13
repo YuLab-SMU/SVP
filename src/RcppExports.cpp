@@ -12,6 +12,20 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// cal_permutation_p
+double cal_permutation_p(arma::vec x, double obs, int permutation, int alternative);
+RcppExport SEXP _SVP_cal_permutation_p(SEXP xSEXP, SEXP obsSEXP, SEXP permutationSEXP, SEXP alternativeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type obs(obsSEXP);
+    Rcpp::traits::input_parameter< int >::type permutation(permutationSEXP);
+    Rcpp::traits::input_parameter< int >::type alternative(alternativeSEXP);
+    rcpp_result_gen = Rcpp::wrap(cal_permutation_p(x, obs, permutation, alternative));
+    return rcpp_result_gen;
+END_RCPP
+}
 // CalGlobalLeeParallel
 arma::mat CalGlobalLeeParallel(arma::sp_mat x, arma::mat w, arma::uvec f1, arma::uvec f2, int permutation, int alternative, bool cal_pvalue);
 RcppExport SEXP _SVP_CalGlobalLeeParallel(SEXP xSEXP, SEXP wSEXP, SEXP f1SEXP, SEXP f2SEXP, SEXP permutationSEXP, SEXP alternativeSEXP, SEXP cal_pvalueSEXP) {
@@ -360,6 +374,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_SVP_cal_permutation_p", (DL_FUNC) &_SVP_cal_permutation_p, 4},
     {"_SVP_CalGlobalLeeParallel", (DL_FUNC) &_SVP_CalGlobalLeeParallel, 7},
     {"_SVP_MatMultCpp", (DL_FUNC) &_SVP_MatMultCpp, 2},
     {"_SVP_SpMatElemMultiMat", (DL_FUNC) &_SVP_SpMatElemMultiMat, 2},
