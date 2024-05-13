@@ -68,6 +68,7 @@ double cal_global_lee(
     return(L);
 }
 
+// [[Rcpp::export]]
 double cal_permutation_p(
         arma::vec x,
         double obs,
@@ -75,20 +76,19 @@ double cal_permutation_p(
         int alternative = 3
   ){
   double pv = 0.0;
-  arma::vec abx = arma::abs(x);
   double n = 0.0;
 
   if (alternative == 1){
-      n = sum(std::abs(obs) > abx);
-      pv = 1.0 - n/permutation;
+      n = 1.0 * abs(sum(obs >= x) - permutation/2.0 + 1.0)/permutation;
+      pv = R::punif(n, 0.0, 0.5, 0, 0);
       return(pv);
   }else if (alternative == 3){
-      n = sum(x > obs);
+      n = 1.0 * sum(x > obs)/permutation;
+      pv = R::punif(n, 0.0, 1.0, 1, 0);
   }else{
-      n = sum(x < obs);
+      n = 1.0 * sum(x > obs)/permutation;
+      pv = R::punif(n, 0.0, 1.0, 0, 0);
   }
-
-  pv = n / permutation;
   return(pv);
 }
 

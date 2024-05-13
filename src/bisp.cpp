@@ -39,7 +39,7 @@ struct RunGlobalLee : public Worker{
   const arma::uvec& f1;
   const arma::uvec& f2;
   simple_progress& p;
-  const int nf2;
+  const uword& nf2;
   const double S2;
   const int n;
   const uint64_t seed;
@@ -48,7 +48,7 @@ struct RunGlobalLee : public Worker{
   arma::mat& result;
   
   RunGlobalLee(const arma::mat& x, const arma::mat& w, const arma::uvec& f1,
-          const arma::uvec& f2, simple_progress& p, const int nf2, 
+          const arma::uvec& f2, simple_progress& p, const uword& nf2, 
           const double S2, const int n, const uint64_t seed, const int permutation,
           const bool cal_pvalue, arma::mat& result):
     x(x), w(w), f1(f1), f2(f2), p(p), nf2(nf2), S2(S2), n(n), seed(seed), 
@@ -84,7 +84,6 @@ arma::mat CalGlobalLeeParallel(
   bool cal_pvalue = false
   ){
   arma::mat xm = conv_to<arma::mat>::from(x);
-  int n = xm.n_rows;
   int m = xm.n_cols;
 
   double S2 = accu(pow(sum(w, 1), 2.0));
@@ -93,7 +92,7 @@ arma::mat CalGlobalLeeParallel(
   uint64_t seed1 = dqrng::convert_seed<uint64_t>(seed0);
   
   int n1 = f1.n_elem;
-  int n2 = f2.n_elem;
+  uword n2 = f2.n_elem;
 
   simple_progress p (n1 * n2);
   

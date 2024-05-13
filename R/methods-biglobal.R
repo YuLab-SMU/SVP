@@ -35,6 +35,7 @@
 #' \code{add.pvalue = TRUE}, default is \code{greater}.
 #' @param add.pvalue logical whether calculate the pvalue, which is calculated with permutation test. So it might
 #' be slow, default is \code{FALSE}, which the pvalue of result will be NULL.
+#' @param random.seed numeric random seed number to repeatability, default is 1024.
 #' @param verbose logical whether print the help information, default is TRUE.
 #' @param ... additional parameters the parameters which are from the weight.method function.
 #' @return SimpleList  
@@ -56,6 +57,7 @@ setGeneric('runBIGLOBAL',
     permutation = 100,
     alternative = 'greater',
     add.pvalue = FALSE,
+    random.seed = 1024,
     verbose = TRUE,
     ...
   )
@@ -78,6 +80,7 @@ setMethod("runBIGLOBAL", "SingleCellExperiment", function(
     permutation = 100,
     alternative = 'greater',
     add.pvalue = FALSE,
+    random.seed = 1024,
     verbose = TRUE,
     ...
   ){
@@ -112,81 +115,16 @@ setMethod("runBIGLOBAL", "SingleCellExperiment", function(
                   if (any(rowSums(wm) == 0)){
                       cli::cli_warn("no-neighbour observations found in the spatial neighborhoods graph.")
                   }
-                  res <- .internal.runBIGLOBAL(xi, wm, features1, features2, permutation, alternative, add.pvalue)
+                  res <- .internal.runBIGLOBAL(xi, wm, features1, features2, 
+                                               permutation, alternative, 
+                                               add.pvalue, random.seed)
                   return(res)
          })
   if (length(res) == 1){
       return(res[[1]])
   }
+  names(res) <- sample_id
   res <- S4Vectors::SimpleList(res)
   return(res)
 })
 
-
-.internal.runBIGLOBAL <- function(
-  x, 
-  weight,
-  features1 = NULL, 
-  features2 = NULL, 
-  permutation = 100, 
-  alternative = c('greater', 'two.sided', 'less'), 
-  add.pvalue = FALSE
-  ){
-  allf <- rownames(x)
-  alter <- switch(alternative, greater=2, `two.sided`=1, less = 3)
-  if (is.null(features1) && is.null(features2)){
-      f1 <- f2 <- seq(nrow(x))
-  }else if (!is.null(features1) && is.null(features2)){
-      f1 <- f2 <- .check_features(features1, allf, prefix='features1')
-  }else if (is.null(features1) && !is.null(features2)){
-      f1 <- f2 <- .check_features(features2, allf, prefix="features2")
-  }else if (!is.null(features1) && !is.null(features2)){
-      f1 <- .check_features(features1, allf, prefix='features1')
-      f2 <- .check_features(features2, allf, prefix='features2')
-  }
-  
-  L <- CalGlobalLeeParallel(x, weight, f1-1L, f2-1L, permutation, alter, add.pvalue)
-  rownames(L) <- allf[f1]
-  colnames(L) <- allf[f2]
-  if (add.pvalue){
-      pv <- CalGlobalLeeParallel(x, weight, f1-1L, f2-1L, permutation, alter, add.pvalue)
-      rownames(pv) <- allf[f1]
-      rownames(pv) <- allf[f2]
-  }else{
-      pv <- NULL
-  }
-  return(list(Lee=L, pvalue=pv))
-}
-
-
-.check_features <- function(x, y, prefix){
-  x <- unique(x)
-  f1 <- match(x, y)
-  f1 <- f1[!is.na(f1)]
-  if (length(f1) < 1){
-      cli::cli_abort(paste0("The `", prefix[1],"` is/are not present in the row names."))
-  }
-  return(f1)
-}
-
-
-.check_coords <- function(data, reduction.used, weight = NULL){
-  flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
-
-  flag2 <- any(reduction.used %in% reducedDimNames(data))
-  coords <- NULL
-  if((flag1 || flag2) && is.null(weight)){
-      if (flag2){
-          coords <- reducedDim(data, reduction.used)
-          coords <- coords[,c(1, 2)]
-      }
-      if (flag1 ){
-          coords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
-      }
-  }else if (all(!flag1, !flag2) && is.null(weight)){
-      cli::cli_abort(c("The {.cls {class(data)}} should have 'spatialCoords' or the reduction result of 'UMAP' or 'TSNE'.
-                     Or the `weight` should be provided."))
-  }
-
-  return(coords)
-}

@@ -19,6 +19,7 @@ runBIGLOBAL(
   permutation = 100,
   alternative = "greater",
   add.pvalue = FALSE,
+  random.seed = 1024,
   verbose = TRUE,
   ...
 )
@@ -36,6 +37,7 @@ runBIGLOBAL(
   permutation = 100,
   alternative = "greater",
   add.pvalue = FALSE,
+  random.seed = 1024,
   verbose = TRUE,
   ...
 )
@@ -85,6 +87,8 @@ default is \code{UMAP}, if \code{data} has \code{spatialCoords}, which will be u
 
 \item{add.pvalue}{logical whether calculate the pvalue, which is calculated with permutation test. So it might
 be slow, default is \code{FALSE}, which the pvalue of result will be NULL.}
+
+\item{random.seed}{numeric random seed number to repeatability, default is 1024.}
 
 \item{verbose}{logical whether print the help information, default is TRUE.}
 
