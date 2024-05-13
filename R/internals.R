@@ -235,6 +235,7 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
     }
     flag1 <- .check_element_obj(x, key = 'spatialCoords', basefun = int_colData, namefun = names) 
     if (flag1 && withSpatialCoords){
+        out$sample_id <- x$sample_id
         out <- as(out, 'SpatialExperiment')
         spatialCoords(out) <- .extract_element_object(x, key = 'spatialCoords', basefun = int_colData, namefun = names)
     }
