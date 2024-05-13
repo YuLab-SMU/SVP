@@ -41,17 +41,23 @@
 .add_cluster <- function(x, method){
     lbs <- c("Low", "High")
     if (method == 'localG'){
-        x$`cluster.no.test` <- cut(x$`Z.Gi`,
-                         c(-Inf, mean(x$`Z.Gi`, na.rm=TRUE), Inf),
-                         lbs)
+        if (!all(is.na(x$`Z.Gi`))){
+            x$`cluster.no.test` <- cut(x$`Z.Gi`,
+                             c(-Inf, mean(x$`Z.Gi`, na.rm=TRUE), Inf),
+                             lbs)
+        }
     }else{
-        c1 <- cut(x$z, c(-Inf, mean(x$z), Inf), lbs)
-        c2 <- cut(x$lz, c(-Inf, mean(x$lz), Inf), lbs)
-        x$`cluster.no.test` <- interaction(c1, c2, sep="-")
+	if (!all(is.na(x$z)) && !all(is.na(x$lz))){
+            c1 <- cut(x$z, c(-Inf, mean(x$z), Inf), lbs)
+            c2 <- cut(x$lz, c(-Inf, mean(x$lz), Inf), lbs)
+            x$`cluster.no.test` <- interaction(c1, c2, sep="-")
+	}
         x$z <- NULL
         x$lz <- NULL
     }
-    x$`cluster.test`<- ifelse(x[[5]] <= 0.05, as.character(x[["cluster.no.test"]]), "NoSign")
+    if (!all(is.na(x[[5]]))){
+        x$`cluster.test`<- ifelse(x[[5]] <= 0.05, as.character(x[["cluster.no.test"]]), "NoSign")
+    }
     return(x)
 }
 
@@ -67,9 +73,13 @@
     if (length(res)==1){
         return(res[[1]])
     }
-    
+
     res <- unlist(unname(res), recursive=FALSE)
+    if (length(res) == 1){
+        return(res)
+    }
     nm <- names(res) |> unique()
     res <- lapply(nm, function(x)dplyr::bind_rows(res[names(res)==x]))
     names(res) <- nm
+    return(res)
 }

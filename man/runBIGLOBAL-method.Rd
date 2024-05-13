@@ -4,6 +4,8 @@
 \alias{runBIGLOBAL}
 \alias{runBIGLOBAL,SingleCellExperiment-method}
 \alias{runBIGLOBAL,SingleCellExperiment}
+\alias{runBIGLOBAL,SVPExperiment-method}
+\alias{runBIGLOBAL,SVPExperiment}
 \title{Bivariate analysis for spatial autocorrelation}
 \usage{
 runBIGLOBAL(
@@ -21,6 +23,9 @@ runBIGLOBAL(
   add.pvalue = FALSE,
   random.seed = 1024,
   verbose = TRUE,
+  gsvaexp = NULL,
+  gsvaexp.assay.type = NULL,
+  gsvaexp.features = NULL,
   ...
 )
 
@@ -39,6 +44,30 @@ runBIGLOBAL(
   add.pvalue = FALSE,
   random.seed = 1024,
   verbose = TRUE,
+  gsvaexp = NULL,
+  gsvaexp.assay.type = NULL,
+  gsvaexp.features = NULL,
+  ...
+)
+
+\S4method{runBIGLOBAL}{SVPExperiment}(
+  data,
+  features1 = NULL,
+  features2 = NULL,
+  assay.type = "logcounts",
+  sample_id = "all",
+  method = c("lee"),
+  weight = NULL,
+  weight.method = c("knn", "tri2nb"),
+  reduction.used = NULL,
+  permutation = 100,
+  alternative = "greater",
+  add.pvalue = FALSE,
+  random.seed = 1024,
+  verbose = TRUE,
+  gsvaexp = NULL,
+  gsvaexp.assay.type = NULL,
+  gsvaexp.features = NULL,
   ...
 )
 }
@@ -91,6 +120,17 @@ be slow, default is \code{FALSE}, which the pvalue of result will be NULL.}
 \item{random.seed}{numeric random seed number to repeatability, default is 1024.}
 
 \item{verbose}{logical whether print the help information, default is TRUE.}
+
+\item{gsvaexp}{character the one character from the name of \code{gsvaExpNames(data)}, default is NULL. If \code{data}
+is \linkS4class{SVPExperiment}, and the parameter is specified simultaneously. the \code{features} (Usually genes)
+from the displayed class, and \code{gsvaexp.features} from name in \code{rownames(gsvaExp(data, gsvaexp))} will be
+performed the analysis.}
+
+\item{gsvaexp.assay.type}{character the assay name in the \code{assays(gsvaExp(data, gsvaexp))}, default is NULL,
+which works with \code{gsvaexp} parameter.}
+
+\item{gsvaexp.features}{character the name from the \code{rownames(gsvaExp(data, gsvaexp))}. If \code{gsvaexp} is
+specified and \code{data} is linkS4class{SVPExperiment}, it should be provided. Default is NULL.}
 
 \item{...}{additional parameters the parameters which are from the weight.method function.}
 }
