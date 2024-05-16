@@ -13,7 +13,7 @@ runDetectSVG(
   assay.type = "logcounts",
   method = c("moransi", "gearysc", "getisord"),
   weight = NULL,
-  weight.method = c("knn", "tri2nb", "none"),
+  weight.method = c("voronoi", "knn", "none"),
   sample_id = "all",
   reduction.used = c("UMAP", "TSNE"),
   permutation = NULL,
@@ -31,7 +31,7 @@ runDetectSVG(
   assay.type = "logcounts",
   method = c("moransi", "gearysc", "getisord"),
   weight = NULL,
-  weight.method = c("knn", "tri2nb", "none"),
+  weight.method = c("voronoi", "knn", "none"),
   sample_id = "all",
   reduction.used = c("UMAP", "TSNE"),
   permutation = NULL,
@@ -49,7 +49,7 @@ runDetectSVG(
   assay.type = "logcounts",
   method = c("moransi", "gearysc"),
   weight = NULL,
-  weight.method = c("knn", "tri2nb", "none"),
+  weight.method = c("voronoi", "knn", "none"),
   sample_id = "all",
   reduction.used = c("UMAP", "TSNE"),
   permutation = NULL,
@@ -77,8 +77,8 @@ if the \code{data} contains multiple samples, and the \code{sample_id} is specif
 provided as a list object with names (using \code{sample_id}).}
 
 \item{weight.method}{character the method to build the spatial neighbours weights, default
-is \code{knn} (k nearest neighbours). Other method, which requires coord matrix as input and returns
-\code{nb}, \code{listw} or \code{Graph} object, also is avaiable, such as \code{'tri2nb'}, \code{"knearneigh"},
+is \code{voronoi} (Voronoi tessellation). Other method, which requires coord matrix as input and returns
+\code{nb}, \code{listw} or \code{Graph} object, also is avaiable, such as \code{"knearneigh"},
 \code{'dnearneigh'}, \code{"gabrielneigh"}, \code{"relativeneigh"}, which are from \code{spdep} package.
 default is \code{knn}, if it is \code{"none"}, meaning the distance weight of each spot is used to
 the weight.}

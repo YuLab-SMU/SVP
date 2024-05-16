@@ -19,8 +19,8 @@
 #' if the \code{data} contains multiple samples, and the \code{sample_id} is specified, it should be
 #' provided as a list object with names (using \code{sample_id}).
 #' @param weight.method character the method to build the spatial neighbours weights, default
-#' is \code{knn} (k nearest neighbours). Other method, which requires coord matrix as input and returns
-#' \code{nb}, \code{listw} or \code{Graph} object, also is avaiable, such as \code{'tri2nb'}, \code{"knearneigh"},
+#' is \code{voronoi} (Voronoi tessellation). Other method, which requires coord matrix as input and returns
+#' \code{nb}, \code{listw} or \code{Graph} object, also is avaiable, such as \code{"knearneigh"},
 #' \code{'dnearneigh'}, \code{"gabrielneigh"}, \code{"relativeneigh"}, which are from \code{spdep} package.
 #' default is \code{knn}, if it is \code{"none"}, meaning the distance weight of each spot is used to
 #' the weight.
@@ -93,16 +93,16 @@
 #'              color=NA,
 #'              linewidth=2
 #'   ) +
-#'   scale_color_manual(values=c('white', "grey", 'black'))
+#'   scale_color_manual(values=c("black", "white"))
 #'   p1
 #'   f1 <- sc_spatial(hpda_spe_cell_dec, features="Cancer clone A",
-#'              mapping=aes(x=x,y=y),
+#'              mapping=aes(x = x, y = y),
 #'              pointsize=10
 #'   ) +
 #'   geom_scattermore2(
 #'     mapping = aes(bg_color=cluster.test.Cancer.A, subset=cluster.test.Cancer.A=="High"),
-#'     bg_line_width = .15,
-#'     gap_line_width = .02,
+#'     bg_line_width = .16,
+#'     gap_line_width = .14,
 #'     pointsize = 7
 #'   ) +
 #'   scale_bg_color_manual(values=c('black'))
@@ -113,8 +113,8 @@
 #'   ) +
 #'   geom_scattermore2(
 #'     mapping = aes(bg_color=cluster.test.Acinar, subset=cluster.test.Acinar=="High"),
-#'     bg_line_width = .15,
-#'     gap_line_width = .02,
+#'     bg_line_width = .16,
+#'     gap_line_width = .14,
 #'     pointsize = 7
 #'   ) +
 #'   scale_bg_color_manual(values=c('black'))
@@ -126,7 +126,7 @@
 #'   geom_scattermore2(
 #'     mapping = aes(bg_color=cluster.test.Cancer.B, subset=cluster.test.Cancer.B=="High"),
 #'     bg_line_width = .18,
-#'     gap_line_width = .06,
+#'     gap_line_width = .14,
 #'     pointsize = 8
 #'   ) +
 #'   scale_bg_color_manual(values=c('black'))
@@ -139,7 +139,7 @@ setGeneric('runLISA',
     sample_id = 'all',
     method = c("localG", "localmoran"),
     weight = NULL,
-    weight.method = c("knn", "tri2nb"),
+    weight.method = c("voronoi", "knn", "none"),
     reduction.used = NULL,
     cells = NULL,
     action = c("get", "add", "only"),
@@ -163,7 +163,7 @@ setMethod("runLISA", "SingleCellExperiment", function(
     sample_id = 'all',
     method = c("localG", "localmoran"),
     weight = NULL, 
-    weight.method = c("knn", "tri2nb"), 
+    weight.method = c("voronoi", "knn", "none"), 
     reduction.used = NULL,
     cells = NULL,
     action = c("get", "add", "only"),
@@ -248,7 +248,7 @@ setMethod("runLISA", "SVPExperiment", function(
     sample_id = 'all',
     method = c("localG", "localmoran"),
     weight = NULL,
-    weight.method = c("knn", "tri2nb"),
+    weight.method = c("voronoi", "knn", "none"),
     reduction.used = NULL,
     cells = NULL,
     action = c("get", "add", "only"),

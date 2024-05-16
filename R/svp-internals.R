@@ -442,7 +442,7 @@ pairDist <- function(x, y){
   x,
   coords,
   weight = NULL,
-  weight.method = c("knn", "tri2nb", "none"), 
+  weight.method = c("voronoi", "knn", "none"), 
   method = 'moransi',
   permutation = 1, 
   scaled = FALSE,
@@ -527,6 +527,9 @@ pairDist <- function(x, y){
   if (inherits(x, "listw")){
       res <- .convert_to_distmt.listw(x)
   }
+  if (inherits(x, 'deldir')){
+      res <- .convert_to_distmt.deldir(x)
+  }
   return(res)
 }
 
@@ -568,11 +571,19 @@ pairDist <- function(x, y){
   return(res)
 }
 
+.convert_to_distmt.deldir <- function(x){
+  res <- sparseMatrix(
+           i = c(x$delsgs[,5], x$delsgs[,6]), 
+           j = c(x$delsgs[, 6], x$delsgs[, 5]),
+           x = rep(1, nrow(x$delsgs))
+  ) |> as.matrix()
+  return(res)
+}
 
 .obtain.weight <- function(
      coords = NULL,
      weight = NULL,
-     weight.method = c("knn", "tri2nb", "none"),
+     weight.method = c("voronoi", "knn", "none"),
      ...
   ){
   params <- list(...)
@@ -582,7 +593,7 @@ pairDist <- function(x, y){
       weight.method <- match.arg(weight.method)
   }
 
-  if (is.null(weight) && (weight.method %in% c('none', 'knn'))){
+  if (is.null(weight) && (weight.method %in% c("none", "voronoi", "knn"))){
       if (is.integer(coords)) coords <- coords * 1.0
       weight.mat <- pairDist(coords, coords)
       if (weight.method == 'knn'){
@@ -593,6 +604,9 @@ pairDist <- function(x, y){
           }
           weight.mat <- .build.adj.m(weight.mat, k + 1) |> as.matrix() |> t()
           diag(weight.mat) <- 0
+      }else if (weight.method == "voronoi"){
+          rlang::check_installed("deldir", "is required when `weight.method=='voronoi'`.") 
+          weight.mat <- do.call(".build.adj.using.voronoi", list(coords, params)) 
       }
       weight.mat <- weight.mat * (1/rowSums(weight.mat))
   }
@@ -601,13 +615,28 @@ pairDist <- function(x, y){
       weight.mat <- .convert_to_distmt(weight)
   }
 
-  if (is.null(weight) && !weight.method %in% c("none", "knn")){
+  if (is.null(weight) && !weight.method %in% c("none", "voronoi", "knn")){
       rlang::check_installed("spdep", paste0("is required to identify SVG or SVP with `", weight.method,"` ."))
       weight.mat <- do.call(weight.method, c(list(coords), params))
       weight.mat <- .convert_to_distmt(weight.mat)
   }
 
   return(weight.mat)
+}
+
+#' @importFrom deldir deldir
+.build.adj.using.voronoi <- function(coords, flag.z = FALSE, ...){
+  x <- coords[, 1]
+  y <- coords[, 2]
+  z <- NULL
+  if (ncol(coords)>=3 && flag.z){
+      z <- coords[,3]
+  }
+  
+  res <- deldir::deldir(x, y, z, ...)
+  res <- .convert_to_distmt(res)
+  return(res)
+  
 }
 
 #' @importFrom rlang .data
