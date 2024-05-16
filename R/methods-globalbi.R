@@ -1,7 +1,7 @@
 #' @title Bivariate analysis for spatial autocorrelation
 #' @description
 #' This function is to explore the bivariate relationship in the spatial space.
-#' @rdname runBIGLOBAL-method
+#' @rdname runGLOBALBI-method
 #' @param data a \linkS4class{SingleCellExperiment} object with contains \code{UMAP} or \code{TSNE},
 #' or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} object with specified
 #' \code{gsvaexp} argument.
@@ -23,8 +23,8 @@
 #' if the \code{data} contains multiple samples, and the \code{sample_id} is specified, it should be
 #' provided as a list object with names (using \code{sample_id}).
 #' @param weight.method character the method to build the spatial neighbours weights, default
-#' is \code{knn} (k nearest neighbours). Other method, which requires coord matrix as input and returns
-#' \code{nb}, \code{listw} or \code{Graph} object, also is avaiable, such as \code{'tri2nb'}, \code{"knearneigh"},
+#' is \code{voronoi} (Voronoi tessellation). Other method, which requires coord matrix as input and returns
+#' \code{nb}, \code{listw} or \code{Graph} object, also is avaiable, such as \code{"knearneigh"},
 #' \code{'dnearneigh'}, \code{"gabrielneigh"}, \code{"relativeneigh"}, which are from \code{spdep} package.
 #' default is \code{knn}, if it is \code{"none"}, meaning the distance weight of each spot is used to
 #' the weight.
@@ -51,7 +51,7 @@
 #' [`runLISA`] to explore the spatial hotspots.
 #' @author Shuangbin Xu
 #' @export
-setGeneric('runBIGLOBAL',
+setGeneric('runGLOBALBI',
   function(
     data,
     features1 = NULL,
@@ -60,7 +60,7 @@ setGeneric('runBIGLOBAL',
     sample_id = 'all',
     method = c("lee"),
     weight = NULL,
-    weight.method = c("knn", "tri2nb"),
+    weight.method = c("voronoi", "knn", "none"),
     reduction.used = NULL,
     permutation = 100,
     alternative = 'greater',
@@ -72,13 +72,13 @@ setGeneric('runBIGLOBAL',
     gsvaexp.features = NULL,    
     ...
   )
-  standardGeneric('runBIGLOBAL')
+  standardGeneric('runGLOBALBI')
 )
 
-#' @rdname runBIGLOBAL-method
-#' @aliases runBIGLOBAL,SingleCellExperiment
-#' @export runBIGLOBAL
-setMethod("runBIGLOBAL", "SingleCellExperiment", function(
+#' @rdname runGLOBALBI-method
+#' @aliases runGLOBALBI,SingleCellExperiment
+#' @export runGLOBALBI
+setMethod("runGLOBALBI", "SingleCellExperiment", function(
     data, 
     features1 = NULL,
     features2 = NULL,
@@ -86,7 +86,7 @@ setMethod("runBIGLOBAL", "SingleCellExperiment", function(
     sample_id = 'all',
     method = c("lee"),
     weight = NULL, 
-    weight.method = c("knn", "tri2nb"), 
+    weight.method = c("voronoi", "knn", "none"), 
     reduction.used = NULL,
     permutation = 100,
     alternative = 'greater',
@@ -129,7 +129,7 @@ setMethod("runBIGLOBAL", "SingleCellExperiment", function(
                   if (any(rowSums(wm) == 0)){
                       cli::cli_warn("no-neighbour observations found in the spatial neighborhoods graph.")
                   }
-                  res <- .internal.runBIGLOBAL(xi, wm, features1, features2, 
+                  res <- .internal.runGLOBALBI(xi, wm, features1, features2, 
                                                permutation, alternative, 
                                                add.pvalue, random.seed)
                   return(res)
@@ -143,10 +143,10 @@ setMethod("runBIGLOBAL", "SingleCellExperiment", function(
 })
 
 
-#' @rdname runBIGLOBAL-method
-#' @aliases runBIGLOBAL,SVPExperiment
-#' @export runBIGLOBAL
-setMethod("runBIGLOBAL", "SVPExperiment", function(
+#' @rdname runGLOBALBI-method
+#' @aliases runGLOBALBI,SVPExperiment
+#' @export runGLOBALBI
+setMethod("runGLOBALBI", "SVPExperiment", function(
     data,
     features1 = NULL,
     features2 = NULL,
@@ -154,7 +154,7 @@ setMethod("runBIGLOBAL", "SVPExperiment", function(
     sample_id = 'all',
     method = c("lee"),
     weight = NULL,
-    weight.method = c("knn", "tri2nb"),
+    weight.method = c("voronoi", "knn", "none"),
     reduction.used = NULL,
     permutation = 100,
     alternative = 'greater',
@@ -225,7 +225,7 @@ setMethod("runBIGLOBAL", "SVPExperiment", function(
                        if (any(rowSums(wm) == 0)){
                            cli::cli_warn("no-neighbour observations found in the spatial neighborhoods graph.")
                        }
-                       res <- .internal.runBIGLOBAL(xi, wm, features1, features2,
+                       res <- .internal.runGLOBALBI(xi, wm, features1, features2,
                                                     permutation, alternative,
                                                     add.pvalue, random.seed)
                        return(res)
