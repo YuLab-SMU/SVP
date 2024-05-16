@@ -1,4 +1,4 @@
-.internal.runBIGLOBAL <- function(
+.internal.runGLOBALBI <- function(
   x,
   weight,
   features1 = NULL,
@@ -21,18 +21,18 @@
       f2 <- .check_features(features2, allf, prefix='features2')
   }
 
-  L <- CalGlobalLeeParallel(x, weight, f1-1L, f2-1L, permutation, alter, FALSE)
-  rownames(L) <- allf[f1]
-  colnames(L) <- allf[f2]
+  res <- withr::with_seed(random.seed, 
+         CalGlobalLeeParallel(x, weight, f1-1L, f2-1L, 
+                              permutation, alter, add.pvalue))
+  rownames(res$Lee) <- allf[f1]
+  colnames(res$Lee) <- allf[f2]
   if (add.pvalue){
-      pv <- withr::with_seed(random.seed,
-               CalGlobalLeeParallel(x, weight, f1-1L, f2-1L, permutation, alter, TRUE)
-      )
-      rownames(pv) <- allf[f1]
-      colnames(pv) <- allf[f2]
+      rownames(res$pvalue) <- allf[f1]
+      colnames(res$pvalue) <- allf[f2]
   }else{
-      pv <- NULL
+      res$pvalue <- NULL
+      res <- c(res, list(pvalue=NULL))
   }
-  return(list(Lee=L, pvalue=pv))
+  return(res)
 }
 

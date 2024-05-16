@@ -46,13 +46,14 @@ struct RunGlobalLee : public Worker{
   const int permutation;
   const bool cal_pvalue;
   arma::mat& result;
+  arma::mat& presult;
   
   RunGlobalLee(const arma::mat& x, const arma::mat& w, const arma::uvec& f1,
           const arma::uvec& f2, simple_progress& p, const uword& nf2, 
           const double S2, const int n, const uint64_t seed, const int permutation,
-          const bool cal_pvalue, arma::mat& result):
+          const bool cal_pvalue, arma::mat& result, arma::mat& presult):
     x(x), w(w), f1(f1), f2(f2), p(p), nf2(nf2), S2(S2), n(n), seed(seed), 
-    permutation(permutation), cal_pvalue(cal_pvalue), result(result){} 
+    permutation(permutation), cal_pvalue(cal_pvalue), result(result), presult(presult){} 
 
   void operator()(std::size_t begin, std::size_t end){
       dqrng::xoshiro256plus rng(seed);
@@ -60,12 +61,11 @@ struct RunGlobalLee : public Worker{
           dqrng::xoshiro256plus lrng(rng);
           for (uword j = 0; j < nf2; j ++){
               double obs = cal_global_lee(x.row(f1[i]), x.row(f2[j]), w, S2, n);
+              result(i, j) = obs;
               if (cal_pvalue){
                   arma::vec resp = cal_global_lee_test(x.row(f1[i]), x.row(f2[j]), w, lrng, S2, n, permutation);
                   double pv = cal_permutation_p(resp, obs, permutation + 1);
-                  result(i, j) = pv;
-              }else{
-                  result(i, j) = obs;
+                  presult(i, j) = pv;
               }
               p.increment();
           }
@@ -74,7 +74,7 @@ struct RunGlobalLee : public Worker{
 };
 
 //[[Rcpp::export]]
-arma::mat CalGlobalLeeParallel(
+Rcpp::List CalGlobalLeeParallel(
   arma::sp_mat x, 
   arma::mat w, 
   arma::uvec f1,
@@ -97,10 +97,12 @@ arma::mat CalGlobalLeeParallel(
   simple_progress p (n1 * n2);
   
   arma::mat res(n1, n2);
+  arma::mat pres(n1, n2);
 
-  RunGlobalLee rungloballeeperm(xm, w, f1, f2, p, n2, S2, m, seed1, permutation, cal_pvalue, res);
+  RunGlobalLee rungloballeeperm(xm, w, f1, f2, p, n2, S2, m, seed1, permutation, cal_pvalue, res, pres);
        
   parallelFor(0, n1, rungloballeeperm);
+  List result = List::create(Named("Lee")=res, Named("pvalue")=pres);
   
-  return(res);
+  return(result);
 }

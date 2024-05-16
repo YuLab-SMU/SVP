@@ -27,7 +27,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // CalGlobalLeeParallel
-arma::mat CalGlobalLeeParallel(arma::sp_mat x, arma::mat w, arma::uvec f1, arma::uvec f2, int permutation, int alternative, bool cal_pvalue);
+Rcpp::List CalGlobalLeeParallel(arma::sp_mat x, arma::mat w, arma::uvec f1, arma::uvec f2, int permutation, int alternative, bool cal_pvalue);
 RcppExport SEXP _SVP_CalGlobalLeeParallel(SEXP xSEXP, SEXP wSEXP, SEXP f1SEXP, SEXP f2SEXP, SEXP permutationSEXP, SEXP alternativeSEXP, SEXP cal_pvalueSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
