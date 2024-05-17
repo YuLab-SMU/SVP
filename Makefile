@@ -7,16 +7,18 @@ crd:
 	Rscript -e 'Rcpp::compileAttributes()'
 
 rd: crd
-	Rscript -e 'library(methods);devtools::document()'
+	Rscript -e 'roxygen2::roxygenise(".")'
 
 readme:
 	Rscript -e 'rmarkdown::render("README.Rmd", encoding="UTF-8")'
 
 build:
-	Rscript -e 'devtools::build()'
+	cd ..;\
+	R CMD build $(PKGSRC)
 
 build2:
-	Rscript -e 'devtools::build(vignettes = FALSE)'
+	cd ..;\
+	R CMD build --no-build-vignettes $(PKGSRC)
 
 install: build2
 	cd ..;\
@@ -27,6 +29,7 @@ check: rd build
 	Rscript -e 'rcmdcheck::rcmdcheck("$(PKGNAME)_$(PKGVERS).tar.gz")'
 
 check2: rd build
+	cd ..;\
 	R CMD check $(PKGNAME)_$(PKGVERS).tar.gz
 
 bioccheck: rd build
@@ -34,4 +37,5 @@ bioccheck: rd build
         Rscript -e 'BiocCheck::BiocCheck("$(PKGNAME)_$(PKGVERS).tar.gz")'
 
 clean:
+	cd ..;\
 	@rm -rf $(PKGNAME)_$(PKGVERS).tar.gz $(PKGNAME).Rcheck

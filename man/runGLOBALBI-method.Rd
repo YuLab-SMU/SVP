@@ -130,7 +130,7 @@ performed the analysis.}
 which works with \code{gsvaexp} parameter.}
 
 \item{gsvaexp.features}{character the name from the \code{rownames(gsvaExp(data, gsvaexp))}. If \code{gsvaexp} is
-specified and \code{data} is linkS4class{SVPExperiment}, it should be provided. Default is NULL.}
+specified and \code{data} is \linkS4class{SVPExperiment}, it should be provided. Default is NULL.}
 
 \item{...}{additional parameters the parameters which are from the weight.method function.}
 }

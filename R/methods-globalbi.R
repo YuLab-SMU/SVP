@@ -44,7 +44,7 @@
 #' @param gsvaexp.assay.type character the assay name in the `assays(gsvaExp(data, gsvaexp))`, default is NULL, 
 #' which works with \code{gsvaexp} parameter.
 #' @param gsvaexp.features character the name from the `rownames(gsvaExp(data, gsvaexp))`. If \code{gsvaexp} is
-#' specified and \code{data} is linkS4class{SVPExperiment}, it should be provided. Default is NULL.
+#' specified and \code{data} is \linkS4class{SVPExperiment}, it should be provided. Default is NULL.
 #' @param ... additional parameters the parameters which are from the weight.method function.
 #' @return SimpleList  
 #' @seealso [`runDetectSVG`] and [`runKldSVG`] to identify the spatial variable features.
