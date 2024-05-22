@@ -105,7 +105,7 @@ features to features, cells to features respectively to build graph.}
 
 \item{knn.k.use}{numeric the number of the Nearest Neighbors nodes, default is 600.}
 
-\item{rwr.restart}{default is 0.75.}
+\item{rwr.restart}{the restart probability used for restart walk with restart, should be between 0 and 1, default is 0.75.}
 
 \item{rwr.normalize.adj.method}{character the method to normalize the adjacency matrix of the input graph,
 default is \code{laplacian}.}

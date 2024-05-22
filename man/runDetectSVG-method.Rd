@@ -69,7 +69,8 @@ or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} ob
 
 \item{assay.type}{which expressed data to be pulled to run, default is \code{logcounts}.}
 
-\item{method}{character one of \code{'moransi'}, \code{"gearysc"} or \code{"getisord"}, default is \code{'moransi'}.}
+\item{method}{character the method of spatial autocorrelation using a spatial weights to detect spatial
+variable features, one of \code{'moransi'}, \code{"gearysc"} or \code{"getisord"}, default is \code{'moransi'}.}
 
 \item{weight}{object, which can be \code{nb}, \code{listw} or \code{Graph} object, default is NULL,
 meaning the spatail neighbours weights will be calculated using the \code{weight.method}.
@@ -93,7 +94,7 @@ if \code{data} has \code{spatialCoords}, which will be used as spatial coordinat
 \item{permutation}{integer the number to permutation test for the calculation of Moran's I, default
 is NULL. Because we do not recommend using this parameter, as the permutation test is too slow.}
 
-\item{p.adjust.method}{character the method to adjust the pvalue of the result, default is \code{BY}.}
+\item{p.adjust.method}{character the method to adjust the pvalue of the result, default is \code{BH}.}
 
 \item{random.seed}{numeric random seed number to repeatability, default is 1024.}
 

@@ -272,7 +272,8 @@ setMethod('runKldSVG', 'SVPExperiment',
 #' or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} object with specified
 #' \code{gsvaexp} argument.
 #' @param assay.type which expressed data to be pulled to run, default is \code{logcounts}.
-#' @param method character one of \code{'moransi'}, \code{"gearysc"} or \code{"getisord"}, default is \code{'moransi'}.
+#' @param method character the method of spatial autocorrelation using a spatial weights to detect spatial
+#' variable features, one of \code{'moransi'}, \code{"gearysc"} or \code{"getisord"}, default is \code{'moransi'}.
 #' @param weight object, which can be \code{nb}, \code{listw} or \code{Graph} object, default is NULL,
 #' meaning the spatail neighbours weights will be calculated using the \code{weight.method}.
 #' if the \code{data} contains multiple samples, and the \code{sample_id} is specified, it should be 
@@ -290,7 +291,7 @@ setMethod('runKldSVG', 'SVPExperiment',
 #' if \code{data} has \code{spatialCoords}, which will be used as spatial coordinates.
 #' @param permutation integer the number to permutation test for the calculation of Moran's I, default
 #' is NULL. Because we do not recommend using this parameter, as the permutation test is too slow.
-#' @param p.adjust.method character the method to adjust the pvalue of the result, default is \code{BY}.
+#' @param p.adjust.method character the method to adjust the pvalue of the result, default is \code{BH}.
 #' @param random.seed numeric random seed number to repeatability, default is 1024.
 #' @param verbose logical whether print the intermediate message when running the program, default is TRUE.
 #' @param action character control the type of output, if \code{action='add'}, the result of identification 

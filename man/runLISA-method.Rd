@@ -80,7 +80,8 @@ provided and \code{data} is \linkS4class{SingleCellExperiment}, it should be the
 Can be \code{all} to compute metric for all samples; the metric is computed separately for each sample.
 default is \code{"all"}.}
 
-\item{method}{character one of \code{'localG'}, \code{"localmoran"}, default is \code{'localG'}.}
+\item{method}{character the method for the local spatial statistic, one of \code{'localG'}, \code{"localmoran"},
+default is \code{'localG'}.}
 
 \item{weight}{object, which can be \code{nb}, \code{listw} or \code{Graph} object, default is NULL,
 meaning the spatail neighbours weights will be calculated using the \code{weight.method}.
