@@ -38,4 +38,4 @@ bioccheck: rd build
 
 clean:
 	cd ..;\
-	@rm -rf $(PKGNAME)_$(PKGVERS).tar.gz $(PKGNAME).Rcheck
+	rm -rf $(PKGNAME)_$(PKGVERS).tar.gz $(PKGNAME).Rcheck
