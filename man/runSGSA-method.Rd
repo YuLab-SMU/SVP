@@ -29,6 +29,7 @@ runSGSA(
   rwr.threads = NULL,
   hyper.test.weighted = c("Hypergeometric", "Wallenius", "none"),
   hyper.test.by.expr = TRUE,
+  add.weighted.metric = FALSE,
   add.cor.features = FALSE,
   cells = NULL,
   features = NULL,
@@ -58,6 +59,7 @@ runSGSA(
   rwr.threads = NULL,
   hyper.test.weighted = c("Hypergeometric", "Wallenius", "none"),
   hyper.test.by.expr = TRUE,
+  add.weighted.metric = FALSE,
   add.cor.features = FALSE,
   cells = NULL,
   features = NULL,
@@ -122,8 +124,11 @@ number of threads, you can also set this using \code{RcppParallel::setThreadOpti
 \item{hyper.test.weighted}{character which method to weight the activity score of cell, should is one of "Hypergeometric", "Wallenius",
 "none", default is "Hypergeometric".}
 
-\item{hyper.test.by.expr}{logical whether using the expression matrix to find the nearest genes of cells, default is \code{TRUE},
-if it is \code{FALSE}, meaning using the result of reduction to find the nearest genes of cells to perfrom the \code{hyper.test.weighted}.}
+\item{hyper.test.by.expr}{logical whether using the expression matrix to find the nearest genes of cells, default is TRUE,
+if it is FALSE, meaning using the result of reduction to find the nearest genes of cells to perfrom the \code{hyper.test.weighted}.}
+
+\item{add.weighted.metric}{logical whether return the weight activity score of cell using the corresponding \code{hyper.test.weighted},
+default is FALSE.}
 
 \item{add.cor.features}{logical whether calculate the corrlelation between the new features and orginal featuers (genes), default
 is FALSE. If it is TRUE the corrleation result will be kept in fscoreDf which can be extracted using \code{fscoreDf()} function.}

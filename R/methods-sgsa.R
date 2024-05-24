@@ -51,8 +51,10 @@
 #' number of threads, you can also set this using \code{RcppParallel::setThreadOptions(numThreads=10)}.
 #' @param hyper.test.weighted character which method to weight the activity score of cell, should is one of "Hypergeometric", "Wallenius", 
 #' "none", default is "Hypergeometric".
-#' @param hyper.test.by.expr logical whether using the expression matrix to find the nearest genes of cells, default is \code{TRUE},
-#' if it is \code{FALSE}, meaning using the result of reduction to find the nearest genes of cells to perfrom the \code{hyper.test.weighted}.
+#' @param hyper.test.by.expr logical whether using the expression matrix to find the nearest genes of cells, default is TRUE,
+#' if it is FALSE, meaning using the result of reduction to find the nearest genes of cells to perfrom the \code{hyper.test.weighted}.
+#' @param add.weighted.metric logical whether return the weight activity score of cell using the corresponding \code{hyper.test.weighted},
+#' default is FALSE.
 #' @param add.cor.features logical whether calculate the corrlelation between the new features and orginal featuers (genes), default
 #' is FALSE. If it is TRUE the corrleation result will be kept in fscoreDf which can be extracted using \code{fscoreDf()} function.
 #' @param cells Vector specifying the subset of cells to be used for the calculation of the activaty score or identification 
@@ -182,6 +184,7 @@ setGeneric('runSGSA',
     rwr.threads = NULL,
     hyper.test.weighted = c("Hypergeometric", "Wallenius", "none"),
     hyper.test.by.expr = TRUE,
+    add.weighted.metric = FALSE,
     add.cor.features = FALSE,
     cells = NULL,
     features = NULL,
@@ -221,6 +224,7 @@ setMethod('runSGSA',
     rwr.threads = NULL,
     hyper.test.weighted = c("Hypergeometric", "Wallenius", "none"),
     hyper.test.by.expr = TRUE,
+    add.weighted.metric = FALSE,
     add.cor.features = FALSE,
     cells = NULL,
     features = NULL,
@@ -317,9 +321,12 @@ setMethod('runSGSA',
                            method = hyper.test.weighted
                   ))
       gset.score.cells2 <- .weighted_by_hgt(gset.score.cells, gset.hgt)
-      assay.res <- list(affi.score = as(gset.score.cells2,'dgCMatrix'),
-                        rwr.score = as(gset.score.cells[rownames(gset.score.cells2),,drop=FALSE], 'dgCMatrix'),
-                        hyper.weighted = as(gset.hgt,'dgCMatrix'))
+      assay.res <- list(affi.score = as(gset.score.cells2, 'dgCMatrix'))
+      if (add.weighted.metric){
+          assay.res <- c(assay.res, 
+                         list(rwr.score = as(gset.score.cells[rownames(gset.score.cells2),,drop=FALSE], 'dgCMatrix'),
+                            hyper.weighted = as(gset.hgt,'dgCMatrix')))
+      }
   }else{
       assay.res <- list(affi.score = as(gset.score.cells, 'dgCMatrix'))
   }
