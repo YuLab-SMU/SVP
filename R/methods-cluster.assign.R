@@ -25,7 +25,7 @@
 #' data(hpda_spe_cell_dec)
 #' assays(hpda_spe_cell_dec)
 #' hpda_spe_cell_dec <- hpda_spe_cell_dec |>
-#'    cluster.assign(assay.type = 'rwr.score')
+#'    cluster.assign()
 #' hpda_spe_cell_dec 
 setGeneric('cluster.assign', 
   function(

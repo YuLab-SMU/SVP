@@ -70,3 +70,4 @@ LinkingTo:
   RcppEigen,
   dqrng
 Config/testthat/edition: 3
+LazyData: true
