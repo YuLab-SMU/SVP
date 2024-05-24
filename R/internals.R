@@ -358,3 +358,12 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
 
   return(coords)
 }
+
+.check_features_in_sce <- function(sce, svg){
+  if (inherits(rownames(svg), "tbl_df")){
+      sce <- sce[svg$features,]
+  }else{
+      sce <- sce[rownames(svg),]  
+  }
+  return(sce)
+}

@@ -206,7 +206,7 @@ setMethod('runKldSVG', 'SingleCellExperiment',
                        "can be extracted by `gsvaExp()` (return a `SingleCellExperiment` or ",
                        "`SpatialExperiment`, then also use `svDf()` to extract."))
   }
-
+  data <- .check_features_in_sce(data, res.sv)
   data <- .add.int.rowdata(sce = data,
                         getfun = svDfs,
                         setfun1 = `svDfs<-`,
@@ -449,7 +449,7 @@ setMethod('runDetectSVG', 'SingleCellExperiment',
                        "the result can be extracted by `gsvaExp()` (return a `SingleCellExperiment`",
                        " or `SpatialExperiment`),then also using `svDf()` to extract."))
   }
-
+  data <- .check_features_in_sce(data, res.sv)
   data <- .add.int.rowdata(sce = data,
                         getfun = svDfs,
                         setfun1 = `svDfs<-`,
