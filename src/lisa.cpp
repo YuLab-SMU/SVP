@@ -24,12 +24,13 @@ arma::mat CalLocalGCpp(
     ZG = ZG/sqrt(VG);
     
     arma::vec scale = x_star - x;
-    arma::mat res(n, 4);
+    arma::mat res(n, 5);
 
     res.col(0) = Gi/scale;
     res.col(1) = EG/scale;
     res.col(2) = VG/(pow(scale, 2.0));
     res.col(3) = ZG;
+    res.col(4) = x;
 
     return(res);
 }

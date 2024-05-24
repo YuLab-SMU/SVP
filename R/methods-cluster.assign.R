@@ -92,7 +92,6 @@ setMethod(
     
 })
 
-#' @importFrom BiocParallel bplapply
 #' @importFrom withr with_seed
 .internal.assign.cluster <- function(da, assign = FALSE, ...){
     i <- apply(da, 2, function(x) which.max(x))

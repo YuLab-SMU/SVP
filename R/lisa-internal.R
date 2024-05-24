@@ -13,7 +13,7 @@
   prefix <- switch(alternative, two.sided = "!=", greater = ">", less = "<")
 
   if (method == 'localG'){
-      nm <- c("Gi", "E.Gi", "Var.Gi", "Z.Gi")
+      nm <- c("Gi", "E.Gi", "Var.Gi", "Z.Gi", "x")
       pnm <- gettextf("Pr (z %s E(%s))", prefix, "Gi")
       nm <- c(nm, pnm)
       res <- CalLocalGCpp(x, weight, wi, wi2, n) |> data.frame()
@@ -43,8 +43,9 @@
     if (method == 'localG'){
         if (!all(is.na(x$`Z.Gi`))){
             x$`cluster.no.test` <- cut(x$`Z.Gi`,
-                             c(-Inf, mean(x$`Z.Gi`, na.rm=TRUE), Inf),
+                             c(-Inf, mean(x$x, na.rm=TRUE), Inf),
                              lbs)
+            x$x <- NULL
         }
     }else{
 	if (!all(is.na(x$z)) && !all(is.na(x$lz))){
