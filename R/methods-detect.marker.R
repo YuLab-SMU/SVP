@@ -8,20 +8,27 @@
 #' @param reduction character which reduction space, default is \code{'MCA'}.
 #' @param dims integer the number of components to defined the nearest distance.
 #' @param ntop integer the top number of nearest or furthest (\code{type = 'negative'}) features, 
-#' default is 200 .
-#' @param present.prop numeric the appearance proportion of samples in the corresponding group in \code{group.by},
-#' default is 0.2 .
+#' default is 200.
+#' @param present.prop.in.group numeric the appearance proportion of groups which have the marker
+#' default is .1, smaller value represent the marker will have higher specificity, but the number of 
+#' marker for each group might also decrease, the mininum value is \code{1/length(unique(data[[group.by]]))}.
+#' @param present.prop.in.sample numeric the appearance proportion of samples which have the marker in 
+#' the corresponding group by specific \code{group.by}, default is 0.2.
 #' @param type character which features are be extracted, the nearest features (\code{type='positive'}) 
 #' or furthest features (\code{type = 'negative'}) or both (\code{type='all'}), default is 
 #' \code{type='positive'}.
-#' @param consider.unique.in.group logical whether detect the unique features belonging to one cell cluster.
+#' @param BPPARAM A BiocParallelParam object specifying whether perform the analysis parallelly using
+#' \code{BiocParallel} default is \code{SerialParam()}, meaning no parallel.
+#' You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=T)} to parallel it,
+#' the \code{workers} of \code{MulticoreParam} is the number of cores used, see also
+#' \code{\link[BiocParallel]{MulticoreParam}}. default is \code{SerialParam()}.
 #' @param ... additional parameters.
 #' @return a list, which contains features and named with clusters of \code{group.by}.
 #' @export
 #' @examples
 #' example(runMCA, echo = FALSE)
-#' small.sce |> runDetectMarker(group.by='Cell_Cycle', ntop=20, 
-#'               present.prop=.9, consider.unique.in.group=FALSE)
+#' small.sce |> runDetectMarker(group.by = 'Cell_Cycle', ntop = 20, 
+#'               present.prop.in.sample = .2)
 setGeneric('runDetectMarker',
   function(
     data,
@@ -30,9 +37,10 @@ setGeneric('runDetectMarker',
     reduction = 'MCA',
     dims = 30,
     ntop = 200,
-    present.prop = .2,
+    present.prop.in.group = 0.1,
+    present.prop.in.sample = .2,
     type = c('positive', 'all', 'negative'),
-    consider.unique.in.group = TRUE,
+    BPPARAM = SerialParam(),
     ...
   )
   standardGeneric('runDetectMarker')
@@ -52,9 +60,10 @@ setMethod(
     reduction = 'MCA', 
     dims = 30, 
     ntop = 200,
-    present.prop = .2,
+    present.prop.in.group = .1,
+    present.prop.in.sample = .2,
     type = c('positive', 'all', 'negative'),
-    consider.unique.in.group = TRUE,
+    BPPARAM = SerialParam(),
     ...
   ){
   
@@ -80,74 +89,98 @@ setMethod(
     group.vec <- as.character(colData(data)[[group.by]])
 
     if (aggregate.group){
-        cell.rd <- as.data.frame(cell.rd, check.names=FALSE)
-        cell.rd$Group <- group.vec
-        cell.rd <- .calGroupCenter(cell.rd, group.by = "Group", fun = mean)
+        cell.rd <- .calGroupCenter(cell.rd, group.vec, fun = "mean", BPPARAM)
     }
 
     cell2features.dist <- t(pairDist(f.rd, cell.rd))
     
     dt <- .obtain.nn.genes(cell2features.dist, type, ntop)
-    if (!aggregate.group){
-        gnm <- unique(group.vec)
-        dt <- lapply(gnm, function(x) unique(c(dt[, x==group.vec]))) |> setNames(gnm)
-    } 
-    if (consider.unique.in.group){
-        if (aggregate.group){
-            gsetlist <- lapply(seq(ncol(dt)),function(i)setdiff(dt[,i], c(dt[,-i]))) |>
-                setNames(colnames(dt))
-        }else{
-            gsetlist <- lapply(seq(length(dt)), function(i)setdiff(dt[[i]], unlist(dt[-i]))) |>
-                setNames(names(dt))
-        }
-    }else{
-        if (aggregate.group){
-            gsetlist <- lapply(seq(ncol(dt)), function(i)dt[,i]) |> setNames(colnames(dt))
-        }else{
-            gsetlist <- dt
-        }
+
+    if (present.prop.in.sample > 1){
+        present.prop.in.sample <- .5
     }
     
-    if (present.prop > 1){
-        present.prop <- .5
-    }
-    gsetlist <- .check.genes.present(data, group.by, gsetlist, present.prop)
+    gsetlist <- .check.genes.present2(
+                   data,
+                   dt, 
+                   group.vec, 
+                   present.prop.in.group,
+                   present.prop.in.sample,
+                   BPPARAM
+                )
     return(gsetlist)
 })
 
-.calGroupCenter <- function(da, group.by, fun=mean){
-    da <- da |> dplyr::group_by(!!as.symbol(group.by)) |> 
-        dplyr::summarize_all(fun, na.rm=TRUE) |> 
-        as.data.frame(check.names=FALSE)
-    rownames(da) <- da[[group.by]]
-    da[[group.by]] <- NULL
-    return(as.matrix(da))
+.calGroupCenter <- function(da, group.vec, fun="mean", BPPARAM = SerialParam()){
+    fun <- switch(fun, mean=colMeans, sum=colSums)
+    nm <- unique(group.vec)
+    da <- bplapply(nm, function(x){
+        tmpda <- da[group.vec == x, ,drop=FALSE]
+        tmpda <- fun(tmpda)
+	return(tmpda)
+    }, BPPARAM = BPPARAM) 
+    da <- do.call('rbind', da)
+    rownames(da) <- nm
+    return(da)
 }
 
 .obtain.nn.genes <- function(d, type = c('positive'), ntop = 200){
     if (type == 'positive'){
-        dt <- apply(d, 2, function(x)names(sort(x, method = 'quick'))[seq(ntop)])
-    }else if (type == 'negative'){
-        dt <- apply(d, 2, function(x)names(sort(x, method = 'quick', decreasing=TRUE))[seq(ntop)])
-    }else if (type == 'all'){
-        dt1 <- apply(d, 2, function(x)names(sort(x, method = 'quick'))[seq(ntop)])
-        dt <- apply(d, 2, function(x)names(sort(x, method = 'quick', decreasing=TRUE))[seq(ntop)])
-        dt <- rbind(dt1, dt)
+        dt <- .build.adj.m(d, top.n = ntop)
+	return(dt)
+    }
+    d2 <- .normalize_dist_as_matrix(d)
+    if (type == 'negative'){
+	dt <- .build.adj.m(d2, top.n = ntop)
+    }else{
+        dt1 <- .build.adj.m(d, top.n = ntop)
+        dt2 <- .build.adj.m(d2, top.n = ntop)
+        dt <- dt1 + dt2
     }
     return(dt)
 }
 
+.normalize_dist_as_matrix <- function(x){
+    y <- .normalize_dist(x)
+    attr(y, "dim") <- attr(x, "dim")
+    attr(y, "dimnames") <- attr(x, "dimnames")
+    return(y)
+}
 
-
-.check.genes.present <- function(da, group.by, pseudomarker, present.prop = .5){
+.check.genes.present <- function(da, group.vec, pseudomarker, present.prop = .5, BPPARAM){
     nm <- names(pseudomarker)
+    da <- assay(da)
     
-    res <- lapply(nm, function(i){
-       tmpda <- da[pseudomarker[[i]], da[[group.by]]==i,drop=FALSE]
-       flag <- Matrix::rowMeans(assay(tmpda) > 0) >= present.prop
+    res <- bplapply(nm, function(i){
+       tmpda <- da[pseudomarker[[i]], group.vec == i, drop=FALSE]
+       flag <- DelayedMatrixStats::rowMeans2(tmpda > 0) >= present.prop
        rownames(tmpda)[flag]
-    }) |> setNames(nm)
+    }, BPPARAM = BPPARAM) |> setNames(nm)
     
     return(res)
 
+}
+
+.check.genes.present2 <- function(
+    data,
+    da, 
+    group.vec, 
+    present.prop.in.group, 
+    present.prop.in.sample, 
+    BPPARAM
+    ){
+    flag <- ncol(da) == length(group.vec)
+    if (flag){
+        da <- Matrix::t(da) |> as.matrix() |> as.data.frame(check.names=FALSE)
+        da <- .calGroupCenter(da, group.vec, fun = "mean", BPPARAM)
+        da <- t(da)
+    }
+    
+    present.prop.in.group <- max(present.prop.in.group, 1/ncol(da))
+    index <- DelayedMatrixStats::rowMeans2(da > 0) <= present.prop.in.group
+    da <- da[index,,drop=FALSE]
+    res <- apply(da, 2, function(x)names(which(x>0)), simplify=FALSE)
+    names(res) <- colnames(da)
+    res <- .check.genes.present(data, group.vec, res, present.prop.in.sample, BPPARAM)
+    return(res)
 }

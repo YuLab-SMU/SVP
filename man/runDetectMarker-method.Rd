@@ -13,9 +13,10 @@ runDetectMarker(
   reduction = "MCA",
   dims = 30,
   ntop = 200,
-  present.prop = 0.2,
+  present.prop.in.group = 0.1,
+  present.prop.in.sample = 0.2,
   type = c("positive", "all", "negative"),
-  consider.unique.in.group = TRUE,
+  BPPARAM = SerialParam(),
   ...
 )
 
@@ -26,9 +27,10 @@ runDetectMarker(
   reduction = "MCA",
   dims = 30,
   ntop = 200,
-  present.prop = 0.2,
+  present.prop.in.group = 0.1,
+  present.prop.in.sample = 0.2,
   type = c("positive", "all", "negative"),
-  consider.unique.in.group = TRUE,
+  BPPARAM = SerialParam(),
   ...
 )
 }
@@ -46,16 +48,24 @@ FALSE, meaning the nearest features to each cell are detected firstly.}
 \item{dims}{integer the number of components to defined the nearest distance.}
 
 \item{ntop}{integer the top number of nearest or furthest (\code{type = 'negative'}) features,
-default is 200 .}
+default is 200.}
 
-\item{present.prop}{numeric the appearance proportion of samples in the corresponding group in \code{group.by},
-default is 0.2 .}
+\item{present.prop.in.group}{numeric the appearance proportion of groups which have the marker
+default is .1, smaller value represent the marker will have higher specificity, but the number of
+marker for each group might also decrease, the mininum value is \code{1/length(unique(data[[group.by]]))}.}
+
+\item{present.prop.in.sample}{numeric the appearance proportion of samples which have the marker in
+the corresponding group by specific \code{group.by}, default is 0.2.}
 
 \item{type}{character which features are be extracted, the nearest features (\code{type='positive'})
 or furthest features (\code{type = 'negative'}) or both (\code{type='all'}), default is
 \code{type='positive'}.}
 
-\item{consider.unique.in.group}{logical whether detect the unique features belonging to one cell cluster.}
+\item{BPPARAM}{A BiocParallelParam object specifying whether perform the analysis parallelly using
+\code{BiocParallel} default is \code{SerialParam()}, meaning no parallel.
+You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=T)} to parallel it,
+the \code{workers} of \code{MulticoreParam} is the number of cores used, see also
+\code{\link[BiocParallel]{MulticoreParam}}. default is \code{SerialParam()}.}
 
 \item{...}{additional parameters.}
 }
@@ -67,6 +77,6 @@ Detecting the specific cell features with nearest distance of cells in MCA space
 }
 \examples{
 example(runMCA, echo = FALSE)
-small.sce |> runDetectMarker(group.by='Cell_Cycle', ntop=20, 
-              present.prop=.9, consider.unique.in.group=FALSE)
+small.sce |> runDetectMarker(group.by = 'Cell_Cycle', ntop = 20, 
+              present.prop.in.sample = .2)
 }
