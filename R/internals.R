@@ -360,7 +360,7 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
 }
 
 .check_features_in_sce <- function(sce, svg){
-  if (inherits(rownames(svg), "tbl_df")){
+  if (inherits(svg, "tbl_df")){
       sce <- sce[svg$features,]
   }else{
       sce <- sce[rownames(svg),]  
