@@ -13,6 +13,7 @@ runMCA(
   ncomponents = 30,
   subset.row = NULL,
   subset.col = NULL,
+  group.by.vars = NULL,
   consider.spcoord = FALSE,
   ...
 )
@@ -24,6 +25,7 @@ runMCA(
   ncomponents = 50,
   subset.row = NULL,
   subset.col = NULL,
+  group.by.vars = NULL,
   consider.spcoord = FALSE,
   ...
 )
@@ -48,10 +50,13 @@ dimensionality reduction. This can be a character vector of column names,
 an integer vector of column indices or a logical vector, default is NULL, meaning
 all cells to be used for dimensionality reduction.}
 
-\item{consider.spcoord}{whether consider the spatial coords to run MCA with
-the features of data, default is FALSE (TRUE is experimental).}
+\item{group.by.vars}{character the name(s) of covariates that harmony will remove its
+effect on the data, default is NULL.}
 
-\item{...}{additional parameters, meaningless now.}
+\item{consider.spcoord}{whether consider the spatial coords as the features of data
+to run MCA, default is FALSE (TRUE is experimental).}
+
+\item{...}{additional parameters, see also \code{RunHarmony}.}
 }
 \value{
 a \linkS4class{SingleCellExperiment} and the reduction result of \code{MCA}

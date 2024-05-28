@@ -16,9 +16,11 @@
 #' dimensionality reduction. This can be a character vector of column names,
 #' an integer vector of column indices or a logical vector, default is NULL, meaning
 #' all cells to be used for dimensionality reduction.
-#' @param consider.spcoord whether consider the spatial coords to run MCA with 
-#' the features of data, default is FALSE (TRUE is experimental).
-#' @param ... additional parameters, meaningless now.
+#' @param group.by.vars character the name(s) of covariates that harmony will remove its
+#' effect on the data, default is NULL.
+#' @param consider.spcoord whether consider the spatial coords as the features of data 
+#' to run MCA, default is FALSE (TRUE is experimental).
+#' @param ... additional parameters, see also \code{RunHarmony}.
 #' @return a \linkS4class{SingleCellExperiment} and the reduction result of \code{MCA}
 #' can be extracted using \code{reducedDim()} function.
 #' @export
@@ -38,6 +40,7 @@ setGeneric('runMCA', function(data,
                               ncomponents = 30, 
                               subset.row = NULL, 
                               subset.col = NULL,
+                              group.by.vars = NULL,
                               consider.spcoord = FALSE,
                               ...)
   standardGeneric('runMCA')
@@ -55,6 +58,7 @@ setMethod('runMCA', 'SingleCellExperiment',
                    ncomponents = 50, 
                    subset.row = NULL,
                    subset.col = NULL, 
+                   group.by.vars = NULL,
                    consider.spcoord = FALSE,
                    ...){
   if (is.numeric(assay.type)){
@@ -73,7 +77,7 @@ setMethod('runMCA', 'SingleCellExperiment',
   }
 
   x <- assay(data, assay.type)
-  x <- x[DelayedMatrixStats::rowVars(x) != 0,]
+  #x <- x[DelayedMatrixStats::rowVars(x) != 0,]
 
   flag.coords <- .check_element_obj(data, key = 'spatialCoords', basefun = int_colData, namefun = names)
   if (flag.coords && consider.spcoord){
@@ -81,10 +85,15 @@ setMethod('runMCA', 'SingleCellExperiment',
       specoords <- .normalize.coords(specoords)
       x <- rbind(x, t(specoords))
   }
-  
-  res.mca <- .runMCA.internal(x, 
+  metadata <- NULL
+  if (!is.null(group.by.vars)){
+      metadata <- colData(data)[,group.by.vars,drop=FALSE] |> as.data.frame(check.names=FALSE)
+  }
+  res.mca <- .runMCA.internal(x,
+                              metadata, 
                               reduction.name = reduction.name, 
-                              ncomponents = ncomponents
+                              ncomponents = ncomponents,
+                              ...
              )
 
   reducedDim(data, reduction.name) <- res.mca

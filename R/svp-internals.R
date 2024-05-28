@@ -1,13 +1,13 @@
 ## This function refers to CelliD, However, we utilize Spectra and Eigen to expedite the 
 ## computation of SVD and the calculation of feature coordinates (1.5 faster than RunMCA of CelliD).
-.runMCA.internal <- function(x, reduction.name = 'MCA', ncomponents, coords = NULL){
-  rlang::check_installed(c('RSpectra', 'Matrix'), '`runMCA()`')
+.runMCA.internal <- function(x, y = NULL, reduction.name = 'MCA', ncomponents, coords = NULL, ...){
+  rlang::check_installed(c('RSpectra', 'Matrix'), 'for `runMCA()`')
   if (inherits(x, 'dgTMatrix')){
      x <- as(x, "CsparseMatrix")
   }else if (inherits(x, 'matrix')){
      x <- Matrix::Matrix(x, sparse = TRUE)
   }
-  #x <- x[matrixStats::rowVars(x) != 0, ]
+  x <- x[DelayedMatrixStats::rowVars(x) != 0, ]
   cells.nm <- colnames(x)
   features.nm <- rownames(x)
   if (ncol(x) < 4){
@@ -18,10 +18,16 @@
   message("Computing Fuzzy Matrix")
   MCAPrepRes <- MCAStep1(x)
   message("Computing SVD")
-  #SVD <- irlba::irlba(A = MCAPrepRes$Z, nv = ncomponents + 1, nu = 1)[seq(3)]
   SVD <- RSpectra::svds(MCAPrepRes$Z, k=ncomponents + 1, nu = 1, opts = list(tol = 1e-5))
+  V <- SVD$v[,-1,drop=FALSE]
+  if (!is.null(y)){
+      rlang::check_installed("harmony", 'for `runMCA()` when `group.by.vars` is not NULL.')
+      cli::cli_inform("Running Harmony to remove the batch effect")
+      group.vars <- unique(colnames(y))
+      V <- harmony::RunHarmony(V, y, group.vars, verbose=FALSE, ...)
+  }
   message("Computing Coordinates")
-  MCA <- MCAStep2(Z = MCAPrepRes$Z, V = SVD$v[, -1], Dc = MCAPrepRes$Dc)
+  MCA <- MCAStep2(Z = MCAPrepRes$Z, V = V, Dc = MCAPrepRes$Dc)
   component <- paste0(reduction.name, "_", seq(ncol(MCA$cellsCoordinates)))
   mca <- MCA$cellsCoordinates
   colnames(mca) <- component

@@ -51,7 +51,8 @@ Suggests:
   magrittr,
   DropletUtils,
   tibble,
-  tidyr 
+  tidyr,
+  harmony 
 License: GPL-3
 BugReports: https://github.com/YuLab-SMU/SVP/issues
 URL: https://github.com/YuLab-SMU/SVP
