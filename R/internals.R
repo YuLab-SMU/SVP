@@ -228,12 +228,18 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
     if (withDimnames) {
         colnames(out) <- colnames(x)
     }
-    if (withColData) {
-        prep <- cbind(colData(x), colData(out))
+    flag1 <- .check_element_obj(x, key = 'spatialCoords', basefun = int_colData, namefun = names)
+    if (withColData){
+        cmain <- colData(x)
+        cout <- colData(out)
+        cmain <- cmain[, setdiff(colnames(cmain), colnames(cout)),drop=FALSE]
+        if (flag1){
+            cmain$sample_id <- NULL
+        }
+        prep <- cbind(cmain, cout)
         rownames(prep) <- colnames(out)
         colData(out) <- prep
     }
-    flag1 <- .check_element_obj(x, key = 'spatialCoords', basefun = int_colData, namefun = names) 
     if (flag1 && withSpatialCoords){
         out$sample_id <- x$sample_id
         out <- as(out, 'SpatialExperiment')
