@@ -1,7 +1,7 @@
-#' @title Bivariate analysis for spatial autocorrelation
+#' @title Global Bivariate analysis for spatial autocorrelation
 #' @description
-#' This function is to explore the bivariate relationship in the spatial space.
-#' @rdname runGLOBALBI-method
+#' This function is to explore the global bivariate relationship in the spatial space.
+#' @rdname runGLOBALBV-method
 #' @param data a \linkS4class{SingleCellExperiment} object with contains \code{UMAP} or \code{TSNE},
 #' or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} object with specified
 #' \code{gsvaexp} argument.
@@ -51,7 +51,7 @@
 #' [`runLISA`] to explore the spatial hotspots.
 #' @author Shuangbin Xu
 #' @export
-setGeneric('runGLOBALBI',
+setGeneric('runGLOBALBV',
   function(
     data,
     features1 = NULL,
@@ -72,13 +72,13 @@ setGeneric('runGLOBALBI',
     gsvaexp.features = NULL,    
     ...
   )
-  standardGeneric('runGLOBALBI')
+  standardGeneric('runGLOBALBV')
 )
 
-#' @rdname runGLOBALBI-method
-#' @aliases runGLOBALBI,SingleCellExperiment
-#' @export runGLOBALBI
-setMethod("runGLOBALBI", "SingleCellExperiment", function(
+#' @rdname runGLOBALBV-method
+#' @aliases runGLOBALBV,SingleCellExperiment
+#' @export runGLOBALBV
+setMethod("runGLOBALBV", "SingleCellExperiment", function(
     data, 
     features1 = NULL,
     features2 = NULL,
@@ -129,12 +129,12 @@ setMethod("runGLOBALBI", "SingleCellExperiment", function(
                   if (any(rowSums(wm) == 0)){
                       cli::cli_warn("no-neighbour observations found in the spatial neighborhoods graph.")
                   }
-                  res <- .internal.runGLOBALBI(xi, wm, features1, features2, 
+                  res <- .internal.runGLOBALBV(xi, wm, features1, features2, 
                                                permutation, alternative, 
                                                add.pvalue, random.seed)
                   return(res)
          })
-  if (length(res) == 1){
+  if (length(sample_id) == 1){
       return(res[[1]])
   }
   names(res) <- sample_id
@@ -143,10 +143,10 @@ setMethod("runGLOBALBI", "SingleCellExperiment", function(
 })
 
 
-#' @rdname runGLOBALBI-method
-#' @aliases runGLOBALBI,SVPExperiment
-#' @export runGLOBALBI
-setMethod("runGLOBALBI", "SVPExperiment", function(
+#' @rdname runGLOBALBV-method
+#' @aliases runGLOBALBV,SVPExperiment
+#' @export runGLOBALBV
+setMethod("runGLOBALBV", "SVPExperiment", function(
     data,
     features1 = NULL,
     features2 = NULL,
@@ -202,13 +202,9 @@ setMethod("runGLOBALBI", "SVPExperiment", function(
            x <- x[features1, , drop=FALSE]
        }
 
-       data2 <- gsvaExp(data, gsvaexp)
-       if (is.null(gsvaexp.assay.type)){
-           gsvaexp.assay.type <- 1
-       }
-       x2 <- assay(data2, gsvaexp.assay.type)
+       x2 <- .extract_gsvaExp_assay(data, gsvaexp, gsvaexp.assay.type)
        x2 <- x2[features2, , drop=FALSE]
-       x <- Matrix::rbind2(x, x2)
+       x <- rbind(x, x2)
 
        coords <- .check_coords(data, reduction.used, weight)
 
@@ -225,11 +221,14 @@ setMethod("runGLOBALBI", "SVPExperiment", function(
                        if (any(rowSums(wm) == 0)){
                            cli::cli_warn("no-neighbour observations found in the spatial neighborhoods graph.")
                        }
-                       res <- .internal.runGLOBALBI(xi, wm, features1, features2,
+                       res <- .internal.runGLOBALBV(xi, wm, features1, features2,
                                                     permutation, alternative,
                                                     add.pvalue, random.seed)
                        return(res)
               })
+       if (length(sample_id)==1){
+          return(res[[1]])
+       }
        names(res) <- sample_id
        res <- S4Vectors::SimpleList(res)
     }else{
