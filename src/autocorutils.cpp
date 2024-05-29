@@ -23,6 +23,14 @@ arma::rowvec scaleCpp(arma::rowvec x){
   return(x);
 }
 
+arma::vec scaleCpp2(arma::vec x){
+  double f = sqrt(accu(pow(x, 2.0))/max(1.0, x.n_elem - 1.0));
+  if (f > 0.0){
+     x = x / f;
+  }
+  return(x);
+}
+
 arma::mat outermultidot(arma::rowvec x){
   arma::mat xm = repelem(x, x.n_elem, 1);
   xm.diag().fill(0.0);
@@ -38,12 +46,28 @@ arma::vec lagCpp(arma::mat w, arma::vec x){
     return(res);
 }
 
-arma::rowvec lagCpp2(arma::mat w, arma::rowvec x){
+arma::vec lagCpp1(arma::mat w, arma::rowvec x){
     arma::mat xm = repelem(x, x.n_elem, 1);
     xm.diag().fill(0.0);
     w = w % xm;
     arma::vec res = sum(w, 1);
+    return(res);
+}
+
+arma::rowvec lagCpp2(arma::mat w, arma::rowvec x){
+    arma::vec res = lagCpp1(w, x);
     return(res.t());
+}
+
+//[[Rcpp::export]]
+arma::vec cal_local_moran_bv(
+    arma::vec x, 
+    arma::vec y,
+    arma::mat weight
+    ){
+    arma::vec ldy = lagCpp(weight, y);
+    arma::vec res = x % ldy;
+    return(res);
 }
 
 double cal_global_lee(
@@ -68,7 +92,6 @@ double cal_global_lee(
     return(L);
 }
 
-// [[Rcpp::export]]
 double cal_permutation_p(
         arma::vec x,
         double obs,
@@ -91,29 +114,6 @@ double cal_permutation_p(
   }
   return(pv);
 }
-
-arma::rowvec cal_local_lee(
-    arma::rowvec x,
-    arma::rowvec y,
-    arma::mat weight,
-    double S2,
-    int n
-    ){
-
-    arma::rowvec dx = x - mean(x);
-    arma::rowvec dy = y - mean(y);
-
-    double dx2 = accu(pow(dx, 2.0));
-    double dy2 = accu(pow(dy, 2.0));
-
-    arma::rowvec ldx = lagCpp2(weight, dx);
-    arma::rowvec ldy = lagCpp2(weight, dy);
-
-    arma::rowvec l = (n * ldx % ldy)/(sqrt(dx2) * sqrt(dy2));
-
-    return(l);
-}
-
 
 double cal_moransi(
           arma::rowvec x,

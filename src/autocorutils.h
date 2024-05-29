@@ -10,7 +10,8 @@ arma::mat outersubtractdot(arma::rowvec x);
 
 arma::mat outermultidot(arma::rowvec x); 
 
-arma::mat scaleCpp(arma::rowvec x);
+arma::rowvec scaleCpp(arma::rowvec x);
+arma::vec scaleCpp2(arma::vec x);
 
 arma::vec lagCpp(arma::mat w, arma::vec x);
 
@@ -40,6 +41,12 @@ double cal_global_lee(
   arma::mat weight, 
   double S2, 
   int n
+);
+
+arma::vec cal_local_moran_bv(
+    arma::vec x,
+    arma::vec y,
+    arma::mat weight
 );
 
 #endif

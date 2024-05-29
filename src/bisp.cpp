@@ -106,3 +106,63 @@ Rcpp::List CalGlobalLeeParallel(
   
   return(result);
 }
+
+//[[Rcpp::export]]
+arma::vec RunLocalLee(
+    arma::vec x,
+    arma::vec y,
+    arma::mat weight,
+    double n
+    ){
+
+    arma::vec dx = x - mean(x);
+    arma::vec dy = y - mean(y);
+
+    double dx2 = accu(pow(dx, 2.0));
+    double dy2 = accu(pow(dy, 2.0));
+
+    arma::vec ldx = lagCpp(weight, dx);
+    arma::vec ldy = lagCpp(weight, dy);
+
+    arma::vec l = (n * ldx % ldy)/(sqrt(dx2) * sqrt(dy2));
+    return(l);
+}
+
+arma::mat cal_local_moran_bv_perm(
+    arma::vec x,
+    arma::vec y,
+    arma::mat w,
+    int n,
+    int perm
+){
+    arma::mat res(n, perm);
+    for (int i = 0; i< perm; i++){
+        arma::vec y1 = shuffle(y);
+        res.col(i) = cal_local_moran_bv(x, y1, w);
+    }
+    return(res);
+}
+
+//[[Rcpp::export]]
+arma::mat RunLocalMoranBvPerm(
+  arma::vec x,
+  arma::vec y,
+  arma::mat w,
+  int n,
+  int permutation = 200
+  ){
+  
+  x = scaleCpp2(x);
+  y = scaleCpp2(y);  
+  arma::mat result(n, 4);
+  
+  result.col(0) = cal_local_moran_bv(x, y, w);
+
+  arma::mat res = cal_local_moran_bv_perm(x, y, w, n, permutation);
+  result.col(1) = mean(res, 1);
+  result.col(2) = var(res, 0, 1);
+  result.col(3) = (result.col(0) - result.col(1))/sqrt(result.col(2));
+
+  return(result);
+}
+

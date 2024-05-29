@@ -1,4 +1,4 @@
-.internal.runGLOBALBI <- function(
+.internal.runGLOBALBV <- function(
   x,
   weight,
   features1 = NULL,
@@ -33,6 +33,83 @@
       res$pvalue <- NULL
       res <- c(res, list(pvalue=NULL))
   }
+  return(res)
+}
+
+.extract_gsvaExp_assay <- function(data, gsvaexp, gsvaexp.assay.type = NULL){
+  if (is.null(gsvaexp.assay.type)){
+      gsvaexp.assay.type <- 1
+  }
+  res <- lapply(gsvaexp, function(x){
+         assay(gsvaExp(data, x), gsvaexp.assay.type)
+   })
+  res <- do.call('rbind', res)
+  return(res)
+}
+
+.runLocalBv <- function(
+  x,
+  weight,
+  features1, 
+  features2, 
+  n, 
+  permutation = 200, 
+  bv.method = c('locallee', 'localmoran_bv'),
+  bv.alternative = c("two.sided", "greater", "less"),
+  seed = 123,
+  wi,
+  wi2,
+  lisa.method = c("localG", "localmoran"),
+  lisa.alternative = c("greater", "two.sided", "less"),
+  BPPARAM = SerialParam() 
+){
+  bv.method <- match.arg(bv.method)
+  bv.alternative <- match.arg(bv.alternative)
+  lisa.method <- match.arg(lisa.method)
+  lisa.alternative <- match.arg(lisa.alternative)
+  allpair <- expand.grid(features1, features2) |> as.matrix()
+  if (bv.method == 'localmoran_bv'){
+      res <- bplapply(seq(nrow(allpair)), function(i){
+               .internal.runLocalMoranBv(x[allpair[i, 1],], x[allpair[i, 2],], weight, n, permutation, bv.alternative, 
+                                      seed, wi, wi2, lisa.method, lisa.alternative)
+               }, BPPARAM = BPPARAM)
+  }else{
+      res <- bplapply(seq(nrow(allpair)), function(i){
+               .internal.runLocalLeeBv(x[allpair[i,1], ], x[allpair[i,2], ], weight, n, 
+                                      wi, wi2, lisa.method, lisa.alternative)
+               }, BPPARAM = BPPARAM)
+  }
+  names(res) <- paste(allpair[,1], allpair[,2], sep="_VS_")
+  return(res)
+}
+
+.internal.runLocalMoranBv <- function(x, y, weight, n, permutation, bv.alternative, seed, 
+                                      wi, wi2, lisa.method, lisa.alternative){
+  res <- withr::with_seed(seed, RunLocalMoranBvPerm(x, y, weight, n, permutation)) |> 
+         data.frame()
+  prefix <- switch(bv.alternative, two.sided = "!=", greater = ">", less = "<")
+  nm <- c("Ibvi", "E.Ibvi", "Var.Ibvi", "Z.Ibvi")
+  pnm <- gettextf("Pr (z %s E(%s))", prefix, "Ibvi")
+  if (bv.alternative == 'two.sided'){
+      res[, 5] <- 2 * pnorm(abs(res[, 4]), lower.tail = FALSE)
+  }else if (bv.alternative == 'greater'){
+      res[, 5] <- pnorm(res[, 4], lower.tail = FALSE)
+  }else{
+      res[, 5] <- pnorm(res[, 4])
+  }
+  colnames(res) <- c(nm, pnm)
+  lisa.res <- .internal.runLISA(res[, 1], weight, wi, wi2, n, lisa.method, lisa.alternative)
+  res <- cbind(res, lisa.res)
+  rownames(res) <- names(x)
+  return(res)
+}
+
+.internal.runLocalLeeBv <- function(x, y, weight, n, wi, wi2, lisa.method, lisa.alternative){
+  res <- RunLocalLee(x, y, weight, n) |> data.frame()
+  colnames(res) <- "LocalLee"
+  lisa.res <- .internal.runLISA(res[, 1], weight, wi, wi2, n, lisa.method, lisa.alternative)
+  res <- cbind(res, lisa.res)
+  rownames(res) <- names(x)
   return(res)
 }
 
