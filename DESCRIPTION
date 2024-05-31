@@ -36,7 +36,8 @@ Imports:
   withr,
   Matrix,
   DelayedMatrixStats,
-  deldir
+  deldir,
+  utils
 Suggests:
   BiocNeighbors,
   broman,

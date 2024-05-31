@@ -84,3 +84,41 @@
     names(res) <- nm
     return(res)
 }
+
+.internal.as_tbl_df <- function(x){
+    if (identical(rownames(x), colnames(x))){
+        x <- .as_from_square_matrix(x)
+        return(x)
+    }
+
+    x <- x |>
+         as.data.frame(check.names=FALSE) |>
+         tibble::rownames_to_column(var='.Term') |>
+         tidyr::pivot_longer(cols=-".Term")
+    return(x)
+}
+
+.as_from_square_matrix <- function(x, clnm = NULL){
+    ind <- which(upper.tri(x, diag = FALSE), arr.ind = TRUE)
+    nn <- rownames(x)
+    x <- data.frame(x = nn[ind[,1]] , y= nn[ind[,2]], val=x[ind])
+    if (!is.null(clnm)){
+        colnames(x) <- clnm
+    }
+    return(x)
+}
+
+.as_list_to_tbl <- function(x){
+    f <- unlist(x)
+    term <- lapply(names(x), function(i)rep(i, length(x[[i]]))) |> unlist()
+    data.frame(f=f, term=term)
+}
+
+.add_list <- function(x, y){
+    y <- .as_list_to_tbl(y)
+    ind1 <- "f" |> setNames("x")
+    ind2 <- "f" |> setNames("y")
+    x <- dplyr::left_join(x, y, by = ind1)
+    x <- dplyr::left_join(x, y, by = ind2)
+    return(x)
+}
