@@ -100,7 +100,7 @@ default is \code{NULL}.}
 Can be \code{all} to compute metric for all samples; the metric is computed separately for each sample.
 default is \code{"all"}.}
 
-\item{bv.method}{character one of the \code{'locallee'} and {'localmoran_bv'}, default is \code{'locallee'}.}
+\item{bv.method}{character one of the \code{'locallee'} and \code{'localmoran_bv'}, default is \code{'locallee'}.}
 
 \item{bv.alternative}{a character string specifying the alternative hypothesis, default is \code{tow.sided}.
 This only work when \code{bv.method = 'localmoran_bv'}.}
@@ -117,7 +117,7 @@ is \code{voronoi} (Voronoi tessellation). Other method, which requires coord mat
 default is \code{knn}, if it is \code{"none"}, meaning the distance weight of each spot is used to
 the weight.}
 
-\item{lisa.method}{character one of the \code{'localG'} and {'localmoran'}, this is to perform the \code{LISA}
+\item{lisa.method}{character one of the \code{'localG'} and \code{'localmoran'}, this is to perform the \code{LISA}
 analysis using the result of bv.method, which can identify the spatial domain of the bivariate spatial
 analysis result, default is \code{'localG'}.}
 
