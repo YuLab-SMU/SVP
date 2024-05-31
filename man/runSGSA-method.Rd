@@ -11,6 +11,7 @@ runSGSA(
   data,
   gset.idx.list,
   gsvaExp.name = "gset1.rwr",
+  symbol.from.gson = FALSE,
   min.sz = 10,
   max.sz = Inf,
   gene.occurrence.rate = 0.2,
@@ -41,6 +42,7 @@ runSGSA(
   data,
   gset.idx.list,
   gsvaExp.name = "gset1.rwr",
+  symbol.from.gson = FALSE,
   min.sz = 10,
   max.sz = Inf,
   gene.occurrence.rate = 0.2,
@@ -74,6 +76,9 @@ runSGSA(
 \item{gset.idx.list}{gene set list contains the names.}
 
 \item{gsvaExp.name}{a character the name of \code{gsvaExp} of result \code{SVP} object.}
+
+\item{symbol.from.gson}{logical whether extract the SYMBOL ID as \code{gset.idx.list}, only work
+when \code{gset.idx.list} is a \code{GSON} object.}
 
 \item{min.sz}{integer the minimum gene set number, default is 10, the number of gene sets
 smaller than \code{min.sz} will be ignored.}

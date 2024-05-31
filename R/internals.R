@@ -373,3 +373,41 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
   }
   return(sce)
 }
+
+.extract.gset <- function(x, gene.name=FALSE){
+  if (inherits(x, "list") && !is.null(names(x))){
+      return(x)
+  }
+  if (inherits(x, "GSON")){
+      x <- .extract.gset.from.gson(x, gene.name=gene.name)
+  }else{
+      cli::cli_abort(c("The `gset.idx.list` must be a list which have name (gene set name, such as ",
+                       " GO Term name or Reactome Pathway name) or GSON object defined in `gson` package."))
+  }
+  return(x)
+}
+
+.extract.gset.from.gson <- function(x, gene.name=FALSE){
+  gsid2gene <- x@gsid2gene
+  gene2name <- x@gene2name
+  gsid2name <- x@gsid2name
+  nm <- "gsid"
+  if (!is.null(gsid2name)){
+      y <- dplyr::left_join(gsid2gene, gsid2name, by='gsid')
+      nm <- "name"
+  }
+  gnm <- colnames(gsid2gene)[2]
+  if (!is.null(gene2name) && gene.name){
+      ind <- colnames(gene2name)[1] |> setNames(gnm)
+      y <- dplyr::left_join(y, gene2name, by = c(ind))
+      gnm <- colnames(gene2name)[2]
+  }else if(gene.name && is.null(gene2name)){
+      cli::cli_warn("The `gson` object does not have `SYMBOL` ID.")
+  }
+  
+  x <- y |> 
+       dplyr::group_by(!!rlang::sym(nm)) |> 
+       dplyr::summarize(.TARGET=list(!!rlang::sym(gnm))) |> 
+       dplyr::pull(".TARGET", name=nm)
+  return(x)
+}

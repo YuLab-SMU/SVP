@@ -19,6 +19,8 @@
 #' \code{UMAP} or \code{TSNE}. Or a \linkS4class{SVPExperiment} object.
 #' @param gset.idx.list gene set list contains the names.
 #' @param gsvaExp.name a character the name of \code{gsvaExp} of result \code{SVP} object.
+#' @param symbol.from.gson logical whether extract the SYMBOL ID as \code{gset.idx.list}, only work
+#' when \code{gset.idx.list} is a \code{GSON} object.
 #' @param min.sz integer the minimum gene set number, default is 10, the number of gene sets 
 #' smaller than \code{min.sz} will be ignored.
 #' @param max.sz integer the maximum gene set number, default is Inf, the number of gene sets
@@ -166,6 +168,7 @@ setGeneric('runSGSA',
     data, 
     gset.idx.list,
     gsvaExp.name = 'gset1.rwr',
+    symbol.from.gson = FALSE,
     min.sz = 10,
     max.sz = Inf,
     gene.occurrence.rate = .2,
@@ -206,6 +209,7 @@ setMethod('runSGSA',
     data,
     gset.idx.list,
     gsvaExp.name = 'gset1.rwr',
+    symbol.from.gson = FALSE,
     min.sz = 10, 
     max.sz = Inf,
     gene.occurrence.rate = .2,
@@ -252,7 +256,7 @@ setMethod('runSGSA',
   dims <- min(ncol(rd.df), knn.used.reduction.dims)
   cells.rd <- rd.df[cells, seq(dims), drop=FALSE]
   features.rd <- rd.f.res[features, seq(dims), drop=FALSE]
-
+  gset.idx.list <- .extract.gset(gset.idx.list, gene.name = symbol.from.gson)
   gset.num <- .filter.gset.gene(features, gset.idx.list, min.sz, max.sz, gene.occurrence.rate)
   gset.idx.list <- gset.idx.list[match(rownames(gset.num), names(gset.idx.list))]
 
