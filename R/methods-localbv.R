@@ -64,6 +64,15 @@
 #' analysis the global bivariate spatial analysis, [`runLISA`] to identify the spatial domain of specified features.
 #' @export
 #' @author Shuangbin Xu
+#' @examples
+#' data(hpda)
+#' res1 <- hpda_spe_cell_dec |> runLOCALBV(
+#'           features1 = 'Cancer clone A', 
+#'           features2 = 'Cancer clone B', 
+#'           assay.type='affi.score'
+#'         )
+#' res1
+#' res1[['Cancer clone A_VS_Cancer clone B']] |> head()
 setGeneric('runLOCALBV',
   function(
     data,

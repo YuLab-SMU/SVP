@@ -10,7 +10,7 @@
 \usage{
 runLOCALBV(
   data,
-  features1,
+  features1 = NULL,
   features2 = NULL,
   assay.type = "logcounts",
   sample_id = "all",
@@ -34,7 +34,7 @@ runLOCALBV(
 
 \S4method{runLOCALBV}{SingleCellExperiment}(
   data,
-  features1,
+  features1 = NULL,
   features2 = NULL,
   assay.type = "logcounts",
   sample_id = "all",
@@ -58,7 +58,7 @@ runLOCALBV(
 
 \S4method{runLOCALBV}{SVPExperiment}(
   data,
-  features1,
+  features1 = NULL,
   features2 = NULL,
   assay.type = "logcounts",
   sample_id = "all",
@@ -164,6 +164,16 @@ stored in the \code{localResults} column of \code{int_colData} (internal column 
 }
 \description{
 This function is to explore the local bivariate relationship in the spatial space.
+}
+\examples{
+data(hpda)
+res1 <- hpda_spe_cell_dec |> runLOCALBV(
+          features1 = 'Cancer clone A', 
+          features2 = 'Cancer clone B', 
+          assay.type='affi.score'
+        )
+res1
+res1[['Cancer clone A_VS_Cancer clone B']] |> head()
 }
 \seealso{
 \code{\link{runDetectSVG}} and \code{\link{runKldSVG}} to identify the spatial variable features, \code{\link{runGLOBALBV}} to

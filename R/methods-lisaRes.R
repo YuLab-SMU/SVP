@@ -47,3 +47,49 @@ LISAResult <- function(x, type = NULL, features=NULL, ...){
     }
     x[[features]]
 }
+
+#' convert the square matrix to long tidy table
+#' @description
+#' This function is designed to convert the output of \code{runGLOBALBV},
+#' \code{fast_cor} or the matrix output of \code{cor} to long tidy table.
+#' @param x list or matrix object, which is the output of \code{runGLOBALBV},
+#' \code{fast_cor} or the matrix output of \code{cor}.
+#' @param listn list object, which must have name, and the element must
+#' from the row names of \code{x} or \code{x[[1]]} (when \code{x} is a list)
+#' default is NULL.
+#' @return a long tidy table
+#' @export
+#' @examples
+#' example(fast_cor, echo=FALSE)
+#' x <- as_tbl_df(res)
+#' head(x)
+#' x2 <- as_tbl_df(res2)
+#' head(x2)
+as_tbl_df <- function(x, listn=NULL){
+    if (inherits(x, 'list') && length(x)==2){
+        rmat <- x[[1]]
+        pval <- x[[2]]
+        nm <- names(x) 
+    }else{
+        rmat <- x
+        pval <- NULL
+        nm <- c('val')
+    }
+    rmat <- .internal.as_tbl_df(rmat)
+    colnames(rmat) <- c("x", "y", nm[1])
+    if (!is.null(pval)){
+        pval <- .internal.as_tbl_df(pval)
+        colnames(pval) <- c("x", "y", nm[2])
+        rmat <- dplyr::left_join(rmat, pval, by=c("x", "y"))
+    }
+    if (!is.null(listn)){
+        if (inherits(listn, "list") && !is.null(names(listn))){
+            rmat <- .add_list(rmat, listn)
+        }else{
+            cli::cli_warn("The `listn` must be a list object with name.")
+        }
+    }
+    rmat <- tibble::as_tibble(rmat)
+    return(rmat)
+}
+

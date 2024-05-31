@@ -22,6 +22,7 @@ runGLOBALBV(
   alternative = "greater",
   add.pvalue = FALSE,
   random.seed = 1024,
+  action = c("get", "only"),
   verbose = TRUE,
   gsvaexp = NULL,
   gsvaexp.assay.type = NULL,
@@ -43,6 +44,7 @@ runGLOBALBV(
   alternative = "greater",
   add.pvalue = FALSE,
   random.seed = 1024,
+  action = c("get", "only"),
   verbose = TRUE,
   gsvaexp = NULL,
   gsvaexp.assay.type = NULL,
@@ -64,6 +66,7 @@ runGLOBALBV(
   alternative = "greater",
   add.pvalue = FALSE,
   random.seed = 1024,
+  action = "only",
   verbose = TRUE,
   gsvaexp = NULL,
   gsvaexp.assay.type = NULL,
@@ -119,6 +122,12 @@ be slow, default is \code{FALSE}, which the pvalue of result will be NULL.}
 
 \item{random.seed}{numeric random seed number to repeatability, default is 1024.}
 
+\item{action}{character, which should be one of \code{'only'} and \code{'get'}, default is \code{"only"}.
+This will return a long tidy table (when the sample number of \code{data} is one) or a \code{SimpleList} which
+contains long tidy table for each sample. When \code{action="get"}, it will return a list contained global bivariate
+spatial autocorrelation and pvalue (when \code{add.pvalue=TRUE}), or a \code{SimpleList} which contains a list
+global bivariate spatial result for each sample (when the sample number of \code{data} is larger than one).}
+
 \item{verbose}{logical whether print the help information, default is TRUE.}
 
 \item{gsvaexp}{character the one character from the name of \code{gsvaExpNames(data)}, default is NULL. If \code{data}
@@ -135,10 +144,30 @@ specified and \code{data} is \linkS4class{SVPExperiment}, it should be provided.
 \item{...}{additional parameters the parameters which are from the weight.method function.}
 }
 \value{
-SimpleList
+SimpleList or long tidy table see also the help information of \code{action} argument.
 }
 \description{
 This function is to explore the global bivariate relationship in the spatial space.
+}
+\examples{
+data(hpda_spe_cell_dec)
+rownames(hpda_spe_cell_dec) |> head()
+res1 <- runGLOBALBV(hpda_spe_cell_dec, 
+                    features1 = "Ductal APOL1 high-hypoxic", 
+                    features2 = c('Cancer clone A', "Cancer clone B"), 
+                    assay.type = 'affi.score', 
+                    action='only'
+        )
+res1
+res2 <- runGLOBALBV(hpda_spe_cell_dec, 
+                    features1 = c("Acinar cells", 
+                                  "Ductal APOL1 high-hypoxic", 
+                                  "Cancer clone A",
+                                  "Cancer clone B"), 
+                    assay.type = 1, 
+                    action = 'get'
+        )
+res2
 }
 \seealso{
 \code{\link{runDetectSVG}} and \code{\link{runKldSVG}} to identify the spatial variable features.
