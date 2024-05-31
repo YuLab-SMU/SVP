@@ -380,11 +380,23 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
   }
   if (inherits(x, "GSON")){
       x <- .extract.gset.from.gson(x, gene.name=gene.name)
+  }else if (inherits(x, 'character') && file.exists(x)){
+      x <- .read.gmt(x)
   }else{
       cli::cli_abort(c("The `gset.idx.list` must be a list which have name (gene set name, such as ",
-                       " GO Term name or Reactome Pathway name) or GSON object defined in `gson` package."))
+                       " GO Term name or Reactome Pathway name) or GSON object defined in `gson` package.",
+		       "Or the gmt file."))
   }
   return(x)
+}
+
+
+.read.gmt <- function(gmtfile){
+    x <- readLines(gmtfile)
+    res <- strsplit(x, "\t")
+    names(res) <- vapply(res, function(y) y[1], character(1))
+    res <- lapply(res, "[", -c(1:2))
+    return(res)
 }
 
 .extract.gset.from.gson <- function(x, gene.name=FALSE){

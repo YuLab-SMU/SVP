@@ -17,7 +17,7 @@
 #' @rdname runSGSA-method
 #' @param data a \linkS4class{SingleCellExperiment} object normalized and have the result of 
 #' \code{UMAP} or \code{TSNE}. Or a \linkS4class{SVPExperiment} object.
-#' @param gset.idx.list gene set list contains the names.
+#' @param gset.idx.list gene set list contains the names, or GSON object or a gmt file.
 #' @param gsvaExp.name a character the name of \code{gsvaExp} of result \code{SVP} object.
 #' @param symbol.from.gson logical whether extract the SYMBOL ID as \code{gset.idx.list}, only work
 #' when \code{gset.idx.list} is a \code{GSON} object.

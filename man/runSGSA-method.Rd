@@ -73,7 +73,7 @@ runSGSA(
 \item{data}{a \linkS4class{SingleCellExperiment} object normalized and have the result of
 \code{UMAP} or \code{TSNE}. Or a \linkS4class{SVPExperiment} object.}
 
-\item{gset.idx.list}{gene set list contains the names.}
+\item{gset.idx.list}{gene set list contains the names, or GSON object or a gmt file.}
 
 \item{gsvaExp.name}{a character the name of \code{gsvaExp} of result \code{SVP} object.}
 
