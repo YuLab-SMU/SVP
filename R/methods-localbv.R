@@ -16,7 +16,7 @@
 #' @param sample_id character the sample(s) in the \linkS4class{SpatialExperiment} object whose cells/spots to use.
 #' Can be \code{all} to compute metric for all samples; the metric is computed separately for each sample.
 #' default is \code{"all"}.
-#' @param bv.method character one of the \code{'locallee'} and {'localmoran_bv'}, default is \code{'locallee'}.
+#' @param bv.method character one of the \code{'locallee'} and \code{'localmoran_bv'}, default is \code{'locallee'}.
 #' @param bv.alternative a character string specifying the alternative hypothesis, default is \code{tow.sided}.
 #' This only work when \code{bv.method = 'localmoran_bv'}.
 #' @param weight object, which can be \code{nb}, \code{listw} or \code{Graph} object, default is NULL,
@@ -29,7 +29,7 @@
 #' \code{'dnearneigh'}, \code{"gabrielneigh"}, \code{"relativeneigh"}, which are from \code{spdep} package.
 #' default is \code{knn}, if it is \code{"none"}, meaning the distance weight of each spot is used to
 #' the weight.
-#' @param lisa.method character one of the \code{'localG'} and {'localmoran'}, this is to perform the \code{LISA}
+#' @param lisa.method character one of the \code{'localG'} and \code{'localmoran'}, this is to perform the \code{LISA}
 #' analysis using the result of bv.method, which can identify the spatial domain of the bivariate spatial
 #' analysis result, default is \code{'localG'}.
 #' @param lisa.alternative a character string specifying the alternative hypothesis, which works with
@@ -67,7 +67,7 @@
 setGeneric('runLOCALBV',
   function(
     data,
-    features1,
+    features1 = NULL,
     features2 = NULL,
     assay.type = 'logcounts',
     sample_id = 'all',
@@ -97,7 +97,7 @@ setGeneric('runLOCALBV',
 #' @export runLOCALBV
 setMethod("runLOCALBV", "SingleCellExperiment", function(
     data,
-    features1,
+    features1 = NULL,
     features2 = NULL,
     assay.type = "logcounts",
     sample_id = 'all',
@@ -184,7 +184,7 @@ setMethod("runLOCALBV", "SingleCellExperiment", function(
 setMethod("runLOCALBV", "SVPExperiment",
   function(
     data,
-    features1,
+    features1 = NULL,
     features2 = NULL,
     assay.type = 'logcounts',
     sample_id = 'all',
@@ -212,7 +212,9 @@ setMethod("runLOCALBV", "SVPExperiment",
                            "used to perform the analysis with `features` displayed from `rownames(data)`."))
        }
        weight.method <- match.arg(weight.method)
-       method <- match.arg(method)
+       bv.method <- match.arg(bv.method)
+       lisa.method <- match.arg(lisa.method)
+       action <- match.arg(action)
        sample_id <- .check_sample_id(data, sample_id)
 
        if (is.null(assay.type)){
@@ -220,9 +222,9 @@ setMethod("runLOCALBV", "SVPExperiment",
        }
 
        x <- assay(data, assay.type)
-       if (is.null(features1) && is.null(features2)){
+       if (is.null(features1) && is.null(features2) && is.null(gsvaexp.features)){
            cli::cli_abort(c("The {.var gsvaexp} is specified, and the `data` is {.cls {class(data)}}.",
-                            "The `features1` and `features2` should not be `NULL` simultaneously."))
+                            "The `features1`, `features2` and `gsvaexp.features` should not be `NULL` simultaneously."))
        }
        if (!is.null(features1) && !is.null(features2)){
            cli::cli_inform(c("The `data` is {.cls {class(data)}} class, the `features1` and `features2` which are from ",

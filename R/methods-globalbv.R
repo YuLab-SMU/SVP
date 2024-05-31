@@ -181,9 +181,9 @@ setMethod("runGLOBALBV", "SVPExperiment", function(
        }
 
        x <- assay(data, assay.type)
-       if (is.null(features1) && is.null(features2)){
+       if (is.null(features1) && is.null(features2) && is.null(gsvaexp.features)){
            cli::cli_abort(c("The {.var gsvaexp} is specified, and the `data` is {.cls {class(data)}}.",
-                            "The `features1` and `features2` should not be `NULL` simultaneously."))
+                            "The `features1`, `features2` and `gsvaexp.features` should not be `NULL` simultaneously."))
        }
        if (!is.null(features1) && !is.null(features2)){
            cli::cli_inform(c("The `data` is {.cls {class(data)}} class, the `features1` and `features2` which are from ",

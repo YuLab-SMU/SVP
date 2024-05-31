@@ -67,7 +67,13 @@
   bv.alternative <- match.arg(bv.alternative)
   lisa.method <- match.arg(lisa.method)
   lisa.alternative <- match.arg(lisa.alternative)
-  allpair <- expand.grid(features1, features2) |> as.matrix()
+  if (is.null(features1) && length(features2) > 1){
+      allpair <- combn(features2, 2) |> t()
+  }else if(is.null(features2) && length(features1) > 1){
+      allpair <- combn(features1, 2) |> t()
+  }else{
+      allpair <- expand.grid(features1, features2) |> as.matrix()
+  }
   if (bv.method == 'localmoran_bv'){
       res <- bplapply(seq(nrow(allpair)), function(i){
                .internal.runLocalMoranBv(x[allpair[i, 1],], x[allpair[i, 2],], weight, n, permutation, bv.alternative, 
