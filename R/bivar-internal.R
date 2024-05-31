@@ -47,6 +47,7 @@
   return(res)
 }
 
+#' @importFrom utils combn
 .runLocalBv <- function(
   x,
   weight,
@@ -117,5 +118,24 @@
   res <- cbind(res, lisa.res)
   rownames(res) <- names(x)
   return(res)
+}
+
+.generate_feature_listn <- function(x, f1, f2, ind){
+  nm <- gsvaExpNames(x)
+  if (is.numeric(ind)){
+    ind <- nm[ind]
+  }
+  y <- lapply(ind, function(i) 
+         intersect(f2, rownames(gsvaExp(x, i, withColData=FALSE, 
+                                        withSpatialCoords=FALSE, withImgData=FALSE)))
+  ) |> setNames(ind)
+  if (is.null(f1)){
+      return(y)
+  }
+  return(c(list(main = f1), y))
+}
+
+.tidy_globalbv_res <- function(x, y = NULL){
+  lapply(x, function(i)as_tbl_df(i, y))
 }
 

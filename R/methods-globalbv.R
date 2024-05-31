@@ -36,6 +36,11 @@
 #' @param add.pvalue logical whether calculate the pvalue, which is calculated with permutation test. So it might
 #' be slow, default is \code{FALSE}, which the pvalue of result will be NULL.
 #' @param random.seed numeric random seed number to repeatability, default is 1024.
+#' @param action character, which should be one of \code{'only'} and \code{'get'}, default is \code{"only"}.
+#' This will return a long tidy table (when the sample number of \code{data} is one) or a \code{SimpleList} which
+#' contains long tidy table for each sample. When \code{action="get"}, it will return a list contained global bivariate
+#' spatial autocorrelation and pvalue (when \code{add.pvalue=TRUE}), or a \code{SimpleList} which contains a list 
+#' global bivariate spatial result for each sample (when the sample number of \code{data} is larger than one). 
 #' @param verbose logical whether print the help information, default is TRUE.
 #' @param gsvaexp character the one character from the name of `gsvaExpNames(data)`, default is NULL. If \code{data}
 #' is \linkS4class{SVPExperiment}, and the parameter is specified simultaneously. the `features` (Usually genes)
@@ -46,11 +51,30 @@
 #' @param gsvaexp.features character the name from the `rownames(gsvaExp(data, gsvaexp))`. If \code{gsvaexp} is
 #' specified and \code{data} is \linkS4class{SVPExperiment}, it should be provided. Default is NULL.
 #' @param ... additional parameters the parameters which are from the weight.method function.
-#' @return SimpleList  
+#' @return SimpleList or long tidy table see also the help information of \code{action} argument.
 #' @seealso [`runDetectSVG`] and [`runKldSVG`] to identify the spatial variable features.
 #' [`runLISA`] to explore the spatial hotspots.
 #' @author Shuangbin Xu
 #' @export
+#' @examples
+#' data(hpda_spe_cell_dec)
+#' rownames(hpda_spe_cell_dec) |> head()
+#' res1 <- runGLOBALBV(hpda_spe_cell_dec, 
+#'                     features1 = "Ductal APOL1 high-hypoxic", 
+#'                     features2 = c('Cancer clone A', "Cancer clone B"), 
+#'                     assay.type = 'affi.score', 
+#'                     action='only'
+#'         )
+#' res1
+#' res2 <- runGLOBALBV(hpda_spe_cell_dec, 
+#'                     features1 = c("Acinar cells", 
+#'                                   "Ductal APOL1 high-hypoxic", 
+#'                                   "Cancer clone A",
+#'                                   "Cancer clone B"), 
+#'                     assay.type = 1, 
+#'                     action = 'get'
+#'         )
+#' res2
 setGeneric('runGLOBALBV',
   function(
     data,
@@ -66,10 +90,11 @@ setGeneric('runGLOBALBV',
     alternative = 'greater',
     add.pvalue = FALSE,
     random.seed = 1024,
+    action = c("get", "only"),
     verbose = TRUE,
     gsvaexp = NULL,
     gsvaexp.assay.type = NULL,
-    gsvaexp.features = NULL,    
+    gsvaexp.features = NULL,
     ...
   )
   standardGeneric('runGLOBALBV')
@@ -92,6 +117,7 @@ setMethod("runGLOBALBV", "SingleCellExperiment", function(
     alternative = 'greater',
     add.pvalue = FALSE,
     random.seed = 1024,
+    action = c("get", "only"),
     verbose = TRUE,
     gsvaexp = NULL,
     gsvaexp.assay.type = NULL,
@@ -101,6 +127,7 @@ setMethod("runGLOBALBV", "SingleCellExperiment", function(
   
   weight.method <- match.arg(weight.method)
   method <- match.arg(method)
+  action <- match.arg(action)
   sample_id <- .check_sample_id(data, sample_id)
 
   if (is.null(assay.type)){
@@ -134,6 +161,9 @@ setMethod("runGLOBALBV", "SingleCellExperiment", function(
                                                add.pvalue, random.seed)
                   return(res)
          })
+  if (action == 'only'){
+      res <- .tidy_globalbv_res(res)
+  }
   if (length(sample_id) == 1){
       return(res[[1]])
   }
@@ -160,6 +190,7 @@ setMethod("runGLOBALBV", "SVPExperiment", function(
     alternative = 'greater',
     add.pvalue = FALSE,
     random.seed = 1024,
+    action = "only",
     verbose = TRUE,
     gsvaexp = NULL,
     gsvaexp.assay.type = NULL,
@@ -174,6 +205,7 @@ setMethod("runGLOBALBV", "SVPExperiment", function(
        }
        weight.method <- match.arg(weight.method)
        method <- match.arg(method)
+       action <- match.arg(action, c("only", "get"))
        sample_id <- .check_sample_id(data, sample_id)
 
        if (is.null(assay.type)){
@@ -226,8 +258,12 @@ setMethod("runGLOBALBV", "SVPExperiment", function(
                                                     add.pvalue, random.seed)
                        return(res)
               })
+       if (action == 'only'){
+           listn <- .generate_feature_listn(data, features1, features2, gsvaexp)
+           res <- .tidy_globalbv_res(res, listn)
+       }
        if (length(sample_id)==1){
-          return(res[[1]])
+           return(res[[1]])
        }
        names(res) <- sample_id
        res <- S4Vectors::SimpleList(res)
