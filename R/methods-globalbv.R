@@ -50,6 +50,12 @@
 #' which works with \code{gsvaexp} parameter.
 #' @param gsvaexp.features character the name from the `rownames(gsvaExp(data, gsvaexp))`. If \code{gsvaexp} is
 #' specified and \code{data} is \linkS4class{SVPExperiment}, it should be provided. Default is NULL.
+#' @param across.gsvaexp logical whether only calculate the relationship of features between the multiple `gsvaExps`
+#' not the internal features of gsvaExp. For example, \code{'a'} and \code{'b'} features are from the \code{'AB'} `gsvaExp`,
+#' \code{'c'} and \code{'d'} features are from the \code{'CD'} `gsvaExp`. When \code{across.gsvaexp=TRUE} and 
+#' \code{gsvaexp.features = c('a', 'b', 'c', 'd')} and \code{gsvaexp = c('AB', 'CD')}, Only the relationship of
+#' \code{a} and \code{c}, \code{a} and \code{d}, \code{b} and \code{c}, and \code{b} and \code{d} will be calculated.
+#' default is TRUE.
 #' @param ... additional parameters the parameters which are from the weight.method function.
 #' @return SimpleList or long tidy table see also the help information of \code{action} argument.
 #' @seealso [`runDetectSVG`] and [`runKldSVG`] to identify the spatial variable features.
@@ -95,6 +101,7 @@ setGeneric('runGLOBALBV',
     gsvaexp = NULL,
     gsvaexp.assay.type = NULL,
     gsvaexp.features = NULL,
+    across.gsvaexp = TRUE,
     ...
   )
   standardGeneric('runGLOBALBV')
@@ -121,7 +128,8 @@ setMethod("runGLOBALBV", "SingleCellExperiment", function(
     verbose = TRUE,
     gsvaexp = NULL,
     gsvaexp.assay.type = NULL,
-    gsvaexp.features = NULL,    
+    gsvaexp.features = NULL,
+    across.gsvaexp = TRUE,
     ...
   ){
   
@@ -142,7 +150,7 @@ setMethod("runGLOBALBV", "SingleCellExperiment", function(
   }
 
   coords <- .check_coords(data, reduction.used, weight)
-
+  
   res <- lapply(sample_id, function(sid){
                   if (sid == ".ALLCELL"){
                       ind <- seq(ncol(x))
@@ -157,8 +165,8 @@ setMethod("runGLOBALBV", "SingleCellExperiment", function(
                       cli::cli_warn("no-neighbour observations found in the spatial neighborhoods graph.")
                   }
                   res <- .internal.runGLOBALBV(xi, wm, features1, features2, 
-                                               permutation, alternative, 
-                                               add.pvalue, random.seed)
+                                               permutation, alternative, add.pvalue, 
+                                               NULL, across.gsvaexp, random.seed)
                   return(res)
          })
   if (action == 'only'){
@@ -195,13 +203,14 @@ setMethod("runGLOBALBV", "SVPExperiment", function(
     gsvaexp = NULL,
     gsvaexp.assay.type = NULL,
     gsvaexp.features = NULL,
+    across.gsvaexp = TRUE,
     ...
   ){
 
     if (!is.null(gsvaexp)){
        if (verbose){
           cli::cli_inform(c("The {.var gsvaexp} is specified, the specified {.var gsvaExp} will be",
-                           "used to perform the analysis with `features` displayed from `rownames(data)`."))
+                           "used to perform the analysis."))
        }
        weight.method <- match.arg(weight.method)
        method <- match.arg(method)
@@ -239,7 +248,7 @@ setMethod("runGLOBALBV", "SVPExperiment", function(
        x <- rbind(x, x2)
 
        coords <- .check_coords(data, reduction.used, weight)
-
+       listn <- .generate_feature_listn(data, features1, features2, gsvaexp)
        res <- lapply(sample_id, function(sid){
                        if (sid == ".ALLCELL"){
                            ind <- seq(ncol(x))
@@ -255,11 +264,11 @@ setMethod("runGLOBALBV", "SVPExperiment", function(
                        }
                        res <- .internal.runGLOBALBV(xi, wm, features1, features2,
                                                     permutation, alternative,
-                                                    add.pvalue, random.seed)
+                                                    add.pvalue, listn, across.gsvaexp, 
+                                                    random.seed)
                        return(res)
               })
        if (action == 'only'){
-           listn <- .generate_feature_listn(data, features1, features2, gsvaexp)
            res <- .tidy_globalbv_res(res, listn)
        }
        if (length(sample_id)==1){

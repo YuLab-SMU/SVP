@@ -6,6 +6,8 @@
   permutation = 100,
   alternative = c('greater', 'two.sided', 'less'),
   add.pvalue = FALSE,
+  listn = NULL,
+  across.gsvaexp = TRUE,
   random.seed = 1024
   ){
   allf <- rownames(x)
@@ -15,7 +17,12 @@
   }else if (!is.null(features1) && is.null(features2)){
       f1 <- f2 <- .check_features(features1, allf, prefix='features1')
   }else if (is.null(features1) && !is.null(features2)){
-      f1 <- f2 <- .check_features(features2, allf, prefix="features2")
+      if (across.gsvaexp && length(listn) > 1){
+          f1 <- .check_features(listn[[1]], allf, prefix='features2')
+          f2 <- .check_features(unlist(listn[-1], use.names=FALSE), allf, prefix='features2')
+      }else{
+          f1 <- f2 <- .check_features(features2, allf, prefix="features2")
+      }
   }else if (!is.null(features1) && !is.null(features2)){
       f1 <- .check_features(features1, allf, prefix='features1')
       f2 <- .check_features(features2, allf, prefix='features2')

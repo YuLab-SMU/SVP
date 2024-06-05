@@ -27,6 +27,7 @@ runGLOBALBV(
   gsvaexp = NULL,
   gsvaexp.assay.type = NULL,
   gsvaexp.features = NULL,
+  across.gsvaexp = TRUE,
   ...
 )
 
@@ -49,6 +50,7 @@ runGLOBALBV(
   gsvaexp = NULL,
   gsvaexp.assay.type = NULL,
   gsvaexp.features = NULL,
+  across.gsvaexp = TRUE,
   ...
 )
 
@@ -71,6 +73,7 @@ runGLOBALBV(
   gsvaexp = NULL,
   gsvaexp.assay.type = NULL,
   gsvaexp.features = NULL,
+  across.gsvaexp = TRUE,
   ...
 )
 }
@@ -140,6 +143,13 @@ which works with \code{gsvaexp} parameter.}
 
 \item{gsvaexp.features}{character the name from the \code{rownames(gsvaExp(data, gsvaexp))}. If \code{gsvaexp} is
 specified and \code{data} is \linkS4class{SVPExperiment}, it should be provided. Default is NULL.}
+
+\item{across.gsvaexp}{logical whether only calculate the relationship of features between the multiple \code{gsvaExps}
+not the internal features of gsvaExp. For example, \code{'a'} and \code{'b'} features are from the \code{'AB'} \code{gsvaExp},
+\code{'c'} and \code{'d'} features are from the \code{'CD'} \code{gsvaExp}. When \code{across.gsvaexp=TRUE} and
+\code{gsvaexp.features = c('a', 'b', 'c', 'd')} and \code{gsvaexp = c('AB', 'CD')}, Only the relationship of
+\code{a} and \code{c}, \code{a} and \code{d}, \code{b} and \code{c}, and \code{b} and \code{d} will be calculated.
+default is TRUE.}
 
 \item{...}{additional parameters the parameters which are from the weight.method function.}
 }
