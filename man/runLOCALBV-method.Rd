@@ -166,7 +166,7 @@ stored in the \code{localResults} column of \code{int_colData} (internal column 
 This function is to explore the local bivariate relationship in the spatial space.
 }
 \examples{
-data(hpda)
+data(hpda_spe_cell_dec)
 res1 <- hpda_spe_cell_dec |> runLOCALBV(
           features1 = 'Cancer clone A', 
           features2 = 'Cancer clone B', 

@@ -65,7 +65,7 @@
 #' @export
 #' @author Shuangbin Xu
 #' @examples
-#' data(hpda)
+#' data(hpda_spe_cell_dec)
 #' res1 <- hpda_spe_cell_dec |> runLOCALBV(
 #'           features1 = 'Cancer clone A', 
 #'           features2 = 'Cancer clone B', 
@@ -163,7 +163,7 @@ setMethod("runLOCALBV", "SingleCellExperiment", function(
                       cli::cli_warn("no-neighbour observations found in the spatial neighborhoods graph.")
                   }
                   result <- .runLocalBv(xi, wm, features1, features2, n, permutation, bv.method, bv.alternative,
-				       	random.seed, wi, wi2, lisa.method, lisa.alternative, BPPARAM)
+                                        random.seed, wi, wi2, lisa.method, lisa.alternative, BPPARAM)
                   return(result)
          })
 
