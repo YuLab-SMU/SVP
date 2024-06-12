@@ -24,3 +24,26 @@ a data.frame or SimpleList.
 \description{
 Extracting the result of \code{runLISA()}
 }
+\examples{
+data(hpda_spe_cell_dec)
+hpda_spe_cell_dec <- hpda_spe_cell_dec |> 
+                     runLISA(features = 'Cancer clone A', 
+                             assay.type = 'affi.score', 
+                             method = 'localG',
+                             action = 'add'
+                     ) 
+hpda_spe_cell_dec <- hpda_spe_cell_dec |>
+                     runLISA(features = 'Cancer clone A', 
+                             assay.type = 'affi.score', 
+                             method = 'localmoran',
+                             action = 'add'
+                     )
+local.G <- LISAResult(hpda_spe_cell_dec, 
+                      type='localG.SVP', features='Cancer clone A'
+           )
+localmoran <- LISAResult(hpda_spe_cell_dec, 
+                         type = 'logcalmoran.SVP', 
+                         features = 'Cancer clone A'
+           )
+hpda_spe_cell_dec |> LISAResult() |> head()
+}
