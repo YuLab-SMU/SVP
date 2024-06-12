@@ -6,6 +6,9 @@
 \alias{SenMayoSymbol}
 \title{A gene set identifies senescent cells and predicts senescence-associated
 pathways across tissues}
+\format{
+list
+}
 \source{
 \url{https://static-content.springer.com/esm/art\%3A10.1038\%2Fs41467-022-32552-1/MediaObjects/41467_2022_32552_MOESM4_ESM.xlsx}
 }

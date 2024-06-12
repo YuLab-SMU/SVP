@@ -5,6 +5,9 @@
 \alias{CellCycle.Hs}
 \alias{data_CellCycle.Hs}
 \title{the Cell Cycle gene set}
+\format{
+list
+}
 \value{
 a list object
 }

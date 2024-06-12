@@ -8,7 +8,8 @@
 #'
 #' @name data_CancerSEA
 #' @aliases CancerSEASymbol
-#' @format a gene symbol list with gene signature names collected in CancerSEA:
+#' @format list
+#' a gene symbol list with gene signature names collected in CancerSEA:
 #' \describe{
 #'    \item{Angiogenesis}{Angiogenesis ensures that cancer cells receive continuous supplies 
 #'       of oxygen and other nutrients.}
@@ -51,6 +52,7 @@ NA
 #' @rdname data_CancerSEA
 #' @name data_CacerSEA
 #' @aliases CancerSEAEnsemble
+#' @format list
 #' @docType data
 #' @keywords data
 #' @examples
@@ -66,6 +68,7 @@ NA
 #'
 #' @name data_SenMayo
 #' @aliases SenMayoSymbol
+#' @format list
 #' @docType data
 #' @keywords data
 #' @return a list object
@@ -85,6 +88,7 @@ NA
 #' contains 1304 genes and 800 cells (extract randomly)
 #' 
 #' @name data_sceSubPbmc
+#' @format S4 class:SingleCellExperiment
 #' @aliases sceSubPbmc
 #' @docType data
 #' @keywords data
@@ -102,6 +106,7 @@ NA
 #' 
 #' @name CellCycle.Hs
 #' @aliases data_CellCycle.Hs
+#' @format list
 #' @docType data
 #' @keywords data
 #' @return a list object
@@ -117,6 +122,7 @@ NA
 #'
 #' @name data_hpda_spe_cell_dec
 #' @aliases hpda_spe_cell_dec
+#' @format S4 class:SpatialExperiment
 #' @docType data
 #' @keywords data
 #' @return a \linkS4class{SpatialExperiment} object

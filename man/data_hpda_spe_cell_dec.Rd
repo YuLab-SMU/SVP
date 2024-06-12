@@ -5,6 +5,9 @@
 \alias{data_hpda_spe_cell_dec}
 \alias{hpda_spe_cell_dec}
 \title{an example of result of runSGSA by extracting with gsvaExp}
+\format{
+S4 class:SpatialExperiment
+}
 \value{
 a \linkS4class{SpatialExperiment} object
 }

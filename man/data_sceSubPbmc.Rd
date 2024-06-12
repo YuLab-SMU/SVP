@@ -5,6 +5,9 @@
 \alias{data_sceSubPbmc}
 \alias{sceSubPbmc}
 \title{a subset data of pbmck3 from SeuratData}
+\format{
+S4 class:SingleCellExperiment
+}
 \value{
 a \linkS4class{SingleCellExperiment} object
 }

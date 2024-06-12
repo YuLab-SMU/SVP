@@ -8,6 +8,7 @@
 \alias{CancerSEAEnsemble}
 \title{The Gene List of Cancer Single-cell State Atlas (CancerSEA)}
 \format{
+list
 a gene symbol list with gene signature names collected in CancerSEA:
 \describe{
 \item{Angiogenesis}{Angiogenesis ensures that cancer cells receive continuous supplies
@@ -36,6 +37,8 @@ progression.}
 \item{Quiescence}{Quiescent cancer cells are resistant to chemotherapy.}
 \item{Stemness}{Cancer cells with high stemness fuel the growth of cancer.}
 }
+
+list
 }
 \source{
 \url{http://biocc.hrbmu.edu.cn/CancerSEA/goDownload}
