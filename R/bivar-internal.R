@@ -47,8 +47,11 @@
   if (is.null(gsvaexp.assay.type)){
       gsvaexp.assay.type <- 1
   }
-  res <- lapply(gsvaexp, function(x){
-         assay(gsvaExp(data, x), gsvaexp.assay.type)
+  if (length(gsvaexp) > 1 && length(gsvaexp.assay.type)==1){
+      gsvaexp.assay.type <- rep(gsvaexp.assay.type, length(gsvaexp))
+  }
+  res <- lapply(seq(length(gsvaexp)), function(x){
+         assay(gsvaExp(data, gsvaexp[x]), gsvaexp.assay.type[x])
    })
   res <- do.call('rbind', res)
   return(res)
