@@ -284,7 +284,7 @@ setMethod("runLISA", "SVPExperiment", function(
         if (action!='add'){
             return(da2)
         }
-	if (verbose){
+        if (verbose){
             cli::cli_inform(c("The `action = 'add'`, If you want to extract the results, you need to",
                               "use `gsvaExp(data, gsvaexp)` to extract the internal object firstly."))
         }

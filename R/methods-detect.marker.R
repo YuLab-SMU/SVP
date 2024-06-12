@@ -117,7 +117,7 @@ setMethod(
     da <- bplapply(nm, function(x){
         tmpda <- da[group.vec == x, ,drop=FALSE]
         tmpda <- fun(tmpda)
-	return(tmpda)
+        return(tmpda)
     }, BPPARAM = BPPARAM) 
     da <- do.call('rbind', da)
     rownames(da) <- nm
@@ -127,11 +127,11 @@ setMethod(
 .obtain.nn.genes <- function(d, type = c('positive'), ntop = 200){
     if (type == 'positive'){
         dt <- .build.adj.m(d, top.n = ntop)
-	return(dt)
+        return(dt)
     }
     d2 <- .normalize_dist_as_matrix(d)
     if (type == 'negative'){
-	dt <- .build.adj.m(d2, top.n = ntop)
+        dt <- .build.adj.m(d2, top.n = ntop)
     }else{
         dt1 <- .build.adj.m(d, top.n = ntop)
         dt2 <- .build.adj.m(d2, top.n = ntop)

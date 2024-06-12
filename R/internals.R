@@ -341,9 +341,9 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
 
 
 .check_coords <- function(data, 
-			  reduction.used, 
-			  weight = NULL, 
-			  prefix="Or the `weight` should be provided."
+                          reduction.used, 
+                          weight = NULL, 
+                          prefix="Or the `weight` should be provided."
   ){
   flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
 
@@ -359,7 +359,7 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
       }
   }else if (all(!flag1, !flag2) && is.null(weight)){
       cli::cli_abort(c("The {.cls {class(data)}} should have 'spatialCoords' or the",
-		       paste("reduction result of 'UMAP' or 'TSNE'.", prefix)))
+                     paste("reduction result of 'UMAP' or 'TSNE'.", prefix)))
   }
 
   return(coords)
@@ -385,7 +385,7 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
   }else{
       cli::cli_abort(c("The `gset.idx.list` must be a list which have name (gene set name, such as ",
                        " GO Term name or Reactome Pathway name) or GSON object defined in `gson` package.",
-		       "Or the gmt file."))
+                       "Or the gmt file."))
   }
   return(x)
 }
@@ -395,7 +395,7 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
     x <- readLines(gmtfile)
     res <- strsplit(x, "\t")
     names(res) <- vapply(res, function(y) y[1], character(1))
-    res <- lapply(res, "[", -c(1:2))
+    res <- lapply(res, "[", -seq(2))
     return(res)
 }
 

@@ -553,8 +553,8 @@ pairDist <- function(x, y){
       w <- w[ind]
   }
   res <- sparseMatrix(i = i, j = j, x = w, 
-		      dims = rep(n, 2), 
-		      dimnames = list(region_id, region_id)) |> 
+                      dims = rep(n, 2), 
+                      dimnames = list(region_id, region_id)) |> 
          as.matrix()
   return(res)
 }
