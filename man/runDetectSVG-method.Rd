@@ -47,7 +47,7 @@ runDetectSVG(
 \S4method{runDetectSVG}{SVPExperiment}(
   data,
   assay.type = "logcounts",
-  method = c("moransi", "gearysc"),
+  method = c("moransi", "gearysc", "getisord"),
   weight = NULL,
   weight.method = c("voronoi", "knn", "none"),
   sample_id = "all",
