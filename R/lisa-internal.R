@@ -48,11 +48,11 @@
             x$x <- NULL
         }
     }else{
-	if (!all(is.na(x$z)) && !all(is.na(x$lz))){
+        if (!all(is.na(x$z)) && !all(is.na(x$lz))){
             c1 <- cut(x$z, c(-Inf, mean(x$z), Inf), lbs)
             c2 <- cut(x$lz, c(-Inf, mean(x$lz), Inf), lbs)
             x$`cluster.no.test` <- interaction(c1, c2, sep="-")
-	}
+        }
         x$z <- NULL
         x$lz <- NULL
     }
@@ -85,26 +85,52 @@
     return(res)
 }
 
-.internal.as_tbl_df <- function(x){
-    if (identical(rownames(x), colnames(x))){
-        x <- .as_from_square_matrix(x)
+.internal.as_tbl_df <- function(x, 
+                                diag = FALSE, 
+                                flag.clust = FALSE, 
+                                dist.method = 'euclidean', 
+                                hclust.method = 'average'
+    ){
+    if (identical(rownames(x), colnames(x)) && nrow(x)==ncol(x)){
+        if (flag.clust && nrow(x) > 2){
+            x <- .adjust_order_by_clust1(x, dist.method, hclust.method)
+        }
+        x <- .as_from_square_matrix(x = x, diag = diag)
         return(x)
     }
-
+    if (flag.clust && nrow(x) > 2 && ncol(x) > 2){
+        x <- .adjust_order_by_clust2(x, dist.method, hclust.method)
+    }
     x <- x |>
          as.data.frame(check.names=FALSE) |>
          tibble::rownames_to_column(var='.Term') |>
-         tidyr::pivot_longer(cols=-".Term")
+         tidyr::pivot_longer(cols=-".Term") |>
+         dplyr::mutate(.Term=factor(.data$.Term, rownames(x)), name=factor(.data$name, colnames(x)))
     return(x)
 }
 
-.as_from_square_matrix <- function(x, clnm = NULL){
-    ind <- which(upper.tri(x, diag = FALSE), arr.ind = TRUE)
+.as_from_square_matrix <- function(x, clnm = NULL, diag = FALSE){
+    ind <- which(upper.tri(x, diag = diag), arr.ind = TRUE)
     nn <- rownames(x)
     x <- data.frame(x = nn[ind[,1]] , y= nn[ind[,2]], val=x[ind])
+    x$x <- factor(x$x, nn)
+    x$y <- factor(x$y, nn)
     if (!is.null(clnm)){
         colnames(x) <- clnm
     }
+    return(x)
+}
+
+.adjust_order_by_clust1 <- function(x, dist.method, hclust.method){
+    res <- dist(x, dist.method) |> hclust(hclust.method)
+    x <- x[res$order,res$order,drop=FALSE]
+    return(x)
+}
+
+.adjust_order_by_clust2 <- function(x, dist.method, hclust.method){
+    res1 <- dist(x, dist.method) |> hclust(hclust.method)
+    res2 <- dist(t(x), dist.method) |> hclust(hclust.method)
+    x <- x[res1$order, res2$order, drop=FALSE]
     return(x)
 }
 

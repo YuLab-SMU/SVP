@@ -9,7 +9,30 @@
 #' `code{runLISA()}` and \code{action='add'}, default is NULL.
 #' @param ... additional parameter, meaningless now.
 #' @return a data.frame or SimpleList.
+#' @importFrom S4Vectors SimpleList
 #' @export
+#' @examples
+#' data(hpda_spe_cell_dec)
+#' hpda_spe_cell_dec <- hpda_spe_cell_dec |> 
+#'                      runLISA(features = 'Cancer clone A', 
+#'                              assay.type = 'affi.score', 
+#'                              method = 'localG',
+#'                              action = 'add'
+#'                      ) 
+#' hpda_spe_cell_dec <- hpda_spe_cell_dec |>
+#'                      runLISA(features = 'Cancer clone A', 
+#'                              assay.type = 'affi.score', 
+#'                              method = 'localmoran',
+#'                              action = 'add'
+#'                      )
+#' local.G <- LISAResult(hpda_spe_cell_dec, 
+#'                       type='localG.SVP', features='Cancer clone A'
+#'            )
+#' localmoran <- LISAResult(hpda_spe_cell_dec, 
+#'                          type = 'logcalmoran.SVP', 
+#'                          features = 'Cancer clone A'
+#'            )
+#' hpda_spe_cell_dec |> LISAResult() |> head()
 LISAResult <- function(x, type = NULL, features=NULL, ...){
     if (!inherits(x, "SingleCellExperiment")){
         cli::cli_abort("The `x` should be a `SingleCellExperiment` object!")
@@ -57,15 +80,65 @@ LISAResult <- function(x, type = NULL, features=NULL, ...){
 #' @param listn list object, which must have name, and the element must
 #' from the row names of \code{x} or \code{x[[1]]} (when \code{x} is a list)
 #' default is NULL.
+#' @param diag logical whether include the diagonal (only work when the cor 
+#' matrix is square), default is TRUE.
+#' @param flag.clust logical whether perform the hierarchical cluster analysis
+#' to obtain the label for visualization.
+#' @param dist.method the distance measure to be used, only work when \code{flag.clust = TRUE}.
+#' It must be one of \code{"euclidean"}, \code{"maximum"}, \code{"manhattan"}, \code{"canberra"},
+#' \code{"binary"} or \code{"minkowski"}.
+#' @param hclust.method the agglomeration method to be used, only work with \code{flag.clust=TRUE}.
+#' This should be (an unambiguous abbreviation of) one of \code{"ward.D"}, \code{"ward.D2"}, 
+#' \code{"single"}, \code{"complete"}, \code{"average"} (= UPGMA), \code{"mcquitty"} (= WPGMA), 
+#' \code{"median"} (= WPGMC) or \code{"centroid"} (= UPGMC).
 #' @return a long tidy table
 #' @export
+#' @importFrom stats dist hclust
 #' @examples
+#' library(ggplot2)
+#' library(ggtree)
+#' library(aplot)
 #' example(fast_cor, echo=FALSE)
 #' x <- as_tbl_df(res)
 #' head(x)
+#' xx <- as_tbl_df(res, flag.clust = TRUE, 
+#'                 dist.method = 'euclidean', hclust.method = 'average')
+#' p1 <- ggplot(xx, mapping = aes(x=x,y=y,color=r,size=abs(r))) +
+#'       geom_point() + xlab(NULL) + ylab(NULL) +
+#'       guides(y=guide_axis(position='right'))
+#' p2 <- res$r |> dist() |> hclust(method = 'average') |> 
+#'       ggtree(layout='den', branch.length='none', ladderize=FALSE)
+#' p3 <- res$r |> t() |> dist() |> hclust(method = 'average') |>
+#'       ggtree(branch.length = 'none', ladderize = FALSE)
+#' p4 <- p1 |> insert_left(p3, width=.12) |> insert_top(p2, height=.12)
+#' aplot::plot_list(p1, p4)
 #' x2 <- as_tbl_df(res2)
 #' head(x2)
-as_tbl_df <- function(x, listn=NULL){
+#' f1 <- ggplot(x2, aes(x=x, y=y, color=r, size=abs(r))) + geom_point() +
+#'       xlab(NULL) + ylab(NULL) + 
+#'       guides(x=guide_axis(position='top', angle=45), 
+#'              y=guide_axis(position='right'))
+#' f2 <- res2$r |> t() |> dist() |> hclust(method = 'average') |>
+#'       ggtree(branch.length = 'none', ladderize=FALSE)
+#' f3 <- f1 |> aplot::insert_left(f2, width=.12)
+#' xx2 <- as_tbl_df(res2, 
+#'                 flag.clust = TRUE,
+#'                 dist.method = 'euclidean', 
+#'                 hclust.method = 'average'
+#'       )
+#' ff1 <- ggplot(xx2, mapping = aes(x=x,y=y, color=r,size=abs(r))) +
+#'        geom_point() + xlab(NULL) + ylab(NULL) +
+#'        guides(x=guide_axis(position='top', angle=45),
+#'               y=guide_axis(position='right'))
+#' ff3 <- ff1 |> aplot::insert_left(f2, width = .12)
+#' aplot::plot_list(f3, ff3)
+as_tbl_df <- function(x, 
+                      listn = NULL, 
+                      diag = TRUE, 
+                      flag.clust = FALSE, 
+                      dist.method = 'euclidean',
+                      hclust.method = 'average'
+                     ){
     if (inherits(x, 'list') && length(x)==2){
         rmat <- x[[1]]
         pval <- x[[2]]
@@ -75,10 +148,11 @@ as_tbl_df <- function(x, listn=NULL){
         pval <- NULL
         nm <- c('val')
     }
-    rmat <- .internal.as_tbl_df(rmat)
+    rmat <- .internal.as_tbl_df(rmat, diag = diag, flag.clust=flag.clust, 
+                                dist.method=dist.method, hclust.method=hclust.method)
     colnames(rmat) <- c("x", "y", nm[1])
     if (!is.null(pval)){
-        pval <- .internal.as_tbl_df(pval)
+        pval <- .internal.as_tbl_df(pval, diag = diag)
         colnames(pval) <- c("x", "y", nm[2])
         rmat <- dplyr::left_join(rmat, pval, by=c("x", "y"))
     }

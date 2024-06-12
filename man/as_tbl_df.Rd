@@ -4,7 +4,14 @@
 \alias{as_tbl_df}
 \title{convert the square matrix to long tidy table}
 \usage{
-as_tbl_df(x, listn = NULL)
+as_tbl_df(
+  x,
+  listn = NULL,
+  diag = TRUE,
+  flag.clust = FALSE,
+  dist.method = "euclidean",
+  hclust.method = "average"
+)
 }
 \arguments{
 \item{x}{list or matrix object, which is the output of \code{runGLOBALBV},
@@ -13,6 +20,21 @@ as_tbl_df(x, listn = NULL)
 \item{listn}{list object, which must have name, and the element must
 from the row names of \code{x} or \code{x[[1]]} (when \code{x} is a list)
 default is NULL.}
+
+\item{diag}{logical whether include the diagonal (only work when the cor
+matrix is square), default is TRUE.}
+
+\item{flag.clust}{logical whether perform the hierarchical cluster analysis
+to obtain the label for visualization.}
+
+\item{dist.method}{the distance measure to be used, only work when \code{flag.clust = TRUE}.
+It must be one of \code{"euclidean"}, \code{"maximum"}, \code{"manhattan"}, \code{"canberra"},
+\code{"binary"} or \code{"minkowski"}.}
+
+\item{hclust.method}{the agglomeration method to be used, only work with \code{flag.clust=TRUE}.
+This should be (an unambiguous abbreviation of) one of \code{"ward.D"}, \code{"ward.D2"},
+\code{"single"}, \code{"complete"}, \code{"average"} (= UPGMA), \code{"mcquitty"} (= WPGMA),
+\code{"median"} (= WPGMC) or \code{"centroid"} (= UPGMC).}
 }
 \value{
 a long tidy table
@@ -22,9 +44,41 @@ This function is designed to convert the output of \code{runGLOBALBV},
 \code{fast_cor} or the matrix output of \code{cor} to long tidy table.
 }
 \examples{
+library(ggplot2)
+library(ggtree)
+library(aplot)
 example(fast_cor, echo=FALSE)
 x <- as_tbl_df(res)
 head(x)
+xx <- as_tbl_df(res, flag.clust = TRUE, 
+                dist.method = 'euclidean', hclust.method = 'average')
+p1 <- ggplot(xx, mapping = aes(x=x,y=y,color=r,size=abs(r))) +
+      geom_point() + xlab(NULL) + ylab(NULL) +
+      guides(y=guide_axis(position='right'))
+p2 <- res$r |> dist() |> hclust(method = 'average') |> 
+      ggtree(layout='den', branch.length='none', ladderize=FALSE)
+p3 <- res$r |> t() |> dist() |> hclust(method = 'average') |>
+      ggtree(branch.length = 'none', ladderize = FALSE)
+p4 <- p1 |> insert_left(p3, width=.12) |> insert_top(p2, height=.12)
+aplot::plot_list(p1, p4)
 x2 <- as_tbl_df(res2)
 head(x2)
+f1 <- ggplot(x2, aes(x=x, y=y, color=r, size=abs(r))) + geom_point() +
+      xlab(NULL) + ylab(NULL) + 
+      guides(x=guide_axis(position='top', angle=45), 
+             y=guide_axis(position='right'))
+f2 <- res2$r |> t() |> dist() |> hclust(method = 'average') |>
+      ggtree(branch.length = 'none', ladderize=FALSE)
+f3 <- f1 |> aplot::insert_left(f2, width=.12)
+xx2 <- as_tbl_df(res2, 
+                flag.clust = TRUE,
+                dist.method = 'euclidean', 
+                hclust.method = 'average'
+      )
+ff1 <- ggplot(xx2, mapping = aes(x=x,y=y, color=r,size=abs(r))) +
+       geom_point() + xlab(NULL) + ylab(NULL) +
+       guides(x=guide_axis(position='top', angle=45),
+              y=guide_axis(position='right'))
+ff3 <- ff1 |> aplot::insert_left(f2, width = .12)
+aplot::plot_list(f3, ff3)
 }
