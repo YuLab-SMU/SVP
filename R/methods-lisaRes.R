@@ -152,6 +152,7 @@ as_tbl_df <- function(x,
                                 dist.method=dist.method, hclust.method=hclust.method)
     colnames(rmat) <- c("x", "y", nm[1])
     if (!is.null(pval)){
+        pval <- pval[levels(rmat$x), levels(rmat$y), drop=FALSE]
         pval <- .internal.as_tbl_df(pval, diag = diag)
         colnames(pval) <- c("x", "y", nm[2])
         rmat <- dplyr::left_join(rmat, pval, by=c("x", "y"))
