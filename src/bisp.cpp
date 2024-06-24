@@ -45,15 +45,17 @@ struct RunGlobalLee : public Worker{
   const uint64_t seed;
   const int permutation;
   const bool cal_pvalue;
+  const int alternative;
   arma::mat& result;
   arma::mat& presult;
   
   RunGlobalLee(const arma::mat& x, const arma::mat& w, const arma::uvec& f1,
           const arma::uvec& f2, simple_progress& p, const uword& nf2, 
           const double S2, const int n, const uint64_t seed, const int permutation,
-          const bool cal_pvalue, arma::mat& result, arma::mat& presult):
+          const bool cal_pvalue, const int alternative, arma::mat& result, arma::mat& presult):
     x(x), w(w), f1(f1), f2(f2), p(p), nf2(nf2), S2(S2), n(n), seed(seed), 
-    permutation(permutation), cal_pvalue(cal_pvalue), result(result), presult(presult){} 
+    permutation(permutation), cal_pvalue(cal_pvalue), alternative(alternative), 
+    result(result), presult(presult){} 
 
   void operator()(std::size_t begin, std::size_t end){
       dqrng::xoshiro256plus rng(seed);
@@ -64,7 +66,7 @@ struct RunGlobalLee : public Worker{
               result(i, j) = obs;
               if (cal_pvalue){
                   arma::vec resp = cal_global_lee_test(x.row(f1[i]), x.row(f2[j]), w, lrng, S2, n, permutation);
-                  double pv = cal_permutation_p(resp, obs, permutation + 1);
+                  double pv = cal_permutation_p(resp, obs, permutation + 1, alternative);
                   presult(i, j) = pv;
               }
               p.increment();
@@ -99,7 +101,7 @@ Rcpp::List CalGlobalLeeParallel(
   arma::mat res(n1, n2);
   arma::mat pres(n1, n2);
 
-  RunGlobalLee rungloballeeperm(xm, w, f1, f2, p, n2, S2, m, seed1, permutation, cal_pvalue, res, pres);
+  RunGlobalLee rungloballeeperm(xm, w, f1, f2, p, n2, S2, m, seed1, permutation, cal_pvalue, alternative, res, pres);
        
   parallelFor(0, n1, rungloballeeperm);
   List result = List::create(Named("Lee")=res, Named("pvalue")=pres);

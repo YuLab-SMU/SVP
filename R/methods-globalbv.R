@@ -93,7 +93,7 @@ setGeneric('runGLOBALBV',
     weight.method = c("voronoi", "knn", "none"),
     reduction.used = NULL,
     permutation = 100,
-    alternative = 'greater',
+    alternative = c('greater', 'two.sided', 'less'),
     add.pvalue = FALSE,
     random.seed = 1024,
     action = c("get", "only"),
@@ -121,7 +121,7 @@ setMethod("runGLOBALBV", "SingleCellExperiment", function(
     weight.method = c("voronoi", "knn", "none"), 
     reduction.used = NULL,
     permutation = 100,
-    alternative = 'greater',
+    alternative = c('greater', 'two.sided', 'less'),
     add.pvalue = FALSE,
     random.seed = 1024,
     action = c("get", "only"),
@@ -136,6 +136,7 @@ setMethod("runGLOBALBV", "SingleCellExperiment", function(
   weight.method <- match.arg(weight.method)
   method <- match.arg(method)
   action <- match.arg(action)
+  alternative <- match.arg(alternative)
   sample_id <- .check_sample_id(data, sample_id)
 
   if (is.null(assay.type)){
@@ -195,7 +196,7 @@ setMethod("runGLOBALBV", "SVPExperiment", function(
     weight.method = c("voronoi", "knn", "none"),
     reduction.used = NULL,
     permutation = 100,
-    alternative = 'greater',
+    alternative = c('greater', 'two.sided', 'less'),
     add.pvalue = FALSE,
     random.seed = 1024,
     action = "only",
@@ -215,6 +216,7 @@ setMethod("runGLOBALBV", "SVPExperiment", function(
        weight.method <- match.arg(weight.method)
        method <- match.arg(method)
        action <- match.arg(action, c("only", "get"))
+       alternative <- match.arg(alternative)
        sample_id <- .check_sample_id(data, sample_id)
 
        if (is.null(assay.type)){
