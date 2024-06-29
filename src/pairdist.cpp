@@ -1,6 +1,6 @@
-#include <RcppParallel.h>
 #include <RcppArmadillo.h>
 #include <RcppEigen.h>
+#include <RcppParallel.h>
 using namespace Rcpp;
 using namespace RcppParallel;
 using namespace Eigen;

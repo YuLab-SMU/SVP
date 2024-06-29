@@ -1,13 +1,9 @@
-#include <RcppParallel.h>
-#include <RcppArmadillo.h>
-#include <algorithm>
-#include <cstddef>
-#include <iterator>
-#include <xoshiro.h>
-#include <convert_seed.h>
-#include <R_randgen.h>
-#include "progress.h"
 #include "autocorutils.h"
+#include "xoshiro.h"
+#include "convert_seed.h"
+#include "R_randgen.h"
+#include "progress.h"
+#include <RcppParallel.h>
 using namespace RcppParallel;
 using namespace Rcpp;
 using namespace arma;

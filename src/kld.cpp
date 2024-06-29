@@ -1,10 +1,9 @@
 #include <RcppArmadillo.h>
-#include <RcppParallel.h>
-#include <algorithm>
-#include <xoshiro.h>
-#include <convert_seed.h>
-#include <R_randgen.h>
+#include "xoshiro.h"
+#include "convert_seed.h"
+#include "R_randgen.h"
 #include "progress.h"
+#include <RcppParallel.h>
 using namespace RcppParallel;
 using namespace arma;
 using namespace Rcpp;

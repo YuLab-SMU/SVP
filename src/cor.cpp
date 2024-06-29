@@ -1,8 +1,7 @@
 // This script refer to the https://systematicinvestor.github.io/Correlation-Rcpp
-#include <RcppParallel.h>
 #include <RcppArmadillo.h>
 #include <RcppEigen.h>
-
+#include <RcppParallel.h>
 using namespace Rcpp;
 using namespace RcppParallel;
 using namespace Eigen;
