@@ -40,11 +40,13 @@
 #' @param gsvaexp which gene set variation experiment will be pulled to run, this only work when \code{data} is a
 #' \linkS4class{SVPExperiment}, default is NULL.
 #' @param gsvaexp.assay.type which assay data in the specified \code{gsvaexp} will be used to run, default is NULL.
+#' @param gsvaexp.features character which is from the `rownames(gsvaExp(data, gsvaexp))`. If \code{gsvaexp} is
+#' specified and \code{data} is \linkS4class{SVPExperiment}, it should be provided. Default is NULL.
 #' @param ... additional parameters the parameters which are from the weight.method function.
-#' @return if \code{action = 'get'} (in default), the SimpleList object (like list object) will be return, 
-#' if \code{action = 'only'}, the data.frame will be return. if \code{action = 'add'}, the result of LISA is 
-#' stored in the \code{localResults} column of \code{int_colData} (internal column metadata). You can use 
-#' \code{localResults()} function of \code{SpatialFeatureExperiment} package to extract it.
+#' @return if \code{action = 'get'} (in default), the SimpleList object (like list object) will be return,
+#' if \code{action = 'only'}, the data.frame will be return. if \code{action = 'add'}, the result of LISA is
+#' stored in the \code{localResults} column of \code{int_colData} (internal column metadata), which can be extracted
+#' using [`LISAResult`]
 #' @references
 #' 1. Bivand, R.S., Wong, D.W.S. Comparing implementations of global and local indicators of spatial association. TEST 27,
 #'    716–748 (2018). https://doi.org/10.1007/s11749-018-0599-x
@@ -149,6 +151,7 @@ setGeneric('runLISA',
     verbose = TRUE,
     gsvaexp = NULL,
     gsvaexp.assay.type = NULL,
+    gsvaexp.features = NULL,
     ...
   )
   standardGeneric('runLISA')
@@ -173,6 +176,7 @@ setMethod("runLISA", "SingleCellExperiment", function(
     verbose = TRUE,
     gsvaexp = NULL,
     gsvaexp.assay.type = NULL,
+    gsvaexp.features = NULL,
     ...
   ){
   
@@ -258,13 +262,22 @@ setMethod("runLISA", "SVPExperiment", function(
     verbose = TRUE,
     gsvaexp = NULL,
     gsvaexp.assay.type = NULL,
+    gsvaexp.features = NULL,
     ...
   ){
     method <- match.arg(method)
     action <- match.arg(action)
     if (!is.null(gsvaexp)){
         if (verbose){
-            cli::cli_inform(c("The {.var gsvaexp} was specified, the specified {.var gsvaExp} will be used to perform LISA."))
+            cli::cli_inform(c("The {.var gsvaexp} is specified, the specified {.var gsvaExp} will be used to perform LISA."))
+        }
+        if (missing(features) && is.null(gsvaexp.features)){
+            cli::cli_abort("The {.var gsvaexp} is specified, the {.var features} or {.var gsvaexp.features} should be provided.")
+        }
+        if (missing(features)){
+            features <- gsvaexp.features
+        }else{
+            features <- unique(features, gsvaexp.features)
         }
         da2 <- gsvaExp(data, gsvaexp, withSpatialCoords = TRUE, withReducedDim = TRUE, withColData = FALSE, withImgData = FALSE)
         da2 <- runLISA(da2,

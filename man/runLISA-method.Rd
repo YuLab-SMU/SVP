@@ -24,6 +24,7 @@ runLISA(
   verbose = TRUE,
   gsvaexp = NULL,
   gsvaexp.assay.type = NULL,
+  gsvaexp.features = NULL,
   ...
 )
 
@@ -43,6 +44,7 @@ runLISA(
   verbose = TRUE,
   gsvaexp = NULL,
   gsvaexp.assay.type = NULL,
+  gsvaexp.features = NULL,
   ...
 )
 
@@ -62,6 +64,7 @@ runLISA(
   verbose = TRUE,
   gsvaexp = NULL,
   gsvaexp.assay.type = NULL,
+  gsvaexp.features = NULL,
   ...
 )
 }
@@ -118,13 +121,16 @@ the \code{workers} of \code{MulticoreParam} is the number of cores used, see als
 
 \item{gsvaexp.assay.type}{which assay data in the specified \code{gsvaexp} will be used to run, default is NULL.}
 
+\item{gsvaexp.features}{character which is from the \code{rownames(gsvaExp(data, gsvaexp))}. If \code{gsvaexp} is
+specified and \code{data} is \linkS4class{SVPExperiment}, it should be provided. Default is NULL.}
+
 \item{...}{additional parameters the parameters which are from the weight.method function.}
 }
 \value{
 if \code{action = 'get'} (in default), the SimpleList object (like list object) will be return,
 if \code{action = 'only'}, the data.frame will be return. if \code{action = 'add'}, the result of LISA is
-stored in the \code{localResults} column of \code{int_colData} (internal column metadata). You can use
-\code{localResults()} function of \code{SpatialFeatureExperiment} package to extract it.
+stored in the \code{localResults} column of \code{int_colData} (internal column metadata), which can be extracted
+using \code{\link{LISAResult}}
 }
 \description{
 This function use the local indicators of spatial association (LISA) to identify the hotspot
