@@ -56,7 +56,7 @@ setMethod('imgData', 'SVPExperiment', function(x){
     return(x)    
 })
 
-#' @rdname SVP-setters
+#' @rdname SVP-accessors
 #' @importFrom S4Vectors isEmpty
 #' @exportMethod imgData<-
 setReplaceMethod('imgData', c('SVPExperiment', "DataFrame"), function(x, value){
@@ -73,7 +73,7 @@ setReplaceMethod('imgData', c('SVPExperiment', "DataFrame"), function(x, value){
     return(x)
 })
 
-#' @rdname SVP-setters
+#' @rdname SVP-accessors
 #' @exportMethod imgData<-
 setReplaceMethod('imgData', c("SVPExperiment", "NULL"), function(x, value){
     flag <- .check_element_obj(x, key='imgData', basefun = int_metadata, namefun = names)
@@ -84,7 +84,7 @@ setReplaceMethod('imgData', c("SVPExperiment", "NULL"), function(x, value){
     return(x)
 })
 
-#' @rdname SVP-setters
+#' @rdname SVP-accessors
 #' @aliases spatialCoords<-,SVPExperiment
 #' @exportMethod spatialCoords<-
 setReplaceMethod("spatialCoords", c("SVPExperiment", "matrix_Or_NULL"), function(x, value){
@@ -112,7 +112,7 @@ setReplaceMethod("spatialCoords", c("SVPExperiment", "matrix_Or_NULL"), function
 })
 
 
-#' @rdname SVP-setters
+#' @rdname SVP-accessors
 #' @importFrom SpatialExperiment spatialCoordsNames<-
 #' @exportMethod spatialCoordsNames<-
 setReplaceMethod("spatialCoordsNames", c('SVPExperiment', 'character'),

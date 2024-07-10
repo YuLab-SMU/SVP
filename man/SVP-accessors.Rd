@@ -9,6 +9,8 @@
 \alias{spatialCoordsNames<-,SVPExperiment,character-method}
 \alias{imgData<-,SVPExperiment,DataFrame-method}
 \alias{imgData<-,SVPExperiment,NULL-method}
+\alias{spatialCoords<-,SVPExperiment,matrix_Or_NULL-method}
+\alias{spatialCoords<-,SVPExperiment}
 \title{Some accessor funtions to get the internal slots of SVPExperiment}
 \usage{
 \S4method{spatialCoords}{SVPExperiment}(x)
@@ -17,15 +19,23 @@
 
 \S4method{imgData}{SVPExperiment}(x)
 
+\S4method{imgData}{SVPExperiment,DataFrame}(x) <- value
+
+\S4method{imgData}{SVPExperiment,NULL}(x) <- value
+
+\S4method{spatialCoords}{SVPExperiment,matrix_Or_NULL}(x) <- value
+
+\S4method{spatialCoordsNames}{SVPExperiment,character}(x) <- value
+
 \S4method{show}{SVPExperiment}(object)
 }
 \arguments{
 \item{x}{a \linkS4class{SVPExperiment} class.}
 
-\item{object}{a \linkS4class{SVPExperiment} class.}
-
 \item{value}{matrix for \code{spatialCoords(object) <- value}
 character for \code{spatialCoordsNames(object) <- value}.}
+
+\item{object}{a \linkS4class{SVPExperiment} class.}
 }
 \value{
 matrix or character or print the information of object
