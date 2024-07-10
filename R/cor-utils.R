@@ -138,3 +138,41 @@ fast_cor <- function(
     x[!x] <- 0
     return(x)
 }
+
+
+.internal.runCORR <- function(
+    x, 
+    features1, 
+    features2, 
+    method = "spearman",
+    alternative = 'two.sided',
+    add.pvalue = FALSE,
+    listn = NULL,
+    across.gsvaexp = TRUE
+){
+  allf <- rownames(x)
+  y <- NULL
+  if (is.null(features1) && !is.null(features2)){
+      if (across.gsvaexp && length(listn) > 1){
+          f1 <- .check_features(listn[[1]], allf, prefix='features2')
+          f2 <- .check_features(unlist(listn[-1], use.names=FALSE), allf, prefix='features2')
+          y <- x[f2, ,drop=FALSE]
+          x <- x[f1, ,drop=FALSE]
+      }else{
+          f1 <- .check_features(features2, allf, prefix="features2")
+          x <- x[f1,,drop=FALSE]
+      }
+  }else if (!is.null(features1) && !is.null(features2)){
+      f1 <- .check_features(features1, allf, prefix='features1')
+      f2 <- .check_features(features2, allf, prefix='features2')
+      y <- x[f2,,drop=FALSE]
+      x <- x[f1,,drop=FALSE]
+  }
+  res <- fast_cor(x = x, 
+                  y = y, 
+                  method = method, 
+                  alternative = alternative, 
+                  add.pvalue = add.pvalue
+  )
+  return(res)
+}
