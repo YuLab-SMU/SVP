@@ -5,7 +5,7 @@
 #' @param gsvaExps list containing \linkS4class{SingleCellExperiment} object,
 #' each of which should have the same number of columns as the output 
 #' \linkS4class{SVPExperiment} object.
-#' @importFrom methods setClass
+#' @importFrom methods setClass setClassUnion
 #' @importClassesFrom SingleCellExperiment SingleCellExperiment
 #' @return a \linkS4class{SVPExperiment} object
 #' @aliases
@@ -41,6 +41,8 @@ SVPExperiment <- function(..., gsvaExps = list()){
 setClass('SVPExperiment', contains = 'SingleCellExperiment')
 
 setClass('SCEByColumn', slot = c(sce = 'SingleCellExperiment'))
+
+setClassUnion("matrix_Or_NULL", c("matrix", "NULL"))
 
 #' @exportMethod coerce
 #' @importFrom methods as
