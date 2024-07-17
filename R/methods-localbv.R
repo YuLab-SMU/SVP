@@ -55,6 +55,12 @@
 #' which works with \code{gsvaexp} parameter.
 #' @param gsvaexp.features character the name from the `rownames(gsvaExp(data, gsvaexp))`. If \code{gsvaexp} is
 #' specified and \code{data} is \linkS4class{SVPExperiment}, it should be provided. Default is NULL.
+#' @param across.gsvaexp logical whether only calculate the relationship of features between the multiple `gsvaExps`
+#' not the internal features of gsvaExp. For example, \code{'a'} and \code{'b'} features are from the \code{'AB'} `gsvaExp`,
+#' \code{'c'} and \code{'d'} features are from the \code{'CD'} `gsvaExp`. When \code{across.gsvaexp=TRUE} and
+#' \code{gsvaexp.features = c('a', 'b', 'c', 'd')} and \code{gsvaexp = c('AB', 'CD')}, Only the relationship of
+#' \code{a} and \code{c}, \code{a} and \code{d}, \code{b} and \code{c}, and \code{b} and \code{d} will be calculated.
+#' default is TRUE.
 #' @param ... additional parameters the parameters which are from the weight.method function.
 #' @return if \code{action = 'get'} (in default), the SimpleList object (like list object) will be return,
 #' if \code{action = 'only'}, the data.frame will be return. if \code{action = 'add'}, the result of LISA is
@@ -95,6 +101,7 @@ setGeneric('runLOCALBV',
     gsvaexp = NULL,
     gsvaexp.assay.type = NULL,
     gsvaexp.features = NULL,
+    across.gsvaexp = TRUE,
     ...
   )
   standardGeneric('runLOCALBV')
@@ -125,6 +132,7 @@ setMethod("runLOCALBV", "SingleCellExperiment", function(
     gsvaexp = NULL,
     gsvaexp.assay.type = NULL,
     gsvaexp.features = NULL,
+    across.gsvaexp = TRUE,
     ...
   ){
 
@@ -162,8 +170,9 @@ setMethod("runLOCALBV", "SingleCellExperiment", function(
                   if (any(rowSums(wm) == 0)){
                       cli::cli_warn("no-neighbour observations found in the spatial neighborhoods graph.")
                   }
-                  result <- .runLocalBv(xi, wm, features1, features2, n, permutation, bv.method, bv.alternative,
-                                        random.seed, wi, wi2, lisa.method, lisa.alternative, BPPARAM)
+                  result <- .runLocalBv(xi, wm, features1, features2, n, NULL, across.gsvaexp, 
+                                        permutation, bv.method, bv.alternative, random.seed,
+                                        wi, wi2, lisa.method, lisa.alternative, BPPARAM)
                   return(result)
          })
 
@@ -212,6 +221,7 @@ setMethod("runLOCALBV", "SVPExperiment",
     gsvaexp = NULL,
     gsvaexp.assay.type = NULL,
     gsvaexp.features = NULL,
+    across.gsvaexp = TRUE,
     ...
   ){
 
@@ -255,7 +265,7 @@ setMethod("runLOCALBV", "SVPExperiment",
        x2 <- .extract_gsvaExp_assay(data, gsvaexp, gsvaexp.assay.type)
        x2 <- x2[features2, , drop=FALSE]
        x <- rbind(x, x2)
-
+       listn <- .generate_feature_listn(data, features1, features2, gsvaexp)
        coords <- .check_coords(data, reduction.used, weight)
 
        res <- lapply(sample_id, function(sid){
@@ -274,7 +284,7 @@ setMethod("runLOCALBV", "SVPExperiment",
                        if (any(rowSums(wm) == 0)){
                            cli::cli_warn("no-neighbour observations found in the spatial neighborhoods graph.")
                        }
-                       result <- .runLocalBv(xi, wm, features1, features2, n, permutation, bv.method, bv.alternative,
+                       result <- .runLocalBv(xi, wm, features1, features2, n, listn, across.gsvaexp, permutation, bv.method, bv.alternative,
                                              random.seed, wi, wi2, lisa.method, lisa.alternative, BPPARAM)
                        return(result)
               })

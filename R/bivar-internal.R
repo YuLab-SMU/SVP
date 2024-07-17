@@ -64,6 +64,8 @@
   features1, 
   features2, 
   n, 
+  listn = NULL,
+  across.gsvaexp = TRUE,
   permutation = 200, 
   bv.method = c('locallee', 'localmoran_bv'),
   bv.alternative = c("two.sided", "greater", "less"),
@@ -79,7 +81,11 @@
   lisa.method <- match.arg(lisa.method)
   lisa.alternative <- match.arg(lisa.alternative)
   if (is.null(features1) && length(features2) > 1){
-      allpair <- combn(features2, 2) |> t()
+      if (length(listn)>1 && across.gsvaexp){
+          allpair <- .generate_across_gsvaexp_pair(listn)
+      }else{
+          allpair <- combn(features2, 2) |> t()
+      }
   }else if(is.null(features2) && length(features1) > 1){
       allpair <- combn(features1, 2) |> t()
   }else{
@@ -147,5 +153,18 @@
 
 .tidy_globalbv_res <- function(x, y = NULL){
   lapply(x, function(i)as_tbl_df(i, y))
+}
+
+.generate_across_gsvaexp_pair <- function(x){
+  pair1 <- names(x) |> combn(2) |> t()
+  
+  res <- lapply(seq(nrow(pair1)), function(i){
+     x[pair1[i,]] |> expand.grid() |> as.matrix()
+  })
+
+  res <- do.call("rbind", res)
+
+  return(res)
+
 }
 
