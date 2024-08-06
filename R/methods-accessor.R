@@ -108,6 +108,10 @@ setReplaceMethod("spatialCoords", c("SVPExperiment", "matrix_Or_NULL"), function
        cli::cli_abort("The rownames of coordinate matrix must be the same of the column names of {.cl class(x)}.")
     }
     int_colData(x)$spatialCoords <- value[colnames(x),,drop=FALSE]
+    flag4 <- .check_element_obj(x, key = 'imgData', basefun = int_metadata, namefun = names)
+    if (!flag4){
+        int_metadata(x)$imgData <- matrix(nrow=0, ncol=1) |> DataFrame() |> stats::setNames('sample_id')
+    }
     return(x)
 })
 

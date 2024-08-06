@@ -373,6 +373,12 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
   }
   return(sce)
 }
+ 
+#' @importFrom SpatialExperiment SpatialExperiment
+.check_params <- function(x, fun = SpatialExperiment){
+  y <- intersect(names(x), setdiff(names(formals(fun)), "..."))
+  return(length(y)>0)
+}
 
 .extract.gset <- function(x, gene.name=FALSE){
   if (inherits(x, "list") && !is.null(names(x))){

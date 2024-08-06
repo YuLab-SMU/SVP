@@ -30,7 +30,13 @@
 #' svpe <- as(sce, 'SVPExperiment')
 #' svpe
 SVPExperiment <- function(..., gsvaExps = list()){
-    svpe <- SingleCellExperiment(...)
+    params <- list(...)
+    flag <- .check_params(params)
+    if (flag){
+        svpe <- SpatialExperiment(...)
+    }else{
+        svpe <- SingleCellExperiment(...)
+    }
     svpe <- .sce_to_svpe(svpe, gsvaExps = gsvaExps)
     return(svpe)
 }
