@@ -374,7 +374,8 @@ pairDist <- function(x, y){
     
     total.genes <- x
     gset.gene.num <- lapply(gset.idx.list, function(i)length(unique(i))) |> unlist()
-    exp.gene.num  <- lapply(gset.idx.list, function(i) sum(unique(i) %fin% total.genes)) |> unlist()
+    exp.gene <- lapply(gset.idx.list, function(i)i[unique(i) %fin% total.genes])
+    exp.gene.num <- lapply(exp.gene, function(i)length(unique(i))) |> unlist()    
     if (any(gset.gene.num <=1) && min.sz == 1){
         cli::cli_warn(c("Some gene sets have size one.",
                         "You've supplied 'min.sz = {min.sz},'
@@ -386,6 +387,7 @@ pairDist <- function(x, y){
                   gset.gene.num = gset.gene.num, 
                   gene.occurrence.rate = exp.gene.num/gset.gene.num
                 )
+    gene.num$geneSets <- exp.gene
     rownames(gene.num) <- names(gset.idx.list)
     gene.num <- gene.num[gene.num$gset.gene.num >= min.sz & gene.num$gene.occurrence.rate >= gene.occurrence.rate,]
     if (nrow(gene.num)==0){
@@ -394,8 +396,7 @@ pairDist <- function(x, y){
                           call = NULL)
     }
 
-    return(as.matrix(gene.num))
-
+    return(gene.num)
 }
 
 
