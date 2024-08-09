@@ -1,6 +1,6 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# SVP: Efficient analysis of ‘gene set’ activity in spatial or single-cell data
+# SVP: Robust analysis of ‘gene set’ activity in spatial or single-cell data
 
 ## :newspaper: Description
 
