@@ -8,6 +8,7 @@ as_tbl_df(
   x,
   listn = NULL,
   diag = TRUE,
+  rmrd = TRUE,
   flag.clust = FALSE,
   dist.method = "euclidean",
   hclust.method = "average"
@@ -23,6 +24,9 @@ default is NULL.}
 
 \item{diag}{logical whether include the diagonal (only work when the cor
 matrix is square), default is TRUE.}
+
+\item{rmrd}{logical whether remove of redundancy when the correlation matrix
+is a square matrix, default is TRUE.}
 
 \item{flag.clust}{logical whether perform the hierarchical cluster analysis
 to obtain the label for visualization.}

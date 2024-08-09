@@ -87,11 +87,12 @@
 
 .internal.as_tbl_df <- function(x, 
                                 diag = FALSE, 
+                                rmrd = TRUE,
                                 flag.clust = FALSE, 
                                 dist.method = 'euclidean', 
                                 hclust.method = 'average'
     ){
-    if (identical(rownames(x), colnames(x)) && nrow(x)==ncol(x)){
+    if (identical(rownames(x), colnames(x)) && nrow(x)==ncol(x) && rmrd){
         if (flag.clust && nrow(x) > 2){
             x <- .adjust_order_by_clust1(x, dist.method, hclust.method)
         }

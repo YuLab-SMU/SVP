@@ -82,6 +82,8 @@ LISAResult <- function(x, type = NULL, features=NULL, ...){
 #' default is NULL.
 #' @param diag logical whether include the diagonal (only work when the cor 
 #' matrix is square), default is TRUE.
+#' @param rmrd logical whether remove of redundancy when the correlation matrix
+#' is a square matrix, default is TRUE.
 #' @param flag.clust logical whether perform the hierarchical cluster analysis
 #' to obtain the label for visualization.
 #' @param dist.method the distance measure to be used, only work when \code{flag.clust = TRUE}.
@@ -135,6 +137,7 @@ LISAResult <- function(x, type = NULL, features=NULL, ...){
 as_tbl_df <- function(x, 
                       listn = NULL, 
                       diag = TRUE, 
+                      rmrd = TRUE,
                       flag.clust = FALSE, 
                       dist.method = 'euclidean',
                       hclust.method = 'average'
@@ -148,12 +151,12 @@ as_tbl_df <- function(x,
         pval <- NULL
         nm <- c('val')
     }
-    rmat <- .internal.as_tbl_df(rmat, diag = diag, flag.clust=flag.clust, 
+    rmat <- .internal.as_tbl_df(rmat, diag = diag, rmrd = rmrd, flag.clust=flag.clust, 
                                 dist.method=dist.method, hclust.method=hclust.method)
     colnames(rmat) <- c("x", "y", nm[1])
     if (!is.null(pval)){
         pval <- pval[levels(rmat$x), levels(rmat$y), drop=FALSE]
-        pval <- .internal.as_tbl_df(pval, diag = diag)
+        pval <- .internal.as_tbl_df(pval, diag = diag, rmrd = rmrd)
         colnames(pval) <- c("x", "y", nm[2])
         rmat <- dplyr::left_join(rmat, pval, by=c("x", "y"))
     }

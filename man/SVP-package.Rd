@@ -4,9 +4,9 @@
 \name{SVP-package}
 \alias{SVP}
 \alias{SVP-package}
-\title{SVP: Efficient analysis of 'gene set' activity in spatial or single-cell data}
+\title{SVP: Robust analysis of 'gene set' activity in spatial or single-cell data}
 \description{
-SVP uses the distance between cells and cells, features and features, cells and features in the space of MCA to build nearest neighbor graph, then uses random walk with restart algorithm to calculate the activity score of gene sets (such as kegg pathway, signatures, go term, gene modules, transcription factor, ...), which is then further weighted using the hypergeometric test results from the original expression matrix. In addition, to detect the spatially or single cell variable gene sets or (other features) accurately, SVP uses the 2d weighted kernel density estimation to process the score of gene sets (or expression of genes) and uses Kullback–Leibler divergence to identify the spatial variable features based on permutation test. SVP also provides Geary’s and Morans'I that measure spatial autocorrelation to identify the spatial variable features efficiently based on Rcpp and RcppParallel. SVP is developed based on SingleCellExperiment class, which can be interoperable with the existing computing ecosystem.
+SVP uses the distance between cells and cells, features and features, cells and features in the space of MCA to build nearest neighbor graph, then uses random walk with restart algorithm to calculate the activity score of gene sets (such as cell marker genes, kegg pathway, go ontology, gene modules, transcription factor or miRNA target sets, reactome pathway, ...), which is then further weighted using the hypergeometric test results from the original expression matrix. To detect the spatially or single cell variable gene sets or (other features) and the spatial colocalization between the features accurately, SVP provides some global and local spatial autocorrelation method to identify the spatial variable features. SVP is developed based on SingleCellExperiment class, which can be interoperable with the existing computing ecosystem.
 }
 \seealso{
 Useful links:
