@@ -35,7 +35,8 @@
 #' @param lisa.alternative a character string specifying the alternative hypothesis, which works with
 #' \code{lisa.method}, default is \code{greater}.
 #' @param reduction.used character used as spatial coordinates to calculate the neighbours weights,
-#' default is \code{NULL}, if \code{data} has \code{spatialCoords}, which will be used as spatial coordinates.
+#' default is \code{NULL}, the result of reduction can be specified, such as \code{UMAP}, \code{TSNE}, \code{PCA}.
+#' If it is specified, the weight neighbours matrix will be calculated using the result of specified reduction.
 #' @param permutation integer the permutation number to test, which only work with \code{bv.method='localmoran_bv'},
 #' default is 100L.
 #' @param random.seed numeric random seed number to repeatability, default is 1024.
@@ -153,7 +154,7 @@ setMethod("runLOCALBV", "SingleCellExperiment", function(
       x <- x[features, ,drop=FALSE]
   }
 
-  coords <- .check_coords(data, reduction.used, weight)
+  coords <- .check_coords(data, reduction.used, weight, weight.method)
   res <- lapply(sample_id, function(sid){
                   if (sid == ".ALLCELL"){
                       ind <- seq(ncol(x))
@@ -266,7 +267,7 @@ setMethod("runLOCALBV", "SVPExperiment",
        x2 <- x2[features2, , drop=FALSE]
        x <- rbind(x, x2)
        listn <- .generate_feature_listn(data, features1, features2, gsvaexp)
-       coords <- .check_coords(data, reduction.used, weight)
+       coords <- .check_coords(data, reduction.used, weight, weight.method)
 
        res <- lapply(sample_id, function(sid){
                        if (sid == ".ALLCELL"){

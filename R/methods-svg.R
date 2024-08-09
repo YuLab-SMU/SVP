@@ -13,8 +13,9 @@
 #' or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} object with specified
 #' \code{gsvaexp} argument.
 #' @param assay.type which expressed data to be pulled to run, default is \code{logcounts}.
-#' @param reduction.used character used as spatial coordinates to detect SVG, default is \code{UMAP}, 
-#' if \code{data} has \code{spatialCoords}, which will be used as spatial coordinates.
+#' @param reduction.used character used as spatial coordinates to calculate the neighbours weights,
+#' default is \code{NULL}, the result of reduction can be specified, such as \code{UMAP}, \code{TSNE}, \code{PCA}.
+#' If it is specified, the weight neighbours matrix will be calculated using the result of specified reduction.
 #' @param sample_id character the sample(s) in the \linkS4class{SpatialExperiment} object whose cells/spots to use.
 #' Can be \code{all} to compute metric for all samples; the metric is computed separately for each sample.
 #' default is \code{"all"}.
@@ -114,7 +115,7 @@ setGeneric('runKldSVG',
   function(
     data,
     assay.type = 'logcounts',
-    reduction.used = c('UMAP', 'TSNE'),
+    reduction.used = NULL,
     sample_id = 'all',
     grid.n = 100,
     permutation = 100,
@@ -137,7 +138,7 @@ setMethod('runKldSVG', 'SingleCellExperiment',
   function(
     data,
     assay.type = 'logcounts',
-    reduction.used = c('UMAP', 'TSNE'),
+    reduction.used = NULL,
     sample_id = 'all',
     grid.n = 100,
     permutation = 100,
@@ -224,7 +225,7 @@ setMethod('runKldSVG', 'SVPExperiment',
   function(
     data,
     assay.type = 'logcounts',
-    reduction.used = c('UMAP', 'TSNE'),
+    reduction.used = NULL,
     sample_id = 'all',
     grid.n = 100,
     permutation = 100,
@@ -353,7 +354,7 @@ setGeneric("runDetectSVG", function(
     weight = NULL,
     weight.method = c("voronoi", "knn", "none"),
     sample_id = "all",
-    reduction.used = c('UMAP', 'TSNE'),
+    reduction.used = NULL,
     permutation = NULL,
     p.adjust.method = "BH",
     random.seed = 1024,
@@ -377,7 +378,7 @@ setMethod('runDetectSVG', 'SingleCellExperiment',
     weight = NULL,
     weight.method = c("voronoi", "knn", "none"),
     sample_id = "all",
-    reduction.used = c('UMAP', 'TSNE'),
+    reduction.used = NULL,
     permutation = NULL,
     p.adjust.method = "BH",
     random.seed = 1024,
@@ -387,6 +388,7 @@ setMethod('runDetectSVG', 'SingleCellExperiment',
     gsvaexp.assay.type = NULL,
     ...
   ){
+  weight.method <- match.arg(weight.method)
   method <- match.arg(method)
   action <- match.arg(action)
   if (is.null(assay.type)){
@@ -399,7 +401,7 @@ setMethod('runDetectSVG', 'SingleCellExperiment',
 
   sample_id <- .check_sample_id(data, sample_id)
 
-  coords <- .check_coords(data, reduction.used, weight) 
+  coords <- .check_coords(data, reduction.used, weight, weight.method) 
   tic()
   if (verbose){
       cli::cli_inform(paste0("Identifying the spatially variable gene sets (pathway) based on ", method))
@@ -471,7 +473,7 @@ setMethod('runDetectSVG', 'SVPExperiment',
     weight = NULL,
     weight.method = c("voronoi", "knn", "none"),
     sample_id = 'all',
-    reduction.used = c('UMAP', 'TSNE'),
+    reduction.used = NULL,
     permutation = NULL,
     p.adjust.method = "BH",
     random.seed = 1024,
@@ -482,7 +484,6 @@ setMethod('runDetectSVG', 'SVPExperiment',
     ...){
     method <- match.arg(method)
     weight.method <- match.arg(weight.method)
-    reduction.used <- match.arg(reduction.used)
     action <- match.arg(action)
     if (!is.null(gsvaexp)){
        if (verbose){

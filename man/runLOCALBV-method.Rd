@@ -128,7 +128,8 @@ analysis result, default is \code{'localG'}.}
 \code{lisa.method}, default is \code{greater}.}
 
 \item{reduction.used}{character used as spatial coordinates to calculate the neighbours weights,
-default is \code{NULL}, if \code{data} has \code{spatialCoords}, which will be used as spatial coordinates.}
+default is \code{NULL}, the result of reduction can be specified, such as \code{UMAP}, \code{TSNE}, \code{PCA}.
+If it is specified, the weight neighbours matrix will be calculated using the result of specified reduction.}
 
 \item{permutation}{integer the permutation number to test, which only work with \code{bv.method='localmoran_bv'},
 default is 100L.}

@@ -28,8 +28,9 @@
 #' \code{'dnearneigh'}, \code{"gabrielneigh"}, \code{"relativeneigh"}, which are from \code{spdep} package.
 #' default is \code{knn}, if it is \code{"none"}, meaning the distance weight of each spot is used to
 #' the weight.
-#' @param reduction.used character used as spatial coordinates to calculate the neighbours weights, 
-#' default is \code{UMAP}, if \code{data} has \code{spatialCoords}, which will be used as spatial coordinates.
+#' @param reduction.used character used as spatial coordinates to calculate the neighbours weights,
+#' default is \code{NULL}, the result of reduction can be specified, such as \code{UMAP}, \code{TSNE}, \code{PCA}.
+#' If it is specified, the weight neighbours matrix will be calculated using the result of specified reduction.
 #' @param permutation integer the permutation number to test, default is 100L.
 #' @param alternative a character string specifying the alternative hypothesis, which only work with 
 #' \code{add.pvalue = TRUE}, default is \code{greater}.
@@ -150,7 +151,7 @@ setMethod("runGLOBALBV", "SingleCellExperiment", function(
       x <- x[features, ,drop=FALSE]
   }
 
-  coords <- .check_coords(data, reduction.used, weight)
+  coords <- .check_coords(data, reduction.used, weight, weight.method)
   
   res <- lapply(sample_id, function(sid){
                   if (sid == ".ALLCELL"){
@@ -249,7 +250,7 @@ setMethod("runGLOBALBV", "SVPExperiment", function(
        x2 <- x2[features2, , drop=FALSE]
        x <- rbind(x, x2)
 
-       coords <- .check_coords(data, reduction.used, weight)
+       coords <- .check_coords(data, reduction.used, weight, weight.method)
        listn <- .generate_feature_listn(data, features1, features2, gsvaexp)
        res <- lapply(sample_id, function(sid){
                        if (sid == ".ALLCELL"){

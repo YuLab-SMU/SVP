@@ -12,7 +12,7 @@ runSGSA(
   gset.idx.list,
   gsvaExp.name = "gset1.rwr",
   symbol.from.gson = FALSE,
-  min.sz = 10,
+  min.sz = 5,
   max.sz = Inf,
   gene.occurrence.rate = 0.2,
   assay.type = "logcounts",
@@ -43,7 +43,7 @@ runSGSA(
   gset.idx.list,
   gsvaExp.name = "gset1.rwr",
   symbol.from.gson = FALSE,
-  min.sz = 10,
+  min.sz = 5,
   max.sz = Inf,
   gene.occurrence.rate = 0.2,
   assay.type = "logcounts",
@@ -80,7 +80,7 @@ runSGSA(
 \item{symbol.from.gson}{logical whether extract the SYMBOL ID as \code{gset.idx.list}, only work
 when \code{gset.idx.list} is a \code{GSON} object.}
 
-\item{min.sz}{integer the minimum gene set number, default is 10, the number of gene sets
+\item{min.sz}{integer the minimum gene set number, default is 5, the number of gene sets
 smaller than \code{min.sz} will be ignored.}
 
 \item{max.sz}{integer the maximum gene set number, default is Inf, the number of gene sets

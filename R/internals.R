@@ -343,25 +343,29 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
 .check_coords <- function(data, 
                           reduction.used, 
                           weight = NULL, 
+                          weight.method = NULL,
                           prefix="Or the `weight` should be provided."
   ){
-  flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
+  flag1 <- !is.null(int_colData(data)$spatialCoords) && ncol(int_colData(data)$spatialCoords)>0
 
   flag2 <- any(reduction.used %in% reducedDimNames(data))
   coords <- NULL
   if((flag1 || flag2) && is.null(weight)){
+      if (flag1){
+          coords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
+      }
       if (flag2){
           coords <- reducedDim(data, reduction.used)
-          coords <- coords[,c(1, 2)]
-      }
-      if (flag1 ){
-          coords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
       }
   }else if (all(!flag1, !flag2) && is.null(weight)){
       cli::cli_abort(c("The {.cls {class(data)}} should have 'spatialCoords' or the",
                      paste("reduction result of 'UMAP' or 'TSNE'.", prefix)))
   }
-
+  if (is.null(weight.method)){
+      coords <- coords[,c(1, 2)]
+  }else if (weight.method=="voronoi"){
+      coords <- coords[,seq(min(3, ncol(coords)))]
+  }
   return(coords)
 }
 

@@ -12,7 +12,7 @@
 runKldSVG(
   data,
   assay.type = "logcounts",
-  reduction.used = c("UMAP", "TSNE"),
+  reduction.used = NULL,
   sample_id = "all",
   grid.n = 100,
   permutation = 100,
@@ -28,7 +28,7 @@ runKldSVG(
 \S4method{runKldSVG}{SingleCellExperiment}(
   data,
   assay.type = "logcounts",
-  reduction.used = c("UMAP", "TSNE"),
+  reduction.used = NULL,
   sample_id = "all",
   grid.n = 100,
   permutation = 100,
@@ -44,7 +44,7 @@ runKldSVG(
 \S4method{runKldSVG}{SVPExperiment}(
   data,
   assay.type = "logcounts",
-  reduction.used = c("UMAP", "TSNE"),
+  reduction.used = NULL,
   sample_id = "all",
   grid.n = 100,
   permutation = 100,
@@ -64,8 +64,9 @@ or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} ob
 
 \item{assay.type}{which expressed data to be pulled to run, default is \code{logcounts}.}
 
-\item{reduction.used}{character used as spatial coordinates to detect SVG, default is \code{UMAP},
-if \code{data} has \code{spatialCoords}, which will be used as spatial coordinates.}
+\item{reduction.used}{character used as spatial coordinates to calculate the neighbours weights,
+default is \code{NULL}, the result of reduction can be specified, such as \code{UMAP}, \code{TSNE}, \code{PCA}.
+If it is specified, the weight neighbours matrix will be calculated using the result of specified reduction.}
 
 \item{sample_id}{character the sample(s) in the \linkS4class{SpatialExperiment} object whose cells/spots to use.
 Can be \code{all} to compute metric for all samples; the metric is computed separately for each sample.

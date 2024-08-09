@@ -25,8 +25,9 @@
 #' \code{'dnearneigh'}, \code{"gabrielneigh"}, \code{"relativeneigh"}, which are from \code{spdep} package.
 #' default is \code{knn}, if it is \code{"none"}, meaning the distance weight of each spot is used to
 #' the weight.
-#' @param reduction.used character used as spatial coordinates to calculate the neighbours weights, 
-#' default is \code{UMAP}, if \code{data} has \code{spatialCoords}, which will be used as spatial coordinates.
+#' @param reduction.used character used as spatial coordinates to calculate the neighbours weights,
+#' default is \code{NULL}, the result of reduction can be specified, such as \code{UMAP}, \code{TSNE}, \code{PCA}.
+#' If it is specified, the weight neighbours matrix will be calculated using the result of specified reduction.
 #' @param cells the cell name or index of data object, default is NULL.
 #' @param action character, which control the type of return result, default is \code{get}, which will return
 #' a \linkS4class{SimpleList}.
@@ -197,7 +198,7 @@ setMethod("runLISA", "SingleCellExperiment", function(
 
   x <- x[features, ,drop=FALSE]
 
-  coords <- .check_coords(data, reduction.used, weight)
+  coords <- .check_coords(data, reduction.used, weight, weight.method)
 
   res <- lapply(sample_id, function(sid){
                   if (sid == ".ALLCELL"){

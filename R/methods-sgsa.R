@@ -21,7 +21,7 @@
 #' @param gsvaExp.name a character the name of \code{gsvaExp} of result \code{SVP} object.
 #' @param symbol.from.gson logical whether extract the SYMBOL ID as \code{gset.idx.list}, only work
 #' when \code{gset.idx.list} is a \code{GSON} object.
-#' @param min.sz integer the minimum gene set number, default is 10, the number of gene sets 
+#' @param min.sz integer the minimum gene set number, default is 5, the number of gene sets 
 #' smaller than \code{min.sz} will be ignored.
 #' @param max.sz integer the maximum gene set number, default is Inf, the number of gene sets
 #' larger than \code{max.sz} will be ignored.
@@ -169,7 +169,7 @@ setGeneric('runSGSA',
     gset.idx.list,
     gsvaExp.name = 'gset1.rwr',
     symbol.from.gson = FALSE,
-    min.sz = 10,
+    min.sz = 5,
     max.sz = Inf,
     gene.occurrence.rate = .2,
     assay.type = 'logcounts',
@@ -210,7 +210,7 @@ setMethod('runSGSA',
     gset.idx.list,
     gsvaExp.name = 'gset1.rwr',
     symbol.from.gson = FALSE,
-    min.sz = 10, 
+    min.sz = 5, 
     max.sz = Inf,
     gene.occurrence.rate = .2,
     assay.type = 'logcounts',
