@@ -290,8 +290,11 @@ setMethod('runKldSVG', 'SVPExperiment',
 #' default is \code{"all"}.
 #' @param reduction.used character used as spatial coordinates to detect SVG, default is \code{UMAP},
 #' if \code{data} has \code{spatialCoords}, which will be used as spatial coordinates.
+#' @param group.by character a specified category column names (for example the cluster column name) of
+#' \code{colData(data)}, if it was specified, the adjacency weighted matrix will be built based on the principle 
+#' that spots or cells in the same category are adjacent, default is NULL.
 #' @param permutation integer the number to permutation test for the calculation of Moran's I, default
-#' is NULL. Because we do not recommend using this parameter, as the permutation test is too slow.
+#' is NULL. We do not recommend using this parameter, as the permutation test is too slow.
 #' @param p.adjust.method character the method to adjust the pvalue of the result, default is \code{BH}.
 #' @param random.seed numeric random seed number to repeatability, default is 1024.
 #' @param verbose logical whether print the intermediate message when running the program, default is TRUE.
@@ -355,6 +358,7 @@ setGeneric("runDetectSVG", function(
     weight.method = c("voronoi", "knn", "none"),
     sample_id = "all",
     reduction.used = NULL,
+    group.by = NULL,
     permutation = NULL,
     p.adjust.method = "BH",
     random.seed = 1024,
@@ -379,6 +383,7 @@ setMethod('runDetectSVG', 'SingleCellExperiment',
     weight.method = c("voronoi", "knn", "none"),
     sample_id = "all",
     reduction.used = NULL,
+    group.by = NULL,
     permutation = NULL,
     p.adjust.method = "BH",
     random.seed = 1024,
@@ -400,6 +405,7 @@ setMethod('runDetectSVG', 'SingleCellExperiment',
   x <- assay(data, assay.type)
 
   sample_id <- .check_sample_id(data, sample_id)
+  weight <- .check_weight(data, sample_id, weight, group.by)
 
   coords <- .check_coords(data, reduction.used, weight, weight.method) 
   tic()
@@ -474,6 +480,7 @@ setMethod('runDetectSVG', 'SVPExperiment',
     weight.method = c("voronoi", "knn", "none"),
     sample_id = 'all',
     reduction.used = NULL,
+    group.by = NULL,
     permutation = NULL,
     p.adjust.method = "BH",
     random.seed = 1024,
@@ -497,6 +504,7 @@ setMethod('runDetectSVG', 'SVPExperiment',
                      weight.method,
                      sample_id,
                      reduction.used,
+                     group.by,
                      permutation,
                      p.adjust.method,
                      random.seed,

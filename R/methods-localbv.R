@@ -37,6 +37,9 @@
 #' @param reduction.used character used as spatial coordinates to calculate the neighbours weights,
 #' default is \code{NULL}, the result of reduction can be specified, such as \code{UMAP}, \code{TSNE}, \code{PCA}.
 #' If it is specified, the weight neighbours matrix will be calculated using the result of specified reduction.
+#' @param group.by character a specified category column names (for example the cluster column name) of
+#' \code{colData(data)}, if it was specified, the adjacency weighted matrix will be built based on the principle
+#' that spots or cells in the same category are adjacent, default is NULL.
 #' @param permutation integer the permutation number to test, which only work with \code{bv.method='localmoran_bv'},
 #' default is 100L.
 #' @param random.seed numeric random seed number to repeatability, default is 1024.
@@ -94,6 +97,7 @@ setGeneric('runLOCALBV',
     lisa.method = c("localG", "localmoran"),
     lisa.alternative = "greater",
     reduction.used = NULL,
+    group.by = NULL,
     permutation = 100,
     random.seed = 1024,
     BPPARAM = SerialParam(),
@@ -125,6 +129,7 @@ setMethod("runLOCALBV", "SingleCellExperiment", function(
     lisa.method = c("localG", "localmoran"),
     lisa.alternative = "greater",
     reduction.used = NULL,
+    group.by = NULL,
     permutation = 100,
     random.seed = 1024,
     BPPARAM = SerialParam(),
@@ -153,6 +158,7 @@ setMethod("runLOCALBV", "SingleCellExperiment", function(
   if (length(features) >= 1){
       x <- x[features, ,drop=FALSE]
   }
+  weight <- .check_weight(data, sample_id, weight, group.by)
 
   coords <- .check_coords(data, reduction.used, weight, weight.method)
   res <- lapply(sample_id, function(sid){
@@ -214,6 +220,7 @@ setMethod("runLOCALBV", "SVPExperiment",
     lisa.method = c("localG", "localmoran"),
     lisa.alternative = "greater",
     reduction.used = NULL,
+    group.by = NULL,
     permutation = 100,
     random.seed = 1024,
     BPPARAM = SerialParam(),
@@ -267,6 +274,8 @@ setMethod("runLOCALBV", "SVPExperiment",
        x2 <- x2[features2, , drop=FALSE]
        x <- rbind(x, x2)
        listn <- .generate_feature_listn(data, features1, features2, gsvaexp)
+
+       weight <- .check_weight(data, sample_id, weight, group.by)
        coords <- .check_coords(data, reduction.used, weight, weight.method)
 
        res <- lapply(sample_id, function(sid){

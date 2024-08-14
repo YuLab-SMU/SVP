@@ -489,7 +489,6 @@ pairDist <- function(x, y){
   }
 
   wm <- .obtain.weight(coords, weight, weight.method, ...)
-
   if (is.null(permutation)){
       permutation <- 1
   }
@@ -617,9 +616,19 @@ pairDist <- function(x, y){
       }
       weight.mat <- weight.mat * (1/rowSums(weight.mat))
   }
-
-  if (inherits(weight, "listw") || inherits(weight, "nb")){
-      weight.mat <- .convert_to_distmt(weight)
+  
+  if (!is.null(weight)){
+      if (inherits(weight, "listw") || inherits(weight, "nb")){
+          weight.mat <- .convert_to_distmt(weight)
+      }else if (inherits(weight, "matrix") && identical(rownames(weight), colnames(weight))){
+          weight.mat <- weight
+      }else{
+          cli::cli_abort(
+            c("The {.var weight} should be a list (with named by sample_id) object containing `listw`, `nb`",
+              "or squared `matrix` with equal the dimnames (the same to colnames of `data`.), Or it can be ",
+              "a single `listw`, `nb` or `matrix` object, if it is provided (not NULL).")
+          )
+      }
   }
 
   if (is.null(weight) && !weight.method %in% c("none", "voronoi", "knn")){

@@ -28,6 +28,9 @@
 #' @param reduction.used character used as spatial coordinates to calculate the neighbours weights,
 #' default is \code{NULL}, the result of reduction can be specified, such as \code{UMAP}, \code{TSNE}, \code{PCA}.
 #' If it is specified, the weight neighbours matrix will be calculated using the result of specified reduction.
+#' @param group.by character a specified category column names (for example the cluster column name) of
+#' \code{colData(data)}, if it was specified, the adjacency weighted matrix will be built based on the principle
+#' that spots or cells in the same category are adjacent, default is NULL.
 #' @param cells the cell name or index of data object, default is NULL.
 #' @param action character, which control the type of return result, default is \code{get}, which will return
 #' a \linkS4class{SimpleList}.
@@ -145,6 +148,7 @@ setGeneric('runLISA',
     weight = NULL,
     weight.method = c("voronoi", "knn", "none"),
     reduction.used = NULL,
+    group.by = NULL,
     cells = NULL,
     action = c("get", "add", "only"),
     alternative = 'two.sided',
@@ -170,6 +174,7 @@ setMethod("runLISA", "SingleCellExperiment", function(
     weight = NULL, 
     weight.method = c("voronoi", "knn", "none"), 
     reduction.used = NULL,
+    group.by = NULL,
     cells = NULL,
     action = c("get", "add", "only"),
     alternative = 'two.sided',
@@ -197,7 +202,8 @@ setMethod("runLISA", "SingleCellExperiment", function(
   }
 
   x <- x[features, ,drop=FALSE]
-
+  
+  weight <- .check_weight(data, sample_id, weight, group.by)
   coords <- .check_coords(data, reduction.used, weight, weight.method)
 
   res <- lapply(sample_id, function(sid){
@@ -256,6 +262,7 @@ setMethod("runLISA", "SVPExperiment", function(
     weight = NULL,
     weight.method = c("voronoi", "knn", "none"),
     reduction.used = NULL,
+    group.by = NULL,
     cells = NULL,
     action = c("get", "add", "only"),
     alternative = 'two.sided',
@@ -289,6 +296,7 @@ setMethod("runLISA", "SVPExperiment", function(
                        weight,
                        weight.method,
                        reduction.used,
+                       group.by,
                        cells,
                        action,
                        alternative,

@@ -31,6 +31,9 @@
 #' @param reduction.used character used as spatial coordinates to calculate the neighbours weights,
 #' default is \code{NULL}, the result of reduction can be specified, such as \code{UMAP}, \code{TSNE}, \code{PCA}.
 #' If it is specified, the weight neighbours matrix will be calculated using the result of specified reduction.
+#' @param group.by character a specified category column names (for example the cluster column name) of
+#' \code{colData(data)}, if it was specified, the adjacency weighted matrix will be built based on the principle
+#' that spots or cells in the same category are adjacent, default is NULL.
 #' @param permutation integer the permutation number to test, default is 100L.
 #' @param alternative a character string specifying the alternative hypothesis, which only work with 
 #' \code{add.pvalue = TRUE}, default is \code{greater}.
@@ -93,6 +96,7 @@ setGeneric('runGLOBALBV',
     weight = NULL,
     weight.method = c("voronoi", "knn", "none"),
     reduction.used = NULL,
+    group.by = NULL,
     permutation = 100,
     alternative = c('greater', 'two.sided', 'less'),
     add.pvalue = FALSE,
@@ -121,6 +125,7 @@ setMethod("runGLOBALBV", "SingleCellExperiment", function(
     weight = NULL, 
     weight.method = c("voronoi", "knn", "none"), 
     reduction.used = NULL,
+    group.by = NULL,
     permutation = 100,
     alternative = c('greater', 'two.sided', 'less'),
     add.pvalue = FALSE,
@@ -150,6 +155,7 @@ setMethod("runGLOBALBV", "SingleCellExperiment", function(
   if (length(features) >= 1){
       x <- x[features, ,drop=FALSE]
   }
+  weight <- .check_weight(data, sample_id, weight, group.by)
 
   coords <- .check_coords(data, reduction.used, weight, weight.method)
   
@@ -196,6 +202,7 @@ setMethod("runGLOBALBV", "SVPExperiment", function(
     weight = NULL,
     weight.method = c("voronoi", "knn", "none"),
     reduction.used = NULL,
+    group.by = NULL,
     permutation = 100,
     alternative = c('greater', 'two.sided', 'less'),
     add.pvalue = FALSE,
@@ -249,7 +256,7 @@ setMethod("runGLOBALBV", "SVPExperiment", function(
        x2 <- .extract_gsvaExp_assay(data, gsvaexp, gsvaexp.assay.type)
        x2 <- x2[features2, , drop=FALSE]
        x <- rbind(x, x2)
-
+       weight <- .check_weight(data, sample_id, weight, group.by)
        coords <- .check_coords(data, reduction.used, weight, weight.method)
        listn <- .generate_feature_listn(data, features1, features2, gsvaexp)
        res <- lapply(sample_id, function(sid){

@@ -433,3 +433,45 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
        dplyr::pull(".TARGET", name=nm)
   return(x)
 }
+
+.check_weight <- function(x, sample_id, weight=NULL, group.by=NULL){
+  if (!is.null(weight)){
+    return(weight) 
+  }
+  
+  if (is.null(group.by)){
+    return(NULL)
+  }
+
+  da <- colData(x)
+
+  res <- lapply(sample_id, function(sid){
+      if (sid == '.ALLCELL'){
+          ind <- seq(ncol(x))
+      }else{
+          ind <- da$sample_id == sid
+      }
+      da <- da[ind,group.by,drop=FALSE]
+      da <- .build_adj_matrix(da)
+      return(da)
+  })
+  if (length(res) > 1){
+    names(res) <- sample_id
+  }else{
+    res <- res[[1]]
+  }
+  return(res)
+}
+
+.build_adj_matrix <- function(da){
+  x <- as.character(unique(da[[1]]))
+  res <- matrix(0, nrow = nrow(da), ncol=nrow(da))
+  for (i in x){
+     ind <- da[[1]] == i
+     res[ind, ind] <- 1
+  }
+  diag(res) <- 0
+  res <- apply(res, 2, function(x)x/sum(x))
+  rownames(res) <- colnames(res) <- rownames(da)
+  return(res)
+}

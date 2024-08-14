@@ -21,6 +21,7 @@ runLOCALBV(
   lisa.method = c("localG", "localmoran"),
   lisa.alternative = "greater",
   reduction.used = NULL,
+  group.by = NULL,
   permutation = 100,
   random.seed = 1024,
   BPPARAM = SerialParam(),
@@ -46,6 +47,7 @@ runLOCALBV(
   lisa.method = c("localG", "localmoran"),
   lisa.alternative = "greater",
   reduction.used = NULL,
+  group.by = NULL,
   permutation = 100,
   random.seed = 1024,
   BPPARAM = SerialParam(),
@@ -71,6 +73,7 @@ runLOCALBV(
   lisa.method = c("localG", "localmoran"),
   lisa.alternative = "greater",
   reduction.used = NULL,
+  group.by = NULL,
   permutation = 100,
   random.seed = 1024,
   BPPARAM = SerialParam(),
@@ -130,6 +133,10 @@ analysis result, default is \code{'localG'}.}
 \item{reduction.used}{character used as spatial coordinates to calculate the neighbours weights,
 default is \code{NULL}, the result of reduction can be specified, such as \code{UMAP}, \code{TSNE}, \code{PCA}.
 If it is specified, the weight neighbours matrix will be calculated using the result of specified reduction.}
+
+\item{group.by}{character a specified category column names (for example the cluster column name) of
+\code{colData(data)}, if it was specified, the adjacency weighted matrix will be built based on the principle
+that spots or cells in the same category are adjacent, default is NULL.}
 
 \item{permutation}{integer the permutation number to test, which only work with \code{bv.method='localmoran_bv'},
 default is 100L.}

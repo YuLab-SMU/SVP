@@ -16,6 +16,7 @@ runDetectSVG(
   weight.method = c("voronoi", "knn", "none"),
   sample_id = "all",
   reduction.used = NULL,
+  group.by = NULL,
   permutation = NULL,
   p.adjust.method = "BH",
   random.seed = 1024,
@@ -34,6 +35,7 @@ runDetectSVG(
   weight.method = c("voronoi", "knn", "none"),
   sample_id = "all",
   reduction.used = NULL,
+  group.by = NULL,
   permutation = NULL,
   p.adjust.method = "BH",
   random.seed = 1024,
@@ -52,6 +54,7 @@ runDetectSVG(
   weight.method = c("voronoi", "knn", "none"),
   sample_id = "all",
   reduction.used = NULL,
+  group.by = NULL,
   permutation = NULL,
   p.adjust.method = "BH",
   random.seed = 1024,
@@ -91,8 +94,12 @@ default is \code{"all"}.}
 \item{reduction.used}{character used as spatial coordinates to detect SVG, default is \code{UMAP},
 if \code{data} has \code{spatialCoords}, which will be used as spatial coordinates.}
 
+\item{group.by}{character a specified category column names (for example the cluster column name) of
+\code{colData(data)}, if it was specified, the adjacency weighted matrix will be built based on the principle
+that spots or cells in the same category are adjacent, default is NULL.}
+
 \item{permutation}{integer the number to permutation test for the calculation of Moran's I, default
-is NULL. Because we do not recommend using this parameter, as the permutation test is too slow.}
+is NULL. We do not recommend using this parameter, as the permutation test is too slow.}
 
 \item{p.adjust.method}{character the method to adjust the pvalue of the result, default is \code{BH}.}
 
