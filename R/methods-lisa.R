@@ -287,7 +287,7 @@ setMethod("runLISA", "SVPExperiment", function(
         }else{
             features <- unique(features, gsvaexp.features)
         }
-        da2 <- gsvaExp(data, gsvaexp, withSpatialCoords = TRUE, withReducedDim = TRUE, withColData = FALSE, withImgData = FALSE)
+        da2 <- gsvaExp(data, gsvaexp, withSpatialCoords = TRUE, withReducedDim = TRUE, withColData = TRUE, withImgData = FALSE)
         da2 <- runLISA(da2,
                        features,
                        gsvaexp.assay.type,
