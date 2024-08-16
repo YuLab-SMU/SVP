@@ -49,4 +49,38 @@ arma::vec cal_local_moran_bv(
     arma::mat weight
 );
 
+arma::mat CalLocalGCpp(
+    arma::vec x,
+    arma::mat w,
+    arma::vec wi,
+    arma::vec S1i,
+    int n
+);
+
+arma::mat tidylocalg(
+    arma::vec res1,
+    arma::vec res2,
+    arma::vec res3,
+    arma::vec res4,
+    arma::vec res5,
+    arma::mat res
+);
+
+arma::mat CalLocalMoranCpp(
+    arma::vec x,
+    arma::mat w,
+    arma::vec wi,
+    arma::vec Wi2,
+    int n
+);
+
+arma::mat tidylocalmoran(
+    arma::vec res1,
+    arma::vec res2,
+    arma::vec res3,
+    arma::vec res4,
+    arma::vec res5,
+    arma::vec res6,
+    arma::mat res
+);
 #endif

@@ -278,33 +278,27 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// CalLocalGCpp
-arma::mat CalLocalGCpp(arma::vec x, arma::mat w, arma::vec wi, arma::vec S1i, int n);
-RcppExport SEXP _SVP_CalLocalGCpp(SEXP xSEXP, SEXP wSEXP, SEXP wiSEXP, SEXP S1iSEXP, SEXP nSEXP) {
+// CalLocalGParallel
+Rcpp::List CalLocalGParallel(arma::sp_mat& x, arma::mat& w);
+RcppExport SEXP _SVP_CalLocalGParallel(SEXP xSEXP, SEXP wSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type w(wSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type wi(wiSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type S1i(S1iSEXP);
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    rcpp_result_gen = Rcpp::wrap(CalLocalGCpp(x, w, wi, S1i, n));
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type w(wSEXP);
+    rcpp_result_gen = Rcpp::wrap(CalLocalGParallel(x, w));
     return rcpp_result_gen;
 END_RCPP
 }
-// CalLocalMoranCpp
-arma::mat CalLocalMoranCpp(arma::vec x, arma::mat w, arma::vec wi, arma::vec Wi2, int n);
-RcppExport SEXP _SVP_CalLocalMoranCpp(SEXP xSEXP, SEXP wSEXP, SEXP wiSEXP, SEXP Wi2SEXP, SEXP nSEXP) {
+// CalLocalMoranParallel
+Rcpp::List CalLocalMoranParallel(arma::sp_mat& x, arma::mat& w);
+RcppExport SEXP _SVP_CalLocalMoranParallel(SEXP xSEXP, SEXP wSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type w(wSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type wi(wiSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type Wi2(Wi2SEXP);
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    rcpp_result_gen = Rcpp::wrap(CalLocalMoranCpp(x, w, wi, Wi2, n));
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type w(wSEXP);
+    rcpp_result_gen = Rcpp::wrap(CalLocalMoranParallel(x, w));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -422,8 +416,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_SVP_CalBgSpatialKld", (DL_FUNC) &_SVP_CalBgSpatialKld, 6},
     {"_SVP_CalWkdeParallel", (DL_FUNC) &_SVP_CalWkdeParallel, 6},
     {"_SVP_CalSpatialKldCpp", (DL_FUNC) &_SVP_CalSpatialKldCpp, 6},
-    {"_SVP_CalLocalGCpp", (DL_FUNC) &_SVP_CalLocalGCpp, 5},
-    {"_SVP_CalLocalMoranCpp", (DL_FUNC) &_SVP_CalLocalMoranCpp, 5},
+    {"_SVP_CalLocalGParallel", (DL_FUNC) &_SVP_CalLocalGParallel, 2},
+    {"_SVP_CalLocalMoranParallel", (DL_FUNC) &_SVP_CalLocalMoranParallel, 2},
     {"_SVP_MCAStep1", (DL_FUNC) &_SVP_MCAStep1, 1},
     {"_SVP_MCAStep2", (DL_FUNC) &_SVP_MCAStep2, 3},
     {"_SVP_CalMoransiParallel", (DL_FUNC) &_SVP_CalMoransiParallel, 5},

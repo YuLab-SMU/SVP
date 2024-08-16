@@ -81,12 +81,12 @@ CalSpatialKldCpp <- function(coords, d, l, h, n = 100L, random_times = 100L) {
     .Call('_SVP_CalSpatialKldCpp', PACKAGE = 'SVP', coords, d, l, h, n, random_times)
 }
 
-CalLocalGCpp <- function(x, w, wi, S1i, n) {
-    .Call('_SVP_CalLocalGCpp', PACKAGE = 'SVP', x, w, wi, S1i, n)
+CalLocalGParallel <- function(x, w) {
+    .Call('_SVP_CalLocalGParallel', PACKAGE = 'SVP', x, w)
 }
 
-CalLocalMoranCpp <- function(x, w, wi, Wi2, n) {
-    .Call('_SVP_CalLocalMoranCpp', PACKAGE = 'SVP', x, w, wi, Wi2, n)
+CalLocalMoranParallel <- function(x, w) {
+    .Call('_SVP_CalLocalMoranParallel', PACKAGE = 'SVP', x, w)
 }
 
 MCAStep1 <- function(X) {

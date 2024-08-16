@@ -1,69 +1,144 @@
-#include <RcppArmadillo.h>
 #include "autocorutils.h"
+#include "progress.h"
+#include <RcppParallel.h>
+using namespace RcppParallel;
 using namespace Rcpp;
 using namespace arma;
 using namespace std;
 
-// [[Rcpp::export]]
-arma::mat CalLocalGCpp(
-    arma::vec x,
-    arma::mat w,
-    arma::vec wi,
-    arma::vec S1i,
-    int n
-    ){
+struct RunLocalG: public Worker{
+    const arma::mat& xm;
+    const arma::mat& w;
+    const arma::vec& wi;
+    const arma::vec& Wi2;
+    simple_progress& p;
+    const int n;
+    arma::mat& result1;
+    arma::mat& result2;
+    arma::mat& result3;
+    arma::mat& result4;
+    arma::mat& result5;
 
-    double x_star = sum(x);
-    arma::vec xx = pow(x, 2.0);
-    arma::vec Gi = lagCpp(w, x);
-    arma::vec xibar = (sum(x) - x) / (n - 1);
-    arma::vec si2 = (sum(xx) - xx)/(n - 1) - pow(xibar, 2.0);
-    arma::vec EG = wi % xibar;
-    arma::vec ZG = Gi - EG;
-    arma::vec VG = si2 % (((n - 1) * S1i - pow(wi, 2.0))/(n - 2));
-    ZG = ZG/sqrt(VG);
+    RunLocalG(const arma::mat& xm, const arma::mat& w, const arma::vec& wi,
+            const arma::vec& Wi2, simple_progress& p, const int n, arma::mat& result1, 
+	    arma::mat& result2, arma::mat& result3, arma::mat& result4, arma::mat& result5
+    ):
+    xm(xm), w(w), wi(wi), Wi2(Wi2), p(p), n(n), result1(result1), result2(result2),
+    result3(result3), result4(result4), result5(result5){ }
+
+    void operator()(std::size_t begin, std::size_t end){
+        for (uword i = begin; i < end; i++){
+            arma::mat res(n, 6);
+            res = CalLocalGCpp(xm.col(i), w, wi, Wi2, n);
+            result1.col(i) = res.col(0);
+            result2.col(i) = res.col(1);
+            result3.col(i) = res.col(2);
+            result4.col(i) = res.col(3);
+            result5.col(i) = res.col(4);
+        }
+    }
+};
+
+// [[Rcpp::export]]
+Rcpp::List CalLocalGParallel(arma::sp_mat& x, arma::mat& w){
+    arma::mat xm = conv_to<arma::mat>::from(x.t());
+    int n = xm.n_cols;
+    int m = xm.n_rows;
+
+    arma::vec wi = sum(w, 1);
+    arma::vec Wi2 = sum(pow(w, 2.0), 1);
+
+    simple_progress p(n);
+
+    arma::mat result1(m, n);
+    arma::mat result2(m, n);
+    arma::mat result3(m, n);
+    arma::mat result4(m, n);
+    arma::mat result5(m, n);
+
+    RunLocalG runlocalg(xm, w, wi, Wi2, p, m, result1, result2,
+            result3, result4, result5);
+
+    parallelFor(0, n, runlocalg);
+
+    List res(n);
+    for (int i = 0; i < n; i++){
+        arma::mat tmp(m, 5);
+        res[i] = tidylocalg(result1.col(i), result2.col(i), result3.col(i),
+                result4.col(i), result5.col(i), tmp);
+        p.increment();
+    }
+
+    return (res);
+}
+
+struct RunLocalMoran : public Worker{
+    const arma::mat& xm;
+    const arma::mat& w;
+    const arma::vec& wi;
+    const arma::vec& Wi2;
+    simple_progress& p;
+    const int n;
+    arma::mat& result1;
+    arma::mat& result2;
+    arma::mat& result3;
+    arma::mat& result4;
+    arma::mat& result5;
+    arma::mat& result6;
+
+    RunLocalMoran(const arma::mat& xm, const arma::mat& w, const arma::vec& wi,
+            const arma::vec& Wi2, simple_progress& p, const int n, arma::mat& result1, arma::mat& result2, 
+            arma::mat& result3, arma::mat& result4, arma::mat& result5, arma::mat& result6
+    ):
+    xm(xm), w(w), wi(wi), Wi2(Wi2), p(p), n(n), result1(result1), result2(result2), 
+    result3(result3), result4(result4), result5(result5), result6(result6){ }
+
+    void operator()(std::size_t begin, std::size_t end){
+        for (uword i = begin; i < end; i++){
+            arma::mat res(n, 6);
+            res = CalLocalMoranCpp(xm.col(i), w, wi, Wi2, n);
+            result1.col(i) = res.col(0);
+            result2.col(i) = res.col(1);
+            result3.col(i) = res.col(2);
+            result4.col(i) = res.col(3);
+            result5.col(i) = res.col(4);
+            result6.col(i) = res.col(5);
+            p.increment();
+        }
+    }
+};
+
+
+// [[Rcpp::export]]
+Rcpp::List CalLocalMoranParallel(arma::sp_mat& x, arma::mat& w){
+    arma::mat xm = conv_to<arma::mat>::from(x.t());
+    int n = xm.n_cols;
+    int m = xm.n_rows;
+
+    arma::vec wi = sum(w, 1);
+    arma::vec Wi2 = sum(pow(w, 2.0), 1);
+
+    simple_progress p(n);
     
-    arma::vec scale = x_star - x;
-    arma::mat res(n, 5);
+    arma::mat result1(m, n);
+    arma::mat result2(m, n);
+    arma::mat result3(m, n);
+    arma::mat result4(m, n);
+    arma::mat result5(m, n);
+    arma::mat result6(m, n);
 
-    res.col(0) = Gi/scale;
-    res.col(1) = EG/scale;
-    res.col(2) = VG/(pow(scale, 2.0));
-    res.col(3) = ZG;
-    res.col(4) = x;
+    RunLocalMoran runlocalmoran(xm, w, wi, Wi2, p, m, result1, result2,
+            result3, result4, result5, result6);
 
-    return(res);
+    parallelFor(0, n, runlocalmoran);
+
+    List res(n);
+    for (int i = 0; i < n; i++){
+        arma::mat tmp(m, 6);
+        res[i] = tidylocalmoran(result1.col(i), result2.col(i), result3.col(i),
+                result4.col(i), result5.col(i), result6.col(i), tmp);
+    }
+
+    return (res);
 }
 
-
-// [[Rcpp::export]]
-arma::mat CalLocalMoranCpp(
-    arma::vec x,
-    arma::mat w,
-    arma::vec wi,
-    arma::vec Wi2,
-    int n
-    ){
-
-    arma::mat res(n, 6);
-    arma::vec z = x - mean(x);
-    arma::vec lz = lagCpp(w, z);
-    arma::vec zz2 = pow(z, 2.0);
-    double m2 = sum(zz2)/n;
-    arma::vec I = (z/m2) % lz;
-    arma::vec EI = -(zz2 % wi) / ((n - 1.0) * m2);
-    arma::vec wwi2 = pow(wi, 2.0);
-    arma::vec VI = pow(z/m2, 2.0) * (n / (n - 2.0));
-    VI = VI % (Wi2 - (wwi2/ (n- 1.0)));
-    VI = VI % (m2 - (zz2/ (n - 1.0)));
-    arma::vec ZI = (I - EI)/sqrt(VI);
-
-    res.col(0) = I;
-    res.col(1) = EI;
-    res.col(2) = VI;
-    res.col(3) = ZI;
-    res.col(4) = z;
-    res.col(5) = lz;
-
-    return(res);
-}

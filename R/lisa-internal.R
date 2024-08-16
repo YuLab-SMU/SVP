@@ -2,12 +2,13 @@
 .internal.runLISA <- function(
     x,
     weight,
-    wi,
-    wi2,
-    n,
     method=c("localG", "localmoran"),
-    alternative = c("two.sided", "greater", "less")
+    alternative = c("two.sided", "greater", "less"),
+    BPPARAM = SerialParam()
   ){
+  if (!inherits(x, 'dgCMatrix')){
+    x <- as.matrix(x) |> Matrix::Matrix(sparse=T) 
+  }  
   method <- match.arg(method)
   alternative <- match.arg(alternative)
   prefix <- switch(alternative, two.sided = "!=", greater = ">", less = "<")
@@ -16,25 +17,34 @@
       nm <- c("Gi", "E.Gi", "Var.Gi", "Z.Gi", "x")
       pnm <- gettextf("Pr (z %s E(%s))", prefix, "Gi")
       nm <- c(nm, pnm)
-      res <- CalLocalGCpp(x, weight, wi, wi2, n) |> data.frame()
+      res <- CalLocalGParallel(x, weight) 
   }else{
       nm <- c("Ii", "E.Ii", "Var.Ii", "Z.Ii", "z", "lz")
       pnm <- gettextf("Pr (z %s E(%s))", prefix, "Ii")
       nm <- c(nm, pnm)
-      res <- CalLocalMoranCpp(x, weight, wi, wi2, n) |> data.frame()
+      res <- CalLocalMoranParallel(x, weight) 
   }
 
-  if (alternative == 'two.sided'){
-      res[[pnm]] <- 2 * pnorm(abs(res[[4]]), lower.tail = FALSE)
-  }else if (alternative == 'greater'){
-      res[[pnm]] <- pnorm(res[[4]], lower.tail = FALSE)
-  }else{
-      res[[pnm]] <- pnorm(res[[4]])
-  }
-  colnames(res) <- nm
-  rownames(res) <- names(x)
-  res <- .add_cluster(res, method)
+  res <- .add_localisa_pvalue(res, pnm, nm, colnames(x), method, alternative, BPPARAM)
+  names(res) <- rownames(x)
+  return(res)
+}
 
+.add_localisa_pvalue <- function(res, pnm, nm, cellnm, method, alternative, BPPARAM){
+  res <- BiocParallel::bplapply(res, function(x){
+            x <- data.frame(x)
+            if (alternative == 'two.sided'){
+                x[[pnm]] <- 2 * pnorm(abs(x[[4]]), lower.tail = FALSE)
+            }else if (alternative == 'greater'){
+                x[[pnm]] <- pnorm(x[[4]], lower.tail = FALSE)
+            }else{
+                x[[pnm]] <- pnorm(x[[4]])
+            }
+            colnames(x) <- nm
+            rownames(x) <- cellnm
+            x <- .add_cluster(x, method)
+            return(x)
+         }, BPPARAM = BPPARAM)
   return(res)
 }
 

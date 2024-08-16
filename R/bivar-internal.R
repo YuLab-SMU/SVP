@@ -121,8 +121,8 @@
       res[, 5] <- pnorm(res[, 4])
   }
   colnames(res) <- c(nm, pnm)
-  lisa.res <- .internal.runLISA(res[, 1], weight, wi, wi2, n, lisa.method, lisa.alternative)
-  res <- cbind(res, lisa.res)
+  lisa.res <- .internal.runLISA(t(res[, 1, drop=FALSE]), weight, lisa.method, lisa.alternative)
+  res <- cbind(res, lisa.res[[1]])
   rownames(res) <- names(x)
   return(res)
 }
@@ -130,8 +130,8 @@
 .internal.runLocalLeeBv <- function(x, y, weight, n, wi, wi2, lisa.method, lisa.alternative){
   res <- RunLocalLee(x, y, weight, n) |> data.frame()
   colnames(res) <- "LocalLee"
-  lisa.res <- .internal.runLISA(res[, 1], weight, wi, wi2, n, lisa.method, lisa.alternative)
-  res <- cbind(res, lisa.res)
+  lisa.res <- .internal.runLISA(t(res[, 1, drop=FALSE]), weight, lisa.method, lisa.alternative)
+  res <- cbind(res, lisa.res[[1]])
   rownames(res) <- names(x)
   return(res)
 }

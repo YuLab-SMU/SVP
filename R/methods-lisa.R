@@ -216,17 +216,7 @@ setMethod("runLISA", "SingleCellExperiment", function(
                   weighti <- if(inherits(weight, 'list')){weight[names(weight) == sid]}else{weight}
                   xi <- x[, ind, drop=FALSE]
                   wm <- .obtain.weight(coordsi, weight = weighti, weight.method = weight.method, ...)
-                  n <- nrow(wm)
-                  wi <- rowSums(wm)
-                  wi2 <- rowSums(wm^2)
-                  if (any(wi == 0)){
-                      cli::cli_warn("no-neighbour observations found in the spatial neighborhoods graph.")
-                  }
-                  res <- BiocParallel::bplapply(seq(nrow(xi)), function(i){ 
-                                                .internal.runLISA(xi[i,], wm, wi, wi2, n, method, alternative)
-                             }, BPPARAM = BPPARAM           
-                         )
-                  names(res) <- rownames(x)
+                  res <- .internal.runLISA(xi, wm, method, alternative, BPPARAM)
                   return(res)
          })
   res <- .tidy_lisa_res(res)
