@@ -138,9 +138,10 @@ struct RunMoransi : public Worker{
 
 
 // [[Rcpp::export]]
-arma::mat CalMoransiParallel(arma::sp_mat& x, arma::mat& weight, bool scaled = false, 
+arma::mat CalMoransiParallel(arma::sp_mat& x, arma::sp_mat& wm, bool scaled = false, 
         int permutation = 999, int lower_tail=1){
   arma::mat xm =  conv_to<arma::mat>::from(x);
+  arma::mat weight = conv_to<arma::mat>::from(wm);
   int n = x.n_rows;
   int m = x.n_cols;
   double ei = -(1.0 / (m - 1));

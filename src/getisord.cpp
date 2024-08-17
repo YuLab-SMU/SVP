@@ -94,8 +94,10 @@ struct RunGetisOrd : public Worker{
 
 
 // [[Rcpp::export]]
-arma::mat CalGetisOrdParallel(arma::sp_mat& x, arma::mat& weight, int lower_tail=1){
-  arma::mat xm =  conv_to<arma::mat>::from(x);
+arma::mat CalGetisOrdParallel(arma::sp_mat& x, arma::sp_mat& wm, int lower_tail=1){
+  // This should be optimized in the future
+  arma::mat xm = conv_to<arma::mat>::from(x);
+  arma::mat weight = conv_to<arma::mat>::from(wm);
   int n = x.n_rows;
   int m = x.n_cols;
 

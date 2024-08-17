@@ -5,16 +5,16 @@ cal_local_moran_bv <- function(x, y, weight) {
     .Call('_SVP_cal_local_moran_bv', PACKAGE = 'SVP', x, y, weight)
 }
 
-CalGlobalLeeParallel <- function(x, w, f1, f2, permutation = 200L, alternative = 3L, cal_pvalue = FALSE) {
-    .Call('_SVP_CalGlobalLeeParallel', PACKAGE = 'SVP', x, w, f1, f2, permutation, alternative, cal_pvalue)
+CalGlobalLeeParallel <- function(x, wm, f1, f2, permutation = 200L, alternative = 3L, cal_pvalue = FALSE) {
+    .Call('_SVP_CalGlobalLeeParallel', PACKAGE = 'SVP', x, wm, f1, f2, permutation, alternative, cal_pvalue)
 }
 
-RunLocalLee <- function(x, y, weight, n) {
-    .Call('_SVP_RunLocalLee', PACKAGE = 'SVP', x, y, weight, n)
+RunLocalLee <- function(x, y, wm, n) {
+    .Call('_SVP_RunLocalLee', PACKAGE = 'SVP', x, y, wm, n)
 }
 
-RunLocalMoranBvPerm <- function(x, y, w, n, permutation = 200L) {
-    .Call('_SVP_RunLocalMoranBvPerm', PACKAGE = 'SVP', x, y, w, n, permutation)
+RunLocalMoranBvPerm <- function(x, y, wm, n, permutation = 200L) {
+    .Call('_SVP_RunLocalMoranBvPerm', PACKAGE = 'SVP', x, y, wm, n, permutation)
 }
 
 MatMultCpp <- function(A, B) {
@@ -53,12 +53,12 @@ ExtractFeatureScoreCpp <- function(x, rnm, cnm, g) {
     .Call('_SVP_ExtractFeatureScoreCpp', PACKAGE = 'SVP', x, rnm, cnm, g)
 }
 
-CalGearyscParallel <- function(x, weight, permutation = 999L, lower_tail = 1L) {
-    .Call('_SVP_CalGearyscParallel', PACKAGE = 'SVP', x, weight, permutation, lower_tail)
+CalGearyscParallel <- function(x, wm, permutation = 999L, lower_tail = 1L) {
+    .Call('_SVP_CalGearyscParallel', PACKAGE = 'SVP', x, wm, permutation, lower_tail)
 }
 
-CalGetisOrdParallel <- function(x, weight, lower_tail = 1L) {
-    .Call('_SVP_CalGetisOrdParallel', PACKAGE = 'SVP', x, weight, lower_tail)
+CalGetisOrdParallel <- function(x, wm, lower_tail = 1L) {
+    .Call('_SVP_CalGetisOrdParallel', PACKAGE = 'SVP', x, wm, lower_tail)
 }
 
 findIntervalCpp <- function(x, breaks) {
@@ -81,12 +81,12 @@ CalSpatialKldCpp <- function(coords, d, l, h, n = 100L, random_times = 100L) {
     .Call('_SVP_CalSpatialKldCpp', PACKAGE = 'SVP', coords, d, l, h, n, random_times)
 }
 
-CalLocalGParallel <- function(x, w) {
-    .Call('_SVP_CalLocalGParallel', PACKAGE = 'SVP', x, w)
+CalLocalGParallel <- function(x, wm) {
+    .Call('_SVP_CalLocalGParallel', PACKAGE = 'SVP', x, wm)
 }
 
-CalLocalMoranParallel <- function(x, w) {
-    .Call('_SVP_CalLocalMoranParallel', PACKAGE = 'SVP', x, w)
+CalLocalMoranParallel <- function(x, wm) {
+    .Call('_SVP_CalLocalMoranParallel', PACKAGE = 'SVP', x, wm)
 }
 
 MCAStep1 <- function(X) {
@@ -97,8 +97,8 @@ MCAStep2 <- function(Z, V, Dc) {
     .Call('_SVP_MCAStep2', PACKAGE = 'SVP', Z, V, Dc)
 }
 
-CalMoransiParallel <- function(x, weight, scaled = FALSE, permutation = 999L, lower_tail = 1L) {
-    .Call('_SVP_CalMoransiParallel', PACKAGE = 'SVP', x, weight, scaled, permutation, lower_tail)
+CalMoransiParallel <- function(x, wm, scaled = FALSE, permutation = 999L, lower_tail = 1L) {
+    .Call('_SVP_CalMoransiParallel', PACKAGE = 'SVP', x, wm, scaled, permutation, lower_tail)
 }
 
 fastPDist <- function(A, B) {

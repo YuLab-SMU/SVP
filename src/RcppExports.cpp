@@ -26,48 +26,48 @@ BEGIN_RCPP
 END_RCPP
 }
 // CalGlobalLeeParallel
-Rcpp::List CalGlobalLeeParallel(arma::sp_mat x, arma::mat w, arma::uvec f1, arma::uvec f2, int permutation, int alternative, bool cal_pvalue);
-RcppExport SEXP _SVP_CalGlobalLeeParallel(SEXP xSEXP, SEXP wSEXP, SEXP f1SEXP, SEXP f2SEXP, SEXP permutationSEXP, SEXP alternativeSEXP, SEXP cal_pvalueSEXP) {
+Rcpp::List CalGlobalLeeParallel(arma::sp_mat& x, arma::sp_mat& wm, arma::uvec f1, arma::uvec f2, int permutation, int alternative, bool cal_pvalue);
+RcppExport SEXP _SVP_CalGlobalLeeParallel(SEXP xSEXP, SEXP wmSEXP, SEXP f1SEXP, SEXP f2SEXP, SEXP permutationSEXP, SEXP alternativeSEXP, SEXP cal_pvalueSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::sp_mat >::type x(xSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type w(wSEXP);
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type wm(wmSEXP);
     Rcpp::traits::input_parameter< arma::uvec >::type f1(f1SEXP);
     Rcpp::traits::input_parameter< arma::uvec >::type f2(f2SEXP);
     Rcpp::traits::input_parameter< int >::type permutation(permutationSEXP);
     Rcpp::traits::input_parameter< int >::type alternative(alternativeSEXP);
     Rcpp::traits::input_parameter< bool >::type cal_pvalue(cal_pvalueSEXP);
-    rcpp_result_gen = Rcpp::wrap(CalGlobalLeeParallel(x, w, f1, f2, permutation, alternative, cal_pvalue));
+    rcpp_result_gen = Rcpp::wrap(CalGlobalLeeParallel(x, wm, f1, f2, permutation, alternative, cal_pvalue));
     return rcpp_result_gen;
 END_RCPP
 }
 // RunLocalLee
-arma::vec RunLocalLee(arma::vec x, arma::vec y, arma::mat weight, double n);
-RcppExport SEXP _SVP_RunLocalLee(SEXP xSEXP, SEXP ySEXP, SEXP weightSEXP, SEXP nSEXP) {
+arma::vec RunLocalLee(arma::vec& x, arma::vec& y, arma::sp_mat& wm, double n);
+RcppExport SEXP _SVP_RunLocalLee(SEXP xSEXP, SEXP ySEXP, SEXP wmSEXP, SEXP nSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type weight(weightSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type wm(wmSEXP);
     Rcpp::traits::input_parameter< double >::type n(nSEXP);
-    rcpp_result_gen = Rcpp::wrap(RunLocalLee(x, y, weight, n));
+    rcpp_result_gen = Rcpp::wrap(RunLocalLee(x, y, wm, n));
     return rcpp_result_gen;
 END_RCPP
 }
 // RunLocalMoranBvPerm
-arma::mat RunLocalMoranBvPerm(arma::vec x, arma::vec y, arma::mat w, int n, int permutation);
-RcppExport SEXP _SVP_RunLocalMoranBvPerm(SEXP xSEXP, SEXP ySEXP, SEXP wSEXP, SEXP nSEXP, SEXP permutationSEXP) {
+arma::mat RunLocalMoranBvPerm(arma::vec& x, arma::vec& y, arma::sp_mat& wm, int n, int permutation);
+RcppExport SEXP _SVP_RunLocalMoranBvPerm(SEXP xSEXP, SEXP ySEXP, SEXP wmSEXP, SEXP nSEXP, SEXP permutationSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type w(wSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type wm(wmSEXP);
     Rcpp::traits::input_parameter< int >::type n(nSEXP);
     Rcpp::traits::input_parameter< int >::type permutation(permutationSEXP);
-    rcpp_result_gen = Rcpp::wrap(RunLocalMoranBvPerm(x, y, w, n, permutation));
+    rcpp_result_gen = Rcpp::wrap(RunLocalMoranBvPerm(x, y, wm, n, permutation));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -180,29 +180,29 @@ BEGIN_RCPP
 END_RCPP
 }
 // CalGearyscParallel
-arma::mat CalGearyscParallel(arma::sp_mat& x, arma::mat& weight, int permutation, int lower_tail);
-RcppExport SEXP _SVP_CalGearyscParallel(SEXP xSEXP, SEXP weightSEXP, SEXP permutationSEXP, SEXP lower_tailSEXP) {
+arma::mat CalGearyscParallel(arma::sp_mat& x, arma::sp_mat& wm, int permutation, int lower_tail);
+RcppExport SEXP _SVP_CalGearyscParallel(SEXP xSEXP, SEXP wmSEXP, SEXP permutationSEXP, SEXP lower_tailSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::sp_mat& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< arma::mat& >::type weight(weightSEXP);
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type wm(wmSEXP);
     Rcpp::traits::input_parameter< int >::type permutation(permutationSEXP);
     Rcpp::traits::input_parameter< int >::type lower_tail(lower_tailSEXP);
-    rcpp_result_gen = Rcpp::wrap(CalGearyscParallel(x, weight, permutation, lower_tail));
+    rcpp_result_gen = Rcpp::wrap(CalGearyscParallel(x, wm, permutation, lower_tail));
     return rcpp_result_gen;
 END_RCPP
 }
 // CalGetisOrdParallel
-arma::mat CalGetisOrdParallel(arma::sp_mat& x, arma::mat& weight, int lower_tail);
-RcppExport SEXP _SVP_CalGetisOrdParallel(SEXP xSEXP, SEXP weightSEXP, SEXP lower_tailSEXP) {
+arma::mat CalGetisOrdParallel(arma::sp_mat& x, arma::sp_mat& wm, int lower_tail);
+RcppExport SEXP _SVP_CalGetisOrdParallel(SEXP xSEXP, SEXP wmSEXP, SEXP lower_tailSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::sp_mat& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< arma::mat& >::type weight(weightSEXP);
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type wm(wmSEXP);
     Rcpp::traits::input_parameter< int >::type lower_tail(lower_tailSEXP);
-    rcpp_result_gen = Rcpp::wrap(CalGetisOrdParallel(x, weight, lower_tail));
+    rcpp_result_gen = Rcpp::wrap(CalGetisOrdParallel(x, wm, lower_tail));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -279,26 +279,26 @@ BEGIN_RCPP
 END_RCPP
 }
 // CalLocalGParallel
-Rcpp::List CalLocalGParallel(arma::sp_mat& x, arma::mat& w);
-RcppExport SEXP _SVP_CalLocalGParallel(SEXP xSEXP, SEXP wSEXP) {
+Rcpp::List CalLocalGParallel(arma::sp_mat& x, arma::sp_mat& wm);
+RcppExport SEXP _SVP_CalLocalGParallel(SEXP xSEXP, SEXP wmSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::sp_mat& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< arma::mat& >::type w(wSEXP);
-    rcpp_result_gen = Rcpp::wrap(CalLocalGParallel(x, w));
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type wm(wmSEXP);
+    rcpp_result_gen = Rcpp::wrap(CalLocalGParallel(x, wm));
     return rcpp_result_gen;
 END_RCPP
 }
 // CalLocalMoranParallel
-Rcpp::List CalLocalMoranParallel(arma::sp_mat& x, arma::mat& w);
-RcppExport SEXP _SVP_CalLocalMoranParallel(SEXP xSEXP, SEXP wSEXP) {
+Rcpp::List CalLocalMoranParallel(arma::sp_mat& x, arma::sp_mat& wm);
+RcppExport SEXP _SVP_CalLocalMoranParallel(SEXP xSEXP, SEXP wmSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::sp_mat& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< arma::mat& >::type w(wSEXP);
-    rcpp_result_gen = Rcpp::wrap(CalLocalMoranParallel(x, w));
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type wm(wmSEXP);
+    rcpp_result_gen = Rcpp::wrap(CalLocalMoranParallel(x, wm));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -327,17 +327,17 @@ BEGIN_RCPP
 END_RCPP
 }
 // CalMoransiParallel
-arma::mat CalMoransiParallel(arma::sp_mat& x, arma::mat& weight, bool scaled, int permutation, int lower_tail);
-RcppExport SEXP _SVP_CalMoransiParallel(SEXP xSEXP, SEXP weightSEXP, SEXP scaledSEXP, SEXP permutationSEXP, SEXP lower_tailSEXP) {
+arma::mat CalMoransiParallel(arma::sp_mat& x, arma::sp_mat& wm, bool scaled, int permutation, int lower_tail);
+RcppExport SEXP _SVP_CalMoransiParallel(SEXP xSEXP, SEXP wmSEXP, SEXP scaledSEXP, SEXP permutationSEXP, SEXP lower_tailSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::sp_mat& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< arma::mat& >::type weight(weightSEXP);
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type wm(wmSEXP);
     Rcpp::traits::input_parameter< bool >::type scaled(scaledSEXP);
     Rcpp::traits::input_parameter< int >::type permutation(permutationSEXP);
     Rcpp::traits::input_parameter< int >::type lower_tail(lower_tailSEXP);
-    rcpp_result_gen = Rcpp::wrap(CalMoransiParallel(x, weight, scaled, permutation, lower_tail));
+    rcpp_result_gen = Rcpp::wrap(CalMoransiParallel(x, wm, scaled, permutation, lower_tail));
     return rcpp_result_gen;
 END_RCPP
 }

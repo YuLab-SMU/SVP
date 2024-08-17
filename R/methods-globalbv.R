@@ -169,7 +169,7 @@ setMethod("runGLOBALBV", "SingleCellExperiment", function(
                   weighti <- if(inherits(weight, 'list')){weight[names(weight) == sid]}else{weight}
                   xi <- x[, ind, drop=FALSE]
                   wm <- .obtain.weight(coordsi, weight = weighti, weight.method = weight.method, ...)
-                  if (any(rowSums(wm) == 0)){
+                  if (any(Matrix::rowSums(wm) == 0)){
                       cli::cli_warn("no-neighbour observations found in the spatial neighborhoods graph.")
                   }
                   res <- .internal.runGLOBALBV(xi, wm, features1, features2, 
@@ -269,7 +269,7 @@ setMethod("runGLOBALBV", "SVPExperiment", function(
                        weighti <- if(inherits(weight, 'list')){weight[names(weight) == sid]}else{weight}
                        xi <- x[, ind, drop=FALSE]
                        wm <- .obtain.weight(coordsi, weight = weighti, weight.method = weight.method, ...)
-                       if (any(rowSums(wm) == 0)){
+                       if (any(Matrix::rowSums(wm) == 0)){
                            cli::cli_warn("no-neighbour observations found in the spatial neighborhoods graph.")
                        }
                        res <- .internal.runGLOBALBV(xi, wm, features1, features2,

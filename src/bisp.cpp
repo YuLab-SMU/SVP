@@ -73,8 +73,8 @@ struct RunGlobalLee : public Worker{
 
 //[[Rcpp::export]]
 Rcpp::List CalGlobalLeeParallel(
-  arma::sp_mat x, 
-  arma::mat w, 
+  arma::sp_mat& x, 
+  arma::sp_mat& wm, 
   arma::uvec f1,
   arma::uvec f2,
   int permutation = 200,
@@ -82,6 +82,7 @@ Rcpp::List CalGlobalLeeParallel(
   bool cal_pvalue = false
   ){
   arma::mat xm = conv_to<arma::mat>::from(x);
+  arma::mat w = conv_to<arma::mat>::from(wm);
   int m = xm.n_cols;
 
   double S2 = accu(pow(sum(w, 1), 2.0));
@@ -107,12 +108,12 @@ Rcpp::List CalGlobalLeeParallel(
 
 //[[Rcpp::export]]
 arma::vec RunLocalLee(
-    arma::vec x,
-    arma::vec y,
-    arma::mat weight,
+    arma::vec& x,
+    arma::vec& y,
+    arma::sp_mat& wm,
     double n
     ){
-
+    arma::mat weight = conv_to<arma::mat>::from(wm);
     arma::vec dx = x - mean(x);
     arma::vec dy = y - mean(y);
 
@@ -143,13 +144,13 @@ arma::mat cal_local_moran_bv_perm(
 
 //[[Rcpp::export]]
 arma::mat RunLocalMoranBvPerm(
-  arma::vec x,
-  arma::vec y,
-  arma::mat w,
+  arma::vec& x,
+  arma::vec& y,
+  arma::sp_mat& wm,
   int n,
   int permutation = 200
   ){
-  
+  arma::mat w = conv_to<arma::mat>::from(wm);
   x = scaleCpp2(x);
   y = scaleCpp2(y);  
   arma::mat result(n, 4);

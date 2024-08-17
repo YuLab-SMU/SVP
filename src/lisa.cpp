@@ -35,13 +35,15 @@ struct RunLocalG: public Worker{
             result3.col(i) = res.col(2);
             result4.col(i) = res.col(3);
             result5.col(i) = res.col(4);
+            p.increment();
         }
     }
 };
 
 // [[Rcpp::export]]
-Rcpp::List CalLocalGParallel(arma::sp_mat& x, arma::mat& w){
+Rcpp::List CalLocalGParallel(arma::sp_mat& x, arma::sp_mat& wm){
     arma::mat xm = conv_to<arma::mat>::from(x.t());
+    arma::mat w = conv_to<arma::mat>::from(wm);
     int n = xm.n_cols;
     int m = xm.n_rows;
 
@@ -66,7 +68,6 @@ Rcpp::List CalLocalGParallel(arma::sp_mat& x, arma::mat& w){
         arma::mat tmp(m, 5);
         res[i] = tidylocalg(result1.col(i), result2.col(i), result3.col(i),
                 result4.col(i), result5.col(i), tmp);
-        p.increment();
     }
 
     return (res);
@@ -110,8 +111,9 @@ struct RunLocalMoran : public Worker{
 
 
 // [[Rcpp::export]]
-Rcpp::List CalLocalMoranParallel(arma::sp_mat& x, arma::mat& w){
+Rcpp::List CalLocalMoranParallel(arma::sp_mat& x, arma::sp_mat& wm){
     arma::mat xm = conv_to<arma::mat>::from(x.t());
+    arma::mat w = conv_to<arma::mat>::from(wm);
     int n = xm.n_cols;
     int m = xm.n_rows;
 

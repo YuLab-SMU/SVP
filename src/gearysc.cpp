@@ -129,8 +129,9 @@ struct RunGearysc : public Worker{
 
 
 // [[Rcpp::export]]
-arma::mat CalGearyscParallel(arma::sp_mat& x, arma::mat& weight, int permutation = 999, int lower_tail = 1){
-  arma::mat xm =  conv_to<arma::mat>::from(x);
+arma::mat CalGearyscParallel(arma::sp_mat& x, arma::sp_mat& wm, int permutation = 999, int lower_tail = 1){
+  arma::mat xm = conv_to<arma::mat>::from(x);
+  arma::mat weight = conv_to<arma::mat>::from(wm);
   int n = x.n_rows;
   int m = x.n_cols;
   double ei = 1.0;

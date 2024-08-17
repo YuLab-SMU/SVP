@@ -554,8 +554,7 @@ pairDist <- function(x, y){
   }
   res <- sparseMatrix(i = i, j = j, x = w, 
                       dims = rep(n, 2), 
-                      dimnames = list(region_id, region_id)) |> 
-         as.matrix()
+                      dimnames = list(region_id, region_id)) 
   return(res)
 }
 
@@ -572,8 +571,7 @@ pairDist <- function(x, y){
   res <- sparseMatrix(i=x$from, 
                       j=x$to, x=w, 
                       dims=rep(x$np, 2), 
-                      dimnames = list(region_id, region_id)) |> 
-         as.matrix()
+                      dimnames = list(region_id, region_id)) 
   return(res)
 }
 
@@ -582,7 +580,7 @@ pairDist <- function(x, y){
            i = c(x$delsgs[,5], x$delsgs[,6]), 
            j = c(x$delsgs[, 6], x$delsgs[, 5]),
            x = rep(1, nrow(x$delsgs))
-  ) |> as.matrix()
+  ) 
   return(res)
 }
 
@@ -608,20 +606,20 @@ pairDist <- function(x, y){
           }else{
                k <- 10
           }
-          weight.mat <- .build.adj.m(weight.mat, k + 1) |> as.matrix() |> t()
-          diag(weight.mat) <- 0
+          weight.mat <- .build.adj.m(weight.mat, k + 1) |> Matrix::t()
+          Matrix::diag(weight.mat) <- 0
       }else if (weight.method == "voronoi"){
           rlang::check_installed("deldir", "is required when `weight.method=='voronoi'`.") 
           weight.mat <- do.call(".build.adj.using.voronoi", list(coords, params)) 
       }
-      weight.mat <- weight.mat * (1/rowSums(weight.mat))
+      weight.mat <- weight.mat * (1/Matrix::rowSums(weight.mat))
   }
   
   if (!is.null(weight)){
       if (inherits(weight, "listw") || inherits(weight, "nb")){
           weight.mat <- .convert_to_distmt(weight)
       }else if (inherits(weight, "matrix") && identical(rownames(weight), colnames(weight))){
-          weight.mat <- weight
+          weight.mat <- weight |> Matrix::Matrix(sparse=TRUE)
       }else{
           cli::cli_abort(
             c("The {.var weight} should be a list (with named by sample_id) object containing `listw`, `nb`",

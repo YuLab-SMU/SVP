@@ -172,9 +172,9 @@ setMethod("runLOCALBV", "SingleCellExperiment", function(
                   xi <- x[, ind, drop=FALSE]
                   wm <- .obtain.weight(coordsi, weight = weighti, weight.method = weight.method, ...)
                   n <- nrow(wm)
-                  wi <- rowSums(wm)
-                  wi2 <- rowSums(wm^2)
-                  if (any(rowSums(wm) == 0)){
+                  wi <- Matrix::rowSums(wm)
+                  wi2 <- Matrix::rowSums(wm^2)
+                  if (any(Matrix::rowSums(wm) == 0)){
                       cli::cli_warn("no-neighbour observations found in the spatial neighborhoods graph.")
                   }
                   result <- .runLocalBv(xi, wm, features1, features2, n, NULL, across.gsvaexp, 
@@ -289,9 +289,9 @@ setMethod("runLOCALBV", "SVPExperiment",
                        xi <- x[, ind, drop=FALSE]
                        wm <- .obtain.weight(coordsi, weight = weighti, weight.method = weight.method, ...)
                        n <- nrow(wm)
-                       wi <- rowSums(wm)
-                       wi2 <- rowSums(wm^2)
-                       if (any(rowSums(wm) == 0)){
+                       wi <- Matrix::rowSums(wm)
+                       wi2 <- Matrix::rowSums(wm^2)
+                       if (any(Matrix::rowSums(wm) == 0)){
                            cli::cli_warn("no-neighbour observations found in the spatial neighborhoods graph.")
                        }
                        result <- .runLocalBv(xi, wm, features1, features2, n, listn, across.gsvaexp, permutation, bv.method, bv.alternative,
