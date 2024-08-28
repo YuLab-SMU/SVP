@@ -256,6 +256,7 @@ setMethod("runGLOBALBV", "SVPExperiment", function(
        x2 <- .extract_gsvaExp_assay(data, gsvaexp, gsvaexp.assay.type)
        x2 <- x2[features2, , drop=FALSE]
        x <- rbind(x, x2)
+       x <- .check_dgCMatrix(x)
        weight <- .check_weight(data, sample_id, weight, group.by)
        coords <- .check_coords(data, reduction.used, weight, weight.method)
        listn <- .generate_feature_listn(data, features1, features2, gsvaexp)

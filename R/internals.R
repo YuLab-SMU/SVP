@@ -475,3 +475,25 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
   rownames(res) <- colnames(res) <- rownames(da)
   return(res)
 }
+
+.check_dgCMatrix <- function(x){
+  flag <- inherits(x, 'matrix') || inherits(x, 'dgTMatrix') || 
+          inherits(x, "dgeMatrix") ||  inherits(x, 'dgRMatrix') 
+  if (inherits(x, "data.frame")){
+     x <- as.matrix(x) 
+  }
+
+  if (inherits(x, "ngCMatrix")){
+     x <- as(x, "dMatrix")
+  }
+
+  if (flag){
+     x <- as(x, 'CsparseMatrix')
+  }
+  
+  if (!inherits(x, 'dgCMatrix')){
+     cli_abort("The profile table of features should be a `dgCMatrix` class.")
+  }
+   
+  return(x)
+}

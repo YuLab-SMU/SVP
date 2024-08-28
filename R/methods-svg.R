@@ -158,7 +158,7 @@ setMethod('runKldSVG', 'SingleCellExperiment',
   sample_id <- .check_sample_id(data, sample_id)
 
   x <- assay(data, assay.type)
-  
+  x <- .check_dgCMatrix(x) 
   coords <- .check_coords(data, reduction.used, prefix="")
 
   tic()
@@ -403,7 +403,7 @@ setMethod('runDetectSVG', 'SingleCellExperiment',
   }
   
   x <- assay(data, assay.type)
-
+  x <- .check_dgCMatrix(x)
   sample_id <- .check_sample_id(data, sample_id)
   weight <- .check_weight(data, sample_id, weight, group.by)
 
