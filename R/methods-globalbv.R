@@ -223,7 +223,7 @@ setMethod("runGLOBALBV", "SVPExperiment", function(
        }
        weight.method <- match.arg(weight.method)
        method <- match.arg(method)
-       action <- match.arg(action, c("only", "get"))
+       action <- match.arg(action)
        alternative <- match.arg(alternative)
        sample_id <- .check_sample_id(data, sample_id)
 
