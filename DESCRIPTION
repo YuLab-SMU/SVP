@@ -1,5 +1,5 @@
 Package: SVP
-Title: Robust analysis of 'gene set' activity in spatial or single-cell data
+Title: Predicting cell states and their variability in single-cell or spatial omics data
 Version: 0.99.0
 Authors@R: c(
   person("Shuangbin", "Xu", email = "xshuangbin@163.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3513-5362")),

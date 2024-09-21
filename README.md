@@ -1,6 +1,6 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# SVP: Robust analysis of ‘gene set’ activity in spatial or single-cell data
+# SVP: Predicting cell states and their variability in single-cell or spatial omics data
 
 ## :newspaper: Description
 
