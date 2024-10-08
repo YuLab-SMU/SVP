@@ -6,6 +6,8 @@ using namespace arma;
 
 arma::mat outerdot(arma::rowvec x);
 
+double moranouterdot(arma::vec x, arma::sp_mat w);
+
 arma::mat outersubtractdot(arma::rowvec x);
 
 arma::mat outermultidot(arma::rowvec x); 
@@ -17,11 +19,13 @@ arma::vec lagCpp(arma::sp_mat w, arma::vec x);
 
 arma::vec rowsumsp(arma::sp_mat x, bool flag = false);
 
-double cal_moransi(arma::rowvec x, arma::mat weight, 
-                   arma::rowvec rowsumw, double s, 
+arma::sp_mat powsp(arma::sp_mat x);
+
+double cal_moransi(arma::vec x, arma::sp_mat weight, 
+                   arma::vec rowsumw, double s, 
                    int n, bool scaled = false); 
 
-double cal_getisord(arma::rowvec x, arma::mat weight);
+double cal_getisord(arma::vec x, arma::sp_mat weight);
 
 double cal_permutation_p(
    arma::vec x,
@@ -31,8 +35,8 @@ double cal_permutation_p(
 );
 
 double cal_gearysc(
-   arma::rowvec x, 
-   arma::mat weight, 
+   arma::vec x, 
+   arma::sp_mat weight, 
    double s, 
    int n
 );

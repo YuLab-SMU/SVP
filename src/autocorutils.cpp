@@ -3,16 +3,34 @@ using namespace Rcpp;
 using namespace arma;
 using namespace std;
 
-arma::mat outerdot(arma::rowvec x){
-  arma::mat xm = repelem(x, x.n_elem, 1);
-  arma::mat res = xm % xm.t();
-  return (res);
+
+double moranouterdot(arma::vec x, arma::sp_mat w){
+  arma::vec res(x.n_elem);
+  for (size_t i = 0; i < w.n_cols; i++){
+    res(i) = accu(x(i) * x % w.col(i));
+  }
+  return(accu(res));
 }
 
-arma::mat outersubtractdot(arma::rowvec x){
-  arma::mat xm = repelem(x, x.n_elem, 1);
-  arma::mat res = pow(xm - xm.t(), 2.0);
-  return (res);
+double gearyouterdot(arma::vec x, arma::sp_mat w){
+  arma::vec res(x.n_elem);
+  for (size_t i = 0; i < w.n_cols; i++){
+    res(i) = accu(pow((x(i) - x), 2.0) % w.col(i));
+  }
+  return(accu(res));
+}
+
+vec getisordouterdot(arma::vec x, arma::sp_mat w){
+  arma::vec z1(x.n_elem);
+  arma::vec z(x.n_elem);
+  for (size_t i = 0; i < w.n_cols; i++){
+    arma::vec tmpx = x;
+    tmpx(i) = 0.0;
+    z1(i) = accu(x(i) * tmpx);
+    z(i) = accu(x(i) * tmpx % w.col(i));
+  }
+  arma::vec zv = {accu(z1), accu(z)};
+  return(zv);
 }
 
 arma::rowvec scaleCpp(arma::rowvec x){
@@ -31,36 +49,12 @@ arma::vec scaleCpp2(arma::vec x){
   return(x);
 }
 
-arma::mat outermultidot(arma::rowvec x){
-  arma::mat xm = repelem(x, x.n_elem, 1);
-  xm.diag().fill(0.0);
-  arma::mat res = xm % xm.t();
-  return (res);
-}
-
 arma::vec lagCpp(arma::sp_mat w, arma::vec x){
-    //arma::mat xm = repelem(x, 1, x.n_elem);
-    //xm.diag().fill(0.0);
-    //w = w % xm.t();
-    //arma::vec res = sum(w, 1);
     arma::vec res(x.n_elem);
     for (size_t i = 0; i < w.n_cols; i++){
         res(i) = accu(x % w.col(i));
     }
     return(res);
-}
-
-arma::vec lagCpp1(arma::mat w, arma::rowvec x){
-    arma::mat xm = repelem(x, x.n_elem, 1);
-    xm.diag().fill(0.0);
-    w = w % xm;
-    arma::vec res = sum(w, 1);
-    return(res);
-}
-
-arma::rowvec lagCpp2(arma::mat w, arma::rowvec x){
-    arma::vec res = lagCpp1(w, x);
-    return(res.t());
 }
 
 //[[Rcpp::export]]
@@ -120,18 +114,17 @@ double cal_permutation_p(
 }
 
 double cal_moransi(
-          arma::rowvec x,
-          arma::mat weight,
-          arma::rowvec rowsumw,
+          arma::vec x,
+          arma::sp_mat weight,
+          arma::vec rowsumw,
           double s,
           int n,
           bool scaled = false
         ){
 
     double m = mean(x);
-    arma::rowvec y = x - m;
-    arma::mat ym = outerdot(y);
-    double cv = accu(weight % ym);
+    arma::vec y = x - m;
+    double cv = moranouterdot(y, weight);
     double v = accu(pow(y, 2));
     double obs = (n/s) * (cv/v);
 
@@ -144,29 +137,28 @@ double cal_moransi(
 }
 
 double cal_getisord(
-  arma::rowvec x,
-  arma::mat weight
+  arma::vec x,
+  arma::sp_mat weight
   ){
-  arma::mat ym = outermultidot(x);
-  double cv = accu(weight % ym);
-  double v = accu(ym);
+  arma::vec tmp = getisordouterdot(x, weight);
+  double cv = tmp(1); 
+  double v = tmp(0);
   double obs = cv/v;
 
   return(obs);
 }
 
 double cal_gearysc(
-          arma::rowvec x,
-          arma::mat weight,
+          arma::vec x,
+          arma::sp_mat weight,
           double s,
           int n
         ){
 
     double m = mean(x);
-    arma::rowvec y = x - m;
-    //y = scaleCpp(y);
-    arma::mat ym = outersubtractdot(x);
-    double cv = accu(weight % ym);
+    arma::vec y = x - m;
+    //y = scaleCpp2(y);
+    double cv = gearyouterdot(y, weight);
     double v = accu(pow(y, 2.0));
     double obs = ((n - 1.0) * cv)/(2.0 * s * v);
 
@@ -277,3 +269,11 @@ arma::vec rowsumsp(arma::sp_mat x, bool flag = false){
    arma::vec res = x * ones(x.n_cols, 1);
    return(res);
 }
+
+arma::sp_mat powsp(arma::sp_mat x){
+  for (auto it = x.begin(); it != x.end(); ++it) {
+    *it = std::pow(*it, 2.0);
+  }
+  return (x);
+}
+

@@ -14,7 +14,7 @@ arma::rowvec cal_moransi_p_noperm(
         double obs, 
         double ei, 
         double s, 
-        arma::rowvec y, 
+        arma::vec y, 
         double v, 
         int n, 
         double S1, 
@@ -36,9 +36,9 @@ arma::rowvec cal_moransi_p_noperm(
 }
 
 arma::rowvec cal_moransi_p_perm(
-        arma::rowvec x,
-        arma::mat weight,
-        arma::rowvec rowsumw,
+        arma::vec x,
+        arma::sp_mat weight,
+        arma::vec rowsumw,
         dqrng::xoshiro256plus rng,
         int permutation,
         double s,
@@ -49,7 +49,7 @@ arma::rowvec cal_moransi_p_perm(
     double obs = cal_moransi(x, weight, rowsumw, s, n, scaled);
     arma::vec xmr = arma::vec(permutation, arma::fill::zeros);
     for (int i = 0; i < permutation; i++){
-        arma::rowvec z = x;
+        arma::vec z = x;
         std::shuffle(std::begin(z), std::end(z), rng);
         xmr(i) = cal_moransi(z, weight, rowsumw, s, n, scaled);
     }
@@ -67,9 +67,9 @@ arma::rowvec cal_moransi_p_perm(
 }
 
 arma::rowvec moransi(
-        arma::rowvec x, 
-        arma::mat weight,
-        arma::rowvec rowsumw,
+        arma::vec x, 
+        arma::sp_mat weight,
+        arma::vec rowsumw,
         dqrng::xoshiro256plus rng,
         int permutation,
         double S1,
@@ -82,9 +82,8 @@ arma::rowvec moransi(
         ){
 
   double m = mean(x);
-  arma::rowvec y = x - m;
-  arma::mat ym = outerdot(y);
-  double cv = accu(weight % ym);
+  arma::vec y = x - m;
+  double cv = moranouterdot(y, weight); 
   double v = accu(pow(y, 2));
   double obs = (n/s) * (cv/v);
   
@@ -104,9 +103,9 @@ arma::rowvec moransi(
 
 
 struct RunMoransi : public Worker{
-  const arma::mat& x;
-  const arma::mat& weight;
-  const arma::rowvec& rowsumw;
+  const arma::sp_mat& x;
+  const arma::sp_mat& weight;
+  const arma::vec& rowsumw;
   simple_progress& p;
   const uint64_t seed;
   const int permutation;
@@ -119,7 +118,7 @@ struct RunMoransi : public Worker{
   const int lower_tail;
   arma::mat& result;
 
-  RunMoransi(const arma::mat& x, const arma::mat& weight, const arma::rowvec& rowsumw, simple_progress& p,
+  RunMoransi(const arma::sp_mat& x, const arma::sp_mat& weight, const arma::vec& rowsumw, simple_progress& p,
           const uint64_t seed, const int permutation, const double S1, const double S2, 
           const double s, const int n, const double ei, const bool scaled, const int lower_tail, mat& result):
       x(x), weight(weight), rowsumw(rowsumw), p(p), seed(seed), permutation(permutation), 
@@ -130,7 +129,7 @@ struct RunMoransi : public Worker{
     for (uword i = begin; i < end; i++){
         dqrng::xoshiro256plus lrng(rng);
         lrng.long_jump(i + 1);
-        result.row(i) = moransi(x.row(i), weight, rowsumw, lrng, permutation, S1, S2, s, n, ei, scaled, lower_tail);
+        result.row(i) = moransi(x.col(i).as_dense(), weight, rowsumw, lrng, permutation, S1, S2, s, n, ei, scaled, lower_tail);
         p.increment();
     }
   }
@@ -140,18 +139,17 @@ struct RunMoransi : public Worker{
 // [[Rcpp::export]]
 arma::mat CalMoransiParallel(arma::sp_mat& x, arma::sp_mat& wm, bool scaled = false, 
         int permutation = 999, int lower_tail=1){
-  arma::mat xm =  conv_to<arma::mat>::from(x);
-  arma::mat weight = conv_to<arma::mat>::from(wm);
+  arma::sp_mat xm =  x.t();
+  arma::sp_mat weight = wm.t();
   int n = x.n_rows;
   int m = x.n_cols;
   double ei = -(1.0 / (m - 1));
   
-  arma::rowvec colsumw = sum(weight, 0);
-  arma::colvec rowsumw = sum(weight, 1);
-  arma::rowvec rowsumw2 = conv_to<arma::rowvec>::from(rowsumw);
+  arma::vec colsumw = rowsumsp(weight);
+  arma::vec rowsumw = rowsumsp(wm);
   
-  double S1 =  0.5 * accu(pow(weight + weight.t(), 2.0));
-  double S2 = accu(pow(rowsumw2 + colsumw, 2.0));
+  double S1 =  0.5 * accu(powsp(wm + wm.t()));
+  double S2 = accu(pow(rowsumw + colsumw, 2.0));
   double s = accu(weight);
 
   Rcpp::IntegerVector seed(2, dqrng::R_random_int);
@@ -161,7 +159,7 @@ arma::mat CalMoransiParallel(arma::sp_mat& x, arma::sp_mat& wm, bool scaled = fa
 
   simple_progress p(n);
 
-  RunMoransi runmoransi(xm, weight, rowsumw2, p, seed2, permutation, S1, S2, s, m, ei, scaled, lower_tail, result);
+  RunMoransi runmoransi(xm, weight, rowsumw, p, seed2, permutation, S1, S2, s, m, ei, scaled, lower_tail, result);
 
   parallelFor(0, n, runmoransi);
 
