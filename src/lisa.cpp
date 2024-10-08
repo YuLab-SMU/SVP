@@ -7,8 +7,8 @@ using namespace arma;
 using namespace std;
 
 struct RunLocalG: public Worker{
-    const arma::mat& xm;
-    const arma::mat& w;
+    const arma::sp_mat& xm;
+    const arma::sp_mat& w;
     const arma::vec& wi;
     const arma::vec& Wi2;
     simple_progress& p;
@@ -19,7 +19,7 @@ struct RunLocalG: public Worker{
     arma::mat& result4;
     arma::mat& result5;
 
-    RunLocalG(const arma::mat& xm, const arma::mat& w, const arma::vec& wi,
+    RunLocalG(const arma::sp_mat& xm, const arma::sp_mat& w, const arma::vec& wi,
             const arma::vec& Wi2, simple_progress& p, const int n, arma::mat& result1, 
 	    arma::mat& result2, arma::mat& result3, arma::mat& result4, arma::mat& result5
     ):
@@ -29,7 +29,7 @@ struct RunLocalG: public Worker{
     void operator()(std::size_t begin, std::size_t end){
         for (uword i = begin; i < end; i++){
             arma::mat res(n, 6);
-            res = CalLocalGCpp(xm.col(i), w, wi, Wi2, n);
+            res = CalLocalGCpp(xm.col(i).as_dense(), w, wi, Wi2, n);
             result1.col(i) = res.col(0);
             result2.col(i) = res.col(1);
             result3.col(i) = res.col(2);
@@ -42,13 +42,14 @@ struct RunLocalG: public Worker{
 
 // [[Rcpp::export]]
 Rcpp::List CalLocalGParallel(arma::sp_mat& x, arma::sp_mat& wm){
-    arma::mat xm = conv_to<arma::mat>::from(x.t());
-    arma::mat w = conv_to<arma::mat>::from(wm);
+    //arma::mat xm = conv_to<arma::mat>::from(x.t());
+    arma::sp_mat xm = x.t();
+    arma::sp_mat w = wm.t();
     int n = xm.n_cols;
     int m = xm.n_rows;
 
-    arma::vec wi = sum(w, 1);
-    arma::vec Wi2 = sum(pow(w, 2.0), 1);
+    arma::vec wi = rowsumsp(wm);
+    arma::vec Wi2 = rowsumsp(wm, true);
 
     simple_progress p(n);
 
@@ -74,8 +75,8 @@ Rcpp::List CalLocalGParallel(arma::sp_mat& x, arma::sp_mat& wm){
 }
 
 struct RunLocalMoran : public Worker{
-    const arma::mat& xm;
-    const arma::mat& w;
+    const arma::sp_mat& xm;
+    const arma::sp_mat& w;
     const arma::vec& wi;
     const arma::vec& Wi2;
     simple_progress& p;
@@ -87,7 +88,7 @@ struct RunLocalMoran : public Worker{
     arma::mat& result5;
     arma::mat& result6;
 
-    RunLocalMoran(const arma::mat& xm, const arma::mat& w, const arma::vec& wi,
+    RunLocalMoran(const arma::sp_mat& xm, const arma::sp_mat& w, const arma::vec& wi,
             const arma::vec& Wi2, simple_progress& p, const int n, arma::mat& result1, arma::mat& result2, 
             arma::mat& result3, arma::mat& result4, arma::mat& result5, arma::mat& result6
     ):
@@ -97,7 +98,7 @@ struct RunLocalMoran : public Worker{
     void operator()(std::size_t begin, std::size_t end){
         for (uword i = begin; i < end; i++){
             arma::mat res(n, 6);
-            res = CalLocalMoranCpp(xm.col(i), w, wi, Wi2, n);
+            res = CalLocalMoranCpp(xm.col(i).as_dense(), w, wi, Wi2, n);
             result1.col(i) = res.col(0);
             result2.col(i) = res.col(1);
             result3.col(i) = res.col(2);
@@ -112,13 +113,14 @@ struct RunLocalMoran : public Worker{
 
 // [[Rcpp::export]]
 Rcpp::List CalLocalMoranParallel(arma::sp_mat& x, arma::sp_mat& wm){
-    arma::mat xm = conv_to<arma::mat>::from(x.t());
-    arma::mat w = conv_to<arma::mat>::from(wm);
+    //arma::mat xm = conv_to<arma::mat>::from(x.t());
+    arma::sp_mat xm = x.t();
+    arma::sp_mat w = wm.t();
     int n = xm.n_cols;
     int m = xm.n_rows;
 
-    arma::vec wi = sum(w, 1);
-    arma::vec Wi2 = sum(pow(w, 2.0), 1);
+    arma::vec wi = rowsumsp(wm);
+    arma::vec Wi2 = rowsumsp(wm, true);
 
     simple_progress p(n);
     

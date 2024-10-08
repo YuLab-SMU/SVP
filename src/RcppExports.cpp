@@ -13,28 +13,28 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // cal_local_moran_bv
-arma::vec cal_local_moran_bv(arma::vec x, arma::vec y, arma::mat weight);
+arma::vec cal_local_moran_bv(arma::vec x, arma::vec y, arma::sp_mat weight);
 RcppExport SEXP _SVP_cal_local_moran_bv(SEXP xSEXP, SEXP ySEXP, SEXP weightSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type weight(weightSEXP);
+    Rcpp::traits::input_parameter< arma::sp_mat >::type weight(weightSEXP);
     rcpp_result_gen = Rcpp::wrap(cal_local_moran_bv(x, y, weight));
     return rcpp_result_gen;
 END_RCPP
 }
 // CalGlobalLeeParallel
-Rcpp::List CalGlobalLeeParallel(arma::sp_mat& x, arma::sp_mat& wm, arma::uvec f1, arma::uvec f2, int permutation, int alternative, bool cal_pvalue);
+Rcpp::List CalGlobalLeeParallel(arma::sp_mat& x, arma::sp_mat& wm, arma::urowvec f1, arma::urowvec f2, int permutation, int alternative, bool cal_pvalue);
 RcppExport SEXP _SVP_CalGlobalLeeParallel(SEXP xSEXP, SEXP wmSEXP, SEXP f1SEXP, SEXP f2SEXP, SEXP permutationSEXP, SEXP alternativeSEXP, SEXP cal_pvalueSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::sp_mat& >::type x(xSEXP);
     Rcpp::traits::input_parameter< arma::sp_mat& >::type wm(wmSEXP);
-    Rcpp::traits::input_parameter< arma::uvec >::type f1(f1SEXP);
-    Rcpp::traits::input_parameter< arma::uvec >::type f2(f2SEXP);
+    Rcpp::traits::input_parameter< arma::urowvec >::type f1(f1SEXP);
+    Rcpp::traits::input_parameter< arma::urowvec >::type f2(f2SEXP);
     Rcpp::traits::input_parameter< int >::type permutation(permutationSEXP);
     Rcpp::traits::input_parameter< int >::type alternative(alternativeSEXP);
     Rcpp::traits::input_parameter< bool >::type cal_pvalue(cal_pvalueSEXP);

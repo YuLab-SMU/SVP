@@ -69,7 +69,7 @@ ByteCompile: true
 VignetteBuilder: knitr
 LinkingTo: 
   Rcpp,
-  RcppArmadillo,
+  RcppArmadillo (>= 14.0),
   RcppParallel,
   RcppEigen,
   dqrng

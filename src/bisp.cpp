@@ -10,9 +10,9 @@ using namespace arma;
 using namespace std;
 
 arma::vec cal_global_lee_test(
-  arma::rowvec x,
-  arma::rowvec y,
-  arma::mat w,
+  arma::vec x,
+  arma::vec y,
+  arma::sp_mat w,
   dqrng::xoshiro256plus rng,
   double S2,
   int n,
@@ -20,8 +20,8 @@ arma::vec cal_global_lee_test(
   ){
   arma::vec res(permutation) ;
   for (int i = 0; i < permutation; i++){
-      arma::rowvec x1 = x;
-      arma::rowvec y1 = y;
+      arma::vec x1 = x;
+      arma::vec y1 = y;
       std::shuffle(std::begin(x1), std::end(x1), rng);
       std::shuffle(std::begin(y1), std::end(y1), rng);
       res[i] = cal_global_lee(x1, y1, w, S2, n); 
@@ -30,10 +30,10 @@ arma::vec cal_global_lee_test(
 }
 
 struct RunGlobalLee : public Worker{
-  const arma::mat& x;
-  const arma::mat& w;
-  const arma::uvec& f1;
-  const arma::uvec& f2;
+  const arma::sp_mat& x;
+  const arma::sp_mat& w;
+  const arma::urowvec& f1;
+  const arma::urowvec& f2;
   simple_progress& p;
   const uword& nf2;
   const double S2;
@@ -45,8 +45,8 @@ struct RunGlobalLee : public Worker{
   arma::mat& result;
   arma::mat& presult;
   
-  RunGlobalLee(const arma::mat& x, const arma::mat& w, const arma::uvec& f1,
-          const arma::uvec& f2, simple_progress& p, const uword& nf2, 
+  RunGlobalLee(const arma::sp_mat& x, const arma::sp_mat& w, const arma::urowvec& f1,
+          const arma::urowvec& f2, simple_progress& p, const uword& nf2, 
           const double S2, const int n, const uint64_t seed, const int permutation,
           const bool cal_pvalue, const int alternative, arma::mat& result, arma::mat& presult):
     x(x), w(w), f1(f1), f2(f2), p(p), nf2(nf2), S2(S2), n(n), seed(seed), 
@@ -58,10 +58,10 @@ struct RunGlobalLee : public Worker{
       for (uword i = begin; i < end; i++){
           dqrng::xoshiro256plus lrng(rng);
           for (uword j = 0; j < nf2; j ++){
-              double obs = cal_global_lee(x.row(f1[i]), x.row(f2[j]), w, S2, n);
+              double obs = cal_global_lee(x.col(f1[i]).as_dense(), x.col(f2[j]).as_dense(), w, S2, n);
               result(i, j) = obs;
               if (cal_pvalue){
-                  arma::vec resp = cal_global_lee_test(x.row(f1[i]), x.row(f2[j]), w, lrng, S2, n, permutation);
+                  arma::vec resp = cal_global_lee_test(x.col(f1[i]).as_dense(), x.col(f2[j]).as_dense(), w, lrng, S2, n, permutation);
                   double pv = cal_permutation_p(resp, obs, permutation + 1, alternative);
                   presult(i, j) = pv;
               }
@@ -75,17 +75,17 @@ struct RunGlobalLee : public Worker{
 Rcpp::List CalGlobalLeeParallel(
   arma::sp_mat& x, 
   arma::sp_mat& wm, 
-  arma::uvec f1,
-  arma::uvec f2,
+  arma::urowvec f1,
+  arma::urowvec f2,
   int permutation = 200,
   int alternative = 3,
   bool cal_pvalue = false
   ){
-  arma::mat xm = conv_to<arma::mat>::from(x);
-  arma::mat w = conv_to<arma::mat>::from(wm);
-  int m = xm.n_cols;
+  arma::sp_mat xm = x.t();
+  arma::sp_mat w = wm.t();
+  int m = xm.n_rows;
 
-  double S2 = accu(pow(sum(w, 1), 2.0));
+  double S2 = accu(pow(rowsumsp(wm), 2.0));
 
   Rcpp::IntegerVector seed0(2, dqrng::R_random_int);
   uint64_t seed1 = dqrng::convert_seed<uint64_t>(seed0);
@@ -113,15 +113,15 @@ arma::vec RunLocalLee(
     arma::sp_mat& wm,
     double n
     ){
-    arma::mat weight = conv_to<arma::mat>::from(wm);
+    arma::sp_mat w = wm.t();
     arma::vec dx = x - mean(x);
     arma::vec dy = y - mean(y);
 
     double dx2 = accu(pow(dx, 2.0));
     double dy2 = accu(pow(dy, 2.0));
 
-    arma::vec ldx = lagCpp(weight, dx);
-    arma::vec ldy = lagCpp(weight, dy);
+    arma::vec ldx = lagCpp(w, dx);
+    arma::vec ldy = lagCpp(w, dy);
 
     arma::vec l = (n * ldx % ldy)/(sqrt(dx2) * sqrt(dy2));
     return(l);
@@ -130,7 +130,7 @@ arma::vec RunLocalLee(
 arma::mat cal_local_moran_bv_perm(
     arma::vec x,
     arma::vec y,
-    arma::mat w,
+    arma::sp_mat w,
     int n,
     int perm
 ){
@@ -150,7 +150,7 @@ arma::mat RunLocalMoranBvPerm(
   int n,
   int permutation = 200
   ){
-  arma::mat w = conv_to<arma::mat>::from(wm);
+  arma::sp_mat w = wm.t();
   x = scaleCpp2(x);
   y = scaleCpp2(y);  
   arma::mat result(n, 4);

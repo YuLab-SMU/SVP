@@ -38,11 +38,15 @@ arma::mat outermultidot(arma::rowvec x){
   return (res);
 }
 
-arma::vec lagCpp(arma::mat w, arma::vec x){
-    arma::mat xm = repelem(x, 1, x.n_elem);
-    xm.diag().fill(0.0);
-    w = w % xm.t();
-    arma::vec res = sum(w, 1);
+arma::vec lagCpp(arma::sp_mat w, arma::vec x){
+    //arma::mat xm = repelem(x, 1, x.n_elem);
+    //xm.diag().fill(0.0);
+    //w = w % xm.t();
+    //arma::vec res = sum(w, 1);
+    arma::vec res(x.n_elem);
+    for (size_t i = 0; i < w.n_cols; i++){
+        res(i) = accu(x % w.col(i));
+    }
     return(res);
 }
 
@@ -63,7 +67,7 @@ arma::rowvec lagCpp2(arma::mat w, arma::rowvec x){
 arma::vec cal_local_moran_bv(
     arma::vec x, 
     arma::vec y,
-    arma::mat weight
+    arma::sp_mat weight
     ){
     arma::vec ldy = lagCpp(weight, y);
     arma::vec res = x % ldy;
@@ -71,21 +75,21 @@ arma::vec cal_local_moran_bv(
 }
 
 double cal_global_lee(
-    arma::rowvec x, 
-    arma::rowvec y, 
-    arma::mat weight, 
+    arma::vec x, 
+    arma::vec y, 
+    arma::sp_mat weight, 
     double S2,
     int n
     ){
     
-    arma::rowvec dx = x - mean(x);
-    arma::rowvec dy = y - mean(y);
+    arma::vec dx = x - mean(x);
+    arma::vec dy = y - mean(y);
     
     double dx2 = accu(pow(dx, 2.0));
     double dy2 = accu(pow(dy, 2.0));
 
-    arma::rowvec ldx = lagCpp2(weight, dx);
-    arma::rowvec ldy = lagCpp2(weight, dy);
+    arma::vec ldx = lagCpp(weight, dx);
+    arma::vec ldy = lagCpp(weight, dy);
 
     double L = (n/S2) * (sum(ldx % ldy))/(sqrt(dx2) * sqrt(dy2));
     
@@ -171,7 +175,7 @@ double cal_gearysc(
 
 arma::mat CalLocalGCpp(
     arma::vec x,
-    arma::mat w,
+    arma::sp_mat w,
     arma::vec wi,
     arma::vec S1i,
     int n
@@ -217,7 +221,7 @@ arma::mat tidylocalg(
 
 arma::mat CalLocalMoranCpp(
     arma::vec x,
-    arma::mat w,
+    arma::sp_mat w,
     arma::vec wi,
     arma::vec Wi2,
     int n
@@ -262,4 +266,14 @@ arma::mat tidylocalmoran(
     res.col(4) = res5;
     res.col(5) = res6;
     return(res);
+}
+
+arma::vec rowsumsp(arma::sp_mat x, bool flag = false){
+   if (flag){
+     for (auto it = x.begin(); it != x.end(); ++it) {
+       *it = std::pow(*it, 2.0);
+     }
+   }
+   arma::vec res = x * ones(x.n_cols, 1);
+   return(res);
 }
