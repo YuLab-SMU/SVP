@@ -186,12 +186,11 @@ pairDist <- function(x, y){
                       odds = odds, MoreArgs=list(lower.tail = FALSE)) 
     }
     toc()
-    rownames(res) <- rownames(q)
-    colnames(res) <- colnames(fs2gset.adj)
     res[res==0] <- 1e-10
     res <- -log10(t(res))
     res[res < 0 ] <- 0
-    #res <- Matrix::Matrix(res, sparse = TRUE)
+    rownames(res) <- names(gene.set.list)
+    colnames(res) <- rownames(q)
     return(res)
 }
 
@@ -414,10 +413,15 @@ pairDist <- function(x, y){
   if (is.null(names(gset.idx.list))){
      cli::cli_abort('The gene set list must have names.')
   }
-  x <- vapply(gset.idx.list, function(i) ifelse(nm %fin% i, 1, 0), numeric(num.row))
+  ind <- lapply(gset.idx.list, function(i) which(nm %fin% i)) 
+  x <- Matrix::sparseMatrix(
+         i = ind |> unlist(),
+         j = lapply(seq(length(ind)), function(i)rep(i, length(ind[[i]]))) |> unlist(), 
+         x = 1,
+         dims = c(num.row, length(gset.idx.list))
+  )
   rownames(x) <- nm
-
-  x <- Matrix::Matrix(x, sparse = TRUE)
+  colnames(x) <- names(gset.idx.list)
   return(x)
 }
 

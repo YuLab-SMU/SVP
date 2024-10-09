@@ -24,15 +24,16 @@ struct calrwr : public Worker{
     for (uword i = begin; i < end; i++){
         int step = 0;
         double delta = 1;
-        arma::mat pt = conv_to<mat>::from(v.col(i));
+        arma::sp_mat pt = v.col(i);
+        //arma::mat pt = conv_to<mat>::from(v.col(i));
         ////arma::uvec ind = find(pt > 0);
         while((delta > stop_delta) && (step <= stop_step)){
-            arma::mat px = ((1 - restart) * (x * pt)) + (restart * v.col(i));
+            arma::sp_mat px = ((1 - restart) * (x * pt)) + (restart * v.col(i));
             delta = arma::accu(abs(px - pt));
             pt = px;
             step = step + 1;
         }
-        result.col(i) = pt;
+        result.col(i) = pt.as_dense();
     }
   }
 };

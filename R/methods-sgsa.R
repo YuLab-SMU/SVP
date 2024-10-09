@@ -293,7 +293,8 @@ setMethod('runSGSA',
   toc()
 
   gset.score <- .run_rwr(
-                  rd.knn.gh, 
+                  rd.knn.gh,
+                  cells, 
                   edge.attr = 'weight',
                   seeds = seedstart.m,
                   normalize.adj.method = rwr.normalize.adj.method,
@@ -315,9 +316,9 @@ setMethod('runSGSA',
           knn.gh <- rd.knn.gh[features, cells]
       }
       gset.hgt <- suppressWarnings(.run_hgt(
-                           knn.gh,
-                           seedstart.m[features,],
-                           rownames(gset.score.cells),
+                           fs2cell.adj = knn.gh,
+                           fs2gset.adj = seedstart.m[features,],
+                           gene.set.list = gset.idx.list[rownames(gset.score.cells)],
                            m = gset.num[,'exp.gene.num'],
                            top.n = knn.k.use,
                            combined.cell.feature = knn.combined.cell.feature,
