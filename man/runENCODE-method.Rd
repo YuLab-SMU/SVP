@@ -34,5 +34,5 @@ sceSubPbmc
 gsvaExp(sceSubPbmc, 'seurat_annotations')
 sceSubPbmc <- runENCODE(sceSubPbmc, group.by = 'seurat_annotations', rm.group.nm = c('Platelet'))
 sceSubPbmc
-gsvaExp(sceSubPbmc2, 'seurat_annotations')
+gsvaExp(sceSubPbmc, 'seurat_annotations')
 }
