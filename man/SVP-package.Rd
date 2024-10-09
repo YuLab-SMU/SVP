@@ -4,7 +4,7 @@
 \name{SVP-package}
 \alias{SVP}
 \alias{SVP-package}
-\title{SVP: Robust analysis of 'gene set' activity in spatial or single-cell data}
+\title{SVP: Predicting cell states and their variability in single-cell or spatial omics data}
 \description{
 SVP uses the distance between cells and cells, features and features, cells and features in the space of MCA to build nearest neighbor graph, then uses random walk with restart algorithm to calculate the activity score of gene sets (such as cell marker genes, kegg pathway, go ontology, gene modules, transcription factor or miRNA target sets, reactome pathway, ...), which is then further weighted using the hypergeometric test results from the original expression matrix. To detect the spatially or single cell variable gene sets or (other features) and the spatial colocalization between the features accurately, SVP provides some global and local spatial autocorrelation method to identify the spatial variable features. SVP is developed based on SingleCellExperiment class, which can be interoperable with the existing computing ecosystem.
 }

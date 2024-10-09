@@ -10,9 +10,9 @@ using namespace Eigen;
 // [[Rcpp::export]]
 List MCAStep1(const arma::sp_mat& X) {
     arma::mat AM = conv_to<arma::mat>::from(X);
-    arma::colvec rmin = arma::min(AM,1);
-    arma::colvec rmax = arma::max(AM,1);
-    arma::colvec range = (rmax -rmin);
+    arma::vec rmin = arma::min(AM,1);
+    arma::vec rmax = arma::max(AM,1);
+    arma::vec range = (rmax - rmin);
     AM.each_col() -= rmin;
     AM.each_col() /= range;
     arma::mat FM = join_cols(AM, 1 - AM);

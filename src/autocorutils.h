@@ -6,6 +6,8 @@ using namespace arma;
 
 arma::mat outerdot(arma::rowvec x);
 
+double moranouterdot(arma::vec x, arma::sp_mat w);
+
 arma::mat outersubtractdot(arma::rowvec x);
 
 arma::mat outermultidot(arma::rowvec x); 
@@ -13,13 +15,17 @@ arma::mat outermultidot(arma::rowvec x);
 arma::rowvec scaleCpp(arma::rowvec x);
 arma::vec scaleCpp2(arma::vec x);
 
-arma::vec lagCpp(arma::mat w, arma::vec x);
+arma::vec lagCpp(arma::sp_mat w, arma::vec x);
 
-double cal_moransi(arma::rowvec x, arma::mat weight, 
-                   arma::rowvec rowsumw, double s, 
+arma::vec rowsumsp(arma::sp_mat x, bool flag = false);
+
+arma::sp_mat powsp(arma::sp_mat x);
+
+double cal_moransi(arma::vec x, arma::sp_mat weight, 
+                   arma::vec rowsumw, double s, 
                    int n, bool scaled = false); 
 
-double cal_getisord(arma::rowvec x, arma::mat weight);
+double cal_getisord(arma::vec x, arma::sp_mat weight);
 
 double cal_permutation_p(
    arma::vec x,
@@ -29,16 +35,16 @@ double cal_permutation_p(
 );
 
 double cal_gearysc(
-   arma::rowvec x, 
-   arma::mat weight, 
+   arma::vec x, 
+   arma::sp_mat weight, 
    double s, 
    int n
 );
 
 double cal_global_lee(
-  arma::rowvec x, 
-  arma::rowvec y, 
-  arma::mat weight, 
+  arma::vec x, 
+  arma::vec y, 
+  arma::sp_mat weight, 
   double S2, 
   int n
 );
@@ -46,12 +52,12 @@ double cal_global_lee(
 arma::vec cal_local_moran_bv(
     arma::vec x,
     arma::vec y,
-    arma::mat weight
+    arma::sp_mat weight
 );
 
 arma::mat CalLocalGCpp(
     arma::vec x,
-    arma::mat w,
+    arma::sp_mat w,
     arma::vec wi,
     arma::vec S1i,
     int n
@@ -68,7 +74,7 @@ arma::mat tidylocalg(
 
 arma::mat CalLocalMoranCpp(
     arma::vec x,
-    arma::mat w,
+    arma::sp_mat w,
     arma::vec wi,
     arma::vec Wi2,
     int n

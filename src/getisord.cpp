@@ -8,7 +8,7 @@ using namespace arma;
 using namespace std;
 
 arma::rowvec cal_getisord_p_noperm(
-    arma::rowvec x,
+    arma::vec x,
     double obs, 
     double ei, 
     double s, 
@@ -46,8 +46,8 @@ arma::rowvec cal_getisord_p_noperm(
 }
 
 arma::rowvec getisord(
-  arma::rowvec x, 
-  arma::mat weight,
+  arma::vec x, 
+  arma::sp_mat weight,
   double S1,
   double S2, 
   double s,
@@ -67,8 +67,8 @@ arma::rowvec getisord(
 
 
 struct RunGetisOrd : public Worker{
-  const arma::mat& x;
-  const arma::mat& weight;
+  const arma::sp_mat& x;
+  const arma::sp_mat& weight;
   simple_progress& p;
   const double S1;
   const double S2;
@@ -78,15 +78,15 @@ struct RunGetisOrd : public Worker{
   const int lower_tail;
   arma::mat& result;
 
-  RunGetisOrd(const arma::mat& x, const arma::mat& weight, simple_progress& p, 
-	  const double S1, const double S2, const double s, const int n, 
-	  const double ei, const int lower_tail, mat& result):
+  RunGetisOrd(const arma::sp_mat& x, const arma::sp_mat& weight, simple_progress& p, 
+          const double S1, const double S2, const double s, const int n, 
+          const double ei, const int lower_tail, mat& result):
       x(x), weight(weight), p(p), S1(S1), S2(S2), s(s), n(n), ei(ei), 
       lower_tail(lower_tail), result(result) { }
 
   void operator()(std::size_t begin, std::size_t end){
     for (uword i = begin; i < end; i++){
-        result.row(i) = getisord(x.row(i), weight, S1, S2, s, n, ei, lower_tail);
+        result.row(i) = getisord(x.col(i).as_dense(), weight, S1, S2, s, n, ei, lower_tail);
         p.increment();
     }
   }
@@ -95,18 +95,16 @@ struct RunGetisOrd : public Worker{
 
 // [[Rcpp::export]]
 arma::mat CalGetisOrdParallel(arma::sp_mat& x, arma::sp_mat& wm, int lower_tail=1){
-  // This should be optimized in the future
-  arma::mat xm = conv_to<arma::mat>::from(x);
-  arma::mat weight = conv_to<arma::mat>::from(wm);
+  arma::sp_mat xm = x.t();
+  arma::sp_mat weight = wm.t();
   int n = x.n_rows;
   int m = x.n_cols;
 
-  arma::rowvec colsumw = sum(weight, 0);
-  arma::colvec rowsumw = sum(weight, 1);
-  arma::rowvec rowsumw2 = conv_to<arma::rowvec>::from(rowsumw);
+  arma::vec colsumw = rowsumsp(weight);
+  arma::vec rowsumw = rowsumsp(wm);
   
-  double S1 =  0.5 * accu(pow(weight + weight.t(), 2.0));
-  double S2 = accu(pow(rowsumw2 + colsumw, 2.0));
+  double S1 =  0.5 * accu(powsp(wm + wm.t()));
+  double S2 = accu(pow(rowsumw + colsumw, 2.0));
   double s = accu(weight);
 
   double ei = s/(m * (m - 1.0));
