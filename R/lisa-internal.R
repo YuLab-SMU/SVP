@@ -74,8 +74,16 @@
 
 .add_LISA_res <- function(x, lisa.res, method){
     nm <- paste0(method,".SVP")
-    lisa.res <- lapply(lisa.res, function(x)DataFrame(I(x))) |> DataFrame() |> setNames(names(lisa.res))
-    x@int_colData$localResults <- matrix(nrow=ncol(x), ncol=0) |> DataFrame()
+    lisa.res <- lapply(lisa.res, function(x)DataFrame(I(x))) |> 
+                  DataFrame() |> 
+                  setNames(names(lisa.res))
+    if (is.null(x@int_colData$localResults)){
+        x@int_colData$localResults <- matrix(nrow=ncol(x), ncol=0) |> DataFrame()
+    }else{
+        if (!is.null(x@int_colData$localResults[[nm]])){
+            lisa.res <- .update_lisa(lisa.res, x@int_colData$localResults[[nm]])
+        }
+    }
     x@int_colData$localResults[[nm]] <- lisa.res
     return(x)
 }
@@ -158,4 +166,10 @@
     x <- dplyr::left_join(x, y, by = ind1)
     x <- dplyr::left_join(x, y, by = ind2)
     return(x)
+}
+
+.update_lisa <- function(x, y){
+    oldn <- names(y)
+    newn <- names(x)
+    return(cbind(y[,setdiff(oldn, newn),drop=FALSE], x))
 }

@@ -78,65 +78,24 @@
 #'      k = 10,
 #'      action = 'get',
 #'    )
+#' hpda_spe_cell_dec <- LISAsce(hpda_spe_cell_dec, lisa.res12)
+#' hpda_spe_cell_dec
+#' gsvaExp(hpda_spe_cell_dec, 'LISA')
 #' lisa.res12
 #' lisa.res12[['Acinar cells']] |> head()
 #' lisa.res12[["Cancer clone A"]] |> head()
-#' colData(hpda_spe_cell_dec)$`cluster.test.Cancer.A` <- lisa.res12[["Cancer clone A"]] |>
-#' dplyr::pull(cluster.test)
-#' colData(hpda_spe_cell_dec)$`cluster.test.Acinar` <- lisa.res12[["Acinar cells"]] |>
-#' dplyr::pull(cluster.test)
-#' colData(hpda_spe_cell_dec)$`cluster.test.Cancer.B` <- lisa.res12[["Cancer clone B"]] |>
-#' dplyr::pull(cluster.test)
+#' # add the Gi of LISA result to input object.
+#' hpda_spe_cell_dec <- LISAsce(hpda_spe_cell_dec, lisa.res12)
+#' hpda_spe_cell_dec
+#' gsvaExp(hpda_spe_cell_dec, 'LISA')
 #' # Then using ggsc to visualize the result
 #' \dontrun{
 #'   library(ggplot2)
 #'   library(ggsc)
-#'   p1 <- sc_spatial(hpda_spe_cell_dec,
-#'              features = rownames(hpda_spe_cell_dec),
-#'              mapping = aes(x=x, y=y, color=cluster.test.Cancer.A),
-#'              plot.pie = T,
-#'              pie.radius.scale = .8,
-#'              bg_circle_radius = 1.1,
-#'              color=NA,
-#'              linewidth=2
-#'   ) +
-#'   scale_color_manual(values=c("black", "white"))
-#'   p1
-#'   f1 <- sc_spatial(hpda_spe_cell_dec, features="Cancer clone A",
-#'              mapping=aes(x = x, y = y),
-#'              pointsize=10
-#'   ) +
-#'   geom_scattermore2(
-#'     mapping = aes(bg_color=cluster.test.Cancer.A, subset=cluster.test.Cancer.A=="High"),
-#'     bg_line_width = .16,
-#'     gap_line_width = .14,
-#'     pointsize = 7
-#'   ) +
-#'   scale_bg_color_manual(values=c('black'))
-#'   f1
-#'   f2 <- sc_spatial(hpda_spe_cell_dec, features="Acinar cells",
-#'              mapping=aes(x=x,y=y),
-#'              pointsize=10
-#'   ) +
-#'   geom_scattermore2(
-#'     mapping = aes(bg_color=cluster.test.Acinar, subset=cluster.test.Acinar=="High"),
-#'     bg_line_width = .16,
-#'     gap_line_width = .14,
-#'     pointsize = 7
-#'   ) +
-#'   scale_bg_color_manual(values=c('black'))
-#'   f2
-#'   f3 <- sc_spatial(hpda_spe_cell_dec, features="Cancer clone B",
-#'              mapping=aes(x=x,y=y),
-#'              pointsize=10
-#'   ) +
-#'   geom_scattermore2(
-#'     mapping = aes(bg_color=cluster.test.Cancer.B, subset=cluster.test.Cancer.B=="High"),
-#'     bg_line_width = .18,
-#'     gap_line_width = .14,
-#'     pointsize = 8
-#'   ) +
-#'   scale_bg_color_manual(values=c('black'))
+#'   p1 <- plot_lisa_feature(hpda_spe_cell_dec, lisa.res12, assay.type=1)
+#'   p2 <- gsvaExp(hpda_spe_cell_dec, 'LISA') |>
+#'   plot_lisa_feature(lisa.res12, assay.type='Gi')
+#'   p1 / p2
 #' }
 setGeneric('runLISA',
   function(

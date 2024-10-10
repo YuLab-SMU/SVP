@@ -83,6 +83,17 @@
 #'         )
 #' res1
 #' res1[['Cancer clone A_VS_Cancer clone B']] |> head()
+#' # add the LocalLee and Gi of LOCALBV result to input object.
+#' hpda_spe_cell_dec <- LISAsce(hpda_spe_cell_dec, res1, 'LOCALBV')
+#' hpda_spe_cell_dec
+#' gsvaExp(hpda_spe_cell_dec, 'LOCALBV')
+#' # Then using ggsc to visualize the result
+#' \dontrun{
+#'   library(ggplot2)
+#'   library(ggsc)
+#'   gsvaExp(hpda_spe_cell_dec, 'LOCALBV') |>
+#'   plot_lisa_feature(res1, assay.type='LocalLee') + ggtitle(NULL)
+#' }
 setGeneric('runLOCALBV',
   function(
     data,
