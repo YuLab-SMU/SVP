@@ -165,9 +165,6 @@ lisa.res12 <- hpda_spe_cell_dec |>
      k = 10,
      action = 'get',
    )
-hpda_spe_cell_dec <- LISAsce(hpda_spe_cell_dec, lisa.res12)
-hpda_spe_cell_dec
-gsvaExp(hpda_spe_cell_dec, 'LISA')
 lisa.res12
 lisa.res12[['Acinar cells']] |> head()
 lisa.res12[["Cancer clone A"]] |> head()
