@@ -155,6 +155,7 @@ setMethod("runGLOBALBV", "SingleCellExperiment", function(
   if (length(features) >= 1){
       x <- x[features, ,drop=FALSE]
   }
+  x <- .check_dgCMatrix(x)
   weight <- .check_weight(data, sample_id, weight, group.by)
 
   coords <- .check_coords(data, reduction.used, weight, weight.method)
