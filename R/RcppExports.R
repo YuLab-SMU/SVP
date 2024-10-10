@@ -97,6 +97,10 @@ MCAStep2 <- function(Z, V, Dc) {
     .Call('_SVP_MCAStep2', PACKAGE = 'SVP', Z, V, Dc)
 }
 
+CalF1Parallel <- function(x, y) {
+    .Call('_SVP_CalF1Parallel', PACKAGE = 'SVP', x, y)
+}
+
 CalMoransiParallel <- function(x, wm, scaled = FALSE, permutation = 999L, lower_tail = 1L) {
     .Call('_SVP_CalMoransiParallel', PACKAGE = 'SVP', x, wm, scaled, permutation, lower_tail)
 }

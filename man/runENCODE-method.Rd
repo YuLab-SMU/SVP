@@ -8,7 +8,7 @@
 \usage{
 runENCODE(data, group.by, rm.group.nm = NULL, ...)
 
-\S4method{runENCODE}{SingleCellExperiment}(data, group.by, rm.group.nm = NULL)
+\S4method{runENCODE}{SingleCellExperiment}(data, group.by, rm.group.nm = NULL, ...)
 }
 \arguments{
 \item{data}{a \linkS4class{SingleCellExperiment} object with contains \code{UMAP} or \code{TSNE},

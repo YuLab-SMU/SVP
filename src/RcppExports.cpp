@@ -326,6 +326,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// CalF1Parallel
+arma::mat CalF1Parallel(arma::sp_mat x, arma::sp_mat y);
+RcppExport SEXP _SVP_CalF1Parallel(SEXP xSEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::sp_mat >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::sp_mat >::type y(ySEXP);
+    rcpp_result_gen = Rcpp::wrap(CalF1Parallel(x, y));
+    return rcpp_result_gen;
+END_RCPP
+}
 // CalMoransiParallel
 arma::mat CalMoransiParallel(arma::sp_mat& x, arma::sp_mat& wm, bool scaled, int permutation, int lower_tail);
 RcppExport SEXP _SVP_CalMoransiParallel(SEXP xSEXP, SEXP wmSEXP, SEXP scaledSEXP, SEXP permutationSEXP, SEXP lower_tailSEXP) {
@@ -420,6 +432,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_SVP_CalLocalMoranParallel", (DL_FUNC) &_SVP_CalLocalMoranParallel, 2},
     {"_SVP_MCAStep1", (DL_FUNC) &_SVP_MCAStep1, 1},
     {"_SVP_MCAStep2", (DL_FUNC) &_SVP_MCAStep2, 3},
+    {"_SVP_CalF1Parallel", (DL_FUNC) &_SVP_CalF1Parallel, 2},
     {"_SVP_CalMoransiParallel", (DL_FUNC) &_SVP_CalMoransiParallel, 5},
     {"_SVP_fastPDist", (DL_FUNC) &_SVP_fastPDist, 2},
     {"_SVP_fusiondist", (DL_FUNC) &_SVP_fusiondist, 4},

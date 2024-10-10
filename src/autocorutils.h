@@ -21,6 +21,8 @@ arma::vec rowsumsp(arma::sp_mat x, bool flag = false);
 
 arma::sp_mat powsp(arma::sp_mat x);
 
+double calculateF1(const arma::vec& predictions, const arma::vec& actuals);
+
 double cal_moransi(arma::vec x, arma::sp_mat weight, 
                    arma::vec rowsumw, double s, 
                    int n, bool scaled = false); 

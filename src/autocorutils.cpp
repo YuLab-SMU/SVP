@@ -277,3 +277,13 @@ arma::sp_mat powsp(arma::sp_mat x){
   return (x);
 }
 
+double calculateF1(const arma::vec& predictions, const arma::vec& actuals){
+    double TP = arma::sum((predictions == 1) % (actuals == 1));
+    double FP = arma::sum((predictions == 1) % (actuals == 0));
+    double FN = arma::sum((predictions == 0) % (actuals == 1));
+    double precision = TP / (TP + FP);
+    double recall = TP / (TP + FN);
+    double F1 = 2 * (precision * recall) / (precision + recall);
+
+    return (F1);
+}
