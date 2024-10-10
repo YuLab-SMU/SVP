@@ -71,6 +71,73 @@ LISAResult <- function(x, type = NULL, features=NULL, ...){
     x[[features]]
 }
 
+
+#' @title convert LISA result to SVPExperiment.
+#' @description
+#' convert the Gi for \code{runLISA} result or LocalLee for \code{runLOCALBV} result 
+#' to a \linkS4class{SVPExperiment}.
+#' @rdname LISAsce-method
+#' @param data a \linkS4class{SingleCellExperiment} object with contains \code{UMAP} or \code{TSNE},
+#' or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} object.
+#' @param lisa.res list the result of \code{runLISA} or \code{runLOCALBV}.
+#' @param gsvaexp.name character the name of gsveExp for the LISA result, default is "LISA".
+#' @param ... currently meaningless.
+#' @seealso [`runLISA`] and [`runLOCALBV`]
+#' @examples
+#' data(hpda_spe_cell_dec)
+#' lisa.res12 <- hpda_spe_cell_dec |>
+#'    runLISA(
+#'      features = c(1, 2, 3),
+#'      assay.type = 'affi.score',
+#'      weight.method = "knn",
+#'      k = 10,
+#'      action = 'get',
+#'    )
+#' hpda_spe_cell_dec <- LISAsce(hpda_spe_cell_dec, lisa.res12)
+#' hpda_spe_cell_dec
+#' gsvaExp(hpda_spe_cell_dec, 'LISA')
+#' localbv.res1 <- hpda_spe_cell_dec |> runLOCALBV(
+#'           features1 = 'Cancer clone A',
+#'           features2 = 'Cancer clone B',
+#'           assay.type='affi.score'
+#'         )
+#' hpda_spe_cell_dec <- LISAsce(hpda_spe_cell_dec, localbv.res1, 'LOCALBV')
+#' gsvaExp(hpda_spe_cell_dec, 'LOCALBV')
+setGeneric('LISAsce',
+  function(
+    data,
+    lisa.res,
+    gsvaexp.name = "LISA",
+    ...
+  )
+  standardGeneric('LISAsce')
+)
+
+#' @rdname LISAsce-method
+#' @aliases LISAsce,SingleCellExperiment
+#' @export LISAsce
+setMethod("LISAsce", "SingleCellExperiment", 
+  function(
+    data, 
+    lisa.res, 
+    gsvaexp.name = "LISA", 
+    ...
+  ){
+    if (missing(lisa.res)){
+      if (is.null(data@int_colData$localResults)){
+         cli::cli_warn(c("The {.var lisa.res} should be provided, when the {.var data} do not contain ",
+                         "the result of runLISA or runLOCALBV (speficied action='add')."))
+      }
+      lisa.res <- data@int_colData$localResults |> lapply(function(x) x|> as.list() |> SimpleList())
+      lisa.res <- lisa.res[[1]]
+    }
+    flag <- .check_localbv_res(lisa.res)
+    dat <- .build_sce_assays(lisa.res, flag)
+    data <- .sce_to_svpe(data)
+    gsvaExp(data, gsvaexp.name) <- SingleCellExperiment(assays = dat)
+    return(data)
+})
+
 #' convert the square matrix to long tidy table
 #' @description
 #' This function is designed to convert the output of \code{runGLOBALBV},
@@ -171,3 +238,26 @@ as_tbl_df <- function(x,
     return(rmat)
 }
 
+.build_sce_assays <- function(x, flag){
+    ind <- seq(1)
+    nm <- "Gi"
+    if (flag){
+       ind <- seq(2)
+       nm <- c("LocalLee", "Gi")
+    }
+    x <- lapply(ind, function(i).build_matrix(x, ind = i))
+    names(x) <- nm
+    return(x)
+}
+
+.build_matrix <- function(x, ind=1){
+    nm <- names(x)
+    x <- lapply(x, function(i)i[,ind,drop=FALSE])
+    x <- do.call('cbind', x) |> setNames(nm) |> t()
+    x <- Matrix::Matrix(x, sparse=TRUE)
+    return(x)   
+}
+
+.check_localbv_res <- function(x){
+    "LocalLee" %in% colnames(x[[1]])
+}
