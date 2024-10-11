@@ -36,9 +36,9 @@ Imports:
   Matrix,
   DelayedMatrixStats,
   deldir,
-  utils
+  utils,
+  BiocNeighbors
 Suggests:
-  BiocNeighbors,
   broman,
   RSpectra,
   BiasedUrn,

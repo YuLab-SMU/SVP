@@ -240,10 +240,11 @@ pairDist <- function(x, y){
         total.rd <- rbind(cells.rd, features.rd)
         #total.dist <- pairDist(total.rd, total.rd)
         top.n <- min(top.n, nrow(total.rd)) 
-        knn.graph <- .build.knn.graph(total.rd, top.n, 
-                                      fun.nm = BiocNeighbors::findKmknn, 
-                                      weighted.distance = weighted.distance)
-        adj.m <- .extract.adj.m(knn.graph, edge.attr = 'weight') 
+        adj.m <- .build.knn.adj(total.rd, top.n, 
+                                  fun.nm = findKmknn, 
+                                  weighted.distance = weighted.distance
+                                  ) 
+        #adj.m <- .extract.adj.m(knn.graph, edge.attr = 'weight') 
         #adj.m <- .build.adj.m(total.dist, top.n, weighted.distance)
     }
     if (weighted.distance){
@@ -272,12 +273,13 @@ pairDist <- function(x, y){
 }
 
 #' @importFrom BiocParallel SerialParam
-.build.knn.graph <- function(x, 
+#' @importFrom BiocNeighbors findKmknn
+.build.knn.adj <- function(x, 
                        knn.k.use = 600, 
-                       fun.nm = "findKmknn", 
+                       fun.nm = findKmknn, 
                        BPPARAM = SerialParam(), 
                        weighted.distance = TRUE,
-                       graph.directed = FALSE,
+                       bycol = TRUE,
                        ...){
   dots.params <- list(...)
   all.params <- .extract_dot_args(fun.nm, 
@@ -285,11 +287,11 @@ pairDist <- function(x, y){
                                   dots.params)
   all.params$X <- x
   all.params$k <- knn.k.use
+  all.params$get.distance <- weighted.distance
   all.params$BPPARAM <- BPPARAM
   knn.res <- suppressWarnings(do.call(fun.nm, all.params))
-  knn.edges <- .extract_edge(knn.res, x, weighted.distance = weighted.distance)
-  knn.graph <- .build.graph(knn.edges, graph.directed = graph.directed) 
-  return(knn.graph)
+  res <- .extract_adj(knn.res, rownames(x), weighted.distance, bycol)
+  return(res)
 }
 
 
@@ -340,32 +342,30 @@ pairDist <- function(x, y){
   return(x)
 }
 
-.extract_edge <- function(knn, x, weighted.distance = TRUE){
-  nm <- rownames(x)
-  knn.index <- knn$index
-  knn.index <- cbind(rep(seq(nrow(knn.index)), 
-                         times=ncol(knn.index)), 
-                     as.vector(knn.index))
-  knn.edges <- cbind(nm[knn.index[,1]], nm[knn.index[,2]])
-  knn.edges <- data.frame(knn.edges)
-  colnames(knn.edges) <- c('from', 'to')
-
-  if (weighted.distance){
-    knn.edges$weight <- .normalize_dist(knn$distance)
+.extract_adj <- function(knn, x, weighted.distance = TRUE, bycol =TRUE){
+  nn <- length(x)
+  ind1 <- rep(seq(nn), each=ncol(knn$index))
+  ind2 <- c(t(knn$index))
+  xx <- ifelse(weighted.distance, c(t(knn$distance)), 1)
+  if (bycol){
+    res <- Matrix::sparseMatrix(i = ind2, j = ind1, x = xx, dims = c(nn, nn))
+  }else{
+    res <- Matrix::sparseMatrix(i = ind1, j = ind2, x = xx, dims = c(nn, nn))  
   }
-  return(knn.edges)
+  rownames(res) <- colnames(res) <- x
+  return(res) 
 }
 
-.build.graph <- function(
-                  edges, 
-                  graph.directed = FALSE){
-  g <- igraph::graph_from_data_frame(
-         edges, 
-         directed = graph.directed
-       ) 
-  g <- igraph::simplify(g)
-  return(g)
-}
+#.build.graph <- function(
+#                  edges, 
+#                  graph.directed = FALSE){
+#  g <- igraph::graph_from_data_frame(
+#         edges, 
+#         directed = graph.directed
+#       ) 
+#  g <- igraph::simplify(g)
+#  return(g)
+#}
 
 
 .filter.gset.gene <- function(x, gset.idx.list, min.sz = 10, max.sz = Inf, 
@@ -602,16 +602,17 @@ pairDist <- function(x, y){
   }
 
   if (is.null(weight) && (weight.method %in% c("none", "voronoi", "knn"))){
-      if (is.integer(coords)) coords <- coords * 1.0
-      weight.mat <- pairDist(coords, coords)
+      #if (is.integer(coords)) coords <- coords * 1.0
+      #weight.mat <- pairDist(coords, coords)
       if (weight.method == 'knn'){
           if ("k" %in% names(params) && is.numeric(params$k)){
-               k <- round(params$k)
+              k <- round(params$k)
           }else{
-               k <- 10
+              k <- 10
           }
-          weight.mat <- .build.adj.m(weight.mat, k + 1) |> Matrix::t()
-          Matrix::diag(weight.mat) <- 0
+          #weight.mat <- .build.adj.m(weight.mat, k + 1) |> Matrix::t()
+          #Matrix::diag(weight.mat) <- 0
+          weight.mat <- .build.knn.adj(coords, k, weighted.distance = FALSE, bycol=FALSE)
       }else if (weight.method == "voronoi"){
           rlang::check_installed("deldir", "is required when `weight.method=='voronoi'`.") 
           weight.mat <- do.call(".build.adj.using.voronoi", list(coords, params)) 
