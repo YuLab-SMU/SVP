@@ -166,6 +166,9 @@ SimpleList or long tidy table see also the help information of \code{action} arg
 }
 \description{
 This function is to explore the global bivariate relationship in the spatial space.
+It efficiently reflects the extent to which bivariate associations are spatially grouped.
+Put differently, it can be utilized to quantify the bivariate spatial dependency. See
+also the references.
 }
 \examples{
 data(hpda_spe_cell_dec)
@@ -186,6 +189,10 @@ res2 <- runGLOBALBV(hpda_spe_cell_dec,
                     action = 'get'
         )
 res2
+}
+\references{
+Lee, SI. Developing a bivariate spatial association measure: An integration of Pearson's r and Moran's I .
+J Geograph Syst 3, 369–385 (2001). https://doi.org/10.1007/s101090100064
 }
 \seealso{
 \code{\link{runDetectSVG}} and \code{\link{runKldSVG}} to identify the spatial variable features.

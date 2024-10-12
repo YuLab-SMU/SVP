@@ -1,6 +1,9 @@
 #' @title Global Bivariate analysis for spatial autocorrelation
 #' @description
 #' This function is to explore the global bivariate relationship in the spatial space.
+#' It efficiently reflects the extent to which bivariate associations are spatially grouped. 
+#' Put differently, it can be utilized to quantify the bivariate spatial dependency. See
+#' also the references.
 #' @rdname runGLOBALBV-method
 #' @param data a \linkS4class{SingleCellExperiment} object with contains \code{UMAP} or \code{TSNE},
 #' or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} object with specified
@@ -64,6 +67,9 @@
 #' @return SimpleList or long tidy table see also the help information of \code{action} argument.
 #' @seealso [`runDetectSVG`] and [`runKldSVG`] to identify the spatial variable features.
 #' [`runLISA`] to explore the spatial hotspots.
+#' @references
+#' Lee, SI. Developing a bivariate spatial association measure: An integration of Pearson's r and Moran's I . 
+#' J Geograph Syst 3, 369–385 (2001). https://doi.org/10.1007/s101090100064
 #' @author Shuangbin Xu
 #' @export
 #' @examples

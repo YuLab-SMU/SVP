@@ -142,7 +142,8 @@ using \code{\link{LISAResult}}
 }
 \description{
 This function use the local indicators of spatial association (LISA) to identify the hotspot
-in the spatial space.
+in the spatial space. In other word, it allow users to explore local variations in spatial
+dependence by measuring each area's relative contribution to the corresponding global measure.
 }
 \examples{
 library(SpatialExperiment)
@@ -184,8 +185,10 @@ gsvaExp(hpda_spe_cell_dec, 'LISA')
 }
 \references{
 \enumerate{
-\item Bivand, R.S., Wong, D.W.S. Comparing implementations of global and local indicators of spatial association. TEST 27,
-716–748 (2018). https://doi.org/10.1007/s11749-018-0599-x
+\item Anselin, L. (1995), Local Indicators of Spatial Association—LISA. Geographical Analysis, 27: 93-115.
+https://doi.org/10.1111/j.1538-4632.1995.tb00338.x
+\item Bivand, R.S., Wong, D.W.S. (2018), Comparing implementations of global and local indicators of spatial association.
+TEST 27, 716–748. https://doi.org/10.1007/s11749-018-0599-x
 }
 }
 \seealso{

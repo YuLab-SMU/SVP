@@ -1,6 +1,9 @@
 #' @title Local Bivariate analysis with spatial autocorrelation
 #' @description
-#' This function is to explore the local bivariate relationship in the spatial space.
+#' This function is to explore the local bivariate relationship in the spatial space. Like
+#' \code{runGLOBALBV}, It efficiently reflects the extent to which bivariate associations 
+#' are spatially grouped in local. Put differently, it can be utilized to quantify the 
+#' bivariate spatial dependency in local. See also the references.  
 #' @rdname runLOCALBV-method
 #' @param data a \linkS4class{SingleCellExperiment} object with contains \code{UMAP} or \code{TSNE},
 #' or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} object with specified
@@ -73,6 +76,9 @@
 #' @seealso [`runDetectSVG`] and [`runKldSVG`] to identify the spatial variable features, [`runGLOBALBV`] to
 #' analysis the global bivariate spatial analysis, [`runLISA`] to identify the spatial domain of specified features.
 #' @export
+#' @references
+#' Lee, SI. Developing a bivariate spatial association measure: An integration of Pearson's r and Moran's I . 
+#' J Geograph Syst 3, 369–385 (2001). https://doi.org/10.1007/s101090100064
 #' @author Shuangbin Xu
 #' @examples
 #' data(hpda_spe_cell_dec)

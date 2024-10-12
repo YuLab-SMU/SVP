@@ -181,7 +181,10 @@ stored in the \code{localResults} column of \code{int_colData} (internal column 
 \code{localResults()} function of \code{SpatialFeatureExperiment} package to extract it.
 }
 \description{
-This function is to explore the local bivariate relationship in the spatial space.
+This function is to explore the local bivariate relationship in the spatial space. Like
+\code{runGLOBALBV}, It efficiently reflects the extent to which bivariate associations
+are spatially grouped in local. Put differently, it can be utilized to quantify the
+bivariate spatial dependency in local. See also the references.
 }
 \examples{
 data(hpda_spe_cell_dec)
@@ -203,6 +206,10 @@ gsvaExp(hpda_spe_cell_dec, 'LOCALBV')
   gsvaExp(hpda_spe_cell_dec, 'LOCALBV') |>
   plot_lisa_feature(res1, assay.type='LocalLee') + ggtitle(NULL)
 }
+}
+\references{
+Lee, SI. Developing a bivariate spatial association measure: An integration of Pearson's r and Moran's I .
+J Geograph Syst 3, 369–385 (2001). https://doi.org/10.1007/s101090100064
 }
 \seealso{
 \code{\link{runDetectSVG}} and \code{\link{runKldSVG}} to identify the spatial variable features, \code{\link{runGLOBALBV}} to

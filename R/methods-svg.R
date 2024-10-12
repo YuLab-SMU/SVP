@@ -308,8 +308,15 @@ setMethod('runKldSVG', 'SVPExperiment',
 #' @param ... additional parameters
 #' @return a \linkS4class{SVPExperiment} or a \linkS4class{SingleCellExperiment}, see \code{action} parameter details.
 #' @references
-#' 1. Bivand, R.S., Wong, D.W.S. Comparing implementations of global and local indicators of spatial association. TEST 27, 
-#'    716–748 (2018). https://doi.org/10.1007/s11749-018-0599-x
+#' 1. P. A. P. Moran, The Interpretation of Statistical Maps, Journal of the Royal Statistical 
+#'    Society: Series B (Methodological), Volume 10, Issue 2, July 1948, Pages 243–251, 
+#'    https://doi.org/10.1111/j.2517-6161.1948.tb00012.x
+#' 2. R. C. Geary, The Contiguity Ratio and Statistical Mapping, Journal of the Royal Statistical 
+#'    Society Series D: The Statistician, Volume 5, Issue 3, November 1954, Pages 115–141, 
+#'    https://doi.org/10.2307/2986645
+#' 3. Cli AD, Ord JK (1981) Spatial processes: models & applications. Pion Limited, London
+#' 4. Bivand, R.S., Wong, D.W.S. Comparing implementations of global and local indicators of spatial 
+#'    association. TEST 27, 716–748 (2018). https://doi.org/10.1007/s11749-018-0599-x
 #' @export
 #' @author Shuangbin Xu
 #' @seealso [`runLISA`] to explore the hotspot for specified features in the spatial space.

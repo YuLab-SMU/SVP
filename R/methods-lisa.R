@@ -1,7 +1,8 @@
 #' @title Local indicators of spatial association analysis 
 #' @description
 #' This function use the local indicators of spatial association (LISA) to identify the hotspot
-#' in the spatial space.
+#' in the spatial space. In other word, it allow users to explore local variations in spatial 
+#' dependence by measuring each area's relative contribution to the corresponding global measure.
 #' @rdname runLISA-method
 #' @param data a \linkS4class{SingleCellExperiment} object with contains \code{UMAP} or \code{TSNE},
 #' or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} object with specified
@@ -52,8 +53,10 @@
 #' stored in the \code{localResults} column of \code{int_colData} (internal column metadata), which can be extracted
 #' using [`LISAResult`]
 #' @references
-#' 1. Bivand, R.S., Wong, D.W.S. Comparing implementations of global and local indicators of spatial association. TEST 27,
-#'    716–748 (2018). https://doi.org/10.1007/s11749-018-0599-x
+#' 1. Anselin, L. (1995), Local Indicators of Spatial Association—LISA. Geographical Analysis, 27: 93-115. 
+#'    https://doi.org/10.1111/j.1538-4632.1995.tb00338.x
+#' 2. Bivand, R.S., Wong, D.W.S. (2018), Comparing implementations of global and local indicators of spatial association. 
+#'    TEST 27, 716–748. https://doi.org/10.1007/s11749-018-0599-x
 #' @seealso [`runDetectSVG`] and [`runKldSVG`] to identify the spatial variable features.
 #' @author Shuangbin Xu
 #' @export
