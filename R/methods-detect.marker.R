@@ -14,9 +14,6 @@
 #' marker for each group might also decrease, the mininum value is \code{1/length(unique(data[[group.by]]))}.
 #' @param present.prop.in.sample numeric the appearance proportion of samples which have the marker in 
 #' the corresponding group by specific \code{group.by}, default is 0.2.
-#' @param type character which features are be extracted, the nearest features (\code{type='positive'}) 
-#' or furthest features (\code{type = 'negative'}) or both (\code{type='all'}), default is 
-#' \code{type='positive'}.
 #' @param BPPARAM A BiocParallelParam object specifying whether perform the analysis parallelly using
 #' \code{BiocParallel} default is \code{SerialParam()}, meaning no parallel.
 #' You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=T)} to parallel it,
@@ -26,6 +23,8 @@
 #' @return a list, which contains features and named with clusters of \code{group.by}.
 #' @export
 #' @examples
+#' # The example data (small.sce) is generated through simulation and has no actual meaning.
+#' set.seed(123)
 #' example(runMCA, echo = FALSE)
 #' small.sce |> runDetectMarker(group.by = 'Cell_Cycle', ntop = 20, 
 #'               present.prop.in.sample = .2)
@@ -39,7 +38,7 @@ setGeneric('runDetectMarker',
     ntop = 200,
     present.prop.in.group = 0.1,
     present.prop.in.sample = .2,
-    type = c('positive', 'all', 'negative'),
+    #type = c('positive', 'all', 'negative'),
     BPPARAM = SerialParam(),
     ...
   )
@@ -62,12 +61,12 @@ setMethod(
     ntop = 200,
     present.prop.in.group = .1,
     present.prop.in.sample = .2,
-    type = c('positive', 'all', 'negative'),
+    #type = c('positive', 'all', 'negative'),
     BPPARAM = SerialParam(),
     ...
   ){
   
-    type <- match.arg(type)
+    #type <- match.arg(type)
     rd <- reducedDim(data, reduction)
     if (grepl("MCA", reduction, ignore.case=TRUE)){
         rd.f.nm <- "genesCoordinates"
@@ -92,9 +91,10 @@ setMethod(
         cell.rd <- .calGroupCenter(cell.rd, group.vec, fun = "mean", BPPARAM)
     }
 
-    cell2features.dist <- t(pairDist(f.rd, cell.rd))
+    #cell2features.dist <- t(pairDist(f.rd, cell.rd))
     
-    dt <- .obtain.nn.genes(cell2features.dist, type, ntop)
+    #dt <- .obtain.nn.genes(cell2features.dist, type, ntop)
+    dt <- .build_pair_knn(cell.rd, f.rd, ntop, FALSE)
 
     if (present.prop.in.sample > 1){
         present.prop.in.sample <- .5
@@ -124,21 +124,21 @@ setMethod(
     return(da)
 }
 
-.obtain.nn.genes <- function(d, type = c('positive'), ntop = 200){
-    if (type == 'positive'){
-        dt <- .build.adj.m(d, top.n = ntop)
-        return(dt)
-    }
-    d2 <- .normalize_dist_as_matrix(d)
-    if (type == 'negative'){
-        dt <- .build.adj.m(d2, top.n = ntop)
-    }else{
-        dt1 <- .build.adj.m(d, top.n = ntop)
-        dt2 <- .build.adj.m(d2, top.n = ntop)
-        dt <- dt1 + dt2
-    }
-    return(dt)
-}
+#.obtain.nn.genes <- function(d, type = c('positive'), ntop = 200){
+#    if (type == 'positive'){
+#        dt <- .build.adj.m(d, top.n = ntop)
+#        return(dt)
+#    }
+#    d2 <- .normalize_dist_as_matrix(d)
+#    if (type == 'negative'){
+#        dt <- .build.adj.m(d2, top.n = ntop)
+#    }else{
+#        dt1 <- .build.adj.m(d, top.n = ntop)
+#        dt2 <- .build.adj.m(d2, top.n = ntop)
+#        dt <- dt1 + dt2
+#    }
+#    return(dt)
+#}
 
 .normalize_dist_as_matrix <- function(x){
     y <- .normalize_dist(x)

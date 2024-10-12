@@ -15,7 +15,6 @@ runDetectMarker(
   ntop = 200,
   present.prop.in.group = 0.1,
   present.prop.in.sample = 0.2,
-  type = c("positive", "all", "negative"),
   BPPARAM = SerialParam(),
   ...
 )
@@ -29,7 +28,6 @@ runDetectMarker(
   ntop = 200,
   present.prop.in.group = 0.1,
   present.prop.in.sample = 0.2,
-  type = c("positive", "all", "negative"),
   BPPARAM = SerialParam(),
   ...
 )
@@ -57,10 +55,6 @@ marker for each group might also decrease, the mininum value is \code{1/length(u
 \item{present.prop.in.sample}{numeric the appearance proportion of samples which have the marker in
 the corresponding group by specific \code{group.by}, default is 0.2.}
 
-\item{type}{character which features are be extracted, the nearest features (\code{type='positive'})
-or furthest features (\code{type = 'negative'}) or both (\code{type='all'}), default is
-\code{type='positive'}.}
-
 \item{BPPARAM}{A BiocParallelParam object specifying whether perform the analysis parallelly using
 \code{BiocParallel} default is \code{SerialParam()}, meaning no parallel.
 You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=T)} to parallel it,
@@ -76,6 +70,8 @@ a list, which contains features and named with clusters of \code{group.by}.
 Detecting the specific cell features with nearest distance of cells in MCA space
 }
 \examples{
+# The example data (small.sce) is generated through simulation and has no actual meaning.
+set.seed(123)
 example(runMCA, echo = FALSE)
 small.sce |> runDetectMarker(group.by = 'Cell_Cycle', ntop = 20, 
               present.prop.in.sample = .2)

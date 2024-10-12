@@ -353,29 +353,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// fastPDist
-SEXP fastPDist(Eigen::Map<Eigen::MatrixXd> A, Eigen::Map<Eigen::MatrixXd> B);
-RcppExport SEXP _SVP_fastPDist(SEXP ASEXP, SEXP BSEXP) {
+// pairKnnCpp
+List pairKnnCpp(arma::mat x, arma::mat y, arma::uword topn);
+RcppExport SEXP _SVP_pairKnnCpp(SEXP xSEXP, SEXP ySEXP, SEXP topnSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type A(ASEXP);
-    Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type B(BSEXP);
-    rcpp_result_gen = Rcpp::wrap(fastPDist(A, B));
-    return rcpp_result_gen;
-END_RCPP
-}
-// fusiondist
-arma::mat fusiondist(arma::mat s, arma::mat p, double alpha, double beta);
-RcppExport SEXP _SVP_fusiondist(SEXP sSEXP, SEXP pSEXP, SEXP alphaSEXP, SEXP betaSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type s(sSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type p(pSEXP);
-    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
-    Rcpp::traits::input_parameter< double >::type beta(betaSEXP);
-    rcpp_result_gen = Rcpp::wrap(fusiondist(s, p, alpha, beta));
+    Rcpp::traits::input_parameter< arma::mat >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type y(ySEXP);
+    Rcpp::traits::input_parameter< arma::uword >::type topn(topnSEXP);
+    rcpp_result_gen = Rcpp::wrap(pairKnnCpp(x, y, topn));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -434,8 +421,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_SVP_MCAStep2", (DL_FUNC) &_SVP_MCAStep2, 3},
     {"_SVP_CalF1Parallel", (DL_FUNC) &_SVP_CalF1Parallel, 2},
     {"_SVP_CalMoransiParallel", (DL_FUNC) &_SVP_CalMoransiParallel, 5},
-    {"_SVP_fastPDist", (DL_FUNC) &_SVP_fastPDist, 2},
-    {"_SVP_fusiondist", (DL_FUNC) &_SVP_fusiondist, 4},
+    {"_SVP_pairKnnCpp", (DL_FUNC) &_SVP_pairKnnCpp, 3},
     {"_SVP_ParallelColOrder", (DL_FUNC) &_SVP_ParallelColOrder, 2},
     {"_SVP_parallelCalRWR", (DL_FUNC) &_SVP_parallelCalRWR, 5},
     {NULL, NULL, 0}

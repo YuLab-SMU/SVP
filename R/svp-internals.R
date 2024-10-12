@@ -65,12 +65,22 @@
   return(rd.res)
 }
 
-pairDist <- function(x, y){
-    z <- fastPDist(y, x)
-    z[is.na(z)] <- 6.629066e-15
-    rownames(z) <- rownames(y)
-    colnames(z) <- rownames(x)
-    return(z)
+#pairDist <- function(x, y){
+#    z <- fastPDist(y, x)
+#    z[is.na(z)] <- 6.629066e-15
+#    rownames(z) <- rownames(y)
+#    colnames(z) <- rownames(x)
+#    return(z)
+#}
+
+.build_pair_knn <- function(x, y, topn = 600, weighted.distance=TRUE){
+   res <- pairKnnCpp(x, y, topn - 1)
+   xx <- if(weighted.distance){c(res$distance)}else{1}
+   j <- rep(seq(nrow(x)), each = topn)
+   res <- Matrix::sparseMatrix(i=res$index, j=j, x=xx, dims=c(nrow(y), nrow(x)))
+   rownames(res) <- rownames(y)
+   colnames(res) <- rownames(x)
+   return(res)
 }
 
 # #' build the adjacency matrix with the distance matrix
@@ -210,31 +220,34 @@ pairDist <- function(x, y){
                        ){
     if (!combined.cell.feature){
         # This is split the cells and features to build knn
-        x <- pairDist(cells.rd, features.rd)
+        #x <- pairDist(cells.rd, features.rd)
         
         #cell.dist <- pairDist(cells.rd, cells.rd)
-        cell.dist <- .fusion.sc.sp.dist(
-                       cells.rd, 
-                       cells.sp.coord, 
-                       knn.consider.spcoord, 
-                       sp.alpha.add.weight, 
-                       sp.beta.add.mp.weight
-        )
+        #cell.dist <- .fusion.sc.sp.dist(
+        #               cells.rd, 
+        #               cells.sp.coord, 
+        #               knn.consider.spcoord, 
+        #               sp.alpha.add.weight, 
+        #               sp.beta.add.mp.weight
+        #)
         
-        fs.dist <- pairDist(features.rd, features.rd)
+        #fs.dist <- pairDist(features.rd, features.rd)
         
         top.n <- min(top.n, nrow(features.rd))
-        top.n.cell <- min(max(50, round(top.n/10)), nrow(cells.rd)) + 1
-        top.n.fs <- min(max(50, round(top.n/10)), nrow(features.rd)) + 1
+        top.n.cell <- min(max(50, round(top.n/10)), nrow(cells.rd)) 
+        top.n.fs <- min(max(50, round(top.n/10)), nrow(features.rd))
 
-        adj.m.list <- BiocParallel::bpmapply(.build.adj.m, list(x, cell.dist, fs.dist), 
-                                             list(top.n, top.n.cell, top.n.fs), 
-                                             MoreArgs=list(weighted.distance),
-                                             BPPARAM = BPPARAM
-        ) 
-
+        adj.m.list <- list()
+        adj.m.list[[1]] <- .build_pair_knn(cells.rd, features.rd, top.n, weighted.distance)
+        adj.m.list[[2]] <- .build.knn.adj(cells.rd, top.n.cell, weighted.distance = weighted.distance)
+        adj.m.list[[3]] <- .build.knn.adj(features.rd, top.n.fs, weighted.distance = weighted.distance)
+        #adj.m.list <- BiocParallel::bpmapply(.build.adj.m, list(x, cell.dist, fs.dist), 
+        #                                     list(top.n, top.n.cell, top.n.fs), 
+        #                                     MoreArgs=list(weighted.distance),
+        #                                     BPPARAM = BPPARAM
+        #) 
         adj.m <- do.call(.join.adj.m, adj.m.list)
-        Matrix::diag(adj.m) <- 0
+        #Matrix::diag(adj.m) <- 0
     }else{
         # build knn by merge the MCA space of cells and features 
         total.rd <- rbind(cells.rd, features.rd)
@@ -255,22 +268,22 @@ pairDist <- function(x, y){
     return(adj.m)
 }
 
-.fusion.sc.sp.dist <- function(cells.rd, 
-                               cells.sp.coord, 
-                               consider.spcoord = FALSE,
-                               alpha = 0.2, 
-                               beta=0.1){
-    cell.dist <- pairDist(cells.rd, cells.rd)
-    if (consider.spcoord && !is.null(cells.sp.coord)){
-        cli::cli_inform('Considering the spatial location ...')
-        cell.sp.dist <- pairDist(cells.sp.coord, cells.sp.coord)
-        nm <- rownames(cell.dist)
-        cell.dist <- fusiondist(cell.dist, cell.sp.dist, alpha, beta)
-        rownames(cell.dist) <- nm
-        colnames(cell.dist) <- nm
-    }
-    return(cell.dist)
-}
+#.fusion.sc.sp.dist <- function(cells.rd, 
+#                               cells.sp.coord, 
+#                               consider.spcoord = FALSE,
+#                               alpha = 0.2, 
+#                               beta=0.1){
+#    cell.dist <- pairDist(cells.rd, cells.rd)
+#    if (consider.spcoord && !is.null(cells.sp.coord)){
+#        cli::cli_inform('Considering the spatial location ...')
+#        cell.sp.dist <- pairDist(cells.sp.coord, cells.sp.coord)
+#        nm <- rownames(cell.dist)
+#        cell.dist <- fusiondist(cell.dist, cell.sp.dist, alpha, beta)
+#        rownames(cell.dist) <- nm
+#        colnames(cell.dist) <- nm
+#    }
+#    return(cell.dist)
+#}
 
 #' @importFrom BiocParallel SerialParam
 #' @importFrom BiocNeighbors findKmknn
@@ -346,7 +359,7 @@ pairDist <- function(x, y){
   nn <- length(x)
   ind1 <- rep(seq(nn), each=ncol(knn$index))
   ind2 <- c(t(knn$index))
-  xx <- ifelse(weighted.distance, c(t(knn$distance)), 1)
+  xx <- if(weighted.distance){c(t(knn$distance))}else{1}
   if (bycol){
     res <- Matrix::sparseMatrix(i = ind2, j = ind1, x = xx, dims = c(nn, nn))
   }else{
