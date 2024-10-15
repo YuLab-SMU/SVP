@@ -20,14 +20,12 @@ double gearyouterdot(arma::vec x, arma::sp_mat w){
   return(accu(res));
 }
 
-vec getisordouterdot(arma::vec x, arma::sp_mat w){
+arma::vec getisordouterdot(arma::vec x, arma::sp_mat w){
   arma::vec z1(x.n_elem);
   arma::vec z(x.n_elem);
   for (size_t i = 0; i < w.n_cols; i++){
-    arma::vec tmpx = x;
-    tmpx(i) = 0.0;
-    z1(i) = accu(x(i) * tmpx);
-    z(i) = accu(x(i) * tmpx % w.col(i));
+    z1(i) = accu(x(i) * x) - x(i) * x(i);
+    z(i) = accu(x(i) * x  % w.col(i)) - x(i) * x(i) * w(i,i);
   }
   arma::vec zv = {accu(z1), accu(z)};
   return(zv);
@@ -141,9 +139,7 @@ double cal_getisord(
   arma::sp_mat weight
   ){
   arma::vec tmp = getisordouterdot(x, weight);
-  double cv = tmp(1); 
-  double v = tmp(0);
-  double obs = cv/v;
+  double obs = tmp(1)/tmp(0);
 
   return(obs);
 }
