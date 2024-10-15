@@ -86,7 +86,7 @@ arma::vec Kde2dWeightedCpp(
 }
 
 struct RunWkde : public Worker{
-  const arma::mat& w;
+  const arma::sp_mat& w;
   const arma::mat& ax;
   const arma::mat& ay;
   const arma::vec& H;
@@ -96,14 +96,14 @@ struct RunWkde : public Worker{
 
   arma::mat& result;
 
-  RunWkde(const arma::mat& w, const arma::mat& ax, const arma::mat& ay, 
+  RunWkde(const arma::sp_mat& w, const arma::mat& ax, const arma::mat& ay, 
           const arma::vec& H, const arma::uvec& indx, const arma::uvec& indy, 
           simple_progress& p, mat& result): 
       w(w), ax(ax), ay(ay), H(H), indx(indx), indy(indy), p(p), result(result) { }
 
   void operator()(std::size_t begin, std::size_t end){
     for (uword i = begin; i < end; i++){
-        result.col(i) = Kde2dWeightedCpp(w.row(i), ax, ay, H, indx, indy);
+        result.col(i) = Kde2dWeightedCpp(w.row(i).as_dense(), ax, ay, H, indx, indy);
         p.increment();
     }
   }
@@ -236,7 +236,7 @@ arma::vec CalBgSpatialKld(
 // }
 
 struct SpatialKldCalWorker : public Worker{
-  const arma::mat& w;
+  const arma::sp_mat& w;
   const arma::vec& bgkld;
   const arma::mat& axm;
   const arma::mat& aym;
@@ -248,7 +248,7 @@ struct SpatialKldCalWorker : public Worker{
   const int random_times;
   mat& result;
 
-  SpatialKldCalWorker(const arma::mat& w, const arma::vec& bgkld,
+  SpatialKldCalWorker(const arma::sp_mat& w, const arma::vec& bgkld,
       const arma::mat& axm, const arma::mat& aym, const arma::vec& H, const arma::uvec& indx,
          const arma::uvec& indy, simple_progress& p, const uint64_t seed, const int random_times, mat& result)
   : w(w), bgkld(bgkld), axm(axm), aym(aym), H(H), indx(indx), indy(indy), p(p), seed(seed),
@@ -257,11 +257,11 @@ struct SpatialKldCalWorker : public Worker{
   void operator()(std::size_t begin, std::size_t end){
     dqrng::xoshiro256plus rng(seed);  
     for (uword i = begin; i < end; i++){
-        arma::vec z = Kde2dWeightedCpp(w.row(i), axm, aym, H, indx, indy);
+        arma::vec z = Kde2dWeightedCpp(w.row(i).as_dense(), axm, aym, H, indx, indy);
         double kld = log(sum(z % log(z / bgkld)));
         dqrng::xoshiro256plus lrng(rng);
         lrng.long_jump(i + 1);
-        arma::vec bootkld = CalRandSpatialKld(w.row(i), bgkld, axm, aym, H, indx, indy, lrng, random_times);
+        arma::vec bootkld = CalRandSpatialKld(w.row(i).as_dense(), bgkld, axm, aym, H, indx, indy, lrng, random_times);
 
         result.row(i) = CalKldPvalue(bootkld, kld);
         p.increment();
@@ -283,7 +283,7 @@ struct SpatialKldCalWorker : public Worker{
 arma::sp_mat CalWkdeParallel(arma::mat& x, arma::sp_mat& w, arma::vec& l, Nullable<NumericVector> h,
         double adjust = 1.0, int n = 400) {
 
-  arma::mat wv = conv_to<arma::mat>::from(w);
+  //arma::mat wv = conv_to<arma::mat>::from(w);
 
   arma::mat result(x.n_rows, w.n_rows);
 
@@ -306,9 +306,9 @@ arma::sp_mat CalWkdeParallel(arma::mat& x, arma::sp_mat& w, arma::vec& l, Nullab
   arma::mat ax = outergrid(gx, x.col(0));
   arma::mat ay = outergrid(gy, x.col(1));
 
-  uword num = wv.n_rows;
+  uword num = w.n_rows;
   simple_progress p(num);
-  RunWkde runWkde(wv, ax, ay, H, indx, indy, p, result);
+  RunWkde runWkde(w, ax, ay, H, indx, indy, p, result);
   parallelFor(0, num, runWkde);
 
   arma::sp_mat res = conv_to<arma::sp_mat>::from(result.t());
@@ -331,7 +331,7 @@ arma::sp_mat CalWkdeParallel(arma::mat& x, arma::sp_mat& w, arma::vec& l, Nullab
 arma::mat CalSpatialKldCpp(arma::mat coords, arma::sp_mat d, arma::vec l, Nullable<NumericVector> h,
         int n = 100, int random_times = 100){
 
-    arma::mat w = conv_to<arma::mat>::from(d);
+    //arma::mat w = conv_to<arma::mat>::from(d);
 
     arma::mat gx = arma::linspace(l[0], l[1], n);
     arma::mat gy = arma::linspace(l[2], l[3], n);
@@ -345,7 +345,7 @@ arma::mat CalSpatialKldCpp(arma::mat coords, arma::sp_mat d, arma::vec l, Nullab
       H = as<arma::vec>(h);
     }
 
-    uword num = w.n_rows;
+    uword num = d.n_rows;
 
     arma::mat result(num, 4);
 
@@ -365,7 +365,7 @@ arma::mat CalSpatialKldCpp(arma::mat coords, arma::sp_mat d, arma::vec l, Nullab
     Rcpp::IntegerVector seed(2, dqrng::R_random_int);
     uint64_t seed2 = dqrng::convert_seed<uint64_t>(seed);
 
-    SpatialKldCalWorker spatialKldCalWorker(w, bgkld, axm, aym, H, indx, indy, p, seed2, random_times, result);
+    SpatialKldCalWorker spatialKldCalWorker(d, bgkld, axm, aym, H, indx, indy, p, seed2, random_times, result);
     parallelFor(0, num, spatialKldCalWorker);
 
 

@@ -159,7 +159,7 @@ setMethod('runWKDE', 'SVPExperiment',
   if (is.null(bandwidths)){
       bandwidths <- c(ks::hpi(coords[,1]), ks::hpi(coords[,2]))
   }
-
+  x <- .check_dgCMatrix(x)
   res <- CalWkdeParallel(x=as.matrix(coords), w=x, l=lims, h = bandwidths, adjust = adjust, n = grid.n)
   colnames(res) <- colnames(x)
   rownames(res) <- rownames(x)
