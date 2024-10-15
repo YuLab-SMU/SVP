@@ -109,8 +109,8 @@ pairKnnCpp <- function(x, y, topn = 2L) {
     .Call('_SVP_pairKnnCpp', PACKAGE = 'SVP', x, y, topn)
 }
 
-ParallelColOrder <- function(x, top_n) {
-    .Call('_SVP_ParallelColOrder', PACKAGE = 'SVP', x, top_n)
+colKnnCpp <- function(x, k, weight = FALSE) {
+    .Call('_SVP_colKnnCpp', PACKAGE = 'SVP', x, k, weight)
 }
 
 parallelCalRWR <- function(x, v, restart = 0.75, stop_delta = 1e-10, stop_step = 50L) {

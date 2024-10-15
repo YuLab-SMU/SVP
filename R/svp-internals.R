@@ -83,41 +83,62 @@
    return(res)
 }
 
-# #' build the adjacency matrix with the distance matrix
-# #' @param x a dist matrix
-# #' @param top.n number of the nearest neighbors.
-# #' @param weighted.distance whether consider the distance between nodes.
-# #' @return adjacency matrix
 
-#' @importFrom Matrix sparseMatrix Matrix
-.build.adj.m <- function(x, top.n = 600, weighted.distance = FALSE){
-    rnm <- rownames(x)
-    cnm <- colnames(x)
-    
-    top.n <- min(nrow(x), top.n)
-    i <- ParallelColOrder(x, top.n)
-    j <- rep(seq(ncol(x)), each = top.n)
-    adj.m <- Matrix::sparseMatrix(i, j, x = 1, dims = c(length(rnm),
-        length(cnm)), dimnames = list(rnm, cnm))
-    if (weighted.distance){
-        adj.m <- SpMatElemMultiMat(adj.m, x)
-        rownames(adj.m) <- rnm
-        colnames(adj.m) <- cnm
-    }
-    return(adj.m)
+.build_col_knn <- function(x, topn=2, weighted.distance=FALSE){
+   topn <- max(1, min(topn, nrow(x)))
+   topn <- ifelse(weighted.distance, topn, topn - 1)
+   res <- colKnnCpp(x, topn, weighted.distance)
+   if (!weighted.distance){
+     j <- rep(seq(ncol(x)), each = topn + 1)
+     res <- Matrix::sparseMatrix(i=res$index, j=j, x=1, dims=c(nrow(x), ncol(x)))
+   }else{
+     res <- res$distance
+     res@x <- .normalize_dist(res@x)
+     #x@x <- rep(1, length(x@x))
+     #res <- SVP:::SpMatElemMultiSpMat(res, x)
+   }
+   rownames(res) <- rownames(x)
+   colnames(res) <- colnames(x)
+   return(res)
 }
 
-#' @importFrom DelayedMatrixStats colRanks
-.build.adj.m_by_expr <- function(x, top.n = 600, weighted.distance = FALSE){
-    expr.rank.dist <- 1 - (DelayedMatrixStats::colRanks(x, useNames=FALSE, preserveShape=TRUE) / (nrow(x) + 1))
-    rownames(expr.rank.dist) <- rownames(x)
-    colnames(expr.rank.dist) <- colnames(x)
-    adj.m <- .build.adj.m(expr.rank.dist, top.n, weighted.distance)
-    if (weighted.distance){
-        adj.m@x <- .normalize_dist(adj.m@x)
-    }
-    return(adj.m)
-}
+
+
+## # #' build the adjacency matrix with the distance matrix
+## # #' @param x a dist matrix
+## # #' @param top.n number of the nearest neighbors.
+## # #' @param weighted.distance whether consider the distance between nodes.
+## # #' @return adjacency matrix
+## 
+## #' @importFrom Matrix sparseMatrix Matrix
+## .build.adj.m <- function(x, top.n = 600, weighted.distance = FALSE){
+##     rnm <- rownames(x)
+##     cnm <- colnames(x)
+##     
+##     top.n <- min(nrow(x), top.n)
+##     i <- ParallelColOrder(x, top.n)
+##     j <- rep(seq(ncol(x)), each = top.n)
+##     adj.m <- Matrix::sparseMatrix(i, j, x = 1, dims = c(length(rnm),
+##         length(cnm)), dimnames = list(rnm, cnm))
+##     if (weighted.distance){
+##         adj.m <- SpMatElemMultiMat(adj.m, x)
+##         rownames(adj.m) <- rnm
+##         colnames(adj.m) <- cnm
+##     }
+##     return(adj.m)
+## }
+## 
+## #' @importFrom DelayedMatrixStats colRanks
+## .build.adj.m_by_expr <- function(x, top.n = 600, weighted.distance = FALSE){
+##     expr.rank.dist <- 1 - (DelayedMatrixStats::colRanks(x, useNames=FALSE, preserveShape=TRUE) / (nrow(x) + 1))
+##     rownames(expr.rank.dist) <- rownames(x)
+##     colnames(expr.rank.dist) <- colnames(x)
+##     adj.m <- .build.adj.m(expr.rank.dist, top.n, weighted.distance)
+##     if (weighted.distance){
+##         adj.m@x <- .normalize_dist(adj.m@x)
+##     }
+##     return(adj.m)
+## }
 
 .join.adj.m <- function(fs2cell, cell2cell, fs2fs){
     x12 <- Matrix::rbind2(cell2cell, fs2cell)
@@ -601,6 +622,7 @@
   return(res)
 }
 
+#' @importFrom Matrix sparseMatrix Matrix
 .obtain.weight <- function(
      coords = NULL,
      weight = NULL,

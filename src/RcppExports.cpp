@@ -366,15 +366,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// ParallelColOrder
-NumericMatrix ParallelColOrder(const arma::mat& x, int top_n);
-RcppExport SEXP _SVP_ParallelColOrder(SEXP xSEXP, SEXP top_nSEXP) {
+// colKnnCpp
+List colKnnCpp(const arma::sp_mat& x, arma::uword k, bool weight);
+RcppExport SEXP _SVP_colKnnCpp(SEXP xSEXP, SEXP kSEXP, SEXP weightSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::mat& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< int >::type top_n(top_nSEXP);
-    rcpp_result_gen = Rcpp::wrap(ParallelColOrder(x, top_n));
+    Rcpp::traits::input_parameter< const arma::sp_mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::uword >::type k(kSEXP);
+    Rcpp::traits::input_parameter< bool >::type weight(weightSEXP);
+    rcpp_result_gen = Rcpp::wrap(colKnnCpp(x, k, weight));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -422,7 +423,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_SVP_CalF1Parallel", (DL_FUNC) &_SVP_CalF1Parallel, 2},
     {"_SVP_CalMoransiParallel", (DL_FUNC) &_SVP_CalMoransiParallel, 5},
     {"_SVP_pairKnnCpp", (DL_FUNC) &_SVP_pairKnnCpp, 3},
-    {"_SVP_ParallelColOrder", (DL_FUNC) &_SVP_ParallelColOrder, 2},
+    {"_SVP_colKnnCpp", (DL_FUNC) &_SVP_colKnnCpp, 3},
     {"_SVP_parallelCalRWR", (DL_FUNC) &_SVP_parallelCalRWR, 5},
     {NULL, NULL, 0}
 };

@@ -311,7 +311,8 @@ setMethod('runSGSA',
   features.expr <- features.expr[features, cells] 
   if (hyper.test.weighted != 'none'){ 
       if (hyper.test.by.expr){
-          knn.gh <- .build.adj.m_by_expr(features.expr, top.n = knn.k.use, weighted.distance = knn.graph.weighted)
+          if (hyper.test.weighted == 'Hypergeometric') knn.graph.weighted <- FALSE
+          knn.gh <- .build_col_knn(features.expr, knn.k.use, knn.graph.weighted)
       }else{
           knn.gh <- rd.knn.gh[features, cells]
       }

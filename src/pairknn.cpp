@@ -80,26 +80,70 @@ List pairKnnCpp(arma::mat x, arma::mat y, arma::uword topn = 2){
                         Named("distance") = res2);
 }
 
+//struct colorder : public Worker{
+//  const arma::mat& x;
+//  arma::umat& result;
+//
+//  colorder(const arma::mat& x, arma::umat& result):
+//      x(x), result(result){}
+//
+//  void operator()(std::size_t begin, std::size_t end){
+//      for (uword i = begin; i < end; i++){
+//          result.col(i) = arma::sort_index(x.col(i), "ascend") + 1;
+//      }
+//  }
+//};
+//
+//// [[Rcpp::export]]
+//NumericMatrix ParallelColOrder(const arma::mat& x, int top_n){
+//    arma::umat ordmat = arma::umat(x.n_rows, x.n_cols);
+//    colorder runcolorder(x, ordmat);
+//    parallelFor(0, x.n_cols, runcolorder);
+//    return wrap(ordmat.head_rows(top_n));
+//}
 
+//arma::uvec rank_ascend(const arma::uvec& x){
+//    arma::uvec res(x.n_elem);
+//    for (arma::uword i = 0; i < x.n_elem; ++i){
+//        res(x(i)) = i + 1;
+//    }
+//    return res;
+//}
 
-struct colorder : public Worker{
-  const arma::mat& x;
-  arma::umat& result;
+struct colKnn : public Worker{
+  const arma::sp_mat& x;
+  const uword& k;
+  const bool& weight;
+  arma::umat& res1;
+  arma::sp_umat& res2;
 
-  colorder(const arma::mat& x, arma::umat& result):
-      x(x), result(result){}
+  colKnn(const arma::sp_mat& x, const uword& k, const bool& weight,
+         arma::umat& res1, arma::sp_umat& res2):
+      x(x), k(k), weight(weight), res1(res1), res2(res2){}
 
   void operator()(std::size_t begin, std::size_t end){
-      for (uword i = begin; i < end; i++){
-          result.col(i) = arma::sort_index(x.col(i), "ascend") + 1;
-      }
+    for (arma::uword col = begin; col < end; ++col){
+        arma::uvec sorted_indices = arma::sort_index(x.col(col).as_dense(), "descend");
+        arma::uvec kind = sorted_indices.subvec(0, k);
+        if (weight){
+            for (arma::uword i = 0; i < k; ++i){
+               res2(kind(i), col) = i + 1;
+            }
+        }else{
+            res1.col(col) = kind;
+        }	
+    }
   }
 };
 
-// [[Rcpp::export]]
-NumericMatrix ParallelColOrder(const arma::mat& x, int top_n){
-    arma::umat ordmat = arma::umat(x.n_rows, x.n_cols);
-    colorder runcolorder(x, ordmat);
-    parallelFor(0, x.n_cols, runcolorder);
-    return wrap(ordmat.head_rows(top_n));
+//[[Rcpp::export]]
+List colKnnCpp(const arma::sp_mat& x, arma::uword k, bool weight = false){
+    arma::umat res1(k + 1, x.n_cols);
+    arma::sp_umat res2(x.n_rows, x.n_cols);
+
+    colKnn runcolknn(x, k, weight, res1, res2);
+    parallelFor(0, x.n_cols, runcolknn);
+    return List::create(Named("index") = res1 + 1,
+                        Named("distance") = res2);
 }
+

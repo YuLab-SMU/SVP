@@ -378,6 +378,8 @@ setGeneric("runDetectSVG", function(
   standardGeneric('runDetectSVG')
 )
 
+
+#' @importFrom DelayedMatrixStats rowVars
 #' @rdname runDetectSVG-method
 #' @aliases runDetectSVG,SingleCellExperiment
 #' @export runDetectSVG
