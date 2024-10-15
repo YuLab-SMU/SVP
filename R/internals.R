@@ -465,13 +465,12 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
 
 .build_adj_matrix <- function(da){
   x <- as.character(unique(da[[1]]))
-  res <- matrix(0, nrow = nrow(da), ncol=nrow(da))
+  res <- Matrix::sparseMatrix(i=seq(nrow(da)),j=seq(nrow(da)),x=0)
   for (i in x){
      ind <- da[[1]] == i
      res[ind, ind] <- 1
   }
-  diag(res) <- 0
-  res <- apply(res, 2, function(x)x/sum(x))
+  res <- res * (1/Matrix::rowSums(res)) 
   rownames(res) <- colnames(res) <- rownames(da)
   return(res)
 }
