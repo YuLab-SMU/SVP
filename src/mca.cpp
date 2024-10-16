@@ -15,15 +15,15 @@ List MCAStep1(const arma::sp_mat& X) {
     arma::vec range = (rmax - rmin);
     AM.each_col() -= rmin;
     AM.each_col() /= range;
-    arma::mat FM = join_cols(AM, 1 - AM);
-    AM.clear();
-    long total = arma::accu(FM);
-    arma::rowvec colsum = arma::sum(FM,0);
-    arma::colvec rowsum = arma::sum(FM,1);
-    FM.each_row() /= sqrt(colsum);
-    FM.each_col() /= sqrt(rowsum);
+    AM = join_cols(AM, 1 - AM);
+    //AM.clear();
+    long total = arma::accu(AM);
+    arma::rowvec colsum = arma::sum(AM,0);
+    arma::colvec rowsum = arma::sum(AM,1);
+    AM.each_row() /= sqrt(colsum);
+    AM.each_col() /= sqrt(rowsum);
     arma::colvec Dc = 1/(sqrt(rowsum/total));
-    return List::create(Named("Z") = wrap(FM),
+    return List::create(Named("Z") = wrap(AM),
                         Named("Dc") = wrap(Dc));
 }
 

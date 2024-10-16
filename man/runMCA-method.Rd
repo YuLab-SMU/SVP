@@ -72,6 +72,9 @@ library(scuttle)
 library(SingleCellExperiment)
 small.sce <- mockSCE()
 small.sce <- logNormCounts(small.sce)
+# To improve computational efficiency, you can use RhpcBLASctl to control the number 
+# of threads on BLAS. From example
+# RhpcBLASctl::blas_set_num_threads(threads = 48)
 small.sce <- runMCA(small.sce, assay.type = 'logcounts',
                     reduction.name = 'MCA', ncomponents = 20) 
 # The MCA result can be extracted using reducedDim of SingleCellExperiment
