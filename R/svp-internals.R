@@ -7,7 +7,7 @@
   }else if (inherits(x, 'matrix')){
      x <- Matrix::Matrix(x, sparse = TRUE)
   }
-  x <- x[DelayedMatrixStats::rowVars(x) != 0, ]
+  x <- x[DelayedMatrixStats::rowVars(x) != 0, ,drop=FALSE]
   cells.nm <- colnames(x)
   features.nm <- rownames(x)
   if (ncol(x) < 4){
@@ -65,13 +65,13 @@
   return(rd.res)
 }
 
-#pairDist <- function(x, y){
-#    z <- fastPDist(y, x)
-#    z[is.na(z)] <- 6.629066e-15
-#    rownames(z) <- rownames(y)
-#    colnames(z) <- rownames(x)
-#    return(z)
-#}
+pairDist <- function(x, y){
+    z <- fastPDist(y, x)
+    z[is.na(z)] <- 6.629066e-15
+    rownames(z) <- rownames(y)
+    colnames(z) <- rownames(x)
+    return(z)
+}
 
 .build_pair_knn <- function(x, y, topn = 600, weighted.distance=TRUE){
    res <- pairKnnCpp(x, y, topn - 1)
@@ -636,21 +636,20 @@
       weight.method <- match.arg(weight.method)
   }
 
-  if (is.null(weight) && (weight.method %in% c("none", "voronoi", "knn"))){
-      #if (is.integer(coords)) coords <- coords * 1.0
-      #weight.mat <- pairDist(coords, coords)
+  if (is.null(weight) && (weight.method %in% c("voronoi", "knn", "none"))){
       if (weight.method == 'knn'){
           if ("k" %in% names(params) && is.numeric(params$k)){
               k <- round(params$k)
           }else{
               k <- 10
           }
-          #weight.mat <- .build.adj.m(weight.mat, k + 1) |> Matrix::t()
-          #Matrix::diag(weight.mat) <- 0
           weight.mat <- .build.knn.adj(coords, k, weighted.distance = FALSE, bycol=FALSE)
       }else if (weight.method == "voronoi"){
           rlang::check_installed("deldir", "is required when `weight.method=='voronoi'`.") 
           weight.mat <- do.call(".build.adj.using.voronoi", list(coords, params)) 
+      }else if (weight.method == 'none'){
+          if (is.integer(coords)) coords <- coords * 1.0
+          weight.mat <- pairDist(coords, coords)
       }
       weight.mat <- weight.mat * (1/Matrix::rowSums(weight.mat))
   }
@@ -660,11 +659,13 @@
           weight.mat <- .convert_to_distmt(weight)
       }else if (inherits(weight, "matrix") && identical(rownames(weight), colnames(weight))){
           weight.mat <- weight |> Matrix::Matrix(sparse=TRUE)
+      }else if (inherits(weight, "Matrix") && identical(rownames(weight), colnames(weight))){
+          weight.mat <- weight
       }else{
           cli::cli_abort(
             c("The {.var weight} should be a list (with named by sample_id) object containing `listw`, `nb`",
-              "or squared `matrix` with equal the dimnames (the same to colnames of `data`.), Or it can be ",
-              "a single `listw`, `nb` or `matrix` object, if it is provided (not NULL).")
+              ", squared `matrix` or `dgCMatrix` with equal the dimnames (the same to colnames of `data`.).", 
+              "Or it can be a single `listw`, `nb` or `matrix` object, if it is provided (not NULL).")
           )
       }
   }

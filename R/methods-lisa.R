@@ -154,12 +154,11 @@ setMethod("runLISA", "SingleCellExperiment", function(
       assay.type <- 1
   }
 
-  x <- assay(data, assay.type)
-
   if (!is.null(cells)){
-      x <- x[, cells, drop=FALSE]
+      data <- data[, cells, drop=FALSE]
   }
 
+  x <- assay(data, assay.type)
   x <- x[features, ,drop=FALSE]
   x <- .check_dgCMatrix(x)  
   weight <- .check_weight(data, sample_id, weight, group.by)
@@ -265,3 +264,100 @@ setMethod("runLISA", "SVPExperiment", function(
     }
     return(data)
 })
+
+
+
+.extract_weight_adj <- function(
+    data, 
+    sample_id = 'all',
+    weight.method = c("voronoi", "knn", "none"), 
+    reduction.used = NULL,
+    group.by = NULL,
+    cells = NULL,
+    ...
+){
+  weight.method <- match.arg(weight.method)
+  if (!is.null(cells)){
+    data <- data[,cells,drop=FALSE]
+  }
+  sample_id <- .check_sample_id(data, sample_id) 
+  weight <- .check_weight(data, sample_id, weight=NULL, group.by)
+  if (!is.null(weight)){
+    return(weight)
+  }
+  coords <- .check_coords(data, reduction.used, weight=NULL, weight.method)
+
+  res <- lapply(sample_id, function(sid){
+                  if (sid == ".ALLCELL"){
+                    ind <- seq(ncol(data))
+                  }else{ 
+                    ind <- colData(data)$sample_id == sid 
+                  }
+		  coordsi <- coords[ind, , drop=FALSE]
+                  weighti <- if(inherits(weight, 'list')){weight[names(weight) == sid]}else{weight}
+                  wm <- .obtain.weight(coordsi, weight = weighti, weight.method = weight.method, ...)
+                  rownames(wm) <- colnames(wm) <- rownames(coordsi)
+                  return(wm)
+         })
+  if (length(res)==1){
+     res <- res[[1]]
+     
+  }else{
+     names(res) <- sample_id
+  }
+
+  return(res)
+
+}
+
+#' @title extract the cell adjacent matrix from spatial space or reduction space
+#' @description
+#' the function provides \code{voronoi} or \code{knn} method to build the
+#' cell adjacent matrix.
+#' @rdname extract_weight_adj-method
+#' @param data a \linkS4class{SingleCellExperiment} object with contains \code{UMAP} or \code{TSNE},
+#' or a \linkS4class{SpatialExperiment} object.
+#' @param sample_id character the sample(s) in the \linkS4class{SpatialExperiment} object whose cells/spots to use.
+#' Can be \code{all} to compute metric for all samples; the matrix is computed separately for each sample.
+#' default is \code{"all"}.
+#' @param weight.method character the method to build the spatial neighbours weights, default
+#' is \code{voronoi} (Voronoi tessellation). Other method, which requires coord matrix as input and returns
+#' \code{nb}, \code{listw} or \code{Graph} object, also is avaiable, such as \code{"knearneigh"},
+#' \code{'dnearneigh'}, \code{"gabrielneigh"}, \code{"relativeneigh"}, which are from \code{spdep} package.
+#' default is \code{knn}, if it is \code{"none"}, meaning the distance weight of each spot is used to
+#' the weight.
+#' @param reduction.used character used as spatial coordinates to calculate the neighbours weights,
+#' default is \code{NULL}, the result of reduction can be specified, such as \code{UMAP}, \code{TSNE}, \code{PCA}.
+#' If it is specified, the weight neighbours matrix will be calculated using the result of specified reduction.
+#' @param group.by character a specified category column names (for example the cluster column name) of
+#' \code{colData(data)}, if it was specified, the adjacency weighted matrix will be built based on the principle
+#' that spots or cells in the same category are adjacent, default is NULL.
+#' @param cells the cell name or index of data object, default is NULL.
+#' @param ... addtional parameters, when \code{weight.method='knn'}, you can specified \code{k=10}.
+#' @examples
+#' data(hpda_spe_cell_dec)
+#' # knn method
+#' wm <- extract_weight_adj(hpda_spe_cell_dec, weight.method='knn', k=7)
+#' # voronoi method
+#' wm <- extract_weight_adj(hpda_spe_cell_dec)
+#' # specified group.by
+#' wm <- extract_weight_adj(hpda_spe_cell_dec, group.by='cluster_domain')
+setGeneric('extract_weight_adj',
+   function(
+    data, 
+    sample_id = 'all', 
+    weight.method = c("voronoi", "knn", "none"), 
+    reduction.used = NULL,
+    group.by = NULL,
+    cells = NULL,
+    ...
+  )
+  standardGeneric('extract_weight_adj')
+)
+
+
+
+#' @rdname extract_weight_adj-method 
+#' @aliases extract_weight_adj,SingleCellExperiment
+#' @export extract_weight_adj
+setMethod("extract_weight_adj", "SingleCellExperiment", .extract_weight_adj)

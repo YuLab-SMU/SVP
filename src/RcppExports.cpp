@@ -353,6 +353,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// fastPDist
+SEXP fastPDist(Eigen::Map<Eigen::MatrixXd> A, Eigen::Map<Eigen::MatrixXd> B);
+RcppExport SEXP _SVP_fastPDist(SEXP ASEXP, SEXP BSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type A(ASEXP);
+    Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type B(BSEXP);
+    rcpp_result_gen = Rcpp::wrap(fastPDist(A, B));
+    return rcpp_result_gen;
+END_RCPP
+}
 // pairKnnCpp
 List pairKnnCpp(arma::mat x, arma::mat y, arma::uword topn);
 RcppExport SEXP _SVP_pairKnnCpp(SEXP xSEXP, SEXP ySEXP, SEXP topnSEXP) {
@@ -422,6 +434,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_SVP_MCAStep2", (DL_FUNC) &_SVP_MCAStep2, 3},
     {"_SVP_CalF1Parallel", (DL_FUNC) &_SVP_CalF1Parallel, 2},
     {"_SVP_CalMoransiParallel", (DL_FUNC) &_SVP_CalMoransiParallel, 5},
+    {"_SVP_fastPDist", (DL_FUNC) &_SVP_fastPDist, 2},
     {"_SVP_pairKnnCpp", (DL_FUNC) &_SVP_pairKnnCpp, 3},
     {"_SVP_colKnnCpp", (DL_FUNC) &_SVP_colKnnCpp, 3},
     {"_SVP_parallelCalRWR", (DL_FUNC) &_SVP_parallelCalRWR, 5},

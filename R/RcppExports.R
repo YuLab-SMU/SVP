@@ -105,6 +105,10 @@ CalMoransiParallel <- function(x, wm, scaled = FALSE, permutation = 999L, lower_
     .Call('_SVP_CalMoransiParallel', PACKAGE = 'SVP', x, wm, scaled, permutation, lower_tail)
 }
 
+fastPDist <- function(A, B) {
+    .Call('_SVP_fastPDist', PACKAGE = 'SVP', A, B)
+}
+
 pairKnnCpp <- function(x, y, topn = 2L) {
     .Call('_SVP_pairKnnCpp', PACKAGE = 'SVP', x, y, topn)
 }

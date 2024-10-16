@@ -1,26 +1,26 @@
 #include <RcppArmadillo.h>
-//#include <RcppEigen.h>
+#include <RcppEigen.h>
 #include <RcppParallel.h>
 using namespace Rcpp;
 using namespace RcppParallel;
-//using namespace Eigen;
+using namespace Eigen;
 using namespace arma;
 
-//// Obtain the pair distance of row between \code{A} and \code{B} matrix
-//// param A matrix which number of column should be equal to column number of \code{B}.
-//// param B matrix which number of column should be equal to column number of \code{A}.
-//// return a distance matrix of row feature in \code{A} and \code{B}.
-////[[Rcpp::export]]
-//SEXP fastPDist(Eigen::Map<Eigen::MatrixXd> A, Eigen::Map<Eigen::MatrixXd> B){
-//    Eigen::VectorXd An = A.array().square().rowwise().sum();
-//    Eigen::VectorXd Bn = B.array().square().rowwise().sum();
-//    Eigen::MatrixXd C = -2 * (A * B.transpose());
-//    C.colwise() += An;
-//    C.rowwise() += Bn.transpose();
-//
-//    return wrap(C.array().sqrt());
-//
-//}
+// Obtain the pair distance of row between \code{A} and \code{B} matrix
+// param A matrix which number of column should be equal to column number of \code{B}.
+// param B matrix which number of column should be equal to column number of \code{A}.
+// return a distance matrix of row feature in \code{A} and \code{B}.
+//[[Rcpp::export]]
+SEXP fastPDist(Eigen::Map<Eigen::MatrixXd> A, Eigen::Map<Eigen::MatrixXd> B){
+    Eigen::VectorXd An = A.array().square().rowwise().sum();
+    Eigen::VectorXd Bn = B.array().square().rowwise().sum();
+    Eigen::MatrixXd C = -2 * (A * B.transpose());
+    C.colwise() += An;
+    C.rowwise() += Bn.transpose();
+
+    return wrap(C.array().sqrt());
+
+}
 
 
 ////[[Rcpp::export]]

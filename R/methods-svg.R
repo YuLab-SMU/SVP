@@ -174,7 +174,7 @@ setMethod('runKldSVG', 'SingleCellExperiment',
                  ind <- colData(data)$sample_id == sid
               }
               xi <- x[, ind, drop=FALSE]
-              xi <- xi[DelayedMatrixStats::rowVars(xi)!=0,]
+              xi <- xi[DelayedMatrixStats::rowVars(xi)!=0,,drop=FALSE]
               coordsi <- coords[ind,, drop=FALSE]
               grid.ni <- if(length(grid.n) > 1){grid.n[names(grid.n)==sid]}else{grid.n[1]}
               res.sv <- .identify.svg(
@@ -429,7 +429,7 @@ setMethod('runDetectSVG', 'SingleCellExperiment',
           ind <- colData(data)$sample_id == sid
       }
       xi <- x[, ind, drop=FALSE]
-      xi <- xi[DelayedMatrixStats::rowVars(xi)!=0,]
+      xi <- xi[DelayedMatrixStats::rowVars(xi)!=0,,drop=FALSE]
       coordsi <- if(!is.null(coords)){coords[ind, , drop=FALSE]}else{NULL}
       weighti <- if(inherits(weight, "list")){weight[names(weight) == sid]}else{weight}
       res <- .identify.svg.by.autocorrelation(
