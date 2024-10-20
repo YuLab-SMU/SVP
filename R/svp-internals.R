@@ -228,10 +228,10 @@ pairDist <- function(x, y){
 .build.nndist.graph <- function(
                             cells.rd, 
                             features.rd,
-                            cells.sp.coord = NULL,
-                            knn.consider.spcoord = FALSE,
-                            sp.alpha.add.weight = .2,
-                            sp.beta.add.mp.weight = .1,
+                            #cells.sp.coord = NULL,
+                            #knn.consider.spcoord = FALSE,
+                            #sp.alpha.add.weight = .2,
+                            #sp.beta.add.mp.weight = .1,
                             top.n = 600,
                             combined.cell.feature = FALSE, 
                             weighted.distance = FALSE,
@@ -659,7 +659,7 @@ pairDist <- function(x, y){
           weight.mat <- .convert_to_distmt(weight)
       }else if (inherits(weight, "matrix") && identical(rownames(weight), colnames(weight))){
           weight.mat <- weight |> Matrix::Matrix(sparse=TRUE)
-      }else if (inherits(weight, "Matrix") && identical(rownames(weight), colnames(weight))){
+      }else if (inherits(weight, "dgCMatrix") && identical(rownames(weight), colnames(weight))){
           weight.mat <- weight
       }else{
           cli::cli_abort(

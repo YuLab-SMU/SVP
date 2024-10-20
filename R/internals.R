@@ -390,7 +390,8 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
   }
   if (inherits(x, "GSON")){
       x <- .extract.gset.from.gson(x, gene.name=gene.name)
-  }else if (inherits(x, 'character') && file.exists(x)){
+  }else if (inherits(x, 'character') && (file.exists(x) || 
+      (grepl("^http",x,ignore.case=TRUE) && grepl("\\.gmt$", 'xx.gmt',ignore.case=TRUE)))){
       x <- .read.gmt(x)
   }else{
       cli::cli_abort(c("The `gset.idx.list` must be a list which have name (gene set name, such as ",
@@ -406,6 +407,10 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
     res <- strsplit(x, "\t")
     names(res) <- vapply(res, function(y) y[1], character(1))
     res <- lapply(res, "[", -seq(2))
+    flag <- inherits(res, "list") && !is.null(names(res))
+    if (!flag){
+       cli::cli_abort(c("Verify if the `gmt file` follows the standard format.")) 
+    }
     return(res)
 }
 
@@ -491,7 +496,13 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
   }
   
   if (!inherits(x, 'dgCMatrix')){
-     cli_abort("The profile table of features should be a `dgCMatrix` class.")
+     cli_abort("The profile assay table of features should be a `dgCMatrix` class.")
+  }
+
+  flag2 <- is.na(x@x)
+  if (any(flag2)){
+     cli::cli_warn("The profile assay table have NA value, which is filling by zero.")
+     x@x[flag2] <- 0
   }
    
   return(x)
