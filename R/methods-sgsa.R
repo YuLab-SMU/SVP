@@ -17,7 +17,8 @@
 #' @rdname runSGSA-method
 #' @param data a \linkS4class{SingleCellExperiment} object normalized and have the result of 
 #' \code{UMAP} or \code{TSNE}. Or a \linkS4class{SVPExperiment} object.
-#' @param gset.idx.list gene set list contains the names, or GSON object or a gmt file.
+#' @param gset.idx.list gene set list contains the names, or GSON object or a gmt file, and
+#' the online gmt file is also supported.
 #' @param gsvaExp.name a character the name of \code{gsvaExp} of result \code{SVP} object.
 #' @param symbol.from.gson logical whether extract the SYMBOL ID as \code{gset.idx.list}, only work
 #' when \code{gset.idx.list} is a \code{GSON} object.
@@ -28,13 +29,6 @@
 #' @param gene.occurrence.rate the occurrence proportion of the gene set in the input object,
 #' default is 0.2.
 #' @param assay.type which expressed data to be pulled to build KNN Graph, default is \code{logcounts}.
-#' @param knn.consider.spcoord logical whether consider the spatial coordinates to run MCA. Note this is 
-#' experimental when it is TRUE, default is FALSE.
-#' @param sp.alpha.add.weight only work when \code{knn.consider.spcoord=TRUE} and \code{knn.combined.cell.feature=FALSE},
-#' which is weight of spatial space of the additive term in single cell and spatial space funsion formula, default is 0.2.
-#' @param sp.beta.add.mp.weight only work when \code{knn.consider.spcoord=TRUE} and \code{knn.combined.cell.feature=FALSE},
-#' which is weight of spatial space of the additive term and multiplicative term in single cell and spatial space funsion
-#' formula, default is 0.1.
 #' @param knn.used.reduction.dims the top components of the reduction with \code{MCA} to be used to build KNN 
 #' Graph, default is 30.
 #' @param knn.combined.cell.feature whether combined the embeddings of cells and features to find the nearest 
@@ -76,19 +70,7 @@
 #' (which is extracted from \linkS4class{SVPExperiment} using \code{gsvaExp()} funtion), output will be also a
 #' \linkS4class{SingleCellExperiment}, the activity score of gene sets result can be extracted using \code{assay()} function. The 
 #' spatially variable gene sets result can be extracted using \code{svDf()} function.
-#'
-#' When the \code{knn.consider.spcoord = TRUE}, \code{combined.cell.feature=FALSE} and the input \code{data} contains the spatial space.
-#' The distance between cells will be reconstructed by taking into account both the space of \code{MCA} from cell transcriptomics data and 
-#' the physical space of cells in the following way (refer to the second refercence article):
-#'
-#' \eqn{C.dist = (1 - \beta) * ((1-\alpha) * S.dist + \alpha * P.dist) + \beta * S.dist \odot P.dist}
-#' 
-#' where \eqn{C.dist} is the new distance matrix of cells, \eqn{S.dist} is the distance matrix of cells in the \code{MCA} space from 
-#' transcriptomics data, \eqn{P.dist} is the distance matrix from physical space of cells, \eqn{beta} weights the contributions of the 
-#' additive and multiplicative terms, which is the argument \code{sp.beta.add.mp.weight}, \eqn{alpha} weighs the contributions of \eqn{P.dist} 
-#' and \eqn{S.dist}, which is the argument \code{sp.alpha.add.weight}, and the \eqn{\odot} is the element-wise product.
-#'
-#' The affinity score is calculated in the following way (refer to the third refercence article):
+#' The affinity score is calculated in the following way (refer to the second article):
 #' 
 #' \eqn{P_{t+1} = (1 - r) * M * P_{t} + r * P_{0}}
 #' 
@@ -102,10 +84,7 @@
 #' 1. Cortal, A., Martignetti, L., Six, E. et al. Gene signature extraction and cell identity recognition at the single-cell 
 #'    level with Cell-ID. Nat Biotechnol 39, 1095–1102 (2021). https://doi.org/10.1038/s41587-021-00896-6
 #'
-#' 2. Arutyunyan, A., Roberts, K., Troulé, K. et al. Spatial multiomics map of trophoblast development in early pregnancy. 
-#'    Nature, 616, 143–151 (2023). https://doi.org/10.1038/s41586-023-05869-0.
-#'
-#' 3. Alberto Valdeolivas, Laurent Tichit, Claire Navarro, Sophie Perrin, et al. Random walk with restart on multiplex and 
+#' 2. Alberto Valdeolivas, Laurent Tichit, Claire Navarro, Sophie Perrin, et al. Random walk with restart on multiplex and 
 #'    heterogeneous biological networks, Bioinformatics, 35, 3, 497–505(2019), https://doi.org/10.1093/bioinformatics/bty637
 #'
 #' @seealso [`cluster.assign`] to classify cell using the activity score of gene sets base \code{kmean} and [`runKldSVG`] to identify the 
@@ -126,6 +105,11 @@
 #' # Here, we use the Cell Cycle gene set from the Seurat 
 #' # You can use other gene set, such as KEGG pathway, GO, Hallmark of MSigDB
 #' # or TFs gene sets etc.
+#' #
+#' # supporting the list with names or gson object or the gmt file
+#' # online gmt file is also be supported 
+#' # such as https://data.broadinstitute.org/gsea-msigdb/msigdb/release/2023.2.Hs/c2.cp.biocarta.v2023.2.Hs.symbols.gmt
+#' 
 #' data(CellCycle.Hs)
 #' sceSubPbmc <- runSGSA(sceSubPbmc, gset.idx.list = CellCycle.Hs, gsvaExp.name = 'CellCycle')
 #' # Then a SVPE class which inherits SingleCellExperiment, is return.
@@ -173,9 +157,9 @@ setGeneric('runSGSA',
     max.sz = Inf,
     gene.occurrence.rate = .2,
     assay.type = 'logcounts',
-    knn.consider.spcoord = FALSE,
-    sp.alpha.add.weight = .2,
-    sp.beta.add.mp.weight = .1,
+    #knn.consider.spcoord = FALSE,
+    #sp.alpha.add.weight = .2,
+    #sp.beta.add.mp.weight = .1,
     knn.used.reduction.dims = 30,
     knn.combined.cell.feature = FALSE,
     knn.graph.weighted = TRUE,
@@ -214,9 +198,9 @@ setMethod('runSGSA',
     max.sz = Inf,
     gene.occurrence.rate = .2,
     assay.type = 'logcounts',
-    knn.consider.spcoord = FALSE,
-    sp.alpha.add.weight = .2,
-    sp.beta.add.mp.weight = .1,    
+    #knn.consider.spcoord = FALSE,
+    #sp.alpha.add.weight = .2,
+    #sp.beta.add.mp.weight = .1,    
     knn.used.reduction.dims = 30,
     knn.combined.cell.feature = FALSE,
     knn.graph.weighted = TRUE,
@@ -260,13 +244,13 @@ setMethod('runSGSA',
   gset.num <- .filter.gset.gene(features, gset.idx.list, min.sz, max.sz, gene.occurrence.rate)
   gset.idx.list <- gset.idx.list[match(rownames(gset.num), names(gset.idx.list))]
 
-  flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
-  if (flag1){
-    coords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
-    coords <- .normalize.coords(coords)
-  }else{
-    coords <- NULL
-  }  
+  #flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
+  #if (flag1){
+  #  coords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
+  #  coords <- .normalize.coords(coords)
+  #}else{
+  #  coords <- NULL
+  #}  
   
   tic()
   cli::cli_inform(c("Building the nearest neighbor graph with the distance between 
@@ -275,10 +259,10 @@ setMethod('runSGSA',
   rd.knn.gh <- .build.nndist.graph(
                        cells.rd,
                        features.rd,
-                       coords,
-                       knn.consider.spcoord,
-                       sp.alpha.add.weight,
-                       sp.beta.add.mp.weight,
+                       #coords,
+                       #knn.consider.spcoord,
+                       #sp.alpha.add.weight,
+                       #sp.beta.add.mp.weight,
                        top.n = knn.k.use,
                        combined.cell.feature = knn.combined.cell.feature,
                        weighted.distance = knn.graph.weighted
