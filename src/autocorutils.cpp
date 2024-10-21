@@ -5,30 +5,28 @@ using namespace std;
 
 
 double moranouterdot(arma::vec x, arma::sp_mat w){
-  arma::vec res(x.n_elem);
+  double res = 0.0;
   for (size_t i = 0; i < w.n_cols; i++){
-    res(i) = accu(x(i) * x % w.col(i));
+    res = res + accu(x(i) * x % w.col(i));
   }
-  return(accu(res));
+  return(res);
 }
 
 double gearyouterdot(arma::vec x, arma::sp_mat w){
-  arma::vec res(x.n_elem);
+  double res = 0.0;
   for (size_t i = 0; i < w.n_cols; i++){
-    res(i) = accu(pow((x(i) - x), 2.0) % w.col(i));
+    res = res + accu(pow((x(i) - x), 2.0) % w.col(i));
   }
-  return(accu(res));
+  return(res);
 }
 
 arma::vec getisordouterdot(arma::vec x, arma::sp_mat w){
-  arma::vec z1(x.n_elem);
-  arma::vec z(x.n_elem);
+  arma::vec res(2);
   for (size_t i = 0; i < w.n_cols; i++){
-    z1(i) = accu(x(i) * x) - x(i) * x(i);
-    z(i) = accu(x(i) * x  % w.col(i)) - x(i) * x(i) * w(i,i);
+    res(0) = res(0) + accu(x(i) * x) - pow(x(i), 2.0);
+    res(1) = res(1) + accu(x(i) * x  % w.col(i)) - pow(x(i),2.0) * w(i,i);
   }
-  arma::vec zv = {accu(z1), accu(z)};
-  return(zv);
+  return(res);
 }
 
 arma::rowvec scaleCpp(arma::rowvec x){

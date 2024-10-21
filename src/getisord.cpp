@@ -103,7 +103,7 @@ arma::mat CalGetisOrdParallel(arma::sp_mat& x, arma::sp_mat& wm, int lower_tail=
   arma::vec colsumw = rowsumsp(weight);
   arma::vec rowsumw = rowsumsp(wm);
   
-  double S1 =  0.5 * accu(powsp(wm + wm.t()));
+  double S1 =  0.5 * accu(powsp(wm + weight));
   double S2 = accu(pow(rowsumw + colsumw, 2.0));
   double s = accu(weight);
 
