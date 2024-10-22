@@ -7,7 +7,7 @@ using namespace std;
 double moranouterdot(arma::vec x, arma::sp_mat w){
   double res = 0.0;
   for (size_t i = 0; i < w.n_cols; i++){
-    res = res + accu(x(i) * x % w.col(i));
+    res += accu(x(i) * x % w.col(i));
   }
   return(res);
 }
@@ -15,7 +15,7 @@ double moranouterdot(arma::vec x, arma::sp_mat w){
 double gearyouterdot(arma::vec x, arma::sp_mat w){
   double res = 0.0;
   for (size_t i = 0; i < w.n_cols; i++){
-    res = res + accu(pow((x(i) - x), 2.0) % w.col(i));
+    res += accu(pow((x(i) - x), 2.0) % w.col(i));
   }
   return(res);
 }
@@ -23,8 +23,8 @@ double gearyouterdot(arma::vec x, arma::sp_mat w){
 arma::vec getisordouterdot(arma::vec x, arma::sp_mat w){
   arma::vec res(2);
   for (size_t i = 0; i < w.n_cols; i++){
-    res(0) = res(0) + accu(x(i) * x) - pow(x(i), 2.0);
-    res(1) = res(1) + accu(x(i) * x  % w.col(i)) - pow(x(i),2.0) * w(i,i);
+    res(0) += accu(x(i) * x) - pow(x(i), 2.0);
+    res(1) += accu(x(i) * x  % w.col(i)) - pow(x(i),2.0) * w(i,i);
   }
   return(res);
 }
@@ -53,14 +53,29 @@ arma::vec lagCpp(arma::sp_mat w, arma::vec x){
     return(res);
 }
 
+double lagCpp2(arma::sp_mat w, arma::vec x, arma::vec y){
+    double res = 0.0;
+    for (size_t i = 0; i < w.n_cols; i++){
+        res += accu(x % w.col(i)) * accu(y % w.col(i));
+    }
+    return(res);
+}
+
+arma::vec lagCpp3(arma::sp_mat w, arma::vec x, arma::vec y){
+    arma::vec res(x.n_elem);
+    for (size_t i = 0; i < w.n_cols; i++){
+        res(i) = accu(x % w.col(i)) * accu(y % w.col(i));
+    }
+    return(res);
+}
+
 //[[Rcpp::export]]
 arma::vec cal_local_moran_bv(
     arma::vec x, 
     arma::vec y,
     arma::sp_mat weight
     ){
-    arma::vec ldy = lagCpp(weight, y);
-    arma::vec res = x % ldy;
+    arma::vec res = x % lagCpp(weight, y);
     return(res);
 }
 
@@ -72,16 +87,12 @@ double cal_global_lee(
     int n
     ){
     
-    arma::vec dx = x - mean(x);
-    arma::vec dy = y - mean(y);
-    
-    double dx2 = accu(pow(dx, 2.0));
-    double dy2 = accu(pow(dy, 2.0));
+    double dx2 = accu(pow(x - mean(x), 2.0));
+    double dy2 = accu(pow(y - mean(y), 2.0));
 
-    arma::vec ldx = lagCpp(weight, dx);
-    arma::vec ldy = lagCpp(weight, dy);
+    double ldxy = lagCpp2(weight, x-mean(x), y-mean(y));
 
-    double L = (n/S2) * (sum(ldx % ldy))/(sqrt(dx2) * sqrt(dy2));
+    double L = (n/S2) * ldxy/(sqrt(dx2) * sqrt(dy2));
     
     return(L);
 }

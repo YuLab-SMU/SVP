@@ -114,16 +114,13 @@ arma::vec RunLocalLee(
     double n
     ){
     arma::sp_mat w = wm.t();
-    arma::vec dx = x - mean(x);
-    arma::vec dy = y - mean(y);
 
-    double dx2 = accu(pow(dx, 2.0));
-    double dy2 = accu(pow(dy, 2.0));
+    double dx2 = accu(pow(x-mean(x), 2.0));
+    double dy2 = accu(pow(y-mean(y), 2.0));
 
-    arma::vec ldx = lagCpp(w, dx);
-    arma::vec ldy = lagCpp(w, dy);
+    arma::vec l = lagCpp3(w, x-mean(x), y-mean(y));
 
-    arma::vec l = (n * ldx % ldy)/(sqrt(dx2) * sqrt(dy2));
+    l = (n * l)/(sqrt(dx2) * sqrt(dy2));
     return(l);
 }
 

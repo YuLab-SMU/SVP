@@ -17,6 +17,8 @@ arma::vec scaleCpp2(arma::vec x);
 
 arma::vec lagCpp(arma::sp_mat w, arma::vec x);
 
+arma::vec lagCpp3(arma::sp_mat w, arma::vec x, arma::vec y);
+
 arma::vec rowsumsp(arma::sp_mat x, bool flag = false);
 
 arma::sp_mat powsp(arma::sp_mat x);
