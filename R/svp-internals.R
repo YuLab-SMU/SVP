@@ -2,11 +2,7 @@
 ## computation of SVD and the calculation of feature coordinates (1.5 faster than RunMCA of CelliD).
 .runMCA.internal <- function(x, y = NULL, reduction.name = 'MCA', ncomponents, coords = NULL, ...){
   rlang::check_installed(c('RSpectra', 'Matrix'), 'for `runMCA()`')
-  if (inherits(x, 'dgTMatrix')){
-     x <- as(x, "CsparseMatrix")
-  }else if (inherits(x, 'matrix')){
-     x <- Matrix::Matrix(x, sparse = TRUE)
-  }
+  x <- .check_dgCMatrix(x)
   x <- x[DelayedMatrixStats::rowVars(x) != 0, ,drop=FALSE]
   cells.nm <- colnames(x)
   features.nm <- rownames(x)
@@ -85,6 +81,7 @@ pairDist <- function(x, y){
 
 
 .build_col_knn <- function(x, topn=2, weighted.distance=FALSE){
+   x <- .check_dgCMatrix(x)
    topn <- max(1, min(topn, nrow(x)))
    topn <- ifelse(weighted.distance, topn, topn - 1)
    res <- colKnnCpp(x, topn, weighted.distance)
@@ -659,7 +656,7 @@ pairDist <- function(x, y){
           weight.mat <- .convert_to_distmt(weight)
       }else if (inherits(weight, "matrix") && identical(rownames(weight), colnames(weight))){
           weight.mat <- weight |> Matrix::Matrix(sparse=TRUE)
-      }else if (inherits(weight, "dgCMatrix") && identical(rownames(weight), colnames(weight))){
+      }else if (inherits(weight, "sparseMatrix") && identical(rownames(weight), colnames(weight))){
           weight.mat <- weight
       }else{
           cli::cli_abort(

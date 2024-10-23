@@ -481,8 +481,7 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
 }
 
 .check_dgCMatrix <- function(x){
-  flag <- inherits(x, 'matrix') || inherits(x, 'dgTMatrix') || 
-          inherits(x, "dgeMatrix") ||  inherits(x, 'dgRMatrix') 
+  flag1 <- inherits(x, c("symmetricMatrix", "diagonalMatrix", "triangularMatrix"))
   if (inherits(x, "data.frame")){
      x <- as.matrix(x) 
   }
@@ -491,18 +490,22 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
      x <- as(x, "dMatrix")
   }
 
-  if (flag){
-     x <- as(x, 'CsparseMatrix')
+  if (flag1){
+     x <- as(x, "generalMatrix")
+  }
+
+  if (!inherits(x,'dgCMatrix')){
+     x <- as(x, "CsparseMatrix")
   }
   
   if (!inherits(x, 'dgCMatrix')){
      cli_abort("The profile assay table of features should be a `dgCMatrix` class.")
   }
 
-  flag2 <- is.na(x@x)
-  if (any(flag2)){
+  flag2 <- is.na(x)
+  if (sum(flag2)>0){
      cli::cli_warn("The profile assay table have NA value, which is filling by zero.")
-     x@x[flag2] <- 0
+     x[flag2] <- 0
   }
    
   return(x)
