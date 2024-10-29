@@ -648,7 +648,7 @@ pairDist <- function(x, y){
           if (is.integer(coords)) coords <- coords * 1.0
           weight.mat <- pairDist(coords, coords)
       }
-      weight.mat <- weight.mat * (1/Matrix::rowSums(weight.mat))
+      weight.mat <- .norm_weight_mat(weight.mat)
   }
   
   if (!is.null(weight)){
@@ -672,7 +672,6 @@ pairDist <- function(x, y){
       weight.mat <- do.call(weight.method, c(list(coords), params))
       weight.mat <- .convert_to_distmt(weight.mat)
   }
-
   return(weight.mat)
 }
 

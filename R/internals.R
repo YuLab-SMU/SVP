@@ -441,6 +441,12 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
 
 .check_weight <- function(x, sample_id, weight=NULL, group.by=NULL){
   if (!is.null(weight)){
+    if (dim(weight)==2){
+        weight <- weight[colnames(x),colnames(x),drop=FALSE]
+        if (any(Matrix::rowSums(weight)!=1)){
+            weight <- .norm_weight_mat(weight)
+        }
+    }
     return(weight) 
   }
   
@@ -475,7 +481,7 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
      ind <- da[[1]] == i
      res[ind, ind] <- 1
   }
-  res <- res * (1/Matrix::rowSums(res)) 
+  res <- .norm_weight_mat(res)
   rownames(res) <- colnames(res) <- rownames(da)
   return(res)
 }
@@ -510,3 +516,14 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
    
   return(x)
 }
+
+.norm_weight_mat <- function(x){
+  rs <- Matrix::rowSums(x)
+  res <- x * (1/rs)
+  if (any(rs == 0)){
+     res[is.na(res)] <- 0.0
+  }
+  return(res)
+}
+
+
