@@ -4,13 +4,7 @@ using namespace arma;
 #ifndef autocorutils_H
 #define autocorutils_H
 
-arma::mat outerdot(arma::rowvec x);
-
 double moranouterdot(arma::vec x, arma::sp_mat w);
-
-arma::mat outersubtractdot(arma::rowvec x);
-
-arma::mat outermultidot(arma::rowvec x); 
 
 arma::rowvec scaleCpp(arma::rowvec x);
 arma::vec scaleCpp2(arma::vec x);
