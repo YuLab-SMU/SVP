@@ -47,6 +47,9 @@
             )
   }
   toc()
+  colnames(pt.m) <- colnames(start.m)
+  rownames(pt.m) <- rownames(start.m)
+  pt.m <- pt.m[cells,,drop=FALSE]  
   pt.m[is.na(pt.m)] <- 0
   pt.m[pt.m < stop.delta] <- 0
   tic()
@@ -54,9 +57,6 @@
   if (ncol(pt.m) == 1){
     normalize.affinity <- FALSE
   }
-  colnames(pt.m) <- colnames(start.m)
-  rownames(pt.m) <- rownames(start.m)
-  pt.m <- pt.m[cells,,drop=FALSE]
   if (prop.normalize){
     if (ncol(pt.m) > 1){
       if (any(pt.m < 0)){
@@ -66,13 +66,14 @@
     }else{
       pt.m <- .normalize.single.score(pt.m)
     }
+    pt.m[is.na(pt.m)] <- 0
   }
 
   if (normalize.affinity){
     rlang::check_installed('broman', 'for `.run_rwr()` with `normalize.affinity = TRUE`.')
     pt.m <- broman::normalize(pt.m)
+    pt.m[is.na(pt.m)] <- 0
   }
-  pt.m[is.na(pt.m)] <- 0
   #pt.m <- Matrix::Matrix(t(pt.m), sparse = TRUE)
   pt.m <- t(pt.m)
   toc()
