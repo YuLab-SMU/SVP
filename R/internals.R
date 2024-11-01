@@ -476,11 +476,10 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
 
 .build_adj_matrix <- function(da){
   x <- as.character(unique(da[[1]]))
-  res <- Matrix::sparseMatrix(i=seq(nrow(da)),j=seq(nrow(da)),x=0)
-  for (i in x){
-     ind <- da[[1]] == i
-     res[ind, ind] <- 1
-  }
+  ind.j <- lapply(x, function(i) which(da[[1]] == i))
+  ind.i <- lapply(ind.j, function(i)rep(i,length(i))) |> unlist()
+  ind.j <- lapply(ind.j, function(i)rep(i,each=length(i))) |> unlist()
+  res <- Matrix::sparseMatrix(i = ind.i, j = ind.j, x=1, dims=c(nrow(da), nrow(da)))
   res <- .norm_weight_mat(res)
   rownames(res) <- colnames(res) <- rownames(da)
   return(res)
