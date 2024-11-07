@@ -7,12 +7,11 @@
 #' to obtain the cells and cells association, genes and gens association, we also extract the top nearest 
 #' cells or genes respectively, then combine all the association into the same network to obtain the adjacency 
 #' matrix of all cells and genes. Another method is that we build the network using the combined \code{MCA} 
-#' space of cells and genes directly, but this method can not combine the spatial physical space.(see also 
-#' details). Next, we build a starting seed matrix (which each column measures the initial probability 
-#' distribution of each gene set in graph nodes) for random walk with restart using the gene set and all
-#' nodes of the graph. Finally, we employ the restart walk with restart algorithm to compute the affinity 
-#' score for each gene set or pathway, which is then further weighted using the hypergeometric test result 
-#' from the original expression matrix.
+#' space of cells and genes directly. Next, we build a starting seed matrix (which each column measures 
+#' the initial probability distribution of each gene set in graph nodes) for random walk with restart using 
+#' the gene set and all nodes of the graph. Finally, we employ the restart walk with restart algorithm to 
+#' compute the affinity score for each gene set or pathway, which is then further weighted using the hypergeometric 
+#' test result from the original expression matrix controlled by \code{hyper.test.weighted} parameter.
 #'
 #' @rdname runSGSA-method
 #' @param data a \linkS4class{SingleCellExperiment} object normalized and have the result of 
@@ -75,10 +74,10 @@
 #' \eqn{P_{t+1} = (1 - r) * M * P_{t} + r * P_{0}}
 #' 
 #' where \eqn{P_{0}} is the initial probability distribution for each gene set, \eqn{M} is the transition matrix that is the column normalization 
-#' of adjacency matrix of graph, \eqn{r} is the the global restart probability, \eqn{P_{t+1}} and \eqn{P_{t}} are the probability distribution in 
+#' of adjacency matrix of graph, \eqn{r} is the global restart probability, \eqn{P_{t+1}} and \eqn{P_{t}} represent the probability distribution in 
 #' each iteration. After several iterations, the difference between \eqn{P_{t+1}} and \eqn{P_{t}} becomes negligible, the stationary probability 
-#' distribution is reached, and the elements for each gene set represent a proximity measure from every graph node. Iterations are stoped when the 
-#' difference between \eqn{P_{t+1}} and \eqn{P_{t}} falls below 1e-6.
+#' distribution is reached, indicating proximity measures from every graph node. Iterations are stopped when the difference between \eqn{P_{t+1}} 
+#' and \eqn{P_{t}} falls below 1e-10.
 #' 
 #' @references
 #' 1. Cortal, A., Martignetti, L., Six, E. et al. Gene signature extraction and cell identity recognition at the single-cell 
