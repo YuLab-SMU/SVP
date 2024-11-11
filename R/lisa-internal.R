@@ -59,8 +59,8 @@
         }
     }else{
         if (!all(is.na(x$z)) && !all(is.na(x$lz))){
-            c1 <- cut(x$z, c(-Inf, mean(x$z), Inf), lbs)
-            c2 <- cut(x$lz, c(-Inf, mean(x$lz), Inf), lbs)
+            c1 <- cut(x$z, c(-Inf, mean(x$z, na.rm=TRUE), Inf), lbs)
+            c2 <- cut(x$lz, c(-Inf, mean(x$lz, na.rm=TRUE), Inf), lbs)
             x$`cluster.no.test` <- interaction(c1, c2, sep="-")
         }
         x$z <- NULL
