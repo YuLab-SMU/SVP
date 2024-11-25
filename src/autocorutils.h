@@ -87,4 +87,45 @@ arma::mat tidylocalmoran(
     arma::vec res6,
     arma::mat res
 );
+
+arma::vec cal_quant(
+  arma::vec diagM,
+  arma::vec diagMt,
+  arma::vec MII
+);
+
+arma::vec cal_Qquant(
+  arma::vec x,
+  arma::vec y,
+  int n
+);
+
+arma::vec cal_EGamma(
+  arma::vec P,
+  arma::vec Q,
+  int n
+);
+
+arma::vec cal_VarGamma(
+  arma::vec P,
+  arma::vec Q,
+  arma::vec EG,
+  int n
+);
+
+double cal_pval_lee(
+  double L,
+  arma::vec dEG,
+  arma::vec dVarG,
+  int alternative=1
+);
+
+double cal_pval_lee_pipeline(
+  double L,
+  arma::vec x,
+  arma::vec y,
+  arma::vec P,
+  int n,
+  int alternative = 1
+);
 #endif

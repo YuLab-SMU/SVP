@@ -29,11 +29,34 @@ arma::vec cal_global_lee_test(
   return(res);
 }
 
+arma::vec cal_Pquant(sp_mat w, int n){
+  double tt = 0.0;
+  arma::vec MII(n);
+  arma::vec diagM(n);
+  arma::vec diagMt(n);
+  arma::vec wv(n);
+  for (int i = 0; i < n; i++){
+    for (int j = 0; j < n; j++){
+      wv(j) = accu(w.col(i) % w.col(j));
+    }
+    tt += accu(wv);
+    MII(i) = accu(wv);
+    diagM(i) = wv(i);
+    diagMt(i) = accu(pow(wv, 2.0));
+  }
+  diagM = diagM/tt;
+  MII = MII/tt;
+  diagMt = diagMt/pow(tt, 2.0);
+  arma::vec res = cal_quant(diagM, diagMt, MII);
+  return(res);
+}
+
 struct RunGlobalLee : public Worker{
   const arma::sp_mat& x;
   const arma::sp_mat& w;
   const arma::urowvec& f1;
   const arma::urowvec& f2;
+  const arma::vec& P;
   simple_progress& p;
   const uword& nf2;
   const double S2;
@@ -46,10 +69,10 @@ struct RunGlobalLee : public Worker{
   arma::mat& presult;
   
   RunGlobalLee(const arma::sp_mat& x, const arma::sp_mat& w, const arma::urowvec& f1,
-          const arma::urowvec& f2, simple_progress& p, const uword& nf2, 
+          const arma::urowvec& f2, const arma::vec& P, simple_progress& p, const uword& nf2, 
           const double S2, const int n, const uint64_t seed, const int permutation,
           const bool cal_pvalue, const int alternative, arma::mat& result, arma::mat& presult):
-    x(x), w(w), f1(f1), f2(f2), p(p), nf2(nf2), S2(S2), n(n), seed(seed), 
+    x(x), w(w), f1(f1), f2(f2), P(P), p(p), nf2(nf2), S2(S2), n(n), seed(seed), 
     permutation(permutation), cal_pvalue(cal_pvalue), alternative(alternative), 
     result(result), presult(presult){} 
 
@@ -61,8 +84,13 @@ struct RunGlobalLee : public Worker{
               double obs = cal_global_lee(x.col(f1[i]).as_dense(), x.col(f2[j]).as_dense(), w, S2, n);
               result(i, j) = obs;
               if (cal_pvalue){
-                  arma::vec resp = cal_global_lee_test(x.col(f1[i]).as_dense(), x.col(f2[j]).as_dense(), w, lrng, S2, n, permutation);
-                  double pv = cal_permutation_p(resp, obs, permutation + 1, alternative);
+                  double pv = 1.0;
+                  if (permutation <= 10){
+                    pv = cal_pval_lee_pipeline(obs, x.col(f1[i]).as_dense(), x.col(f2[j]).as_dense(), P, n, alternative);
+                  }else{
+                    arma::vec resp = cal_global_lee_test(x.col(f1[i]).as_dense(), x.col(f2[j]).as_dense(), w, lrng, S2, n, permutation);
+                    pv = cal_permutation_p(resp, obs, permutation + 1, alternative);
+                  }
                   presult(i, j) = pv;
               }
               p.increment();
@@ -92,13 +120,19 @@ Rcpp::List CalGlobalLeeParallel(
   
   int n1 = f1.n_elem;
   uword n2 = f2.n_elem;
+  
+  arma::vec P(6);
+  if (permutation <= 10){
+    P = cal_Pquant(wm, m); 
+  }
 
-  simple_progress p (n1 * n2);
+  simple_progress p(n1 * n2);
   
   arma::mat res(n1, n2);
   arma::mat pres(n1, n2);
 
-  RunGlobalLee rungloballeeperm(xm, w, f1, f2, p, n2, S2, m, seed1, permutation, cal_pvalue, alternative, res, pres);
+  RunGlobalLee rungloballeeperm(xm, w, f1, f2, P, p, n2, S2, m, seed1, 
+      permutation, cal_pvalue, alternative, res, pres);
        
   parallelFor(0, n1, rungloballeeperm);
   List result = List::create(Named("Lee")=res, Named("pvalue")=pres);

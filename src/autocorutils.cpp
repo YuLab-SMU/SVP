@@ -292,3 +292,110 @@ double calculateF1(const arma::vec& predictions, const arma::vec& actuals){
 
     return (F1);
 }
+
+arma::vec cal_quant(
+  arma::vec diagM,
+  arma::vec diagMt,
+  arma::vec MII
+  ){
+  double Fon0 = accu(diagM);
+  double Foff0 = accu(MII) - Fon0;
+  double Fon1 = accu(pow(diagM, 2.0));
+  double Foff1 = accu(diagMt) - Fon1;
+  double Foff2 = accu(pow(MII - diagM, 2.0));
+  double Fall2 = accu(pow(MII, 2.0));
+  arma::vec res = {Foff0, Fon0, Foff1, Fon1, Foff2, Fall2};
+  return(res);
+}
+
+arma::vec cal_Qquant(
+  arma::vec x,
+  arma::vec y,
+  int n
+){
+  arma::vec xbar = x - mean(x);
+  arma::vec ybar = y - mean(y);
+  double t = ((n - 1.0)/n) * arma::stddev(x) * arma::stddev(y);
+  arma::vec diagM = xbar % ybar/t;
+  arma::vec MII(n);
+  arma::vec diagMt(n);
+  for (int i = 0; i < n; i++){
+    MII(i) = accu(xbar(i) * ybar/t);
+    diagMt(i) = accu(pow(ybar(i) * xbar/t, 2.0));
+  }
+  arma::vec res = cal_quant(diagM, diagMt, MII);
+  return(res);
+}
+
+arma::vec cal_EGamma(
+  arma::vec P,
+  arma::vec Q,
+  int n
+  ){
+  double EGammaoff = P(0) * Q(0)/(n * (n - 1.0));
+  double EGammaon = P(1) * Q(1)/n;
+  arma::vec res = {EGammaoff, EGammaon};
+  return(res);
+}
+
+arma::vec cal_VarGamma(
+  arma::vec P,
+  arma::vec Q,
+  arma::vec EG,
+  int n
+  ){
+  double varGammaoff = 2.0 * P(2) * Q(2)/(n * (n - 1.0));
+  varGammaoff = varGammaoff + 4.0 * (P(4) - P(2)) * (Q(4) - Q(2))/(n * (n - 1.0) * (n - 2.0));
+  varGammaoff = varGammaoff +
+                (pow(P(0), 2.0) + 2.0 * P(2) - 4.0 * P(4)) *
+                (pow(Q(0), 2.0) + 2.0 * Q(2) - 4.0 * Q(4))/(n * (n - 1.0) * (n - 2.0) * (n - 3.0));
+  varGammaoff = varGammaoff - pow(EG(0), 2.0);
+
+  double varGammaon = 1.0 * P(3) * Q(3)/n;
+  varGammaon = varGammaon + (pow(P(1), 2.0) - P(3)) * (pow(Q(1), 2.0) - Q(3))/(n * (n - 1.0));
+  varGammaon = varGammaon - pow(EG(1), 2.0);
+
+  double varGammaonoff = (P(5) - P(3) - P(4)) * (Q(5) - Q(3) - Q(4))/(2 * n * (n - 1.0));
+  varGammaonoff = varGammaonoff +
+                  (P(1) * P(0) - (P(5) - P(3) - P(4))) *
+                  (Q(1) * Q(0) - (Q(5) - Q(3) - Q(4)))/(n * (n - 1.0) * (n - 2.0));
+  varGammaonoff = varGammaonoff - EG(0) * EG(1);
+
+  arma::vec res = {varGammaon, varGammaoff, varGammaonoff};
+  return(res);
+}
+
+double cal_pval_lee(
+  double L, 
+  arma::vec dEG, 
+  arma::vec dVarG, 
+  int alternative=1
+  ){
+  double EL = dEG(1) + dEG(0);
+  double VL = sqrt(dVarG(0) + dVarG(1) + 2.0 * dVarG(2));
+  double ZL = (L - EL)/VL;
+  double pval = 0.0;
+  if (alternative == 3){
+    pval = R::pnorm(ZL, 0, 1, 0, 0);
+  }else if (alternative == 1){
+    pval = 2 * R::pnorm(std::abs(ZL), 0, 1, 0, 0);
+  }else if (alternative == 2){
+    pval = R::pnorm(ZL, 0, 1, 1, 0);
+  }
+  return(pval);
+}
+
+double cal_pval_lee_pipeline(
+  double L,
+  arma::vec x,
+  arma::vec y,
+  arma::vec P,
+  int n,
+  int alternative = 1
+  ){
+  arma::vec Q = cal_Qquant(x, y, n);
+  arma::vec dEG = cal_EGamma(P, Q, n);
+  arma::vec dVarG = cal_VarGamma(P, Q, dEG, n);
+  double pval = cal_pval_lee(L, dEG, dVarG, alternative);
+  return(pval);
+}
