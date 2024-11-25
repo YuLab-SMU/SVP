@@ -3,7 +3,7 @@
   weight,
   features1 = NULL,
   features2 = NULL,
-  permutation = 100,
+  permutation = 100L,
   alternative = c('greater', 'two.sided', 'less'),
   add.pvalue = FALSE,
   listn = NULL,
@@ -12,6 +12,9 @@
   ){
   allf <- rownames(x)
   alter <- switch(alternative, greater=3, `two.sided`=1, less = 2)
+  if (is.null(permutation)){
+     permutation <- 1L
+  }
   if (is.null(features1) && is.null(features2)){
       f1 <- f2 <- seq(nrow(x))
   }else if (!is.null(features1) && is.null(features2)){

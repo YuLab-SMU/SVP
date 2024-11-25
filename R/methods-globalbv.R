@@ -37,9 +37,10 @@
 #' @param group.by character a specified category column names (for example the cluster column name) of
 #' \code{colData(data)}, if it was specified, the adjacency weighted matrix will be built based on the principle
 #' that spots or cells in the same category are adjacent, default is NULL.
-#' @param permutation integer the permutation number to test, default is 100L.
+#' @param permutation integer the permutation number to test, default is 100L, if permutation is smaller than 10
+#' or NULL, which will use mantel test to calculate the pvalue.
 #' @param alternative a character string specifying the alternative hypothesis, which only work with 
-#' \code{add.pvalue = TRUE}, default is \code{greater}.
+#' \code{add.pvalue = TRUE}, default is \code{two.sided}.
 #' @param add.pvalue logical whether calculate the pvalue, which is calculated with permutation test. So it might
 #' be slow, default is \code{FALSE}, which the pvalue of result will be NULL.
 #' @param random.seed numeric random seed number to repeatability, default is 1024.
@@ -70,6 +71,9 @@
 #' @references
 #' Lee, SI. Developing a bivariate spatial association measure: An integration of Pearson's r and Moran's I . 
 #' J Geograph Syst 3, 369–385 (2001). https://doi.org/10.1007/s101090100064
+#' Lee, S.-I. (2004). A Generalized Significance Testing Method for Global Measures of Spatial Association: 
+#' An Extension of the Mantel Test. Environment and Planning A: Economy and Space, 36(9), 1687-1703. 
+#' https://doi.org/10.1068/a34143.
 #' @author Shuangbin Xu
 #' @export
 #' @examples
@@ -91,6 +95,11 @@
 #'                     action = 'get'
 #'         )
 #' res2
+#' # when add.pvalue = TRUE and permutation <= 10 or NULL, the pvalue will be
+#' # calculated using mantel test.
+#' res3 <- runGLOBALBV(hpda_spe_cell_dec, features1 = rownames(hpda_spe_cell_dec), 
+#'                     assay.type = 1, action='get', add.pvalue=TRUE, permutation=NULL)
+#' res3 |> as_tbl_df(diag=FALSE) 
 setGeneric('runGLOBALBV',
   function(
     data,
