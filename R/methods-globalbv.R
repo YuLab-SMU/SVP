@@ -1,4 +1,5 @@
 #' @title Global Bivariate analysis for spatial autocorrelation
+#' 
 #' @description
 #' This function is to explore the global bivariate relationship in the spatial space.
 #' It efficiently reflects the extent to which bivariate associations are spatially grouped. 
@@ -68,12 +69,15 @@
 #' @return SimpleList or long tidy table see also the help information of \code{action} argument.
 #' @seealso [`runDetectSVG`] and [`runKldSVG`] to identify the spatial variable features.
 #' [`runLISA`] to explore the spatial hotspots.
-#' @references
-#' Lee, SI. Developing a bivariate spatial association measure: An integration of Pearson's r and Moran's I . 
+#'
+#' @references 
+#' 1. Lee, SI. Developing a bivariate spatial association measure: An integration of Pearson's r and Moran's I . 
 #' J Geograph Syst 3, 369–385 (2001). https://doi.org/10.1007/s101090100064
-#' Lee, S.-I. (2004). A Generalized Significance Testing Method for Global Measures of Spatial Association: 
+#' 
+#' 2. Lee, SI. A Generalized Significance Testing Method for Global Measures of Spatial Association: 
 #' An Extension of the Mantel Test. Environment and Planning A: Economy and Space, 36(9), 1687-1703. 
 #' https://doi.org/10.1068/a34143.
+#'
 #' @author Shuangbin Xu
 #' @export
 #' @examples

@@ -197,11 +197,13 @@ res3 <- runGLOBALBV(hpda_spe_cell_dec, features1 = rownames(hpda_spe_cell_dec),
 res3 |> as_tbl_df(diag=FALSE) 
 }
 \references{
-Lee, SI. Developing a bivariate spatial association measure: An integration of Pearson's r and Moran's I .
+\enumerate{
+\item Lee, SI. Developing a bivariate spatial association measure: An integration of Pearson's r and Moran's I .
 J Geograph Syst 3, 369–385 (2001). https://doi.org/10.1007/s101090100064
-Lee, S.-I. (2004). A Generalized Significance Testing Method for Global Measures of Spatial Association:
+\item Lee, SI. A Generalized Significance Testing Method for Global Measures of Spatial Association:
 An Extension of the Mantel Test. Environment and Planning A: Economy and Space, 36(9), 1687-1703.
 https://doi.org/10.1068/a34143.
+}
 }
 \seealso{
 \code{\link{runDetectSVG}} and \code{\link{runKldSVG}} to identify the spatial variable features.
