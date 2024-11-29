@@ -304,10 +304,10 @@ pairDist <- function(x, y){
 #}
 
 #' @importFrom BiocParallel SerialParam
-#' @importFrom BiocNeighbors findKmknn
+#' @importFrom BiocNeighbors findKNN
 .build.knn.adj <- function(x, 
                        knn.k.use = 600, 
-                       fun.nm = findKmknn, 
+                       fun.nm = findKNN, 
                        BPPARAM = SerialParam(), 
                        weighted.distance = TRUE,
                        bycol = TRUE,
