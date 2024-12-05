@@ -441,7 +441,7 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
 
 .check_weight <- function(x, sample_id, weight=NULL, group.by=NULL){
   if (!is.null(weight)){
-    if (dim(weight)==2){
+    if (length(dim(weight))==2){
         weight <- weight[colnames(x),colnames(x),drop=FALSE]
         if (any(Matrix::rowSums(weight)!=1)){
             weight <- .norm_weight_mat(weight)
