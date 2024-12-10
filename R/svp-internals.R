@@ -272,7 +272,7 @@ pairDist <- function(x, y){
         #total.dist <- pairDist(total.rd, total.rd)
         top.n <- min(top.n, nrow(total.rd)) 
         adj.m <- .build.knn.adj(total.rd, top.n, 
-                                  fun.nm = findKmknn, 
+                                  fun.nm = findKNN, 
                                   weighted.distance = weighted.distance
                                   ) 
         #adj.m <- .extract.adj.m(knn.graph, edge.attr = 'weight') 

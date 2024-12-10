@@ -53,7 +53,7 @@
     if (method == 'localG'){
         if (!all(is.na(x$`Z.Gi`))){
             x$`cluster.no.test` <- cut(x$`Z.Gi`,
-                             c(-Inf, mean(x$x, na.rm=TRUE), Inf),
+                             c(-Inf, mean(x$Gi, na.rm=TRUE), Inf),
                              lbs)
             x$x <- NULL
         }

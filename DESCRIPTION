@@ -37,7 +37,11 @@ Imports:
   DelayedMatrixStats,
   deldir,
   utils,
-  BiocNeighbors
+  BiocNeighbors,
+  ggplot2,
+  ggstar,
+  ggtree,
+  ggfun
 Suggests:
   broman,
   RSpectra,
@@ -53,9 +57,8 @@ Suggests:
   tibble,
   tidyr,
   harmony,
-  ggplot2,
-  ggtree,
-  aplot 
+  aplot,
+  scales
 License: GPL-3
 BugReports: https://github.com/YuLab-SMU/SVP/issues
 URL: https://github.com/YuLab-SMU/SVP
