@@ -43,12 +43,13 @@ Imports:
   ggtree,
   ggfun
 Suggests:
+  rmarkdown,
+  prettydoc,
   broman,
   RSpectra,
   BiasedUrn,
   knitr,
   ks,
-  rmarkdown,
   igraph,
   testthat (>= 3.0.0),
   scuttle,
@@ -59,7 +60,8 @@ Suggests:
   harmony,
   aplot,
   scales,
-  ggsc
+  ggsc,
+  scran
 License: GPL-3
 BugReports: https://github.com/YuLab-SMU/SVP/issues
 URL: https://github.com/YuLab-SMU/SVP

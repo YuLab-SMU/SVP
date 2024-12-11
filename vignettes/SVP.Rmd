@@ -5,13 +5,14 @@ author: |
   | School of Basic Medical Sciences, Southern Medical University
 date: "`r Sys.Date()`"
 bibliography: refer.bib
-biblio-style: apalike  
-prettydoc::html_pretty:
-  toc: true
-  theme: cayman
-  highlight: vignette
-pdf_document:
-  toc: true
+biblio-style: apalike 
+output:
+  prettydoc::html_pretty:
+    toc: true
+    theme: cayman
+    highlight: vignette
+  pdf_document:
+    toc: true
 vignette: >
   %\VignetteIndexEntry{SVP Vignette}
   %\VignetteEngine{knitr::rmarkdown}
@@ -65,6 +66,7 @@ SVP can integrate gene or protein lists from existing biomedical databases like 
 library(SpatialExperiment)
 library(SingleCellExperiment)
 library(scuttle)
+library(scran)
 library(SVP)
 library(ggsc)
 library(ggplot2)
@@ -205,8 +207,8 @@ pdac_a_sce <- logNormCounts(pdac_a_sce)
 
 # obtain the top high variable genes
 set.seed(123)
-stats <- scran::modelGeneVar(pdac_a_sce)
-hvgs <- scran::getTopHVGs(stats)
+stats <- modelGeneVar(pdac_a_sce)
+hvgs <- getTopHVGs(stats)
 
 # perform the MCA reduction.
 pdac_a_sce <- pdac_a_sce |> runMCA(assay.type = 'logcounts', subset.row=hvgs[seq(2000)])
