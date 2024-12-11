@@ -58,7 +58,8 @@ Suggests:
   tidyr,
   harmony,
   aplot,
-  scales
+  scales,
+  ggsc
 License: GPL-3
 BugReports: https://github.com/YuLab-SMU/SVP/issues
 URL: https://github.com/YuLab-SMU/SVP
