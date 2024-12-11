@@ -234,8 +234,8 @@ heterogeneous biological networks, Bioinformatics, 35, 3, 497–505(2019), https
 }
 }
 \seealso{
-\code{\link{cluster.assign}} to classify cell using the activity score of gene sets base \code{kmean} and \code{\link{runKldSVG}} to identify the
-spatiall variable or specified cell gene sets or a features.
+\code{\link{runDetectSVG}} and \code{\link{runKldSVG}} to identify the spatial variable features.
+\code{\link{runGLOBALBV}} to explore the spatial co-distribution between the spatial variable features
 }
 \author{
 Shuangbin Xu

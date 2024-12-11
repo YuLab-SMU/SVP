@@ -24,7 +24,8 @@
 #' @param threshold numeric the threshold to display the point with the significance level,
 #' default is 0.05.
 #' @return a ggplot2 or aplot object
-#' @importFrom ggtree ggtree td_filter layout_dendrogram
+#' @importFrom ggtree td_filter layout_dendrogram
+#' @importFrom ggtree ggtree
 #' @importFrom ggfun theme_blinds
 #' @examples
 #' data(hpda_spe_cell_dec)

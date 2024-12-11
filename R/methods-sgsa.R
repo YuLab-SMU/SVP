@@ -86,8 +86,8 @@
 #' 2. Alberto Valdeolivas, Laurent Tichit, Claire Navarro, Sophie Perrin, et al. Random walk with restart on multiplex and 
 #'    heterogeneous biological networks, Bioinformatics, 35, 3, 497–505(2019), https://doi.org/10.1093/bioinformatics/bty637
 #'
-#' @seealso [`cluster.assign`] to classify cell using the activity score of gene sets base \code{kmean} and [`runKldSVG`] to identify the 
-#' spatiall variable or specified cell gene sets or a features.
+#' @seealso [`runDetectSVG`] and [`runKldSVG`] to identify the spatial variable features.
+#' [`runGLOBALBV`] to explore the spatial co-distribution between the spatial variable features
 #' @author Shuangbin Xu
 #' @export
 #' @examples
