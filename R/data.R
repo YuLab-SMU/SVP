@@ -1,11 +1,9 @@
 #' @title The Gene List of Cancer Single-cell State Atlas (CancerSEA)
-#' 
 #' @description CancerSEA is the first dedicated database that aims to 
 #' comprehensively decode distinct functional states of cancer cells at 
 #' single-cell resolution.
 #' CancerSEASymbol is a gene symbol list, and CancerSEAEnsemble is a Ensemble 
 #' gene list, they are a list contained gene signature names collected in the database.
-#'
 #' @name data_CancerSEA
 #' @aliases CancerSEASymbol
 #' @format list
@@ -61,11 +59,9 @@ NA
 
 #' @title A gene set identifies senescent cells and predicts senescence-associated 
 #' pathways across tissues
-#'
 #' @description
 #' SenMayoSymbol is a gene symbol list that can be used to identify senescent cells and predicts 
 #' senescence-associated pathways across tissues
-#'
 #' @name data_SenMayo
 #' @aliases SenMayoSymbol
 #' @format list
@@ -82,11 +78,9 @@ NA
 NA
 
 #' @title a subset data of pbmck3 from SeuratData
-#'
 #' @description
 #' a small SingleCellExperiment data set from pbmck3 which
 #' contains 1304 genes and 800 cells (extract randomly)
-#' 
 #' @name data_sceSubPbmc
 #' @format S4 class:SingleCellExperiment
 #' @aliases sceSubPbmc
@@ -98,12 +92,10 @@ NA
 NA
 
 #' @title the Cell Cycle gene set
-#' 
 #' @description
 #' the S and G2M gene list are from the Seurat which refer to this article (doi:10.1126/science.aad050),
 #' the G1 gene list is from the G1_PHASE of Human Gene Set in MSigDB, but remove the duplicated records 
 #' with S and G2M gene list.
-#' 
 #' @name CellCycle.Hs
 #' @aliases data_CellCycle.Hs
 #' @format list
@@ -116,10 +108,8 @@ NA
 
 
 #' @title an example of result of runSGSA by extracting with gsvaExp
-#'
 #' @description
-#' The result of runSGSA with HPDA A sample from (doi:10.1038/s41587-019-0392-8) 
-#'
+#' The result of runSGSA with PDAC A sample from (doi:10.1038/s41587-019-0392-8) 
 #' @name data_hpda_spe_cell_dec
 #' @aliases hpda_spe_cell_dec
 #' @format S4 class:SpatialExperiment
@@ -128,4 +118,32 @@ NA
 #' @return a \linkS4class{SpatialExperiment} object
 #' @examples
 #' data(hpda_spe_cell_dec)
+NA
+
+
+#' @title the single cell gene profiler of a PDAC sample
+#' @description
+#' The single cell transcriptome of PDAC A sample from (doi:10.1038/s41587-019-0392-8)
+#' @name data_pdac_a_sce
+#' @aliases pdac_a_sce
+#' @format S4 class:SingleCellExperiment
+#' @docType data
+#' @keywords data
+#' @return a \linkS4class{SingleCellExperiment} object
+#' @examples
+#' data(pdac_a_sce)
+NA     
+
+
+#' @title the spatial transcriptome of a PDAC sample
+#' @description
+#' The spatial transcriptome of PDAC A sample from (doi:10.1038/s41587-019-0392-8)
+#' @name data_pdac_a_spe
+#' @aliases pdac_a_spe
+#' @format S4 class:SpatialExperiment
+#' @docType data
+#' @keywords data
+#' @return a \linkS4class{SpatialExperiment} object
+#' @examples
+#' data(pdac_a_spe)
 NA

@@ -12,7 +12,7 @@ S4 class:SpatialExperiment
 a \linkS4class{SpatialExperiment} object
 }
 \description{
-The result of runSGSA with HPDA A sample from (doi:10.1038/s41587-019-0392-8)
+The result of runSGSA with PDAC A sample from (doi:10.1038/s41587-019-0392-8)
 }
 \examples{
 data(hpda_spe_cell_dec)
