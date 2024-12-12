@@ -1,0 +1,17 @@
+fig:overview
+fig:CancerSEA
+fig:runLOCALBV
+overview-of-svp
+quantification-of-cell-states-using-svp
+quantification-of-cancersea-etc-function
+quantification-of-cell-type
+quantification-of-cell-type-using-the-pre-established-marker-gene-sets
+quantification-of-cell-type-using-the-reference-single-cell-data
+spatial-statistical-analysis
+univariate-spatial-statistical-analysis
+identification-of-spatial-variable-features
+identification-of-local-spatial-aggregation-areas
+bivariate-spatial-statistical-analysis
+global-bivariate-spatial-analysis
+local-bivariate-spatial-analysis
+session-information

@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>3 Spatial statistical analysis | Predicting cell states and their variability in single-cell or spatial omics data</title>
+  <meta name="description" content="3 Spatial statistical analysis | Predicting cell states and their variability in single-cell or spatial omics data" />
+  <meta name="generator" content="bookdown 0.41 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="3 Spatial statistical analysis | Predicting cell states and their variability in single-cell or spatial omics data" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="3 Spatial statistical analysis | Predicting cell states and their variability in single-cell or spatial omics data" />
+  
+  
+  
+
+
+
+<meta name="date" content="2024-12-12" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="quantification-of-cell-states-using-svp.html"/>
+<link rel="next" href="session-information.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Introduction</a></li>
+<li class="chapter" data-level="1" data-path="overview-of-svp.html"><a href="overview-of-svp.html"><i class="fa fa-check"></i><b>1</b> Overview of SVP</a></li>
+<li class="chapter" data-level="2" data-path="quantification-of-cell-states-using-svp.html"><a href="quantification-of-cell-states-using-svp.html"><i class="fa fa-check"></i><b>2</b> Quantification of cell states using SVP</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="quantification-of-cell-states-using-svp.html"><a href="quantification-of-cell-states-using-svp.html#quantification-of-cancersea-etc-function"><i class="fa fa-check"></i><b>2.1</b> Quantification of CancerSEA etc function</a></li>
+<li class="chapter" data-level="2.2" data-path="quantification-of-cell-states-using-svp.html"><a href="quantification-of-cell-states-using-svp.html#quantification-of-cell-type"><i class="fa fa-check"></i><b>2.2</b> Quantification of cell-type</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="quantification-of-cell-states-using-svp.html"><a href="quantification-of-cell-states-using-svp.html#quantification-of-cell-type-using-the-pre-established-marker-gene-sets"><i class="fa fa-check"></i><b>2.2.1</b> Quantification of cell-type using the pre-established marker gene sets</a></li>
+<li class="chapter" data-level="2.2.2" data-path="quantification-of-cell-states-using-svp.html"><a href="quantification-of-cell-states-using-svp.html#quantification-of-cell-type-using-the-reference-single-cell-data"><i class="fa fa-check"></i><b>2.2.2</b> Quantification of cell-type using the reference single-cell data</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="spatial-statistical-analysis.html"><a href="spatial-statistical-analysis.html"><i class="fa fa-check"></i><b>3</b> Spatial statistical analysis</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="spatial-statistical-analysis.html"><a href="spatial-statistical-analysis.html#univariate-spatial-statistical-analysis"><i class="fa fa-check"></i><b>3.1</b> Univariate spatial statistical analysis</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="spatial-statistical-analysis.html"><a href="spatial-statistical-analysis.html#identification-of-spatial-variable-features"><i class="fa fa-check"></i><b>3.1.1</b> Identification of spatial variable features</a></li>
+<li class="chapter" data-level="3.1.2" data-path="spatial-statistical-analysis.html"><a href="spatial-statistical-analysis.html#identification-of-local-spatial-aggregation-areas"><i class="fa fa-check"></i><b>3.1.2</b> Identification of local spatial aggregation areas</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="spatial-statistical-analysis.html"><a href="spatial-statistical-analysis.html#bivariate-spatial-statistical-analysis"><i class="fa fa-check"></i><b>3.2</b> Bivariate spatial statistical analysis</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="spatial-statistical-analysis.html"><a href="spatial-statistical-analysis.html#global-bivariate-spatial-analysis"><i class="fa fa-check"></i><b>3.2.1</b> Global bivariate spatial analysis</a></li>
+<li class="chapter" data-level="3.2.2" data-path="spatial-statistical-analysis.html"><a href="spatial-statistical-analysis.html#local-bivariate-spatial-analysis"><i class="fa fa-check"></i><b>3.2.2</b> Local bivariate spatial analysis</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="session-information.html"><a href="session-information.html"><i class="fa fa-check"></i><b>4</b> Session information</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Predicting cell states and their variability in single-cell or spatial omics data</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="spatial-statistical-analysis" class="section level1 hasAnchor" number="3">
+<h1><span class="header-section-number">3</span> Spatial statistical analysis<a href="spatial-statistical-analysis.html#spatial-statistical-analysis" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>SVP implements several spatial statistical algorithms to explore the spatial distribution of cell function or other features from three aspects: whether cell function states have spatial variability, where spatially variable cell functions cluster, and the co-distribution patterns of spatially variable cell functions with other features. The following sections provide a detailed description of each aspect.</p>
+<div id="univariate-spatial-statistical-analysis" class="section level2 hasAnchor" number="3.1">
+<h2><span class="header-section-number">3.1</span> Univariate spatial statistical analysis<a href="spatial-statistical-analysis.html#univariate-spatial-statistical-analysis" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>This section addresses whether the feature is spatially variable and identifies its high-cluster areas. In detail, to identify the spatial variable features, <code>SVP</code> implements three spatial autocorrelation algorithms using <code>Rcpp</code> and <code>RcppParallel</code>: global Moran’s <em>I</em>, Geary’s <em>C</em> and Getis-Ord’s <em>G</em>. To identify the spatial high-cluster areas, <code>SVP</code> implements two local univariate spatial statistical algorithms using <code>Rcpp</code> and <code>RcppParallel</code>: local Getis-Ord’s <em>G</em> and local Moran’s <em>I</em>.</p>
+<div id="identification-of-spatial-variable-features" class="section level3 hasAnchor" number="3.1.1">
+<h3><span class="header-section-number">3.1.1</span> Identification of spatial variable features<a href="spatial-statistical-analysis.html#identification-of-spatial-variable-features" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Here, we identify the spatial variable cell-types using <code>runDetectSVG</code>, which implements the global Moran’s <em>I</em>, Geary’s <em>C</em> and Getis-Ord’s <em>G</em> algorithms.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="spatial-statistical-analysis.html#cb8-1" tabindex="-1"></a></span>
+<span id="cb8-2"><a href="spatial-statistical-analysis.html#cb8-2" tabindex="-1"></a><span class="co"># First approach:</span></span>
+<span id="cb8-3"><a href="spatial-statistical-analysis.html#cb8-3" tabindex="-1"></a><span class="co"># we can first obtain the target gsvaExp with gsvaExp names via </span></span>
+<span id="cb8-4"><a href="spatial-statistical-analysis.html#cb8-4" tabindex="-1"></a><span class="co"># gsvaExp() function, for example, CellTypeFree</span></span>
+<span id="cb8-5"><a href="spatial-statistical-analysis.html#cb8-5" tabindex="-1"></a>pdac_a_spe <span class="sc">|&gt;</span> <span class="fu">gsvaExp</span>(<span class="st">&quot;CellTypeFree&quot;</span>) </span>
+<span id="cb8-6"><a href="spatial-statistical-analysis.html#cb8-6" tabindex="-1"></a><span class="co">#&gt; class: SpatialExperiment </span></span>
+<span id="cb8-7"><a href="spatial-statistical-analysis.html#cb8-7" tabindex="-1"></a><span class="co">#&gt; dim: 20 428 </span></span>
+<span id="cb8-8"><a href="spatial-statistical-analysis.html#cb8-8" tabindex="-1"></a><span class="co">#&gt; metadata(0):</span></span>
+<span id="cb8-9"><a href="spatial-statistical-analysis.html#cb8-9" tabindex="-1"></a><span class="co">#&gt; assays(1): affi.score</span></span>
+<span id="cb8-10"><a href="spatial-statistical-analysis.html#cb8-10" tabindex="-1"></a><span class="co">#&gt; rownames(20): Acinar_cells Ductal_terminal_ductal_like ... RBCs</span></span>
+<span id="cb8-11"><a href="spatial-statistical-analysis.html#cb8-11" tabindex="-1"></a><span class="co">#&gt;   Fibroblasts</span></span>
+<span id="cb8-12"><a href="spatial-statistical-analysis.html#cb8-12" tabindex="-1"></a><span class="co">#&gt; rowData names(4): exp.gene.num gset.gene.num gene.occurrence.rate</span></span>
+<span id="cb8-13"><a href="spatial-statistical-analysis.html#cb8-13" tabindex="-1"></a><span class="co">#&gt;   geneSets</span></span>
+<span id="cb8-14"><a href="spatial-statistical-analysis.html#cb8-14" tabindex="-1"></a><span class="co">#&gt; colnames(428): Spot1 Spot2 ... Spot427 Spot428</span></span>
+<span id="cb8-15"><a href="spatial-statistical-analysis.html#cb8-15" tabindex="-1"></a><span class="co">#&gt; colData names(3): cluster_domain sizeFactor sample_id</span></span>
+<span id="cb8-16"><a href="spatial-statistical-analysis.html#cb8-16" tabindex="-1"></a><span class="co">#&gt; reducedDimNames(0):</span></span>
+<span id="cb8-17"><a href="spatial-statistical-analysis.html#cb8-17" tabindex="-1"></a><span class="co">#&gt; mainExpName: NULL</span></span>
+<span id="cb8-18"><a href="spatial-statistical-analysis.html#cb8-18" tabindex="-1"></a><span class="co">#&gt; altExpNames(0):</span></span>
+<span id="cb8-19"><a href="spatial-statistical-analysis.html#cb8-19" tabindex="-1"></a><span class="co">#&gt; spatialCoords names(2) : x y</span></span>
+<span id="cb8-20"><a href="spatial-statistical-analysis.html#cb8-20" tabindex="-1"></a><span class="co">#&gt; imgData names(0):</span></span>
+<span id="cb8-21"><a href="spatial-statistical-analysis.html#cb8-21" tabindex="-1"></a></span>
+<span id="cb8-22"><a href="spatial-statistical-analysis.html#cb8-22" tabindex="-1"></a><span class="co"># Then we use runDetectSVG with method = &#39;moran&#39; to identify the spatial variable </span></span>
+<span id="cb8-23"><a href="spatial-statistical-analysis.html#cb8-23" tabindex="-1"></a><span class="co"># cell-types with global Moran&#39;s I.</span></span>
+<span id="cb8-24"><a href="spatial-statistical-analysis.html#cb8-24" tabindex="-1"></a></span>
+<span id="cb8-25"><a href="spatial-statistical-analysis.html#cb8-25" tabindex="-1"></a>celltype_free.I <span class="ot">&lt;-</span> pdac_a_spe <span class="sc">|&gt;</span> <span class="fu">gsvaExp</span>(<span class="st">&quot;CellTypeFree&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-26"><a href="spatial-statistical-analysis.html#cb8-26" tabindex="-1"></a>  <span class="fu">runDetectSVG</span>(</span>
+<span id="cb8-27"><a href="spatial-statistical-analysis.html#cb8-27" tabindex="-1"></a>    <span class="at">assay.type =</span> <span class="st">&#39;affi.score&#39;</span>, <span class="co"># because default is &#39;logcounts&#39;, it should be adjused</span></span>
+<span id="cb8-28"><a href="spatial-statistical-analysis.html#cb8-28" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&#39;moransi&#39;</span>,</span>
+<span id="cb8-29"><a href="spatial-statistical-analysis.html#cb8-29" tabindex="-1"></a>    <span class="at">action =</span> <span class="st">&#39;only&#39;</span></span>
+<span id="cb8-30"><a href="spatial-statistical-analysis.html#cb8-30" tabindex="-1"></a>  ) </span>
+<span id="cb8-31"><a href="spatial-statistical-analysis.html#cb8-31" tabindex="-1"></a><span class="co">#&gt; Identifying the spatially variable gene sets (pathway) based on moransi</span></span>
+<span id="cb8-32"><a href="spatial-statistical-analysis.html#cb8-32" tabindex="-1"></a><span class="co">#&gt; elapsed time is 0.060000 seconds</span></span>
+<span id="cb8-33"><a href="spatial-statistical-analysis.html#cb8-33" tabindex="-1"></a>  </span>
+<span id="cb8-34"><a href="spatial-statistical-analysis.html#cb8-34" tabindex="-1"></a>celltype_free.I <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">arrange</span>(rank) <span class="sc">|&gt;</span> <span class="fu">head</span>()</span>
+<span id="cb8-35"><a href="spatial-statistical-analysis.html#cb8-35" tabindex="-1"></a><span class="co">#&gt;                                            obs expect.moransi sd.moransi</span></span>
+<span id="cb8-36"><a href="spatial-statistical-analysis.html#cb8-36" tabindex="-1"></a><span class="co">#&gt; Cancer_clone_A                       0.7402441    -0.00234192 0.02807961</span></span>
+<span id="cb8-37"><a href="spatial-statistical-analysis.html#cb8-37" tabindex="-1"></a><span class="co">#&gt; Cancer_clone_B                       0.7187722    -0.00234192 0.02806609</span></span>
+<span id="cb8-38"><a href="spatial-statistical-analysis.html#cb8-38" tabindex="-1"></a><span class="co">#&gt; Acinar_cells                         0.6959057    -0.00234192 0.02788079</span></span>
+<span id="cb8-39"><a href="spatial-statistical-analysis.html#cb8-39" tabindex="-1"></a><span class="co">#&gt; mDCs_A                               0.5823319    -0.00234192 0.02760418</span></span>
+<span id="cb8-40"><a href="spatial-statistical-analysis.html#cb8-40" tabindex="-1"></a><span class="co">#&gt; Ductal_CRISP3_high-centroacinar_like 0.5605952    -0.00234192 0.02794187</span></span>
+<span id="cb8-41"><a href="spatial-statistical-analysis.html#cb8-41" tabindex="-1"></a><span class="co">#&gt; Endothelial_cells                    0.5362277    -0.00234192 0.02757573</span></span>
+<span id="cb8-42"><a href="spatial-statistical-analysis.html#cb8-42" tabindex="-1"></a><span class="co">#&gt;                                      Z.moransi        pvalue          padj rank</span></span>
+<span id="cb8-43"><a href="spatial-statistical-analysis.html#cb8-43" tabindex="-1"></a><span class="co">#&gt; Cancer_clone_A                        26.44573 2.042568e-154 4.085135e-153    1</span></span>
+<span id="cb8-44"><a href="spatial-statistical-analysis.html#cb8-44" tabindex="-1"></a><span class="co">#&gt; Cancer_clone_B                        25.69343 6.921386e-146 6.921386e-145    2</span></span>
+<span id="cb8-45"><a href="spatial-statistical-analysis.html#cb8-45" tabindex="-1"></a><span class="co">#&gt; Acinar_cells                          25.04404 1.013736e-138 6.758238e-138    3</span></span>
+<span id="cb8-46"><a href="spatial-statistical-analysis.html#cb8-46" tabindex="-1"></a><span class="co">#&gt; mDCs_A                                21.18062 7.205485e-100  3.602743e-99    4</span></span>
+<span id="cb8-47"><a href="spatial-statistical-analysis.html#cb8-47" tabindex="-1"></a><span class="co">#&gt; Ductal_CRISP3_high-centroacinar_like  20.14672  1.437699e-90  5.750794e-90    5</span></span>
+<span id="cb8-48"><a href="spatial-statistical-analysis.html#cb8-48" tabindex="-1"></a><span class="co">#&gt; Endothelial_cells                     19.53057  3.018138e-85  1.006046e-84    6</span></span>
+<span id="cb8-49"><a href="spatial-statistical-analysis.html#cb8-49" tabindex="-1"></a></span>
+<span id="cb8-50"><a href="spatial-statistical-analysis.html#cb8-50" tabindex="-1"></a><span class="co"># Second approach:</span></span>
+<span id="cb8-51"><a href="spatial-statistical-analysis.html#cb8-51" tabindex="-1"></a><span class="co"># the result was added to the original object by specific the </span></span>
+<span id="cb8-52"><a href="spatial-statistical-analysis.html#cb8-52" tabindex="-1"></a><span class="co"># gsvaexp argument in the runDetectSVG</span></span>
+<span id="cb8-53"><a href="spatial-statistical-analysis.html#cb8-53" tabindex="-1"></a>pdac_a_spe <span class="ot">&lt;-</span> pdac_a_spe <span class="sc">|&gt;</span> </span>
+<span id="cb8-54"><a href="spatial-statistical-analysis.html#cb8-54" tabindex="-1"></a>  <span class="fu">runDetectSVG</span>(</span>
+<span id="cb8-55"><a href="spatial-statistical-analysis.html#cb8-55" tabindex="-1"></a>    <span class="at">gsvaexp =</span> <span class="st">&#39;CellTypeFree&#39;</span>,  </span>
+<span id="cb8-56"><a href="spatial-statistical-analysis.html#cb8-56" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&#39;moran&#39;</span></span>
+<span id="cb8-57"><a href="spatial-statistical-analysis.html#cb8-57" tabindex="-1"></a>    )</span>
+<span id="cb8-58"><a href="spatial-statistical-analysis.html#cb8-58" tabindex="-1"></a><span class="co">#&gt; The `gsvaexp` was specified, the specified `gsvaExp` will be used to detect &#39;svg&#39;.</span></span>
+<span id="cb8-59"><a href="spatial-statistical-analysis.html#cb8-59" tabindex="-1"></a><span class="co">#&gt; Identifying the spatially variable gene sets (pathway) based on moransi</span></span>
+<span id="cb8-60"><a href="spatial-statistical-analysis.html#cb8-60" tabindex="-1"></a><span class="co">#&gt; elapsed time is 0.077000 seconds</span></span>
+<span id="cb8-61"><a href="spatial-statistical-analysis.html#cb8-61" tabindex="-1"></a><span class="co">#&gt; The result is added to the input object, which can be extracted using</span></span>
+<span id="cb8-62"><a href="spatial-statistical-analysis.html#cb8-62" tabindex="-1"></a><span class="co">#&gt; `svDf()` with type=&#39;sv.moransi&#39; for `SingleCellExperiment` or `SpatialExperiment`.</span></span>
+<span id="cb8-63"><a href="spatial-statistical-analysis.html#cb8-63" tabindex="-1"></a><span class="co">#&gt; If input object is `SVPExperiment`, and `gsvaexp` is specified</span></span>
+<span id="cb8-64"><a href="spatial-statistical-analysis.html#cb8-64" tabindex="-1"></a><span class="co">#&gt; the result can be extracted by `gsvaExp()` (return a `SingleCellExperiment`</span></span>
+<span id="cb8-65"><a href="spatial-statistical-analysis.html#cb8-65" tabindex="-1"></a><span class="co">#&gt; or `SpatialExperiment`),then also using `svDf()` to extract.</span></span>
+<span id="cb8-66"><a href="spatial-statistical-analysis.html#cb8-66" tabindex="-1"></a><span class="fu">gsvaExp</span>(pdac_a_spe, <span class="st">&#39;CellTypeFree&#39;</span>) <span class="sc">|&gt;</span> <span class="fu">svDf</span>(<span class="st">&quot;sv.moransi&quot;</span>) <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">arrange</span>(rank) <span class="sc">|&gt;</span> <span class="fu">head</span>()</span>
+<span id="cb8-67"><a href="spatial-statistical-analysis.html#cb8-67" tabindex="-1"></a><span class="co">#&gt;                                            obs expect.moransi sd.moransi</span></span>
+<span id="cb8-68"><a href="spatial-statistical-analysis.html#cb8-68" tabindex="-1"></a><span class="co">#&gt; Cancer_clone_A                       0.7402441    -0.00234192 0.02807961</span></span>
+<span id="cb8-69"><a href="spatial-statistical-analysis.html#cb8-69" tabindex="-1"></a><span class="co">#&gt; Cancer_clone_B                       0.7187722    -0.00234192 0.02806609</span></span>
+<span id="cb8-70"><a href="spatial-statistical-analysis.html#cb8-70" tabindex="-1"></a><span class="co">#&gt; Acinar_cells                         0.6959057    -0.00234192 0.02788079</span></span>
+<span id="cb8-71"><a href="spatial-statistical-analysis.html#cb8-71" tabindex="-1"></a><span class="co">#&gt; mDCs_A                               0.5823319    -0.00234192 0.02760418</span></span>
+<span id="cb8-72"><a href="spatial-statistical-analysis.html#cb8-72" tabindex="-1"></a><span class="co">#&gt; Ductal_CRISP3_high-centroacinar_like 0.5605952    -0.00234192 0.02794187</span></span>
+<span id="cb8-73"><a href="spatial-statistical-analysis.html#cb8-73" tabindex="-1"></a><span class="co">#&gt; Endothelial_cells                    0.5362277    -0.00234192 0.02757573</span></span>
+<span id="cb8-74"><a href="spatial-statistical-analysis.html#cb8-74" tabindex="-1"></a><span class="co">#&gt;                                      Z.moransi        pvalue          padj rank</span></span>
+<span id="cb8-75"><a href="spatial-statistical-analysis.html#cb8-75" tabindex="-1"></a><span class="co">#&gt; Cancer_clone_A                        26.44573 2.042568e-154 4.085135e-153    1</span></span>
+<span id="cb8-76"><a href="spatial-statistical-analysis.html#cb8-76" tabindex="-1"></a><span class="co">#&gt; Cancer_clone_B                        25.69343 6.921386e-146 6.921386e-145    2</span></span>
+<span id="cb8-77"><a href="spatial-statistical-analysis.html#cb8-77" tabindex="-1"></a><span class="co">#&gt; Acinar_cells                          25.04404 1.013736e-138 6.758238e-138    3</span></span>
+<span id="cb8-78"><a href="spatial-statistical-analysis.html#cb8-78" tabindex="-1"></a><span class="co">#&gt; mDCs_A                                21.18062 7.205485e-100  3.602743e-99    4</span></span>
+<span id="cb8-79"><a href="spatial-statistical-analysis.html#cb8-79" tabindex="-1"></a><span class="co">#&gt; Ductal_CRISP3_high-centroacinar_like  20.14672  1.437699e-90  5.750794e-90    5</span></span>
+<span id="cb8-80"><a href="spatial-statistical-analysis.html#cb8-80" tabindex="-1"></a><span class="co">#&gt; Endothelial_cells                     19.53057  3.018138e-85  1.006046e-84    6</span></span></code></pre></div>
+<p>The <code>obs</code> is the Moran’s <em>I</em>, <code>expect.moransi</code> is the expect Moran’s <em>I</em> (<code>E(I)</code>). Moran’s <em>I</em> quantifies the correlation between a single feature at a specific spatial point or region and its neighboring points or regions. Global Moran’s <em>I</em> usually ranges from -1 to 1, Global Moran’s <em>I</em> significantly above <code>E(I)</code> indicate a distinct spatial pattern or spatial clustering, which occurs when neighboring captured locations tend to have similar feature value. Global Moran’s <em>I</em> around <code>E(I)</code> suggest random spatial expression, that is, absence of spatial pattern. Global Moran’s <em>I</em> significantly below <code>E(I)</code> imply a chessboard-like pattern or dispersion.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="spatial-statistical-analysis.html#cb9-1" tabindex="-1"></a><span class="co"># using Geary&#39;s C </span></span>
+<span id="cb9-2"><a href="spatial-statistical-analysis.html#cb9-2" tabindex="-1"></a>pdac_a_spe <span class="ot">&lt;-</span> pdac_a_spe <span class="sc">|&gt;</span></span>
+<span id="cb9-3"><a href="spatial-statistical-analysis.html#cb9-3" tabindex="-1"></a>  <span class="fu">runDetectSVG</span>(</span>
+<span id="cb9-4"><a href="spatial-statistical-analysis.html#cb9-4" tabindex="-1"></a>    <span class="at">gsvaexp =</span> <span class="st">&#39;CellTypeFree&#39;</span>,</span>
+<span id="cb9-5"><a href="spatial-statistical-analysis.html#cb9-5" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&#39;geary&#39;</span></span>
+<span id="cb9-6"><a href="spatial-statistical-analysis.html#cb9-6" tabindex="-1"></a>  )</span>
+<span id="cb9-7"><a href="spatial-statistical-analysis.html#cb9-7" tabindex="-1"></a><span class="co">#&gt; The `gsvaexp` was specified, the specified `gsvaExp` will be used to detect &#39;svg&#39;.</span></span>
+<span id="cb9-8"><a href="spatial-statistical-analysis.html#cb9-8" tabindex="-1"></a><span class="co">#&gt; Identifying the spatially variable gene sets (pathway) based on gearysc</span></span>
+<span id="cb9-9"><a href="spatial-statistical-analysis.html#cb9-9" tabindex="-1"></a><span class="co">#&gt; elapsed time is 0.046000 seconds</span></span>
+<span id="cb9-10"><a href="spatial-statistical-analysis.html#cb9-10" tabindex="-1"></a><span class="co">#&gt; The result is added to the input object, which can be extracted using</span></span>
+<span id="cb9-11"><a href="spatial-statistical-analysis.html#cb9-11" tabindex="-1"></a><span class="co">#&gt; `svDf()` with type=&#39;sv.gearysc&#39; for `SingleCellExperiment` or `SpatialExperiment`.</span></span>
+<span id="cb9-12"><a href="spatial-statistical-analysis.html#cb9-12" tabindex="-1"></a><span class="co">#&gt; If input object is `SVPExperiment`, and `gsvaexp` is specified</span></span>
+<span id="cb9-13"><a href="spatial-statistical-analysis.html#cb9-13" tabindex="-1"></a><span class="co">#&gt; the result can be extracted by `gsvaExp()` (return a `SingleCellExperiment`</span></span>
+<span id="cb9-14"><a href="spatial-statistical-analysis.html#cb9-14" tabindex="-1"></a><span class="co">#&gt; or `SpatialExperiment`),then also using `svDf()` to extract.</span></span>
+<span id="cb9-15"><a href="spatial-statistical-analysis.html#cb9-15" tabindex="-1"></a></span>
+<span id="cb9-16"><a href="spatial-statistical-analysis.html#cb9-16" tabindex="-1"></a><span class="fu">gsvaExp</span>(pdac_a_spe, <span class="st">&quot;CellTypeFree&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">svDf</span>(<span class="st">&#39;sv.gearysc&#39;</span>) <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">arrange</span>(rank) <span class="sc">|&gt;</span> <span class="fu">head</span>()</span>
+<span id="cb9-17"><a href="spatial-statistical-analysis.html#cb9-17" tabindex="-1"></a><span class="co">#&gt;                                            obs expect.gearysc sd.gearysc</span></span>
+<span id="cb9-18"><a href="spatial-statistical-analysis.html#cb9-18" tabindex="-1"></a><span class="co">#&gt; Cancer_clone_A                       0.2709051              1 0.02873561</span></span>
+<span id="cb9-19"><a href="spatial-statistical-analysis.html#cb9-19" tabindex="-1"></a><span class="co">#&gt; Cancer_clone_B                       0.2880919              1 0.02879022</span></span>
+<span id="cb9-20"><a href="spatial-statistical-analysis.html#cb9-20" tabindex="-1"></a><span class="co">#&gt; Acinar_cells                         0.3055211              1 0.02952587</span></span>
+<span id="cb9-21"><a href="spatial-statistical-analysis.html#cb9-21" tabindex="-1"></a><span class="co">#&gt; Ductal_CRISP3_high-centroacinar_like 0.4213014              1 0.02928596</span></span>
+<span id="cb9-22"><a href="spatial-statistical-analysis.html#cb9-22" tabindex="-1"></a><span class="co">#&gt; mDCs_A                               0.4603825              1 0.03058249</span></span>
+<span id="cb9-23"><a href="spatial-statistical-analysis.html#cb9-23" tabindex="-1"></a><span class="co">#&gt; Endothelial_cells                    0.4843175              1 0.03068854</span></span>
+<span id="cb9-24"><a href="spatial-statistical-analysis.html#cb9-24" tabindex="-1"></a><span class="co">#&gt;                                      Z.gearysc        pvalue          padj rank</span></span>
+<span id="cb9-25"><a href="spatial-statistical-analysis.html#cb9-25" tabindex="-1"></a><span class="co">#&gt; Cancer_clone_A                        25.37252 2.535621e-142 5.071243e-141    1</span></span>
+<span id="cb9-26"><a href="spatial-statistical-analysis.html#cb9-26" tabindex="-1"></a><span class="co">#&gt; Cancer_clone_B                        24.72743 2.711724e-135 2.711724e-134    2</span></span>
+<span id="cb9-27"><a href="spatial-statistical-analysis.html#cb9-27" tabindex="-1"></a><span class="co">#&gt; Acinar_cells                          23.52103 1.242716e-122 8.284772e-122    3</span></span>
+<span id="cb9-28"><a href="spatial-statistical-analysis.html#cb9-28" tabindex="-1"></a><span class="co">#&gt; Ductal_CRISP3_high-centroacinar_like  19.76027  3.272367e-87  1.636183e-86    4</span></span>
+<span id="cb9-29"><a href="spatial-statistical-analysis.html#cb9-29" tabindex="-1"></a><span class="co">#&gt; mDCs_A                                17.64466  5.592678e-70  2.237071e-69    5</span></span>
+<span id="cb9-30"><a href="spatial-statistical-analysis.html#cb9-30" tabindex="-1"></a><span class="co">#&gt; Endothelial_cells                     16.80375  1.145504e-63  3.818347e-63    6</span></span></code></pre></div>
+<p>The <code>obs</code> is the Geary’s <em>C</em>. Global Geary’s <em>C</em> is another popular index of global spatial autocorrelation, but focuses more on differences between neighboring values. Global Geary’s <em>C</em> usually range from 0 to 2. Global Geary’s <em>C</em> significantly below <code>E[C]=1</code> indicate a distinct spatial pattern or spatial clustering, the value significantly above <code>E[C]=1</code> suggest a chessboard-like pattern or dispersion, the value around <code>E[C]=1</code> imply absence of spatial pattern.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="spatial-statistical-analysis.html#cb10-1" tabindex="-1"></a><span class="co"># using Getis-ord&#39;s G</span></span>
+<span id="cb10-2"><a href="spatial-statistical-analysis.html#cb10-2" tabindex="-1"></a>pdac_a_spe <span class="ot">&lt;-</span> pdac_a_spe <span class="sc">|&gt;</span></span>
+<span id="cb10-3"><a href="spatial-statistical-analysis.html#cb10-3" tabindex="-1"></a>  <span class="fu">runDetectSVG</span>(</span>
+<span id="cb10-4"><a href="spatial-statistical-analysis.html#cb10-4" tabindex="-1"></a>    <span class="at">gsvaexp =</span> <span class="st">&#39;CellTypeFree&#39;</span>,</span>
+<span id="cb10-5"><a href="spatial-statistical-analysis.html#cb10-5" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&#39;getis&#39;</span></span>
+<span id="cb10-6"><a href="spatial-statistical-analysis.html#cb10-6" tabindex="-1"></a>  )</span>
+<span id="cb10-7"><a href="spatial-statistical-analysis.html#cb10-7" tabindex="-1"></a><span class="co">#&gt; The `gsvaexp` was specified, the specified `gsvaExp` will be used to detect &#39;svg&#39;.</span></span>
+<span id="cb10-8"><a href="spatial-statistical-analysis.html#cb10-8" tabindex="-1"></a><span class="co">#&gt; Identifying the spatially variable gene sets (pathway) based on getisord</span></span>
+<span id="cb10-9"><a href="spatial-statistical-analysis.html#cb10-9" tabindex="-1"></a><span class="co">#&gt; elapsed time is 0.037000 seconds</span></span>
+<span id="cb10-10"><a href="spatial-statistical-analysis.html#cb10-10" tabindex="-1"></a><span class="co">#&gt; The result is added to the input object, which can be extracted using</span></span>
+<span id="cb10-11"><a href="spatial-statistical-analysis.html#cb10-11" tabindex="-1"></a><span class="co">#&gt; `svDf()` with type=&#39;sv.getisord&#39; for `SingleCellExperiment` or `SpatialExperiment`.</span></span>
+<span id="cb10-12"><a href="spatial-statistical-analysis.html#cb10-12" tabindex="-1"></a><span class="co">#&gt; If input object is `SVPExperiment`, and `gsvaexp` is specified</span></span>
+<span id="cb10-13"><a href="spatial-statistical-analysis.html#cb10-13" tabindex="-1"></a><span class="co">#&gt; the result can be extracted by `gsvaExp()` (return a `SingleCellExperiment`</span></span>
+<span id="cb10-14"><a href="spatial-statistical-analysis.html#cb10-14" tabindex="-1"></a><span class="co">#&gt; or `SpatialExperiment`),then also using `svDf()` to extract.</span></span>
+<span id="cb10-15"><a href="spatial-statistical-analysis.html#cb10-15" tabindex="-1"></a></span>
+<span id="cb10-16"><a href="spatial-statistical-analysis.html#cb10-16" tabindex="-1"></a><span class="fu">gsvaExp</span>(pdac_a_spe, <span class="st">&quot;CellTypeFree&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">svDf</span>(<span class="st">&#39;sv.getisord&#39;</span>) <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">arrange</span>(rank) <span class="sc">|&gt;</span> <span class="fu">head</span>()</span>
+<span id="cb10-17"><a href="spatial-statistical-analysis.html#cb10-17" tabindex="-1"></a><span class="co">#&gt;                                              obs   expect.G         sd.G</span></span>
+<span id="cb10-18"><a href="spatial-statistical-analysis.html#cb10-18" tabindex="-1"></a><span class="co">#&gt; Cancer_clone_A                       0.007214987 0.00234192 0.0001844816</span></span>
+<span id="cb10-19"><a href="spatial-statistical-analysis.html#cb10-19" tabindex="-1"></a><span class="co">#&gt; Cancer_clone_B                       0.007406175 0.00234192 0.0001975938</span></span>
+<span id="cb10-20"><a href="spatial-statistical-analysis.html#cb10-20" tabindex="-1"></a><span class="co">#&gt; Acinar_cells                         0.007109879 0.00234192 0.0001920919</span></span>
+<span id="cb10-21"><a href="spatial-statistical-analysis.html#cb10-21" tabindex="-1"></a><span class="co">#&gt; mDCs_A                               0.005853463 0.00234192 0.0001651428</span></span>
+<span id="cb10-22"><a href="spatial-statistical-analysis.html#cb10-22" tabindex="-1"></a><span class="co">#&gt; Ductal_CRISP3_high-centroacinar_like 0.005800695 0.00234192 0.0001749367</span></span>
+<span id="cb10-23"><a href="spatial-statistical-analysis.html#cb10-23" tabindex="-1"></a><span class="co">#&gt; Endothelial_cells                    0.005749155 0.00234192 0.0001750884</span></span>
+<span id="cb10-24"><a href="spatial-statistical-analysis.html#cb10-24" tabindex="-1"></a><span class="co">#&gt;                                           Z.G        pvalue          padj rank</span></span>
+<span id="cb10-25"><a href="spatial-statistical-analysis.html#cb10-25" tabindex="-1"></a><span class="co">#&gt; Cancer_clone_A                       26.41492 4.617621e-154 9.235241e-153    1</span></span>
+<span id="cb10-26"><a href="spatial-statistical-analysis.html#cb10-26" tabindex="-1"></a><span class="co">#&gt; Cancer_clone_B                       25.62962 3.567592e-145 3.567592e-144    2</span></span>
+<span id="cb10-27"><a href="spatial-statistical-analysis.html#cb10-27" tabindex="-1"></a><span class="co">#&gt; Acinar_cells                         24.82124 2.644298e-136 1.762865e-135    3</span></span>
+<span id="cb10-28"><a href="spatial-statistical-analysis.html#cb10-28" tabindex="-1"></a><span class="co">#&gt; mDCs_A                               21.26368 1.231569e-100 6.157844e-100    4</span></span>
+<span id="cb10-29"><a href="spatial-statistical-analysis.html#cb10-29" tabindex="-1"></a><span class="co">#&gt; Ductal_CRISP3_high-centroacinar_like 19.77158  2.615753e-87  1.046301e-86    5</span></span>
+<span id="cb10-30"><a href="spatial-statistical-analysis.html#cb10-30" tabindex="-1"></a><span class="co">#&gt; Endothelial_cells                    19.46009  1.196819e-84  3.989397e-84    6</span></span></code></pre></div>
+<p>The <code>obs</code> is the Getis-Ord’s <em>G</em> of each cell-type. Global Getis-Ord’s <em>G</em> measures global spatial autocorrelation by evaluating the clustering of high/low value, specifically identifying <code>hot spots</code> or <code>cold spots</code>. Global Getis-Ord’s <em>G</em> values have no fixed range, as they depend on the specific dataset and spatial weight matrix. Global Getis-Ord’s <em>G</em> significantly above <code>E(G)</code> indicate a distinct spatial pattern or spatial clustering, which occurs when neighboring captured locations tend to have similar feature value. Global Getis-Ord’s <em>G</em> around <code>E(G)</code> suggest random spatial expression, that is, absence of spatial pattern. Global Getis-Ord’s <em>G</em> significantly below <code>E(G)</code> imply a chessboard-like pattern or dispersion.</p>
+<p>So the <code>Cancer clone A</code>, <code>Cancer clone B</code>, and <code>Acinar cells</code> were more concentrated in the spatial distribution compare to others.</p>
+</div>
+<div id="identification-of-local-spatial-aggregation-areas" class="section level3 hasAnchor" number="3.1.2">
+<h3><span class="header-section-number">3.1.2</span> Identification of local spatial aggregation areas<a href="spatial-statistical-analysis.html#identification-of-local-spatial-aggregation-areas" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Next, we can identify the spatial high-cluster areas for the spatial variable features via <code>runLISA</code>, which provides two local spatial statistics algorithms: Local Getis-Ord’s <em>G</em> and Local Moran’s <em>I</em></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="spatial-statistical-analysis.html#cb11-1" tabindex="-1"></a>celltypefree_lisares <span class="ot">&lt;-</span> pdac_a_spe <span class="sc">|&gt;</span> </span>
+<span id="cb11-2"><a href="spatial-statistical-analysis.html#cb11-2" tabindex="-1"></a>   <span class="fu">gsvaExp</span>(<span class="st">&quot;CellTypeFree&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb11-3"><a href="spatial-statistical-analysis.html#cb11-3" tabindex="-1"></a>   <span class="fu">runLISA</span>(<span class="at">features=</span><span class="fu">rownames</span>(.), <span class="at">assay.type=</span><span class="dv">1</span>) </span>
+<span id="cb11-4"><a href="spatial-statistical-analysis.html#cb11-4" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="spatial-statistical-analysis.html#cb11-5" tabindex="-1"></a>celltypefree_lisares<span class="sc">$</span>Cancer_clone_A <span class="sc">|&gt;</span> <span class="fu">head</span>()</span>
+<span id="cb11-6"><a href="spatial-statistical-analysis.html#cb11-6" tabindex="-1"></a><span class="co">#&gt;                 Gi       E.Gi       Var.Gi      Z.Gi Pr (z != E(Gi))</span></span>
+<span id="cb11-7"><a href="spatial-statistical-analysis.html#cb11-7" tabindex="-1"></a><span class="co">#&gt; Spot1 0.0001746202 0.00234192 1.649943e-06 -1.687270      0.09155141</span></span>
+<span id="cb11-8"><a href="spatial-statistical-analysis.html#cb11-8" tabindex="-1"></a><span class="co">#&gt; Spot2 0.0003158584 0.00234192 2.996272e-06 -1.170475      0.24180992</span></span>
+<span id="cb11-9"><a href="spatial-statistical-analysis.html#cb11-9" tabindex="-1"></a><span class="co">#&gt; Spot3 0.0002774819 0.00234192 2.489785e-06 -1.308341      0.19075761</span></span>
+<span id="cb11-10"><a href="spatial-statistical-analysis.html#cb11-10" tabindex="-1"></a><span class="co">#&gt; Spot4 0.0001673520 0.00234192 2.489501e-06 -1.378215      0.16813699</span></span>
+<span id="cb11-11"><a href="spatial-statistical-analysis.html#cb11-11" tabindex="-1"></a><span class="co">#&gt; Spot5 0.0004016950 0.00234192 2.994463e-06 -1.121225      0.26219219</span></span>
+<span id="cb11-12"><a href="spatial-statistical-analysis.html#cb11-12" tabindex="-1"></a><span class="co">#&gt; Spot6 0.0004403359 0.00234192 2.130895e-06 -1.302670      0.19268729</span></span>
+<span id="cb11-13"><a href="spatial-statistical-analysis.html#cb11-13" tabindex="-1"></a><span class="co">#&gt;       cluster.no.test cluster.test</span></span>
+<span id="cb11-14"><a href="spatial-statistical-analysis.html#cb11-14" tabindex="-1"></a><span class="co">#&gt; Spot1             Low       NoSign</span></span>
+<span id="cb11-15"><a href="spatial-statistical-analysis.html#cb11-15" tabindex="-1"></a><span class="co">#&gt; Spot2             Low       NoSign</span></span>
+<span id="cb11-16"><a href="spatial-statistical-analysis.html#cb11-16" tabindex="-1"></a><span class="co">#&gt; Spot3             Low       NoSign</span></span>
+<span id="cb11-17"><a href="spatial-statistical-analysis.html#cb11-17" tabindex="-1"></a><span class="co">#&gt; Spot4             Low       NoSign</span></span>
+<span id="cb11-18"><a href="spatial-statistical-analysis.html#cb11-18" tabindex="-1"></a><span class="co">#&gt; Spot5             Low       NoSign</span></span>
+<span id="cb11-19"><a href="spatial-statistical-analysis.html#cb11-19" tabindex="-1"></a><span class="co">#&gt; Spot6             Low       NoSign</span></span></code></pre></div>
+<p>Local Getis-Ord’s <em>G</em> (<em>G<sub>i</sub></em>) measures the aggregation of a feature value in a specific spot and its neighbors, determining if locations are significantly clustered with high (hot spots) or low values (cold spots). <em>G<sub>i</sub></em> usually have no fixed range, a larger <em>G<sub>i</sub></em> indicates a stronger clustering of high expression for the feature in captured location and its neighboring spots, while a smaller <em>G<sub>i</sub></em> indicates a stronger clustering of low expression.</p>
+<p>(ref:LISA_G_fig) <strong>The result of local Getis-Ord for cell-type</strong></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="spatial-statistical-analysis.html#cb12-1" tabindex="-1"></a><span class="fu">gsvaExp</span>(pdac_a_spe, <span class="st">&#39;CellTypeFree&#39;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb12-2"><a href="spatial-statistical-analysis.html#cb12-2" tabindex="-1"></a>  <span class="fu">plot_lisa_feature</span>(</span>
+<span id="cb12-3"><a href="spatial-statistical-analysis.html#cb12-3" tabindex="-1"></a>    <span class="at">lisa.res =</span> celltypefree_lisares[<span class="fu">c</span>(<span class="st">&#39;Cancer_clone_A&#39;</span>, <span class="st">&#39;Cancer_clone_B&#39;</span>, <span class="st">&#39;Acinar_cells&#39;</span>)], </span>
+<span id="cb12-4"><a href="spatial-statistical-analysis.html#cb12-4" tabindex="-1"></a>    <span class="at">assay.type =</span> <span class="dv">1</span>, </span>
+<span id="cb12-5"><a href="spatial-statistical-analysis.html#cb12-5" tabindex="-1"></a>    <span class="at">gap_line_width =</span> .<span class="dv">18</span></span>
+<span id="cb12-6"><a href="spatial-statistical-analysis.html#cb12-6" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="SVP_files/figure-html/LISA_G_fig-1.png" alt="(ref:LISA_G_fig)" width="864" />
+<p class="caption">
+(#fig:LISA_G_fig)(ref:LISA_G_fig)
+</p>
+</div>
+<p>The highlighted area signifies that the feature is significantly clustered in this region.</p>
+<p>We also can use local Moran’s I method to identify the region.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="spatial-statistical-analysis.html#cb13-1" tabindex="-1"></a>celltypefree_lisa.i <span class="ot">&lt;-</span> pdac_a_spe <span class="sc">|&gt;</span></span>
+<span id="cb13-2"><a href="spatial-statistical-analysis.html#cb13-2" tabindex="-1"></a>   <span class="fu">gsvaExp</span>(<span class="st">&quot;CellTypeFree&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb13-3"><a href="spatial-statistical-analysis.html#cb13-3" tabindex="-1"></a>   <span class="fu">runLISA</span>(</span>
+<span id="cb13-4"><a href="spatial-statistical-analysis.html#cb13-4" tabindex="-1"></a>     <span class="at">features =</span> <span class="fu">rownames</span>(.),</span>
+<span id="cb13-5"><a href="spatial-statistical-analysis.html#cb13-5" tabindex="-1"></a>     <span class="at">assay.type =</span> <span class="dv">1</span>,</span>
+<span id="cb13-6"><a href="spatial-statistical-analysis.html#cb13-6" tabindex="-1"></a>     <span class="at">method =</span> <span class="st">&#39;localmoran&#39;</span></span>
+<span id="cb13-7"><a href="spatial-statistical-analysis.html#cb13-7" tabindex="-1"></a>   )</span>
+<span id="cb13-8"><a href="spatial-statistical-analysis.html#cb13-8" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="spatial-statistical-analysis.html#cb13-9" tabindex="-1"></a>celltypefree_lisa.i<span class="sc">$</span>Cancer_clone_A <span class="sc">|&gt;</span> <span class="fu">head</span>()</span>
+<span id="cb13-10"><a href="spatial-statistical-analysis.html#cb13-10" tabindex="-1"></a><span class="co">#&gt;              Ii          E.Ii     Var.Ii     Z.Ii Pr (z != E(Ii))</span></span>
+<span id="cb13-11"><a href="spatial-statistical-analysis.html#cb13-11" tabindex="-1"></a><span class="co">#&gt; Spot1 0.2411323 -0.0004394871 0.02049855 1.687270      0.09155141</span></span>
+<span id="cb13-12"><a href="spatial-statistical-analysis.html#cb13-12" tabindex="-1"></a><span class="co">#&gt; Spot2 0.2610045 -0.0005894003 0.04994947 1.170475      0.24180992</span></span>
+<span id="cb13-13"><a href="spatial-statistical-analysis.html#cb13-13" tabindex="-1"></a><span class="co">#&gt; Spot3 0.2907443 -0.0007044064 0.04962291 1.308341      0.19075761</span></span>
+<span id="cb13-14"><a href="spatial-statistical-analysis.html#cb13-14" tabindex="-1"></a><span class="co">#&gt; Spot4 0.3124376 -0.0007329623 0.05163310 1.378215      0.16813699</span></span>
+<span id="cb13-15"><a href="spatial-statistical-analysis.html#cb13-15" tabindex="-1"></a><span class="co">#&gt; Spot5 0.2792327 -0.0007358277 0.06234951 1.121225      0.26219219</span></span>
+<span id="cb13-16"><a href="spatial-statistical-analysis.html#cb13-16" tabindex="-1"></a><span class="co">#&gt; Spot6 0.2256567 -0.0005002450 0.03014053 1.302670      0.19268729</span></span>
+<span id="cb13-17"><a href="spatial-statistical-analysis.html#cb13-17" tabindex="-1"></a><span class="co">#&gt;       cluster.no.test cluster.test</span></span>
+<span id="cb13-18"><a href="spatial-statistical-analysis.html#cb13-18" tabindex="-1"></a><span class="co">#&gt; Spot1         Low-Low       NoSign</span></span>
+<span id="cb13-19"><a href="spatial-statistical-analysis.html#cb13-19" tabindex="-1"></a><span class="co">#&gt; Spot2         Low-Low       NoSign</span></span>
+<span id="cb13-20"><a href="spatial-statistical-analysis.html#cb13-20" tabindex="-1"></a><span class="co">#&gt; Spot3         Low-Low       NoSign</span></span>
+<span id="cb13-21"><a href="spatial-statistical-analysis.html#cb13-21" tabindex="-1"></a><span class="co">#&gt; Spot4         Low-Low       NoSign</span></span>
+<span id="cb13-22"><a href="spatial-statistical-analysis.html#cb13-22" tabindex="-1"></a><span class="co">#&gt; Spot5         Low-Low       NoSign</span></span>
+<span id="cb13-23"><a href="spatial-statistical-analysis.html#cb13-23" tabindex="-1"></a><span class="co">#&gt; Spot6         Low-Low       NoSign</span></span></code></pre></div>
+<p>Local Moran’s <em>I</em> (<em>I<sub>i</sub></em>) measures the spatial correlation between a feature’s values in a specific area and its neighbors, assessing the similarity or difference between a location’s value and those of its surroundings. <em>I<sub>i</sub></em> also have no fixed range, a larger <em>I<sub>i</sub></em> signifies a stronger positive correlation in a region and its neighbors, with clusters of high or low values. A smaller value indicates a negative correlation, where high values are next to low values, or vice versa.</p>
+<p>(ref:LISA_I_fig) <strong>The result of local Moran for cell-type</strong></p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="spatial-statistical-analysis.html#cb14-1" tabindex="-1"></a><span class="fu">gsvaExp</span>(pdac_a_spe, <span class="st">&quot;CellTypeFree&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb14-2"><a href="spatial-statistical-analysis.html#cb14-2" tabindex="-1"></a>  <span class="fu">plot_lisa_feature</span>(</span>
+<span id="cb14-3"><a href="spatial-statistical-analysis.html#cb14-3" tabindex="-1"></a>     <span class="at">lisa.res =</span> celltypefree_lisa.i[<span class="fu">c</span>(<span class="st">&#39;Cancer_clone_A&#39;</span>, <span class="st">&#39;Cancer_clone_B&#39;</span>, <span class="st">&#39;Acinar_cells&#39;</span>)], </span>
+<span id="cb14-4"><a href="spatial-statistical-analysis.html#cb14-4" tabindex="-1"></a>     <span class="at">clustertype =</span> <span class="st">&#39;High-High&#39;</span>,</span>
+<span id="cb14-5"><a href="spatial-statistical-analysis.html#cb14-5" tabindex="-1"></a>     <span class="at">assay.type =</span> <span class="dv">1</span>, </span>
+<span id="cb14-6"><a href="spatial-statistical-analysis.html#cb14-6" tabindex="-1"></a>     <span class="at">gap_line_width =</span> .<span class="dv">18</span></span>
+<span id="cb14-7"><a href="spatial-statistical-analysis.html#cb14-7" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="SVP_files/figure-html/LISA_I_fig-1.png" alt="(ref:LISA_I_fig)" width="864" />
+<p class="caption">
+(#fig:LISA_I_fig)(ref:LISA_I_fig)
+</p>
+</div>
+</div>
+</div>
+<div id="bivariate-spatial-statistical-analysis" class="section level2 hasAnchor" number="3.2">
+<h2><span class="header-section-number">3.2</span> Bivariate spatial statistical analysis<a href="spatial-statistical-analysis.html#bivariate-spatial-statistical-analysis" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Next, to explore the bivariate spatial co-distribution, <code>SVP</code> implements global and local bivariate spatial statistics algorithms. Global bivariate spatial statistics algorithm can be used to identify whether the bivariate is co-cluster in the specific space. Local bivariate spatial algorithm is to find the areas of spatial co-clustering of bivariate.</p>
+<div id="global-bivariate-spatial-analysis" class="section level3 hasAnchor" number="3.2.1">
+<h3><span class="header-section-number">3.2.1</span> Global bivariate spatial analysis<a href="spatial-statistical-analysis.html#global-bivariate-spatial-analysis" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Here, we use <code>runGLOBALBV</code> of <code>SVP</code> to explore the spatial co-distribution between the cell-types.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="spatial-statistical-analysis.html#cb15-1" tabindex="-1"></a>gbv.res <span class="ot">&lt;-</span> pdac_a_spe <span class="sc">|&gt;</span> </span>
+<span id="cb15-2"><a href="spatial-statistical-analysis.html#cb15-2" tabindex="-1"></a>  <span class="fu">gsvaExp</span>(<span class="st">&#39;CellTypeFree&#39;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb15-3"><a href="spatial-statistical-analysis.html#cb15-3" tabindex="-1"></a>  <span class="fu">runGLOBALBV</span>(</span>
+<span id="cb15-4"><a href="spatial-statistical-analysis.html#cb15-4" tabindex="-1"></a>    <span class="at">features1 =</span> <span class="fu">names</span>(markerList),</span>
+<span id="cb15-5"><a href="spatial-statistical-analysis.html#cb15-5" tabindex="-1"></a>    <span class="at">assay.type =</span> <span class="dv">1</span>, </span>
+<span id="cb15-6"><a href="spatial-statistical-analysis.html#cb15-6" tabindex="-1"></a>    <span class="at">permutation =</span> <span class="cn">NULL</span>, <span class="co"># if permutation is NULL, mantel test will be used to calculated the pvalue</span></span>
+<span id="cb15-7"><a href="spatial-statistical-analysis.html#cb15-7" tabindex="-1"></a>    <span class="at">add.pvalue =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb15-8"><a href="spatial-statistical-analysis.html#cb15-8" tabindex="-1"></a>    <span class="at">alternative =</span> <span class="st">&#39;greater&#39;</span> <span class="co"># one-side test </span></span>
+<span id="cb15-9"><a href="spatial-statistical-analysis.html#cb15-9" tabindex="-1"></a>  )</span>
+<span id="cb15-10"><a href="spatial-statistical-analysis.html#cb15-10" tabindex="-1"></a>  </span>
+<span id="cb15-11"><a href="spatial-statistical-analysis.html#cb15-11" tabindex="-1"></a><span class="co"># gbv.res is a list contained Lee and pvalue matrix.</span></span>
+<span id="cb15-12"><a href="spatial-statistical-analysis.html#cb15-12" tabindex="-1"></a>gbv.res <span class="sc">|&gt;</span> <span class="fu">as_tbl_df</span>(<span class="at">diag=</span><span class="cn">FALSE</span>, <span class="at">flag.clust =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb15-13"><a href="spatial-statistical-analysis.html#cb15-13" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="fu">grepl</span>(<span class="st">&quot;Cancer&quot;</span>, x)) <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">arrange</span>(<span class="fu">desc</span>(Lee))</span>
+<span id="cb15-14"><a href="spatial-statistical-analysis.html#cb15-14" tabindex="-1"></a><span class="co">#&gt; # A tibble: 35 × 4</span></span>
+<span id="cb15-15"><a href="spatial-statistical-analysis.html#cb15-15" tabindex="-1"></a><span class="co">#&gt;    x              y                        Lee   pvalue</span></span>
+<span id="cb15-16"><a href="spatial-statistical-analysis.html#cb15-16" tabindex="-1"></a><span class="co">#&gt;    &lt;fct&gt;          &lt;fct&gt;                  &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span id="cb15-17"><a href="spatial-statistical-analysis.html#cb15-17" tabindex="-1"></a><span class="co">#&gt;  1 Cancer_clone_A Cancer_clone_B      0.728    0       </span></span>
+<span id="cb15-18"><a href="spatial-statistical-analysis.html#cb15-18" tabindex="-1"></a><span class="co">#&gt;  2 Cancer_clone_B Fibroblasts         0.185    2.04e-27</span></span>
+<span id="cb15-19"><a href="spatial-statistical-analysis.html#cb15-19" tabindex="-1"></a><span class="co">#&gt;  3 Cancer_clone_A Fibroblasts         0.180    5.82e-27</span></span>
+<span id="cb15-20"><a href="spatial-statistical-analysis.html#cb15-20" tabindex="-1"></a><span class="co">#&gt;  4 Cancer_clone_B Endothelial_cells   0.000286 4.99e- 1</span></span>
+<span id="cb15-21"><a href="spatial-statistical-analysis.html#cb15-21" tabindex="-1"></a><span class="co">#&gt;  5 Cancer_clone_A Endothelial_cells  -0.0169   8.07e- 1</span></span>
+<span id="cb15-22"><a href="spatial-statistical-analysis.html#cb15-22" tabindex="-1"></a><span class="co">#&gt;  6 Cancer_clone_B T_cells_&amp;_NK_cells -0.0442   9.97e- 1</span></span>
+<span id="cb15-23"><a href="spatial-statistical-analysis.html#cb15-23" tabindex="-1"></a><span class="co">#&gt;  7 Cancer_clone_A RBCs               -0.0443   9.80e- 1</span></span>
+<span id="cb15-24"><a href="spatial-statistical-analysis.html#cb15-24" tabindex="-1"></a><span class="co">#&gt;  8 Cancer_clone_B RBCs               -0.0513   9.91e- 1</span></span>
+<span id="cb15-25"><a href="spatial-statistical-analysis.html#cb15-25" tabindex="-1"></a><span class="co">#&gt;  9 Cancer_clone_A T_cells_&amp;_NK_cells -0.0696   1.00e+ 0</span></span>
+<span id="cb15-26"><a href="spatial-statistical-analysis.html#cb15-26" tabindex="-1"></a><span class="co">#&gt; 10 Cancer_clone_B Macrophages_A      -0.0773   1.00e+ 0</span></span>
+<span id="cb15-27"><a href="spatial-statistical-analysis.html#cb15-27" tabindex="-1"></a><span class="co">#&gt; # ℹ 25 more rows</span></span></code></pre></div>
+<p>The <code>Lee</code> value typically ranges from -1 to 1. When the index is closer to 1, it indicates a strong positive spatial association between the two variables, meaning the high-value areas of one variable tend to overlap with the high-value areas of the other, and low-value areas similarly overlap, showing strong spatial consistency. Conversely, if the index is near -1, it suggests a strong negative spatial association, where the high-value areas of one variable tend to overlap with the low-value areas of the other.</p>
+<p>We developed a function <code>plot_heatmap_globalbv</code> to visualize the result of global bivariate spatial analysis</p>
+<p>(ref:fig_gbv) <strong>The results of clustering analysis of spatial distribution between cell-type</strong></p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="spatial-statistical-analysis.html#cb16-1" tabindex="-1"></a><span class="co"># We can also display the result of global univariate spatial analysis </span></span>
+<span id="cb16-2"><a href="spatial-statistical-analysis.html#cb16-2" tabindex="-1"></a>moran.res <span class="ot">&lt;-</span> <span class="fu">gsvaExp</span>(pdac_a_spe, <span class="st">&#39;CellTypeFree&#39;</span>) <span class="sc">|&gt;</span> <span class="fu">svDf</span>(<span class="st">&quot;sv.moransi&quot;</span>)</span>
+<span id="cb16-3"><a href="spatial-statistical-analysis.html#cb16-3" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="spatial-statistical-analysis.html#cb16-4" tabindex="-1"></a><span class="co"># The result of local univariate spatial analysis also can be added</span></span>
+<span id="cb16-5"><a href="spatial-statistical-analysis.html#cb16-5" tabindex="-1"></a>lisa.f1.res <span class="ot">&lt;-</span> <span class="fu">gsvaExp</span>(pdac_a_spe, <span class="st">&quot;CellTypeFree&quot;</span>, <span class="at">withColData =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb16-6"><a href="spatial-statistical-analysis.html#cb16-6" tabindex="-1"></a>    <span class="fu">cal_lisa_f1</span>(<span class="at">lisa.res =</span> celltypefree_lisares, <span class="at">group.by =</span> <span class="st">&#39;cluster_domain&#39;</span>)</span>
+<span id="cb16-7"><a href="spatial-statistical-analysis.html#cb16-7" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="spatial-statistical-analysis.html#cb16-8" tabindex="-1"></a><span class="fu">plot_heatmap_globalbv</span>(gbv.res, <span class="at">moran.t=</span>moran.res, <span class="at">lisa.t=</span>lisa.f1.res)</span>
+<span id="cb16-9"><a href="spatial-statistical-analysis.html#cb16-9" tabindex="-1"></a><span class="co">#&gt; Warning in grid.Call.graphics(C_rect, x$x, x$y, x$width, x$height,</span></span>
+<span id="cb16-10"><a href="spatial-statistical-analysis.html#cb16-10" tabindex="-1"></a><span class="co">#&gt; resolveHJust(x$just, : semi-transparency is not supported on this device:</span></span>
+<span id="cb16-11"><a href="spatial-statistical-analysis.html#cb16-11" tabindex="-1"></a><span class="co">#&gt; reported only once per page</span></span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="SVP_files/figure-html/fig_gbv-1.png" alt="(ref:fig_gbv)" width="672" />
+<p class="caption">
+(#fig:fig_gbv)(ref:fig_gbv)
+</p>
+</div>
+<p>We can explore the spatial co-cluster between the different type of <code>gsvaExp</code>. For example, we explore the spatial co-distribution between the <code>CellTypeFree</code> and <code>CancerSEA</code> of <code>pdac_a_spe</code> object.</p>
+<p>(ref:runGLOBALBV_CellType_CancerSEA) <strong>The heatmap of spatial correlation between cell tyep and CancerSEA states</strong></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="spatial-statistical-analysis.html#cb17-1" tabindex="-1"></a><span class="co"># If the number of features is excessive, we recommend selecting </span></span>
+<span id="cb17-2"><a href="spatial-statistical-analysis.html#cb17-2" tabindex="-1"></a><span class="co"># those with spatial variability.</span></span>
+<span id="cb17-3"><a href="spatial-statistical-analysis.html#cb17-3" tabindex="-1"></a><span class="co"># celltypeid &lt;- gsvaExp(pdac_a_spe, &quot;CellTypeFree&quot;) |&gt; svDf(&quot;sv.moransi&quot;) |&gt; </span></span>
+<span id="cb17-4"><a href="spatial-statistical-analysis.html#cb17-4" tabindex="-1"></a><span class="co">#   dplyr::filter(padj&lt;=0.01) |&gt; rownames()</span></span>
+<span id="cb17-5"><a href="spatial-statistical-analysis.html#cb17-5" tabindex="-1"></a>celltypeid <span class="ot">&lt;-</span> <span class="fu">rownames</span>(<span class="fu">gsvaExp</span>(pdac_a_spe, <span class="st">&quot;CellTypeFree&quot;</span>))</span>
+<span id="cb17-6"><a href="spatial-statistical-analysis.html#cb17-6" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="spatial-statistical-analysis.html#cb17-7" tabindex="-1"></a>cancerseaid <span class="ot">&lt;-</span> <span class="fu">gsvaExp</span>(pdac_a_spe, <span class="st">&quot;CancerSEA&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb17-8"><a href="spatial-statistical-analysis.html#cb17-8" tabindex="-1"></a>   <span class="fu">runDetectSVG</span>(<span class="at">assay.type =</span> <span class="dv">1</span>, <span class="at">verbose=</span><span class="cn">FALSE</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb17-9"><a href="spatial-statistical-analysis.html#cb17-9" tabindex="-1"></a>   <span class="fu">svDf</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb17-10"><a href="spatial-statistical-analysis.html#cb17-10" tabindex="-1"></a>   dplyr<span class="sc">::</span><span class="fu">filter</span>(padj <span class="sc">&lt;=</span> <span class="fl">0.01</span>) <span class="sc">|&gt;</span></span>
+<span id="cb17-11"><a href="spatial-statistical-analysis.html#cb17-11" tabindex="-1"></a>   <span class="fu">rownames</span>()</span>
+<span id="cb17-12"><a href="spatial-statistical-analysis.html#cb17-12" tabindex="-1"></a><span class="co">#&gt; elapsed time is 0.037000 seconds</span></span>
+<span id="cb17-13"><a href="spatial-statistical-analysis.html#cb17-13" tabindex="-1"></a></span>
+<span id="cb17-14"><a href="spatial-statistical-analysis.html#cb17-14" tabindex="-1"></a><span class="fu">runGLOBALBV</span>(</span>
+<span id="cb17-15"><a href="spatial-statistical-analysis.html#cb17-15" tabindex="-1"></a>  pdac_a_spe, </span>
+<span id="cb17-16"><a href="spatial-statistical-analysis.html#cb17-16" tabindex="-1"></a>  <span class="at">gsvaexp =</span> <span class="fu">c</span>(<span class="st">&quot;CellTypeFree&quot;</span>, <span class="st">&quot;CancerSEA&quot;</span>), </span>
+<span id="cb17-17"><a href="spatial-statistical-analysis.html#cb17-17" tabindex="-1"></a>  <span class="at">gsvaexp.features =</span> <span class="fu">c</span>(celltypeid, cancerseaid), </span>
+<span id="cb17-18"><a href="spatial-statistical-analysis.html#cb17-18" tabindex="-1"></a>  <span class="at">permutation =</span> <span class="cn">NULL</span>, </span>
+<span id="cb17-19"><a href="spatial-statistical-analysis.html#cb17-19" tabindex="-1"></a>  <span class="at">add.pvalue =</span> <span class="cn">TRUE</span></span>
+<span id="cb17-20"><a href="spatial-statistical-analysis.html#cb17-20" tabindex="-1"></a>) <span class="ot">-&gt;</span> res.gbv.celltype.cancersea</span>
+<span id="cb17-21"><a href="spatial-statistical-analysis.html#cb17-21" tabindex="-1"></a><span class="co">#&gt; The `gsvaexp` is specified, the specified `gsvaExp` will be</span></span>
+<span id="cb17-22"><a href="spatial-statistical-analysis.html#cb17-22" tabindex="-1"></a><span class="co">#&gt; used to perform the analysis.</span></span>
+<span id="cb17-23"><a href="spatial-statistical-analysis.html#cb17-23" tabindex="-1"></a></span>
+<span id="cb17-24"><a href="spatial-statistical-analysis.html#cb17-24" tabindex="-1"></a><span class="fu">plot_heatmap_globalbv</span>(res.gbv.celltype.cancersea)</span></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="SVP_files/figure-html/runGLOBALBV_CellType_CancerSEA-1.png" alt="(ref:runGLOBALBV_CellType_CancerSEA)" width="576" />
+<p class="caption">
+(#fig:runGLOBALBV_CellType_CancerSEA)(ref:runGLOBALBV_CellType_CancerSEA)
+</p>
+</div>
+</div>
+<div id="local-bivariate-spatial-analysis" class="section level3 hasAnchor" number="3.2.2">
+<h3><span class="header-section-number">3.2.2</span> Local bivariate spatial analysis<a href="spatial-statistical-analysis.html#local-bivariate-spatial-analysis" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>After global bivariate spatial analysis, we found the <code>Cancer</code> cell and <code>Fibroblasts</code> show significant spatial co-aggregation. Next, we use <code>runLOCALBV</code> of <code>SVP</code> to identify the co-aggregation areas.</p>
+
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="spatial-statistical-analysis.html#cb18-1" tabindex="-1"></a>lbv.res <span class="ot">&lt;-</span> pdac_a_spe <span class="sc">|&gt;</span> </span>
+<span id="cb18-2"><a href="spatial-statistical-analysis.html#cb18-2" tabindex="-1"></a>  <span class="fu">gsvaExp</span>(<span class="st">&#39;CellTypeFree&#39;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb18-3"><a href="spatial-statistical-analysis.html#cb18-3" tabindex="-1"></a>  <span class="fu">runLOCALBV</span>(<span class="at">features1=</span><span class="st">&#39;Fibroblasts&#39;</span>, <span class="at">features2=</span><span class="fu">c</span>(<span class="st">&#39;Cancer_clone_A&#39;</span>, <span class="st">&quot;Cancer_clone_B&quot;</span>), <span class="at">assay.type=</span><span class="dv">1</span>) </span>
+<span id="cb18-4"><a href="spatial-statistical-analysis.html#cb18-4" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="spatial-statistical-analysis.html#cb18-5" tabindex="-1"></a><span class="co"># The result can be added to gsvaExp, then visualized by ggsc.</span></span>
+<span id="cb18-6"><a href="spatial-statistical-analysis.html#cb18-6" tabindex="-1"></a><span class="fu">LISAsce</span>(pdac_a_spe, <span class="at">lisa.res=</span>lbv.res, <span class="at">gsvaexp.name=</span><span class="st">&#39;LBV.res&#39;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb18-7"><a href="spatial-statistical-analysis.html#cb18-7" tabindex="-1"></a>  <span class="fu">gsvaExp</span>(<span class="st">&quot;LBV.res&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-8"><a href="spatial-statistical-analysis.html#cb18-8" tabindex="-1"></a>  <span class="fu">plot_lisa_feature</span>(<span class="at">lisa.res =</span> lbv.res, <span class="at">assay.type =</span> <span class="dv">1</span>)</span></code></pre></div>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:runLOCALBV"></span>
+<img src="SVP_files/figure-html/runLOCALBV-1.png" alt="The heatmap of Local bivariate spatial analysis" width="672" />
+<p class="caption">
+Figure 3.1: <strong>The heatmap of Local bivariate spatial analysis</strong>
+</p>
+</div>
+<p>The highlighted area denotes the region where the two variables significantly co-aggregate in space.</p>
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="quantification-of-cell-states-using-svp.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="session-information.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

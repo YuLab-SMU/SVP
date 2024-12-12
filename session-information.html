@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>4 Session information | Predicting cell states and their variability in single-cell or spatial omics data</title>
+  <meta name="description" content="4 Session information | Predicting cell states and their variability in single-cell or spatial omics data" />
+  <meta name="generator" content="bookdown 0.41 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="4 Session information | Predicting cell states and their variability in single-cell or spatial omics data" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="4 Session information | Predicting cell states and their variability in single-cell or spatial omics data" />
+  
+  
+  
+
+
+
+<meta name="date" content="2024-12-12" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="spatial-statistical-analysis.html"/>
+
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Introduction</a></li>
+<li class="chapter" data-level="1" data-path="overview-of-svp.html"><a href="overview-of-svp.html"><i class="fa fa-check"></i><b>1</b> Overview of SVP</a></li>
+<li class="chapter" data-level="2" data-path="quantification-of-cell-states-using-svp.html"><a href="quantification-of-cell-states-using-svp.html"><i class="fa fa-check"></i><b>2</b> Quantification of cell states using SVP</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="quantification-of-cell-states-using-svp.html"><a href="quantification-of-cell-states-using-svp.html#quantification-of-cancersea-etc-function"><i class="fa fa-check"></i><b>2.1</b> Quantification of CancerSEA etc function</a></li>
+<li class="chapter" data-level="2.2" data-path="quantification-of-cell-states-using-svp.html"><a href="quantification-of-cell-states-using-svp.html#quantification-of-cell-type"><i class="fa fa-check"></i><b>2.2</b> Quantification of cell-type</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="quantification-of-cell-states-using-svp.html"><a href="quantification-of-cell-states-using-svp.html#quantification-of-cell-type-using-the-pre-established-marker-gene-sets"><i class="fa fa-check"></i><b>2.2.1</b> Quantification of cell-type using the pre-established marker gene sets</a></li>
+<li class="chapter" data-level="2.2.2" data-path="quantification-of-cell-states-using-svp.html"><a href="quantification-of-cell-states-using-svp.html#quantification-of-cell-type-using-the-reference-single-cell-data"><i class="fa fa-check"></i><b>2.2.2</b> Quantification of cell-type using the reference single-cell data</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="spatial-statistical-analysis.html"><a href="spatial-statistical-analysis.html"><i class="fa fa-check"></i><b>3</b> Spatial statistical analysis</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="spatial-statistical-analysis.html"><a href="spatial-statistical-analysis.html#univariate-spatial-statistical-analysis"><i class="fa fa-check"></i><b>3.1</b> Univariate spatial statistical analysis</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="spatial-statistical-analysis.html"><a href="spatial-statistical-analysis.html#identification-of-spatial-variable-features"><i class="fa fa-check"></i><b>3.1.1</b> Identification of spatial variable features</a></li>
+<li class="chapter" data-level="3.1.2" data-path="spatial-statistical-analysis.html"><a href="spatial-statistical-analysis.html#identification-of-local-spatial-aggregation-areas"><i class="fa fa-check"></i><b>3.1.2</b> Identification of local spatial aggregation areas</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="spatial-statistical-analysis.html"><a href="spatial-statistical-analysis.html#bivariate-spatial-statistical-analysis"><i class="fa fa-check"></i><b>3.2</b> Bivariate spatial statistical analysis</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="spatial-statistical-analysis.html"><a href="spatial-statistical-analysis.html#global-bivariate-spatial-analysis"><i class="fa fa-check"></i><b>3.2.1</b> Global bivariate spatial analysis</a></li>
+<li class="chapter" data-level="3.2.2" data-path="spatial-statistical-analysis.html"><a href="spatial-statistical-analysis.html#local-bivariate-spatial-analysis"><i class="fa fa-check"></i><b>3.2.2</b> Local bivariate spatial analysis</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="session-information.html"><a href="session-information.html"><i class="fa fa-check"></i><b>4</b> Session information</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Predicting cell states and their variability in single-cell or spatial omics data</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="session-information" class="section level1 hasAnchor" number="4">
+<h1><span class="header-section-number">4</span> Session information<a href="session-information.html#session-information" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>Here is the output of <code>sessionInfo()</code> on the system on which this document was compiled:</p>
+<pre><code>#&gt; R Under development (unstable) (2024-12-10 r87437)
+#&gt; Platform: x86_64-pc-linux-gnu
+#&gt; Running under: CentOS Linux 7 (Core)
+#&gt; 
+#&gt; Matrix products: default
+#&gt; BLAS:   /biostack/tools/devtools/R/devel_241212/lib64/R/lib/libRblas.so 
+#&gt; LAPACK: /biostack/tools/devtools/R/devel_241212/lib64/R/lib/libRlapack.so;  LAPACK version 3.12.0
+#&gt; 
+#&gt; locale:
+#&gt;  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+#&gt;  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+#&gt;  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+#&gt;  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+#&gt;  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+#&gt; [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+#&gt; 
+#&gt; time zone: Asia/Shanghai
+#&gt; tzcode source: system (glibc)
+#&gt; 
+#&gt; attached base packages:
+#&gt; [1] stats4    stats     graphics  grDevices utils     datasets  methods  
+#&gt; [8] base     
+#&gt; 
+#&gt; other attached packages:
+#&gt;  [1] scatterpie_0.2.4            magrittr_2.0.3             
+#&gt;  [3] ggplot2_3.5.1               SVP_0.99.0                 
+#&gt;  [5] scran_1.35.0                scuttle_1.17.0             
+#&gt;  [7] ggsc_1.5.0                  SpatialExperiment_1.17.0   
+#&gt;  [9] SingleCellExperiment_1.29.1 SummarizedExperiment_1.37.0
+#&gt; [11] Biobase_2.67.0              GenomicRanges_1.59.1       
+#&gt; [13] GenomeInfoDb_1.43.2         IRanges_2.41.2             
+#&gt; [15] S4Vectors_0.45.2            BiocGenerics_0.53.3        
+#&gt; [17] generics_0.1.3              MatrixGenerics_1.19.0      
+#&gt; [19] matrixStats_1.4.1           bookdown_0.41              
+#&gt; 
+#&gt; loaded via a namespace (and not attached):
+#&gt;   [1] RcppAnnoy_0.0.22          splines_4.5.0            
+#&gt;   [3] later_1.4.1               ggplotify_0.1.2          
+#&gt;   [5] tibble_3.2.1              polyclip_1.10-7          
+#&gt;   [7] fastDummies_1.7.4         lifecycle_1.0.4          
+#&gt;   [9] edgeR_4.5.1               globals_0.16.3           
+#&gt;  [11] lattice_0.22-6            MASS_7.3-61              
+#&gt;  [13] limma_3.63.2              plotly_4.10.4            
+#&gt;  [15] sass_0.4.9                rmarkdown_2.29           
+#&gt;  [17] jquerylib_0.1.4           yaml_2.3.10              
+#&gt;  [19] metapod_1.15.0            httpuv_1.6.15            
+#&gt;  [21] Seurat_5.1.0              sctransform_0.4.1        
+#&gt;  [23] spam_2.11-0               sp_2.1-4                 
+#&gt;  [25] spatstat.sparse_3.1-0     reticulate_1.40.0        
+#&gt;  [27] cowplot_1.1.3             pbapply_1.7-2            
+#&gt;  [29] RColorBrewer_1.1-3        abind_1.4-8              
+#&gt;  [31] zlibbioc_1.53.0           Rtsne_0.17               
+#&gt;  [33] purrr_1.0.2               pracma_2.4.4             
+#&gt;  [35] yulab.utils_0.1.8         tweenr_2.0.3             
+#&gt;  [37] GenomeInfoDbData_1.2.13   ggrepel_0.9.6            
+#&gt;  [39] irlba_2.3.5.1             listenv_0.9.1            
+#&gt;  [41] spatstat.utils_3.1-1      tidytree_0.4.6           
+#&gt;  [43] goftest_1.2-3             RSpectra_0.16-2          
+#&gt;  [45] spatstat.random_3.3-2     dqrng_0.4.1              
+#&gt;  [47] fitdistrplus_1.2-1        parallelly_1.40.1        
+#&gt;  [49] DelayedMatrixStats_1.29.0 leiden_0.4.3.1           
+#&gt;  [51] codetools_0.2-20          DelayedArray_0.33.3      
+#&gt;  [53] ggforce_0.4.2             tidyselect_1.2.1         
+#&gt;  [55] aplot_0.2.3               UCSC.utils_1.3.0         
+#&gt;  [57] farver_2.1.2              ScaledMatrix_1.15.0      
+#&gt;  [59] spatstat.explore_3.3-3    jsonlite_1.8.9           
+#&gt;  [61] BiocNeighbors_2.1.2       progressr_0.15.1         
+#&gt;  [63] ggridges_0.5.6            survival_3.7-0           
+#&gt;  [65] tools_4.5.0               treeio_1.31.0            
+#&gt;  [67] ggstar_1.0.4              ica_1.0-3                
+#&gt;  [69] Rcpp_1.0.13-1             glue_1.8.0               
+#&gt;  [71] gridExtra_2.3             SparseArray_1.7.2        
+#&gt;  [73] xfun_0.49                 dplyr_1.1.4              
+#&gt;  [75] withr_3.0.2               fastmap_1.2.0            
+#&gt;  [77] bluster_1.17.0            fansi_1.0.6              
+#&gt;  [79] digest_0.6.37             rsvd_1.0.5               
+#&gt;  [81] gridGraphics_0.5-1        R6_2.5.1                 
+#&gt;  [83] mime_0.12                 colorspace_2.1-1         
+#&gt;  [85] scattermore_1.2           tensor_1.5               
+#&gt;  [87] spatstat.data_3.1-4       utf8_1.2.4               
+#&gt;  [89] tidyr_1.3.1               data.table_1.16.4        
+#&gt;  [91] httr_1.4.7                htmlwidgets_1.6.4        
+#&gt;  [93] S4Arrays_1.7.1            uwot_0.2.2               
+#&gt;  [95] pkgconfig_2.0.3           gtable_0.3.6             
+#&gt;  [97] lmtest_0.9-40             XVector_0.47.0           
+#&gt;  [99] htmltools_0.5.8.1         dotCall64_1.2            
+#&gt; [101] SeuratObject_5.0.2        scales_1.3.0             
+#&gt; [103] png_0.1-8                 spatstat.univar_3.1-1    
+#&gt; [105] ggfun_0.1.8               knitr_1.49               
+#&gt; [107] reshape2_1.4.4            rjson_0.2.23             
+#&gt; [109] nlme_3.1-166              cachem_1.1.0             
+#&gt; [111] zoo_1.8-12                stringr_1.5.1            
+#&gt; [113] KernSmooth_2.23-24        parallel_4.5.0           
+#&gt; [115] miniUI_0.1.1.1            pillar_1.9.0             
+#&gt; [117] grid_4.5.0                vctrs_0.6.5              
+#&gt; [119] RANN_2.6.2                promises_1.3.2           
+#&gt; [121] BiocSingular_1.23.0       tidydr_0.0.5             
+#&gt; [123] beachmat_2.23.4           xtable_1.8-4             
+#&gt; [125] cluster_2.1.8             evaluate_1.0.1           
+#&gt; [127] magick_2.8.5              locfit_1.5-9.10          
+#&gt; [129] cli_3.6.3                 compiler_4.5.0           
+#&gt; [131] rlang_1.1.4               crayon_1.5.3             
+#&gt; [133] future.apply_1.11.3       labeling_0.4.3           
+#&gt; [135] plyr_1.8.9                fs_1.6.5                 
+#&gt; [137] stringi_1.8.4             viridisLite_0.4.2        
+#&gt; [139] deldir_2.0-4              BiocParallel_1.41.0      
+#&gt; [141] munsell_0.5.1             lazyeval_0.2.2           
+#&gt; [143] spatstat.geom_3.3-4       Matrix_1.7-1             
+#&gt; [145] RcppHNSW_0.6.0            patchwork_1.3.0          
+#&gt; [147] sparseMatrixStats_1.19.0  future_1.34.0            
+#&gt; [149] statmod_1.5.0             shiny_1.9.1              
+#&gt; [151] ROCR_1.0-11               igraph_2.1.2             
+#&gt; [153] RcppParallel_5.1.9        bslib_0.8.0              
+#&gt; [155] ggtree_3.15.0             fastmatch_1.1-4          
+#&gt; [157] ape_5.8</code></pre>
+
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div class="csl-entry">
+Chang, Yuzhou, Jixin Liu, Yi Jiang, Anjun Ma, Yao Yu Yeo, Qi Guo, Megan McNutt, et al. 2024. <span>“Graph Fourier Transform for Spatial Omics Representation and Analyses of Complex Organs.”</span> <em>Nature Communications</em> 15 (1): 7467.
+</div>
+<div class="csl-entry">
+Cortal, Akira, Loredana Martignetti, Emmanuelle Six, and Antonio Rausell. 2021. <span>“Gene Signature Extraction and Cell Identity Recognition at the Single-Cell Level with Cell-ID.”</span> <em>Nature Biotechnology</em> 39 (9): 1095–1102.
+</div>
+<div class="csl-entry">
+Hao, Yuhan, Tim Stuart, Madeline H Kowalski, Saket Choudhary, Paul Hoffman, Austin Hartman, Avi Srivastava, et al. 2023. <span>“Dictionary Learning for Integrative, Multimodal and Scalable Single-Cell Analysis.”</span> <em>Nature Biotechnology</em>. <a href="https://doi.org/10.1038/s41587-023-01767-y">https://doi.org/10.1038/s41587-023-01767-y</a>.
+</div>
+<div class="csl-entry">
+Miller, Brendan F, Dhananjay Bambah-Mukku, Catherine Dulac, Xiaowei Zhuang, and Jean Fan. 2021. <span>“Characterizing Spatial Gene Expression Heterogeneity in Spatially Resolved Single-Cell Transcriptomic Data with Nonuniform Cellular Densities.”</span> <em>Genome Research</em> 31 (10): 1843–55.
+</div>
+<div class="csl-entry">
+Moncada, Reuben, Dalia Barkley, Florian Wagner, Marta Chiodin, Joseph C Devlin, Maayan Baron, Cristina H Hajdu, Diane M Simeone, and Itai Yanai. 2020. <span>“Integrating Microarray-Based Spatial Transcriptomics and Single-Cell RNA-Seq Reveals Tissue Architecture in Pancreatic Ductal Adenocarcinomas.”</span> <em>Nature Biotechnology</em> 38 (3): 333–42.
+</div>
+<div class="csl-entry">
+Palla, Giovanni, Hannah Spitzer, Michal Klein, David Fischer, Anna Christina Schaar, Louis Benedikt Kuemmerle, Sergei Rybakov, et al. 2022. <span>“Squidpy: A Scalable Framework for Spatial Omics Analysis.”</span> <em>Nature Methods</em> 19 (2): 171–78. <a href="https://doi.org/10.1038/s41592-021-01358-2">https://doi.org/10.1038/s41592-021-01358-2</a>.
+</div>
+<div class="csl-entry">
+Sun, Shiquan, Jiaqiang Zhu, and Xiang Zhou. 2020. <span>“Statistical Analysis of Spatial Expression Patterns for Spatially Resolved Transcriptomic Studies.”</span> <em>Nature Methods</em> 17 (2): 193–200.
+</div>
+<div class="csl-entry">
+Svensson, Valentine, Sarah A Teichmann, and Oliver Stegle. 2018. <span>“SpatialDE: Identification of Spatially Variable Genes.”</span> <em>Nature Methods</em> 15 (5): 343–46.
+</div>
+<div class="csl-entry">
+Weber, Lukas M., Arkajyoti Saha, Abhirup Datta, Kasper D. Hansen, and Stephanie C. Hicks. 2023. <span>“nnSVG for the Scalable Identification of Spatially Variable Genes Using Nearest-Neighbor Gaussian Processes.”</span> <em>Nature Communications</em> 14 (4059). https://doi.org/<a href="https://doi.org/10.1038/s41467-023-39748-z">https://doi.org/10.1038/s41467-023-39748-z</a>.
+</div>
+<div class="csl-entry">
+Zhu, Jiaqiang, Shiquan Sun, and Xiang Zhou. 2021. <span>“SPARK-x: Non-Parametric Modeling Enables Scalable and Robust Detection of Spatial Expression Patterns for Large Spatial Transcriptomic Studies.”</span> <em>Genome Biology</em> 22 (1): 184. <a href="https://doi.org/10.1186/s13059-021-02404-0">https://doi.org/10.1186/s13059-021-02404-0</a>.
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="spatial-statistical-analysis.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>
