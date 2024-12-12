@@ -5,3 +5,5 @@
 ^CONDUCT\.md$
 ^\.Rproj\.user$
 ^\.Rproj$
+^\.github
+gh-pages
