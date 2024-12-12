@@ -74,8 +74,7 @@ library(magrittr)
 
 # load the spatial transcriptome, it is a SpatialExperiment object
 # to build the object, you can refer to the SpatialExperiment package
-data(pdac_a_spe)
-pdac_a_spe 
+pdac_a_spe <- readRDS(url("https://raw.githubusercontent.com/xiangpin/Data_for_Vignette_SVP/main/data/pdac_a_spe.rds")) 
 # we had removed the genes that did not express in any captured location.
 # First, we use logNormCounts of scuttle to normalize the spatial transcriptome
 pdac_a_spe <- logNormCounts(pdac_a_spe)
@@ -198,9 +197,8 @@ This approach requires obtaining the cell-type marker genes from the reference s
 
 ```{r, runDetectMarker}
 # load the reference single cell transcriptome
-# data(pdac_a_sce)
-load("../data/pdac_a_sce.rda")
 # it is a SingleCellExperiment
+pdac_a_sce <- readRDS(url("https://raw.githubusercontent.com/xiangpin/Data_for_Vignette_SVP/main/data/pdac_a_sce.rds"))
 pdac_a_sce
 
 pdac_a_sce <- logNormCounts(pdac_a_sce)
@@ -424,7 +422,7 @@ runGLOBALBV(
   gsvaexp = c("CellTypeFree", "CancerSEA"), 
   gsvaexp.features = c(celltypeid, cancerseaid), 
   permutation = NULL, 
-  add.pvalue = T
+  add.pvalue = TRUE
 ) -> res.gbv.celltype.cancersea
 
 plot_heatmap_globalbv(res.gbv.celltype.cancersea)
