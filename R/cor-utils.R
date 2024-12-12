@@ -37,7 +37,7 @@ fast_cor <- function(
     add.pvalue = FALSE
 ){
     if (!inherits(x, 'dgCMatrix')){
-        x <- suppressWarnings(Matrix::Matrix(as.matrix(x), sparse=TRUE))
+        x <- Matrix::Matrix(as.matrix(x), sparse=TRUE)
     }
     method <- match.arg(method)
     ia <- match.arg(alternative)
@@ -48,7 +48,7 @@ fast_cor <- function(
             cli::cli_abort("The column number of {.var x} and {.var y} should be equal when {.var y} is provided!")
         }
         if (!inherits(y, 'dgCMatrix')){
-            y <- suppressWarnings(Matrix::Matrix(as.matrix(y), sparse=TRUE))
+            y <- Matrix::Matrix(as.matrix(y), sparse=TRUE)
         }
         if (combine){
             x <- Matrix::rbind2(x, y)
@@ -112,8 +112,8 @@ fast_cor <- function(
     }else if (ia == 'less'){
         lower.tail <- TRUE
     }
-    t.val = sqrt(np - 2) * mc/sqrt(1 - mc^2)
-    p = pt(t.val, np - 2, lower.tail = lower.tail)
+    t.val <- sqrt(np - 2) * mc/sqrt(1 - mc^2)
+    p <- pt(t.val, np - 2, lower.tail = lower.tail)
     if (ia == 'two.sided'){
         p <- 2 * p
     }

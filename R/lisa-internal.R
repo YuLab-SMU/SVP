@@ -7,7 +7,7 @@
     BPPARAM = SerialParam()
   ){
   if (!inherits(x, 'dgCMatrix')){
-    x <- as.matrix(x) |> Matrix::Matrix(sparse=T) 
+    x <- as.matrix(x) |> Matrix::Matrix(sparse = TRUE) 
   }  
   method <- match.arg(method)
   alternative <- match.arg(alternative)
