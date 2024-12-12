@@ -32,10 +32,10 @@ check2: rd build
 	cd ..;\
 	R CMD check $(PKGNAME)_$(PKGVERS).tar.gz
 
-bioccheck: rd build
+bioccheck:
 	cd ..;\
-        Rscript -e 'BiocCheck::BiocCheck("$(PKGNAME)_$(PKGVERS).tar.gz")'
+	Rscript -e 'BiocCheck::BiocCheck("$(PKGNAME)_$(PKGVERS).tar.gz", "new-package"=TRUE)'
 
 clean:
 	cd ..;\
-	rm -rf $(PKGNAME)_$(PKGVERS).tar.gz $(PKGNAME).Rcheck
+	rm -rf $(PKGNAME).Rcheck
