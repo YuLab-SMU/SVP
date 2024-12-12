@@ -10,6 +10,7 @@
 #' @param rm.group.nm character which want to remove some group type names from the names of 
 #' the specified category group, default is NULL.
 #' @param ... currently meaningless.
+#' @return SVPExperiment object
 #' @examples
 #' data(sceSubPbmc)
 #' sceSubPbmc
@@ -62,6 +63,7 @@ setMethod("runENCODE", "SingleCellExperiment",
 #' @param rm.group.nm character which want to remove some group type names from the names of
 #' the specified category group, default is NULL.
 #' @param ... currently meaningless.
+#' @return a data.frame object containing the F1 value for each category in \code{group.by}.
 #' @examples
 #' data(hpda_spe_cell_dec)
 #' lisa.res1 <- hpda_spe_cell_dec |> 

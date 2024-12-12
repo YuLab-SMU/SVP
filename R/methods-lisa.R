@@ -38,7 +38,7 @@
 #' @param alternative a character string specifying the alternative hypothesis, default is \code{two.sided}.
 #' @param BPPARAM A BiocParallelParam object specifying whether perform the analysis parallelly using
 #' \code{BiocParallel} default is \code{SerialParam()}, meaning no parallel.
-#' You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=T)} to parallel it,
+#' You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=TRUE)} to parallel it,
 #' the \code{workers} of \code{MulticoreParam} is the number of cores used, see also
 #' \code{\link[BiocParallel]{MulticoreParam}}. default is \code{SerialParam()}.
 #' @param verbose logical whether print the help information, default is TRUE.
@@ -334,6 +334,7 @@ setMethod("runLISA", "SVPExperiment", function(
 #' that spots or cells in the same category are adjacent, default is NULL.
 #' @param cells the cell name or index of data object, default is NULL.
 #' @param ... addtional parameters, when \code{weight.method='knn'}, you can specified \code{k=10}.
+#' @return a dgCMatrix object 
 #' @examples
 #' data(hpda_spe_cell_dec)
 #' # knn method

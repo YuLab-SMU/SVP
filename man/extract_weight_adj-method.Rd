@@ -53,6 +53,9 @@ that spots or cells in the same category are adjacent, default is NULL.}
 
 \item{...}{addtional parameters, when \code{weight.method='knn'}, you can specified \code{k=10}.}
 }
+\value{
+a dgCMatrix object
+}
 \description{
 the function provides \code{voronoi} or \code{knn} method to build the
 cell adjacent matrix.

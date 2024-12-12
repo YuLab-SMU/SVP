@@ -82,6 +82,7 @@ LISAResult <- function(x, type = NULL, features=NULL, ...){
 #' @param lisa.res list the result of \code{runLISA} or \code{runLOCALBV}.
 #' @param gsvaexp.name character the name of gsveExp for the LISA result, default is "LISA".
 #' @param ... currently meaningless.
+#' @return a SVPExperiment object
 #' @seealso [`runLISA`] and [`runLOCALBV`]
 #' @examples
 #' data(hpda_spe_cell_dec)

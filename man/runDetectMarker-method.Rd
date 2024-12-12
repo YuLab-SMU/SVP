@@ -57,7 +57,7 @@ the corresponding group by specific \code{group.by}, default is 0.2.}
 
 \item{BPPARAM}{A BiocParallelParam object specifying whether perform the analysis parallelly using
 \code{BiocParallel} default is \code{SerialParam()}, meaning no parallel.
-You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=T)} to parallel it,
+You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=TRUE)} to parallel it,
 the \code{workers} of \code{MulticoreParam} is the number of cores used, see also
 \code{\link[BiocParallel]{MulticoreParam}}. default is \code{SerialParam()}.}
 

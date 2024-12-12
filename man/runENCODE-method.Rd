@@ -23,6 +23,9 @@ the specified category group, default is NULL.}
 
 \item{...}{currently meaningless.}
 }
+\value{
+SVPExperiment object
+}
 \description{
 This function convert the specified cell category to one hot encode
 }

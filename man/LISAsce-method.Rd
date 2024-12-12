@@ -20,6 +20,9 @@ or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} ob
 
 \item{...}{currently meaningless.}
 }
+\value{
+a SVPExperiment object
+}
 \description{
 convert the Gi for \code{runLISA} result or LocalLee for \code{runLOCALBV} result
 to a \linkS4class{SVPExperiment}.

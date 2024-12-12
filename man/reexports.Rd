@@ -10,6 +10,9 @@
 \alias{spatialCoordsNames}
 \alias{spatialCoordsNames<-}
 \title{Objects exported from other packages}
+\value{
+function
+}
 \keyword{internal}
 \description{
 These objects are imported from other packages. Follow the links

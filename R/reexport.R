@@ -1,4 +1,5 @@
 #' @importFrom SpatialExperiment spatialCoords
+#' @return function
 #' @export
 SpatialExperiment::spatialCoords
 

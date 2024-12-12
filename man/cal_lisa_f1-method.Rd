@@ -26,6 +26,9 @@ the specified category group, default is NULL.}
 
 \item{...}{currently meaningless.}
 }
+\value{
+a data.frame object containing the F1 value for each category in \code{group.by}.
+}
 \description{
 this is to calculate the F1 value based on LISA result in some spatial domain.
 If a feature has a larger F1 value in a spatial domain, it means the feature

@@ -48,7 +48,7 @@
 #' @param random.seed numeric random seed number to repeatability, default is 1024.
 #' @param BPPARAM A BiocParallelParam object specifying whether perform the analysis parallelly using
 #' \code{BiocParallel} default is \code{SerialParam()}, meaning no parallel.
-#' You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=T)} to parallel it,
+#' You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=TRUE)} to parallel it,
 #' the \code{workers} of \code{MulticoreParam} is the number of cores used, see also
 #' \code{\link[BiocParallel]{MulticoreParam}}. default is \code{SerialParam()}.
 #' @param action character, which control the type of return result, default is \code{get}, which will return
