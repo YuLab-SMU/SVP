@@ -36,6 +36,7 @@ library(scran)
 library(SVP)
 library(ggplot2)
 library(magrittr)
+library(scatterpie)
 } |> suppressPackageStartupMessages()
 ```
 
