@@ -106,9 +106,9 @@ To quantifying the cell-type for each captured location, the gene set should be 
 
 We can use the pre-established marker gene sets to quantifying the cell-type for each captured location. Here, we used the markers obtained from the `CARD`, which was used as input for `CARDfree` command.
 
-(ref:runSGSA_free) **The pie plot of cell-type activity**
+(ref:runSGSAFree) **The pie plot of cell-type activity**
 
-```{r, fig.width = 9, fig.height = 7, fig.align = 'center', fig.cap="(ref:runSGSA_free)", runSGSA_free}
+```{r, fig.width = 9, fig.height = 7, fig.align = 'center', fig.cap="(ref:runSGSAFree)", runSGSAFree}
 # The marker gene sets
 load(url("https://github.com/YingMa0107/CARD/blob/master/data/markerList.RData?raw=true"))
 markerList |> names()
@@ -136,9 +136,9 @@ gsvaExp(pdac_a_spe, "CellTypeFree") |>
 
 We cal also display each cell-type activity with heat-map according to the spatial coordinate.
 
-(ref:heatmap_celltype) **the heatmap of each cell-type activity**
+(ref:HeatmapCelltype) **the heatmap of each cell-type activity**
 
-```{r, fig.align = 'center', fig.width = 11, fig.height=11, fig.cap = '(ref:heatmap_celltype)', heatmap_celltype}
+```{r, fig.align = 'center', fig.width = 11, fig.height=11, fig.cap = '(ref:HeatmapCelltype)', HeatmapCelltype}
 pdac_a_spe |> gsvaExp(3) |> 
    sc_spatial(
      features = sort(names(markerList)),
@@ -177,9 +177,9 @@ refmakergene |> lapply(length) |> unlist()
 
 Then, the quantification of the cell-type gene signatures can also be performed via `runSGSA` with the marker gene sets.
 
-(ref:runSGSA_ref) **The pie plot of cell-type activity with the marker gene sets from reference single-cell transcriptome**
+(ref:runSGSARef) **The pie plot of cell-type activity with the marker gene sets from reference single-cell transcriptome**
 
-```{r, fig.width = 9, fig.height = 7, fig.align = 'center', fig.cap='(ref:runSGSA_ref)', runSGSA_ref}
+```{r, fig.width = 9, fig.height = 7, fig.align = 'center', fig.cap='(ref:runSGSARef)', runSGSARef}
 # use the maker gene from the reference single-cell transcriptome
 pdac_a_spe <- runSGSA(
   pdac_a_spe,
@@ -286,9 +286,9 @@ celltypefree_lisares$Cancer_clone_A |> head()
 
 Local Getis-Ord’s *G* (*G~i~*) measures the aggregation of a feature value in a specific spot and its neighbors, determining if locations are significantly clustered with high (hot spots) or low values (cold spots). *G~i~* usually have no fixed range, a larger *G~i~* indicates a stronger clustering of high expression for the feature in captured location and its neighboring spots, while a smaller *G~i~* indicates a stronger clustering of low expression.
 
-(ref:LISA_G_fig) **The result of local Getis-Ord for cell-type**
+(ref:LISAGFig) **The result of local Getis-Ord for cell-type**
 
-```{r, fig.width = 9, fig.height = 3, fig.align = 'center', fig.cap="(ref:LISA_G_fig)", LISA_G_fig}
+```{r, fig.width = 9, fig.height = 3, fig.align = 'center', fig.cap="(ref:LISAGFig)", LISAGFig}
 gsvaExp(pdac_a_spe, 'CellTypeFree') |> 
   plot_lisa_feature(
     lisa.res = celltypefree_lisares[c('Cancer_clone_A', 'Cancer_clone_B', 'Acinar_cells')], 
@@ -316,9 +316,9 @@ celltypefree_lisa.i$Cancer_clone_A |> head()
 
 Local Moran’s *I* (*I~i~*) measures the spatial correlation between a feature's values in a specific area and its neighbors, assessing the similarity or difference between a location's value and those of its surroundings. *I~i~* also have no fixed range, a larger *I~i~* signifies a stronger positive correlation in a region and its neighbors, with clusters of high or low values. A smaller value indicates a negative correlation, where high values are next to low values, or vice versa.
 
-(ref:LISA_I_fig) **The result of local Moran for cell-type**
+(ref:LISAIFig) **The result of local Moran for cell-type**
 
-```{r, fig.width = 9, fig.height = 3, fig.align = 'center', fig.cap='(ref:LISA_I_fig)', LISA_I_fig}
+```{r, fig.width = 9, fig.height = 3, fig.align = 'center', fig.cap='(ref:LISAIFig)', LISAIFig}
 gsvaExp(pdac_a_spe, "CellTypeFree") |>
   plot_lisa_feature(
      lisa.res = celltypefree_lisa.i[c('Cancer_clone_A', 'Cancer_clone_B', 'Acinar_cells')], 
@@ -356,9 +356,9 @@ The `Lee` value typically ranges from -1 to 1. When the index is closer to 1, it
 
 We developed a function `plot_heatmap_globalbv` to visualize the result of global bivariate spatial analysis
 
-(ref:fig_gbv) **The results of clustering analysis of spatial distribution between cell-type**
+(ref:FigGbv) **The results of clustering analysis of spatial distribution between cell-type**
 
-```{r, fig.width = 7, fig.height = 5.5, fig.align = 'center', fig.cap="(ref:fig_gbv)", fig_gbv}
+```{r, fig.width = 7, fig.height = 5.5, fig.align = 'center', fig.cap="(ref:FigGbv)", FigGbv}
 # We can also display the result of global univariate spatial analysis 
 moran.res <- gsvaExp(pdac_a_spe, 'CellTypeFree') |> svDf("sv.moransi")
 
@@ -371,9 +371,9 @@ plot_heatmap_globalbv(gbv.res, moran.t=moran.res, lisa.t=lisa.f1.res)
 
 We can explore the spatial co-cluster between the different type of `gsvaExp`. For example, we explore the spatial co-distribution between the `CellTypeFree` and `CancerSEA` of `pdac_a_spe` object.
 
-(ref:runGLOBALBV_CellType_CancerSEA) **The heatmap of spatial correlation between cell tyep and CancerSEA states**
+(ref:runGLOBALBVCellTypeCancerSEA) **The heatmap of spatial correlation between cell tyep and CancerSEA states**
 
-```{r, fig.width = 6, fig.height=5.6, fig.align = 'center', fig.cap = "(ref:runGLOBALBV_CellType_CancerSEA)", runGLOBALBV_CellType_CancerSEA}
+```{r, fig.width = 6, fig.height=5.6, fig.align = 'center', fig.cap = "(ref:runGLOBALBVCellTypeCancerSEA)", runGLOBALBVCellTypeCancerSEA}
 # If the number of features is excessive, we recommend selecting 
 # those with spatial variability.
 # celltypeid <- gsvaExp(pdac_a_spe, "CellTypeFree") |> svDf("sv.moransi") |> 
