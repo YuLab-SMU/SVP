@@ -1,5 +1,12 @@
 fig:overview
 fig:CancerSEA
+fig:runSGSAFree
+fig:HeatmapCelltype
+fig:runSGSARef
+fig:LISAGFig
+fig:LISAIFig
+fig:FigGbv
+fig:runGLOBALBVCellTypeCancerSEA
 fig:runLOCALBV
 overview-of-svp
 quantification-of-cell-states-using-svp
