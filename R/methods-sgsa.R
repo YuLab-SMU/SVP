@@ -107,7 +107,8 @@
 #' #
 #' # supporting the list with names or gson object or the gmt file
 #' # online gmt file is also be supported 
-#' # such as https://data.broadinstitute.org/gsea-msigdb/msigdb/release/2023.2.Hs/c2.cp.biocarta.v2023.2.Hs.symbols.gmt
+#' # such as 
+#' # https://data.broadinstitute.org/gsea-msigdb/msigdb/release/2023.2.Hs/h.all.v2023.2.Hs.symbols.gmt
 #' 
 #' data(CellCycle.Hs)
 #' sceSubPbmc <- runSGSA(sceSubPbmc, gset.idx.list = CellCycle.Hs, gsvaExp.name = 'CellCycle')

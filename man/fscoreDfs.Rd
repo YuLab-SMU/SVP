@@ -103,12 +103,15 @@ rownames(sce2) <- paste0("KEGG:", seq(nrow(sce2)))
 colnames(sce2) <- colnames(svpe)
 
 # Mocking up some relationship score between new feature and gene
-fscore1 <- lapply(seq(nrow(sce1)), function(i) abs(rnorm(5, 0.5)) |> setNames(sample(rownames(svpe),5))) |> 
-            List() |>  
-            DataFrame() |> setNames("rwr_score") 
+fscore1 <- lapply(seq(nrow(sce1)), function(i) abs(rnorm(5, 0.5)) |> 
+             setNames(sample(rownames(svpe),5))) |> 
+             List() |>  
+             DataFrame() |> setNames("rwr_score") 
 rownames(fscore1) <- rownames(sce1)
-fscore2 <- lapply(seq(nrow(sce2)), function(i) abs(rnorm(5, 0.8)) |> setNames(sample(rownames(svpe),5))) |> 
-           List() |>  DataFrame() |> setNames("hyper_test")
+fscore2 <- lapply(seq(nrow(sce2)), function(i) abs(rnorm(5, 0.8)) |> 
+             setNames(sample(rownames(svpe),5))) |> 
+             List() |> 
+             DataFrame() |> setNames("hyper_test")
 # Setting the score
 fscoreDfs(sce1) <- list()
 fscoreDfs(sce2) <- list()
