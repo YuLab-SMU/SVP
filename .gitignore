@@ -7,3 +7,4 @@ man/figures/
 inst/doc
 vignettes/*.html
 vignettes/*.R
+^gh-pages
