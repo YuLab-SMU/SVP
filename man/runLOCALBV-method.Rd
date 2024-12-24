@@ -20,6 +20,7 @@ runLOCALBV(
   weight.method = c("voronoi", "knn", "none"),
   lisa.method = c("localG", "localmoran"),
   lisa.alternative = "greater",
+  lisa.flag.method = c("mean", "median"),
   reduction.used = NULL,
   group.by = NULL,
   permutation = 100,
@@ -46,6 +47,7 @@ runLOCALBV(
   weight.method = c("voronoi", "knn", "none"),
   lisa.method = c("localG", "localmoran"),
   lisa.alternative = "greater",
+  lisa.flag.method = c("mean", "median"),
   reduction.used = NULL,
   group.by = NULL,
   permutation = 100,
@@ -72,6 +74,7 @@ runLOCALBV(
   weight.method = c("voronoi", "knn", "none"),
   lisa.method = c("localG", "localmoran"),
   lisa.alternative = "greater",
+  lisa.flag.method = c("mean", "median"),
   reduction.used = NULL,
   group.by = NULL,
   permutation = 100,
@@ -129,6 +132,9 @@ analysis result, default is \code{'localG'}.}
 
 \item{lisa.alternative}{a character string specifying the alternative hypothesis, which works with
 \code{lisa.method}, default is \code{greater}.}
+
+\item{lisa.flag.method}{a character string specifying the method to calculate the threshold for the cluster
+type, default is \code{"mean"}. Other option is \code{"median"}.}
 
 \item{reduction.used}{character used as spatial coordinates to calculate the neighbours weights,
 default is \code{NULL}, the result of reduction can be specified, such as \code{UMAP}, \code{TSNE}, \code{PCA}.

@@ -36,6 +36,8 @@
 #' @param action character, which control the type of return result, default is \code{get}, which will return
 #' a \linkS4class{SimpleList}.
 #' @param alternative a character string specifying the alternative hypothesis, default is \code{two.sided}.
+#' @param flag.method a character string specifying the method to calculate the threshold for the cluster 
+#' type, default is \code{"mean"}. Other option is \code{"median"}. 
 #' @param BPPARAM A BiocParallelParam object specifying whether perform the analysis parallelly using
 #' \code{BiocParallel} default is \code{SerialParam()}, meaning no parallel.
 #' You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=TRUE)} to parallel it,
@@ -111,6 +113,7 @@ setGeneric('runLISA',
     cells = NULL,
     action = c("get", "add", "only"),
     alternative = 'two.sided',
+    flag.method = c("mean","median"),
     BPPARAM = SerialParam(),
     verbose = TRUE,
     gsvaexp = NULL,
@@ -137,6 +140,7 @@ setMethod("runLISA", "SingleCellExperiment", function(
     cells = NULL,
     action = c("get", "add", "only"),
     alternative = 'two.sided',
+    flag.method = c('mean', "median"),
     BPPARAM = SerialParam(),
     verbose = TRUE,
     gsvaexp = NULL,
@@ -148,6 +152,7 @@ setMethod("runLISA", "SingleCellExperiment", function(
   action <- match.arg(action)
   weight.method <- match.arg(weight.method)
   method <- match.arg(method)
+  flag.method <- match.arg(flag.method)
   sample_id <- .check_sample_id(data, sample_id)
   
   if (is.null(assay.type)){
@@ -174,7 +179,7 @@ setMethod("runLISA", "SingleCellExperiment", function(
                   weighti <- if(inherits(weight, 'list')){weight[names(weight) == sid]}else{weight}
                   xi <- x[, ind, drop=FALSE]
                   wm <- .obtain.weight(coordsi, weight = weighti, weight.method = weight.method, ...)
-                  res <- .internal.runLISA(xi, wm, method, alternative, BPPARAM)
+                  res <- .internal.runLISA(xi, wm, method, flag.method, alternative, BPPARAM)
                   return(res)
          })
   res <- .tidy_lisa_res(res)
@@ -214,6 +219,7 @@ setMethod("runLISA", "SVPExperiment", function(
     cells = NULL,
     action = c("get", "add", "only"),
     alternative = 'two.sided',
+    flag.method = c("mean", "median"),
     BPPARAM = SerialParam(),
     verbose = TRUE,
     gsvaexp = NULL,
@@ -222,6 +228,7 @@ setMethod("runLISA", "SVPExperiment", function(
     ...
   ){
     method <- match.arg(method)
+    flag.method <- match.arg(flag.method)
     action <- match.arg(action)
     if (!is.null(gsvaexp)){
         if (verbose){
@@ -248,6 +255,7 @@ setMethod("runLISA", "SVPExperiment", function(
                        cells,
                        action,
                        alternative,
+                       flag.method,
                        BPPARAM,       
                        verbose,
                       ...)
@@ -293,7 +301,7 @@ setMethod("runLISA", "SVPExperiment", function(
                   }else{ 
                     ind <- colData(data)$sample_id == sid 
                   }
-		  coordsi <- coords[ind, , drop=FALSE]
+                  coordsi <- coords[ind, , drop=FALSE]
                   weighti <- if(inherits(weight, 'list')){weight[names(weight) == sid]}else{weight}
                   wm <- .obtain.weight(coordsi, weight = weighti, weight.method = weight.method, ...)
                   rownames(wm) <- colnames(wm) <- rownames(coordsi)

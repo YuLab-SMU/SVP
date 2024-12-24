@@ -37,6 +37,8 @@
 #' analysis result, default is \code{'localG'}.
 #' @param lisa.alternative a character string specifying the alternative hypothesis, which works with
 #' \code{lisa.method}, default is \code{greater}.
+#' @param lisa.flag.method a character string specifying the method to calculate the threshold for the cluster
+#' type, default is \code{"mean"}. Other option is \code{"median"}. 
 #' @param reduction.used character used as spatial coordinates to calculate the neighbours weights,
 #' default is \code{NULL}, the result of reduction can be specified, such as \code{UMAP}, \code{TSNE}, \code{PCA}.
 #' If it is specified, the weight neighbours matrix will be calculated using the result of specified reduction.
@@ -113,6 +115,7 @@ setGeneric('runLOCALBV',
     weight.method = c("voronoi", "knn", "none"),
     lisa.method = c("localG", "localmoran"),
     lisa.alternative = "greater",
+    lisa.flag.method = c("mean", "median"),
     reduction.used = NULL,
     group.by = NULL,
     permutation = 100,
@@ -145,6 +148,7 @@ setMethod("runLOCALBV", "SingleCellExperiment", function(
     weight.method = c("voronoi", "knn", "none"),
     lisa.method = c("localG", "localmoran"),
     lisa.alternative = "greater",
+    lisa.flag.method = c("mean", "median"),
     reduction.used = NULL,
     group.by = NULL,
     permutation = 100,
@@ -162,6 +166,7 @@ setMethod("runLOCALBV", "SingleCellExperiment", function(
   weight.method <- match.arg(weight.method)
   bv.method <- match.arg(bv.method)
   lisa.method <- match.arg(lisa.method)
+  lisa.flag.method <- match.arg(lisa.flag.method)
   action <- match.arg(action)
   sample_id <- .check_sample_id(data, sample_id)
 
@@ -196,8 +201,8 @@ setMethod("runLOCALBV", "SingleCellExperiment", function(
                       cli::cli_warn("no-neighbour observations found in the spatial neighborhoods graph.")
                   }
                   result <- .runLocalBv(xi, wm, features1, features2, n, NULL, across.gsvaexp, 
-                                        permutation, bv.method, bv.alternative, random.seed,
-                                        wi, wi2, lisa.method, lisa.alternative, BPPARAM)
+                                        permutation, bv.method, bv.alternative, random.seed, wi, 
+                                        wi2, lisa.method, lisa.alternative, lisa.flag.method, BPPARAM)
                   return(result)
          })
 
@@ -237,6 +242,7 @@ setMethod("runLOCALBV", "SVPExperiment",
     weight.method = c("voronoi", "knn", "none"),
     lisa.method = c("localG", "localmoran"),
     lisa.alternative = "greater",
+    lisa.flag.method = c("mean", "median"),
     reduction.used = NULL,
     group.by = NULL,
     permutation = 100,
@@ -259,6 +265,7 @@ setMethod("runLOCALBV", "SVPExperiment",
        weight.method <- match.arg(weight.method)
        bv.method <- match.arg(bv.method)
        lisa.method <- match.arg(lisa.method)
+       lisa.flag.method <- match.arg(lisa.flag.method)
        action <- match.arg(action)
        sample_id <- .check_sample_id(data, sample_id)
 
@@ -314,7 +321,7 @@ setMethod("runLOCALBV", "SVPExperiment",
                            cli::cli_warn("no-neighbour observations found in the spatial neighborhoods graph.")
                        }
                        result <- .runLocalBv(xi, wm, features1, features2, n, listn, across.gsvaexp, permutation, bv.method, bv.alternative,
-                                             random.seed, wi, wi2, lisa.method, lisa.alternative, BPPARAM)
+                                             random.seed, wi, wi2, lisa.method, lisa.alternative, lisa.flag.method, BPPARAM)
                        return(result)
               })
 

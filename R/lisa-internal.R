@@ -2,7 +2,8 @@
 .internal.runLISA <- function(
     x,
     weight,
-    method=c("localG", "localmoran"),
+    method = c("localG", "localmoran"),
+    flag.method = c("mean", "median"),
     alternative = c("two.sided", "greater", "less"),
     BPPARAM = SerialParam()
   ){
@@ -11,6 +12,7 @@
   }  
   method <- match.arg(method)
   alternative <- match.arg(alternative)
+  flag.method <- match.arg(flag.method)
   prefix <- switch(alternative, two.sided = "!=", greater = ">", less = "<")
 
   if (method == 'localG'){
@@ -25,12 +27,12 @@
       res <- CalLocalMoranParallel(x, weight) 
   }
 
-  res <- .add_localisa_pvalue(res, pnm, nm, colnames(x), method, alternative, BPPARAM)
+  res <- .add_localisa_pvalue(res, pnm, nm, colnames(x), method, flag.method, alternative, BPPARAM)
   names(res) <- rownames(x)
   return(res)
 }
 
-.add_localisa_pvalue <- function(res, pnm, nm, cellnm, method, alternative, BPPARAM){
+.add_localisa_pvalue <- function(res, pnm, nm, cellnm, method, flag.method, alternative, BPPARAM){
   res <- BiocParallel::bplapply(res, function(x){
             x <- data.frame(x)
             if (alternative == 'two.sided'){
@@ -42,25 +44,25 @@
             }
             colnames(x) <- nm
             rownames(x) <- cellnm
-            x <- .add_cluster(x, method)
+            x <- .add_cluster(x, method, flag.method)
             return(x)
          }, BPPARAM = BPPARAM)
   return(res)
 }
 
-.add_cluster <- function(x, method){
+.add_cluster <- function(x, method, flag.method = 'mean'){
     lbs <- c("Low", "High")
     if (method == 'localG'){
         if (!all(is.na(x$`Z.Gi`))){
             x$`cluster.no.test` <- cut(x$`Z.Gi`,
-                             c(-Inf, mean(x$Gi, na.rm=TRUE), Inf),
+                             c(-Inf, do.call(flag.method,list(x$Gi, na.rm=TRUE)), Inf),
                              lbs)
             x$x <- NULL
         }
     }else{
         if (!all(is.na(x$z)) && !all(is.na(x$lz))){
-            c1 <- cut(x$z, c(-Inf, mean(x$z, na.rm=TRUE), Inf), lbs)
-            c2 <- cut(x$lz, c(-Inf, mean(x$lz, na.rm=TRUE), Inf), lbs)
+            c1 <- cut(x$z, c(-Inf, do.call(flag.method, list(x$z, na.rm=TRUE)), Inf), lbs)
+            c2 <- cut(x$lz, c(-Inf, do.call(flag.method, list(x$lz, na.rm=TRUE)), Inf), lbs)
             x$`cluster.no.test` <- interaction(c1, c2, sep="-")
         }
         x$z <- NULL

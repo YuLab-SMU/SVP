@@ -77,11 +77,13 @@
   wi2,
   lisa.method = c("localG", "localmoran"),
   lisa.alternative = c("greater", "two.sided", "less"),
+  lisa.flag.method = c("mean", "median"),
   BPPARAM = SerialParam() 
 ){
   bv.method <- match.arg(bv.method)
   bv.alternative <- match.arg(bv.alternative)
   lisa.method <- match.arg(lisa.method)
+  lisa.flag.method <- match.arg(lisa.flag.method)
   lisa.alternative <- match.arg(lisa.alternative)
   if (is.null(features1) && length(features2) > 1){
       if (length(listn)>1 && across.gsvaexp){
@@ -97,12 +99,12 @@
   if (bv.method == 'localmoran_bv'){
       res <- bplapply(seq(nrow(allpair)), function(i){
                .internal.runLocalMoranBv(x[allpair[i, 1],], x[allpair[i, 2],], weight, n, permutation, bv.alternative, 
-                                      seed, wi, wi2, lisa.method, lisa.alternative)
+                                      seed, wi, wi2, lisa.method, lisa.flag.method, lisa.alternative)
                }, BPPARAM = BPPARAM)
   }else{
       res <- bplapply(seq(nrow(allpair)), function(i){
                .internal.runLocalLeeBv(x[allpair[i,1], ], x[allpair[i,2], ], weight, n, 
-                                      wi, wi2, lisa.method, lisa.alternative)
+                                      wi, wi2, lisa.method, lisa.flag.method, lisa.alternative)
                }, BPPARAM = BPPARAM)
   }
   names(res) <- paste(allpair[,1], allpair[,2], sep="_VS_")
@@ -110,7 +112,7 @@
 }
 
 .internal.runLocalMoranBv <- function(x, y, weight, n, permutation, bv.alternative, seed, 
-                                      wi, wi2, lisa.method, lisa.alternative){
+                                      wi, wi2, lisa.method, lisa.flag.method, lisa.alternative){
   res <- withr::with_seed(seed, RunLocalMoranBvPerm(x, y, weight, n, permutation)) |> 
          data.frame()
   prefix <- switch(bv.alternative, two.sided = "!=", greater = ">", less = "<")
@@ -124,16 +126,16 @@
       res[, 5] <- pnorm(res[, 4])
   }
   colnames(res) <- c(nm, pnm)
-  lisa.res <- .internal.runLISA(t(res[, 1, drop=FALSE]), weight, lisa.method, lisa.alternative)
+  lisa.res <- .internal.runLISA(t(res[, 1, drop=FALSE]), weight, lisa.method, lisa.flag.method, lisa.alternative)
   res <- cbind(res, lisa.res[[1]])
   rownames(res) <- names(x)
   return(res)
 }
 
-.internal.runLocalLeeBv <- function(x, y, weight, n, wi, wi2, lisa.method, lisa.alternative){
+.internal.runLocalLeeBv <- function(x, y, weight, n, wi, wi2, lisa.method, lisa.flag.method, lisa.alternative){
   res <- RunLocalLee(x, y, weight, n) |> data.frame()
   colnames(res) <- "LocalLee"
-  lisa.res <- .internal.runLISA(t(res[, 1, drop=FALSE]), weight, lisa.method, lisa.alternative)
+  lisa.res <- .internal.runLISA(t(res[, 1, drop=FALSE]), weight, lisa.method, lisa.flag.method, lisa.alternative)
   res <- cbind(res, lisa.res[[1]])
   rownames(res) <- names(x)
   return(res)
