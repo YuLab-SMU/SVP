@@ -53,7 +53,7 @@ plot_heatmap_globalbv <- function(globalbv,
                                   limits.colour = NULL,
                                   dist.method = "euclidean",
                                   hclust.method = "average",
-				  threshold = 0.05
+                                  threshold = 0.05
                                   ){
    p1 <- f1 <- p.lisa.l <- p.lisa.t <- p.moran.l <- p.moran.t <- NULL
    flag.square <- FALSE

@@ -106,7 +106,7 @@ pdac_a_spe <- runSGSA(pdac_a_spe,
                       gset.idx.list = CancerSEASymbol, # The target gene set list
                       assay.type = 'logcounts', # The name of assays of gene profiler
                       gsvaExp.name = 'CancerSEA' # The name of result to save to gsvaExps slot
-		      )
+              )
 
 # Then the result was added to gsvaExps to return a SVPExperiment object, the result
 # can be extracted with gsvaExp, you can view more information via help(gsvaExp).
