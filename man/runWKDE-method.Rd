@@ -11,7 +11,7 @@
 runWKDE(
   data,
   assay.type = "logcounts",
-  reduction = c("UMAP", "TSNE"),
+  reduction.used = NULL,
   grid.n = 100,
   adjust = 1,
   bandwidths = NULL,
@@ -24,7 +24,7 @@ runWKDE(
 \S4method{runWKDE}{SingleCellExperiment}(
   data,
   assay.type = "logcounts",
-  reduction = c("UMAP", "TSNE"),
+  reduction.used = NULL,
   grid.n = 100,
   adjust = 1,
   bandwidths = NULL,
@@ -37,7 +37,7 @@ runWKDE(
 \S4method{runWKDE}{SVPExperiment}(
   data,
   assay.type = "logcounts",
-  reduction = c("UMAP", "TSNE"),
+  reduction.used = NULL,
   grid.n = 100,
   adjust = 1,
   bandwidths = NULL,
@@ -54,8 +54,9 @@ or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} ob
 
 \item{assay.type}{which expressed data to be pulled to run, default is \code{logcounts}.}
 
-\item{reduction}{character used as spatial coordinates to detect SVG, default is \code{UMAP},
-if \code{data} has \code{spatialCoords}, which will be used as spatial coordinates.}
+\item{reduction.used}{character used as spatial coordinates to detect SVG, default is NULL,
+if \code{data} has \code{spatialCoords}, which will be used as spatial coordinates, if this is provided
+the coordinate of specified reduced result will be used.}
 
 \item{grid.n}{integer number of grid points in the two directions to estimate 2D weighted kernel density, default is 100.}
 

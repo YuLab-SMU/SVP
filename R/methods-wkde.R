@@ -1,11 +1,13 @@
 #' @title Calculating the 2D Weighted Kernel Density Estimation
+#' 
 #' @rdname runWKDE-method
 #' @param data a \linkS4class{SingleCellExperiment} object with contains \code{UMAP} or \code{TSNE},
 #' or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} object with specified
 #' \code{gsvaexp} argument.
 #' @param assay.type which expressed data to be pulled to run, default is \code{logcounts}.
-#' @param reduction character used as spatial coordinates to detect SVG, default is \code{UMAP},
-#' if \code{data} has \code{spatialCoords}, which will be used as spatial coordinates.
+#' @param reduction.used character used as spatial coordinates to detect SVG, default is NULL,
+#' if \code{data} has \code{spatialCoords}, which will be used as spatial coordinates, if this is provided
+#' the coordinate of specified reduced result will be used.
 #' @param grid.n integer number of grid points in the two directions to estimate 2D weighted kernel density, default is 100.
 #' @param adjust numeric to adjust the \code{bandwidths}, default is 1.0.
 #' @param bandwidths vector a two length numeric vector represents the bandwidths for x and y directions, default is normal 
@@ -49,7 +51,7 @@ setGeneric('runWKDE',
   function(
     data,
     assay.type = 'logcounts',
-    reduction = c('UMAP', 'TSNE'),
+    reduction.used = NULL,
     grid.n = 100,
     adjust = 1,
     bandwidths = NULL,
@@ -69,7 +71,7 @@ setMethod('runWKDE', 'SingleCellExperiment',
   function(
     data,
     assay.type = 'logcounts',
-    reduction = c('UMAP', 'TSNE'),
+    reduction.used = NULL,
     grid.n = 100,
     adjust = 1,
     bandwidths = NULL,    
@@ -91,16 +93,17 @@ setMethod('runWKDE', 'SingleCellExperiment',
 
   flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
 
-  flag2 <- any(reduction %in% reducedDimNames(data))
+  flag2 <- any(reduction.used %in% reducedDimNames(data))
 
   if(flag1 || flag2){
-      if (flag2){
-          coords <- reducedDim(data, reduction)
-          coords <- coords[,c(1, 2)]
-      }
       if (flag1){
           coords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
       }
+
+      if (flag2){
+          coords <- reducedDim(data, reduction.used)
+          coords <- coords[,c(1, 2)]
+      }      
       
       tic()
       if (verbose){
@@ -124,7 +127,7 @@ setMethod('runWKDE', 'SVPExperiment',
   function(
     data,
     assay.type = 'logcounts',
-    reduction = c('UMAP', 'TSNE'),
+    reduction.used = NULL,
     grid.n = 100,
     adjust = 1,
     bandwidths = NULL,    
@@ -132,7 +135,6 @@ setMethod('runWKDE', 'SVPExperiment',
     gsvaexp.assay.type = NULL,
     ...){
 
-    reduction <- match.arg(reduction) 
     if (!is.null(gsvaexp)){
        if (verbose){
           cli::cli_inform("The {.var gsvaexp} was specified, the specified {.var gsvaExp} will be used to calculate density.")
@@ -140,7 +142,7 @@ setMethod('runWKDE', 'SVPExperiment',
        da2 <- gsvaExp(data, gsvaexp, withSpatialCoords=TRUE, withReducedDim=TRUE, withColData = FALSE, withImgData = FALSE)
        da2 <- runWKDE(da2, 
                    assay.type = gsvaexp.assay.type, 
-                   reduction = reduction, 
+                   reduction.used = reduction.used, 
                    grid.n = grid.n, 
                    adjust = adjust, 
                    bandwidths = bandwidths)
@@ -152,7 +154,7 @@ setMethod('runWKDE', 'SVPExperiment',
 })
 
 .internal_runWKDE <- function(x, coords, bandwidths = NULL, adjust = 1, grid.n = 100){
-  coords <- .normalize.coords(coords)
+  #coords <- .normalize.coords(coords)
 
   lims <- c(range(coords[,1]), range(coords[,2]))
 
