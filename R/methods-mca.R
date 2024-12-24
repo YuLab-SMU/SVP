@@ -71,26 +71,34 @@ setMethod('runMCA', 'SingleCellExperiment',
       cli::cli_abort("the {.var assay.type} = {assay.type} is not present in the assays of {.cls {class(data)}}.")
   }
 
+  x <- assay(data, assay.type)
+
   if (!is.null(subset.row)){
-      data <- data[subset.row,]
-  }
-  
-  if (!is.null(subset.col)){
-      data <- data[,subset.col]
+      x <- x[subset.row,]
   }
 
-  x <- assay(data, assay.type)
+  if (!is.null(subset.col)){
+      x <- x[,subset.col]
+  }  
   #x <- x[DelayedMatrixStats::rowVars(x) != 0,]
 
   flag.coords <- .check_element_obj(data, key = 'spatialCoords', basefun = int_colData, namefun = names)
   if (flag.coords && consider.spcoord){
-      specoords <- .extract_element_object(data, key = 'spatialCoords', basefun = int_colData, namefun = names)
+      if (!is.null(subset.col)){
+          specoords <- .extract_element_object(data[,subset.col], key = 'spatialCoords', basefun = int_colData, namefun = names)
+      }else{
+          specoords <- .extract_element_object(data, key = 'spatialCoords', basefun = int_colData, namefun = names)
+      }
       specoords <- .normalize.coords(specoords)
       x <- rbind(x, t(specoords))
   }
   metadata <- NULL
   if (!is.null(group.by.vars)){
-      metadata <- colData(data)[,group.by.vars,drop=FALSE] |> as.data.frame(check.names=FALSE)
+      if (!is.null(subset.col)){
+          metadata <- colData(data[,subset.col])[,group.by.vars,drop=FALSE] |> as.data.frame(check.names=FALSE)
+      }else{
+          metadata <- colData(data)[,group.by.vars,drop=FALSE] |> as.data.frame(check.names=FALSE)
+      }
   }
   res.mca <- .runMCA.internal(x,
                               metadata, 
