@@ -29,27 +29,22 @@ arma::vec cal_global_lee_test(
   return(res);
 }
 
-arma::vec cal_Pquant(sp_mat w, int n){
-  double tt = 0.0;
-  arma::vec MII(n);
-  arma::vec diagM(n);
-  arma::vec diagMt(n);
-  arma::vec wv(n);
-  for (int i = 0; i < n; i++){
-    for (int j = 0; j < n; j++){
-      wv(j) = accu(w.col(i) % w.col(j));
+struct CalPquant : public Worker{
+  const arma::sp_mat& w;
+  arma::mat& res;
+
+  CalPquant(const arma::sp_mat& w, arma::mat& res):
+      w(w), res(res){}
+
+  void operator()(std::size_t begin, std::size_t end){
+    for (std::size_t i = begin; i < end; i++){
+       arma::vec wv = w.t() * w.col(i).as_dense();
+       res(i, 0) = accu(wv);
+       res(i, 1) = wv(i);
+       res(i, 2) = accu(pow(wv, 2.0));
     }
-    tt += accu(wv);
-    MII(i) = accu(wv);
-    diagM(i) = wv(i);
-    diagMt(i) = accu(pow(wv, 2.0));
   }
-  diagM = diagM/tt;
-  MII = MII/tt;
-  diagMt = diagMt/pow(tt, 2.0);
-  arma::vec res = cal_quant(diagM, diagMt, MII);
-  return(res);
-}
+};
 
 struct RunGlobalLee : public Worker{
   const arma::sp_mat& x;
@@ -99,6 +94,18 @@ struct RunGlobalLee : public Worker{
   } 
 };
 
+arma::vec cal_Pquant_Parallel(sp_mat w, int n){
+    arma::mat res(n, 3);
+    CalPquant runpquant(w, res);
+    parallelFor(0, n, runpquant);
+    double tt = accu(res.col(0));
+    arma::vec diagM = res.col(1) / tt;
+    arma::vec MII = res.col(0) / tt;
+    arma::vec diagMt = res.col(2) / pow(tt, 2.0);
+    arma::vec Pq = cal_quant(diagM, diagMt, MII);
+    return(Pq);
+}
+
 //[[Rcpp::export]]
 Rcpp::List CalGlobalLeeParallel(
   arma::sp_mat& x, 
@@ -123,7 +130,7 @@ Rcpp::List CalGlobalLeeParallel(
   
   arma::vec P(6);
   if (permutation <= 10){
-    P = cal_Pquant(wm, m); 
+    P = cal_Pquant_Parallel(wm, m); 
   }
 
   simple_progress p(n1 * n2);

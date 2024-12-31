@@ -251,7 +251,7 @@ setMethod("runGLOBALBV", "SVPExperiment", function(
            assay.type <- 1
        }
 
-       x <- assay(data, assay.type)
+       x <- NULL
        if (is.null(features1) && is.null(features2) && is.null(gsvaexp.features)){
            cli::cli_abort(c("The {.var gsvaexp} is specified, and the `data` is {.cls {class(data)}}.",
                             "The `features1`, `features2` and `gsvaexp.features` should not be `NULL` simultaneously."))
@@ -270,9 +270,9 @@ setMethod("runGLOBALBV", "SVPExperiment", function(
        features2 <- gsvaexp.features
 
        if (length(features1) >= 1){
+           x <- assay(data, assay.type)
            x <- x[features1, , drop=FALSE]
        }
-
        x2 <- .extract_gsvaExp_assay(data, gsvaexp, gsvaexp.assay.type)
        x2 <- x2[features2, , drop=FALSE]
        x <- rbind(x, x2)
