@@ -121,29 +121,28 @@ NA
 NA
 
 
-#' @title the single cell gene profiler of a PDAC sample
+#' @title the single cell gene profiler of a mouse olfactory bulb
 #' @description
-#' The single cell transcriptome of PDAC A sample from (doi:10.1038/s41587-019-0392-8)
-#' @name data_pdac_a_sce
-#' @aliases pdac_a_sce
+#' The single cell transcriptome of WT sample of mouse olfactory bulb from (doi:10.1016/j.celrep.2018.11.034)
+#' @name mob_sce
+#' @aliases mob_sce
 #' @format S4 class:SingleCellExperiment
 #' @docType data
 #' @keywords data
 #' @return a \linkS4class{SingleCellExperiment} object
 #' @examples
-#' data(pdac_a_sce)
+#' data(mob_sce)
 NA     
 
 
-#' @title the spatial transcriptome of a PDAC sample
+#' @title the marker genes of mouse olfactory bulb
 #' @description
-#' The spatial transcriptome of PDAC A sample from (doi:10.1038/s41587-019-0392-8)
-#' @name data_pdac_a_spe
-#' @aliases pdac_a_spe
-#' @format S4 class:SpatialExperiment
+#' this is extracted from the single cell transcriptome of a mouse olfactory bulb from (doi:10.1016/j.celrep.2018.11.034)
+#' @name mob_marker_genes
+#' @aliases mob_marker_genes
 #' @docType data
 #' @keywords data
-#' @return a \linkS4class{SpatialExperiment} object
+#' @return a list object with name
 #' @examples
-#' data(pdac_a_spe)
+#' data(mob_marker_genes)
 NA
