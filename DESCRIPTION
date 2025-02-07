@@ -62,7 +62,9 @@ Suggests:
   scales,
   ggsc,
   scatterpie,
-  scran
+  scran,
+  scater,
+  STexampleData
 License: GPL-3
 BugReports: https://github.com/YuLab-SMU/SVP/issues
 URL: https://github.com/YuLab-SMU/SVP
