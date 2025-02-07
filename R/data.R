@@ -139,6 +139,7 @@ NA
 #' @description
 #' this is extracted from the single cell transcriptome of a mouse olfactory bulb from (doi:10.1016/j.celrep.2018.11.034)
 #' @name mob_marker_genes
+#' @format list
 #' @aliases mob_marker_genes
 #' @docType data
 #' @keywords data

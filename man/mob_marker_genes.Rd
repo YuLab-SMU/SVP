@@ -4,6 +4,9 @@
 \name{mob_marker_genes}
 \alias{mob_marker_genes}
 \title{the marker genes of mouse olfactory bulb}
+\format{
+list
+}
 \value{
 a list object with name
 }

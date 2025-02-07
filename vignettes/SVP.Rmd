@@ -184,7 +184,7 @@ We cal also display each cell-type activity with heat-map according to the spati
 # calculated the of cell-type
 assay(gsvaExp(mob_spe, 2)) |> as.matrix() |> 
   prop.table(2) |> 
-  Matrix::Matrix(sparse=T) -> 
+  Matrix::Matrix(sparse=TRUE) -> 
   assay(gsvaExp(mob_spe,2), "prop")
 
 
