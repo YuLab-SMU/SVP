@@ -734,3 +734,11 @@ pairDist <- function(x, y){
   colnames(x) <- colnames(y)
   return(x)
 }
+
+.normalize_score <- function(x, flag){
+   if (!flag){
+     return(x)
+   }
+   x <- prop.table(x, 2) 
+   return(x)
+}

@@ -27,6 +27,7 @@ runSGSA(
   rwr.threads = NULL,
   hyper.test.weighted = c("Hypergeometric", "Wallenius", "none"),
   hyper.test.by.expr = TRUE,
+  prop.score = FALSE,
   add.weighted.metric = FALSE,
   add.cor.features = FALSE,
   cells = NULL,
@@ -55,6 +56,7 @@ runSGSA(
   rwr.threads = NULL,
   hyper.test.weighted = c("Hypergeometric", "Wallenius", "none"),
   hyper.test.by.expr = TRUE,
+  prop.score = FALSE,
   add.weighted.metric = FALSE,
   add.cor.features = FALSE,
   cells = NULL,
@@ -116,6 +118,8 @@ number of threads, you can also set this using \code{RcppParallel::setThreadOpti
 
 \item{hyper.test.by.expr}{logical whether using the expression matrix to find the nearest genes of cells, default is TRUE,
 if it is FALSE, meaning using the result of reduction to find the nearest genes of cells to perfrom the \code{hyper.test.weighted}.}
+
+\item{prop.score}{logical whether to normalize each feature for each sample, default is FALSE.}
 
 \item{add.weighted.metric}{logical whether return the weight activity score of cell using the corresponding \code{hyper.test.weighted},
 default is FALSE.}

@@ -48,6 +48,7 @@
 #' "none", default is "Hypergeometric".
 #' @param hyper.test.by.expr logical whether using the expression matrix to find the nearest genes of cells, default is TRUE,
 #' if it is FALSE, meaning using the result of reduction to find the nearest genes of cells to perfrom the \code{hyper.test.weighted}.
+#' @param prop.score logical whether to normalize each feature for each sample, default is FALSE.
 #' @param add.weighted.metric logical whether return the weight activity score of cell using the corresponding \code{hyper.test.weighted},
 #' default is FALSE.
 #' @param add.cor.features logical whether calculate the corrlelation between the new features and orginal featuers (genes), default
@@ -171,6 +172,7 @@ setGeneric('runSGSA',
     rwr.threads = NULL,
     hyper.test.weighted = c("Hypergeometric", "Wallenius", "none"),
     hyper.test.by.expr = TRUE,
+    prop.score = FALSE,
     add.weighted.metric = FALSE,
     add.cor.features = FALSE,
     cells = NULL,
@@ -212,6 +214,7 @@ setMethod('runSGSA',
     rwr.threads = NULL,
     hyper.test.weighted = c("Hypergeometric", "Wallenius", "none"),
     hyper.test.by.expr = TRUE,
+    prop.score = FALSE,
     add.weighted.metric = FALSE,
     add.cor.features = FALSE,
     cells = NULL,
@@ -311,6 +314,7 @@ setMethod('runSGSA',
                            method = hyper.test.weighted
                   ))
       gset.score.cells2 <- .weighted_by_hgt(gset.score.cells, gset.hgt)
+      gset.score.cells2 <- .normalize_score(gset.score.cells2, prop.score)
       assay.res <- list(affi.score = as(gset.score.cells2, 'dgCMatrix'))
       if (add.weighted.metric){
           assay.res <- c(assay.res, 
@@ -318,6 +322,7 @@ setMethod('runSGSA',
                             hyper.weighted = as(gset.hgt,'dgCMatrix')))
       }
   }else{
+      gset.score.cells <- .normalize_score(gset.score.cells, prop.score)
       assay.res <- list(affi.score = as(gset.score.cells, 'dgCMatrix'))
   }
   
