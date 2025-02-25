@@ -6,7 +6,8 @@
 #' or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} object with specified
 #' \code{gsvaexp} argument.
 #' @param group.by character a specified category column names (for example the cluster column name) of
-#' \code{colData(data)}, required.
+#' \code{colData(data)}. Or a vector of length equal to ‘ncol(data)’, specifying the group to which each cell
+#' is assigned. It is required.
 #' @param rm.group.nm character which want to remove some group type names from the names of 
 #' the specified category group, default is NULL.
 #' @param ... currently meaningless.
@@ -20,6 +21,14 @@
 #' sceSubPbmc <- runENCODE(sceSubPbmc, group.by = 'seurat_annotations', rm.group.nm = c('Platelet'))
 #' sceSubPbmc
 #' gsvaExp(sceSubPbmc, 'seurat_annotations')
+#' # The group.by also can be a vector of length equal to ncol(data).
+#' sceSubPbmc <- runENCODE(
+#'                 sceSubPbmc, 
+#'                 group.by = sceSubPbmc$seurat_annotations, 
+#'                 rm.group.nm = c('Platelet')
+#'               )
+#' sceSubPbmc
+#' identical(gsvaExp(sceSubPbmc, 'seurat_annotations'), gsvaExp(sceSubPbmc, "ENCODE"))
 setGeneric('runENCODE',
   function(
     data,
@@ -43,6 +52,9 @@ setMethod("runENCODE", "SingleCellExperiment",
 
   mt <- .build_assays_from_group(data, group.by, rm.group.nm)
   data <- .sce_to_svpe(data)
+  if (length(group.by) > 1){
+    group.by <- 'ENCODE'
+  }
   gsvaExp(data, group.by) <- SingleCellExperiment(assays=list(counts = mt))
   return(data)
 })
@@ -57,7 +69,8 @@ setMethod("runENCODE", "SingleCellExperiment",
 #' @param data a \linkS4class{SingleCellExperiment} object
 #' @param lisa.res list the result of \code{runLISA} or \code{runLOCALBV}.
 #' @param group.by character a specified category column names (for example the cluster column name) of
-#' \code{colData(data)}, required.
+#' \code{colData(data)}. Or a vector of length equal to \code{ncol(data)}, specifying the group to 
+#' which each cell is assigned. It is required.
 #' @param type character the type of \code{cluster.test} column of result of \code{runLISA} or
 #' \code{runLOCALBV}, default is \code{'High'}.
 #' @param rm.group.nm character which want to remove some group type names from the names of
@@ -73,6 +86,13 @@ setMethod("runENCODE", "SingleCellExperiment",
 #'    )
 #' res <- cal_lisa_f1(hpda_spe_cell_dec, lisa.res1, type='High', group.by = 'cluster_domain')
 #' head(res)
+#' # group.by, a vector of length equal to the ncol(data).
+#' res2 <- cal_lisa_f1(hpda_spe_cell_dec, 
+#'                     lisa.res1, 
+#'                     type='High', 
+#'                     group.by = hpda_spe_cell_dec$cluster_domain
+#'   )
+#' identical(res, res2)
 setGeneric("cal_lisa_f1", 
   function(
     data,
@@ -127,7 +147,11 @@ setMethod("cal_lisa_f1", "SingleCellExperiment",
 
 
 .build_assays_from_group <- function(data, group.by, rm.group.nm){
-  dt <- colData(data)[[group.by]] |> as.character()
+  if (.check_group.by(group.by, ncol(data))){
+    dt <- group.by |> as.character()
+  }else{
+    dt <- colData(data)[[group.by]] |> as.character()
+  }
   keep.nm <- unique(dt)
   if (!is.null(rm.group.nm)){
     keep.nm <- setdiff(keep.nm, rm.group.nm)

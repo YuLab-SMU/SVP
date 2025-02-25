@@ -453,8 +453,13 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
   if (is.null(group.by)){
     return(NULL)
   }
-
+  
   da <- colData(x)
+
+  if (.check_group.by(group.by, ncol(x))){
+      da$`.EXTERNALGROUP` <- group.by
+      group.by <- ".EXTERNALGROUP"
+  }
 
   res <- lapply(sample_id, function(sid){
       if (sid == '.ALLCELL'){
@@ -525,4 +530,8 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
   return(res)
 }
 
-
+.check_group.by <- function(x, n){
+  flag1 <- inherits(x, "character") || inherits(x, "factor")
+  flag2 <- length(x) == n
+  flag1 && flag2
+}

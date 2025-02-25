@@ -109,8 +109,9 @@ default is \code{NULL}, the result of reduction can be specified, such as \code{
 If it is specified, the weight neighbours matrix will be calculated using the result of specified reduction.}
 
 \item{group.by}{character a specified category column names (for example the cluster column name) of
-\code{colData(data)}, if it was specified, the adjacency weighted matrix will be built based on the principle
-that spots or cells in the same category are adjacent, default is NULL.}
+\code{colData(data)}. Or a vector of length equal to \code{ncol(x)}, specifying the group to which each cell
+is assigned. If it was specified, the adjacency weighted matrix will be built based on the principle that
+spots or cells in the same category are adjacent, default is NULL.}
 
 \item{cells}{the cell name or index of data object, default is NULL.}
 

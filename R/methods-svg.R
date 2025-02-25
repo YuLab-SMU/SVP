@@ -291,8 +291,9 @@ setMethod('runKldSVG', 'SVPExperiment',
 #' @param reduction.used character used as spatial coordinates to detect SVG, default is \code{UMAP},
 #' if \code{data} has \code{spatialCoords}, which will be used as spatial coordinates.
 #' @param group.by character a specified category column names (for example the cluster column name) of
-#' \code{colData(data)}, if it was specified, the adjacency weighted matrix will be built based on the principle 
-#' that spots or cells in the same category are adjacent, default is NULL.
+#' \code{colData(data)}. Or a vector of length equal to \code{ncol(data)}, specifying the group to which each cell 
+#' is assigned. If it was specified, the adjacency weighted matrix will be built based on the principle that
+#' spots or cells in the same category are adjacent, default is NULL.
 #' @param permutation integer the number to permutation test for the calculation of Moran's I, default
 #' is NULL. We do not recommend using this parameter, as the permutation test is too slow.
 #' @param p.adjust.method character the method to adjust the pvalue of the result, default is \code{BH}.

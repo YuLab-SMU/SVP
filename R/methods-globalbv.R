@@ -36,8 +36,9 @@
 #' default is \code{NULL}, the result of reduction can be specified, such as \code{UMAP}, \code{TSNE}, \code{PCA}.
 #' If it is specified, the weight neighbours matrix will be calculated using the result of specified reduction.
 #' @param group.by character a specified category column names (for example the cluster column name) of
-#' \code{colData(data)}, if it was specified, the adjacency weighted matrix will be built based on the principle
-#' that spots or cells in the same category are adjacent, default is NULL.
+#' \code{colData(data)}. Or a vector of length equal to \code{ncol(x)}, specifying the group to which each cell
+#' is assigned. If it was specified, the adjacency weighted matrix will be built based on the principle that
+#' spots or cells in the same category are adjacent, default is NULL.
 #' @param permutation integer the permutation number to test, default is 100L, if permutation is smaller than 10
 #' or NULL, which will use mantel test to calculate the pvalue.
 #' @param alternative a character string specifying the alternative hypothesis, which only work with 

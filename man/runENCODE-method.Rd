@@ -16,7 +16,8 @@ or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} ob
 \code{gsvaexp} argument.}
 
 \item{group.by}{character a specified category column names (for example the cluster column name) of
-\code{colData(data)}, required.}
+\code{colData(data)}. Or a vector of length equal to ‘ncol(data)’, specifying the group to which each cell
+is assigned. It is required.}
 
 \item{rm.group.nm}{character which want to remove some group type names from the names of
 the specified category group, default is NULL.}
@@ -38,4 +39,12 @@ gsvaExp(sceSubPbmc, 'seurat_annotations')
 sceSubPbmc <- runENCODE(sceSubPbmc, group.by = 'seurat_annotations', rm.group.nm = c('Platelet'))
 sceSubPbmc
 gsvaExp(sceSubPbmc, 'seurat_annotations')
+# The group.by also can be a vector of length equal to ncol(data).
+sceSubPbmc <- runENCODE(
+                sceSubPbmc, 
+                group.by = sceSubPbmc$seurat_annotations, 
+                rm.group.nm = c('Platelet')
+              )
+sceSubPbmc
+identical(gsvaExp(sceSubPbmc, 'seurat_annotations'), gsvaExp(sceSubPbmc, "ENCODE"))
 }

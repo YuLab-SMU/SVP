@@ -1,7 +1,8 @@
 #' @title Detecting the specific cell features with nearest distance of cells in MCA space
 #' @rdname runDetectMarker-method
 #' @param data SingleCellExperiment object
-#' @param group.by the column name of cell annotation.
+#' @param group.by the column name of cell annotation. Or a vector of length equal to 
+#' \code{ncol(data)}, specifying the group to which each cell is assigned. It is required.
 #' @param aggregate.group logical whether calculate the center cluster of each group of cell according
 #' to the \code{group.by}, then find the nearest features of the center cluster, default TRUE. If
 #' FALSE, meaning the nearest features to each cell are detected firstly.
@@ -28,6 +29,12 @@
 #' example(runMCA, echo = FALSE)
 #' small.sce |> runDetectMarker(group.by = 'Cell_Cycle', ntop = 20, 
 #'               present.prop.in.sample = .2)
+#' # group.by, a vector of length equal to ncol(small.sce)
+#' small.sce |> runDetectMarker(
+#'                group.by = small.sce$Cell_Cycle, 
+#'                ntop = 20,
+#'                present.prop.in.sample = .2
+#'              )
 setGeneric('runDetectMarker',
   function(
     data,
@@ -85,7 +92,12 @@ setMethod(
     cell.rd <- rd[, dims, drop=FALSE]
 
     f.rd <- f.rd[,dims, drop=FALSE]
-    group.vec <- as.character(colData(data)[[group.by]])
+
+    if (.check_group.by(group.by, ncol(data))){
+        group.vec <- as.character(group.by)
+    }else{
+        group.vec <- as.character(colData(data)[[group.by]])
+    }
 
     if (aggregate.group){
         cell.rd <- .calGroupCenter(cell.rd, group.vec, fun = "mean", BPPARAM)

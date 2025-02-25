@@ -35,7 +35,8 @@ runDetectMarker(
 \arguments{
 \item{data}{SingleCellExperiment object}
 
-\item{group.by}{the column name of cell annotation.}
+\item{group.by}{the column name of cell annotation. Or a vector of length equal to
+\code{ncol(data)}, specifying the group to which each cell is assigned. It is required.}
 
 \item{aggregate.group}{logical whether calculate the center cluster of each group of cell according
 to the \code{group.by}, then find the nearest features of the center cluster, default TRUE. If
@@ -75,4 +76,10 @@ set.seed(123)
 example(runMCA, echo = FALSE)
 small.sce |> runDetectMarker(group.by = 'Cell_Cycle', ntop = 20, 
               present.prop.in.sample = .2)
+# group.by, a vector of length equal to ncol(small.sce)
+small.sce |> runDetectMarker(
+               group.by = small.sce$Cell_Cycle, 
+               ntop = 20,
+               present.prop.in.sample = .2
+             )
 }

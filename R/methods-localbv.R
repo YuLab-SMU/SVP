@@ -43,8 +43,9 @@
 #' default is \code{NULL}, the result of reduction can be specified, such as \code{UMAP}, \code{TSNE}, \code{PCA}.
 #' If it is specified, the weight neighbours matrix will be calculated using the result of specified reduction.
 #' @param group.by character a specified category column names (for example the cluster column name) of
-#' \code{colData(data)}, if it was specified, the adjacency weighted matrix will be built based on the principle
-#' that spots or cells in the same category are adjacent, default is NULL.
+#' \code{colData(data)}. Or a vector of length equal to ‘ncol(x)’, specifying the group to which each cell
+#' is assigned. If it was specified, the adjacency weighted matrix will be built based on the principle that
+#' spots or cells in the same category are adjacent, default is NULL.
 #' @param permutation integer the permutation number to test, which only work with \code{bv.method='localmoran_bv'},
 #' default is 100L.
 #' @param random.seed numeric random seed number to repeatability, default is 1024.

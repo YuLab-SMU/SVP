@@ -19,7 +19,8 @@ cal_lisa_f1(data, lisa.res, type = "High", group.by, rm.group.nm = NULL, ...)
 \code{runLOCALBV}, default is \code{'High'}.}
 
 \item{group.by}{character a specified category column names (for example the cluster column name) of
-\code{colData(data)}, required.}
+\code{colData(data)}. Or a vector of length equal to \code{ncol(data)}, specifying the group to
+which each cell is assigned. It is required.}
 
 \item{rm.group.nm}{character which want to remove some group type names from the names of
 the specified category group, default is NULL.}
@@ -43,4 +44,11 @@ lisa.res1 <- hpda_spe_cell_dec |>
    )
 res <- cal_lisa_f1(hpda_spe_cell_dec, lisa.res1, type='High', group.by = 'cluster_domain')
 head(res)
+# group.by, a vector of length equal to the ncol(data).
+res2 <- cal_lisa_f1(hpda_spe_cell_dec, 
+                    lisa.res1, 
+                    type='High', 
+                    group.by = hpda_spe_cell_dec$cluster_domain
+  )
+identical(res, res2)
 }
