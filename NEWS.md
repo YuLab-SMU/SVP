@@ -1,3 +1,11 @@
+# SVP 0.99.2
+
++ remove unused code. (2025-03-12, Wen)
++ typo of Rd man files. (2025-03-12, Wen)
++ more unit tests. (2025-03-12, Wen)
++ adjust the repetition code. (2025-03-12, Wen)
+  - `.add_localisa_pvalue` and `.internal.runLocalMoranBv`.
+
 # SVP 0.99.1
 
 + `group.by` supporting a vector of equal length of `ncol(data)`. (2025-02-25, Tue)
