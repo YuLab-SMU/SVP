@@ -118,13 +118,7 @@
   prefix <- switch(bv.alternative, two.sided = "!=", greater = ">", less = "<")
   nm <- c("Ibvi", "E.Ibvi", "Var.Ibvi", "Z.Ibvi")
   pnm <- gettextf("Pr (z %s E(%s))", prefix, "Ibvi")
-  if (bv.alternative == 'two.sided'){
-      res[, 5] <- 2 * pnorm(abs(res[, 4]), lower.tail = FALSE)
-  }else if (bv.alternative == 'greater'){
-      res[, 5] <- pnorm(res[, 4], lower.tail = FALSE)
-  }else{
-      res[, 5] <- pnorm(res[, 4])
-  }
+  res <- .cal_pvalue(res, bv.alternative)
   colnames(res) <- c(nm, pnm)
   lisa.res <- .internal.runLISA(t(res[, 1, drop=FALSE]), weight, lisa.method, lisa.flag.method, lisa.alternative)
   res <- cbind(res, lisa.res[[1]])

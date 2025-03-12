@@ -35,19 +35,25 @@
 .add_localisa_pvalue <- function(res, pnm, nm, cellnm, method, flag.method, alternative, BPPARAM){
   res <- BiocParallel::bplapply(res, function(x){
             x <- data.frame(x)
-            if (alternative == 'two.sided'){
-                x[[pnm]] <- 2 * pnorm(abs(x[[4]]), lower.tail = FALSE)
-            }else if (alternative == 'greater'){
-                x[[pnm]] <- pnorm(x[[4]], lower.tail = FALSE)
-            }else{
-                x[[pnm]] <- pnorm(x[[4]])
-            }
+            x <- .cal_pvalue(x, alternative, pnm)
             colnames(x) <- nm
             rownames(x) <- cellnm
             x <- .add_cluster(x, method, flag.method)
             return(x)
          }, BPPARAM = BPPARAM)
   return(res)
+}
+
+.cal_pvalue <- function(x, alternative, pnm=NULL){
+   if (is.null(pnm))pnm <- 5
+   if (alternative == 'two.sided'){
+       x[[pnm]] <- 2 * pnorm(abs(x[[4]]), lower.tail = FALSE)
+   }else if (alternative == 'greater'){
+       x[[pnm]] <- pnorm(x[[4]], lower.tail = FALSE)
+   }else{
+       x[[pnm]] <- pnorm(x[[4]])
+   }
+   return(x)
 }
 
 .add_cluster <- function(x, method, flag.method = 'mean'){
