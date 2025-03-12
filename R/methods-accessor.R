@@ -97,7 +97,10 @@ setReplaceMethod("spatialCoords", c("SVPExperiment", "matrix_Or_NULL"), function
     }
     flag1 <- is.numeric(value)
     flag2 <- nrow(value) >= ncol(x)
-    flag3 <- all(colnames(x) %in% rownames(value))
+    flag3 <- TRUE
+    if (!is.null(rownames(value))){
+       flag3 <- all(colnames(x) %in% rownames(value))
+    }
     if (!flag1){
        cli::cli_abort("The `value` (coordinate of cell or spot) must be a numeric matrix.")
     }
@@ -107,7 +110,11 @@ setReplaceMethod("spatialCoords", c("SVPExperiment", "matrix_Or_NULL"), function
     if (!flag3){
        cli::cli_abort("The rownames of coordinate matrix must be the same of the column names of {.cl class(x)}.")
     }
-    int_colData(x)$spatialCoords <- value[colnames(x),,drop=FALSE]
+    if (!is.null(colnames(x))){
+       int_colData(x)$spatialCoords <- value[colnames(x),,drop=FALSE]
+    }else{
+       int_colData(x)$spatialCoords <- value[seq(ncol(x)),,drop=FALSE]
+    }
     flag4 <- .check_element_obj(x, key = 'imgData', basefun = int_metadata, namefun = names)
     if (!flag4){
         int_metadata(x)$imgData <- matrix(nrow=0, ncol=1) |> DataFrame() |> stats::setNames('sample_id')
