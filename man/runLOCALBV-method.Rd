@@ -207,12 +207,12 @@ hpda_spe_cell_dec <- LISAsce(hpda_spe_cell_dec, res1, 'LOCALBV')
 hpda_spe_cell_dec
 gsvaExp(hpda_spe_cell_dec, 'LOCALBV')
 # Then using ggsc to visualize the result
-\donttest{
+#\donttest{
   library(ggplot2)
   library(ggsc)
   gsvaExp(hpda_spe_cell_dec, 'LOCALBV') |>
   plot_lisa_feature(res1, assay.type='LocalLee') + ggtitle(NULL)
-}
+#}
 }
 \references{
 Lee, SI. Developing a bivariate spatial association measure: An integration of Pearson's r and Moran's I .

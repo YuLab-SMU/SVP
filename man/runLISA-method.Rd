@@ -181,14 +181,14 @@ hpda_spe_cell_dec <- LISAsce(hpda_spe_cell_dec, lisa.res12)
 hpda_spe_cell_dec
 gsvaExp(hpda_spe_cell_dec, 'LISA')
 # Then using ggsc to visualize the result
-\donttest{
+#\donttest{
   library(ggplot2)
   library(ggsc)
   p1 <- plot_lisa_feature(hpda_spe_cell_dec, lisa.res12, assay.type=1)
   p2 <- gsvaExp(hpda_spe_cell_dec, 'LISA') |>
   plot_lisa_feature(lisa.res12, assay.type='Gi')
   p1 / p2
-}
+#}
 }
 \references{
 \enumerate{

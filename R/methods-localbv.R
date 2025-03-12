@@ -97,12 +97,12 @@
 #' hpda_spe_cell_dec
 #' gsvaExp(hpda_spe_cell_dec, 'LOCALBV')
 #' # Then using ggsc to visualize the result
-#' \donttest{
+#' #\donttest{
 #'   library(ggplot2)
 #'   library(ggsc)
 #'   gsvaExp(hpda_spe_cell_dec, 'LOCALBV') |>
 #'   plot_lisa_feature(res1, assay.type='LocalLee') + ggtitle(NULL)
-#' }
+#' #}
 setGeneric('runLOCALBV',
   function(
     data,

@@ -28,7 +28,7 @@
 #' # which can be extracted using assay and visualized using ggsc or
 #' # other packages
 #' assays(hpda_spe_cell_dec)
-#' \donttest{
+#' #\donttest{
 #'     library(ggsc)
 #'     
 #'     f1 <- sc_spatial(hpda_spe_cell_dec, features="Cancer clone A",
@@ -46,7 +46,7 @@
 #'     ) +
 #'     scale_bg_color_manual(values=c('black'))
 #'     f2
-#' }
+#' #}
 setGeneric('runWKDE',
   function(
     data,

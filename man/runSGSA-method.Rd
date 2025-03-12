@@ -204,7 +204,7 @@ sceSubPbmc |> gsvaExp("CellCycle") |> assay() |> t() |> head()
 # Then you can use the ggsc or other package to visulize
 # and you can try to use the findMarkers of scran or other packages to identify
 # the different gene sets.   
-\donttest{
+#\donttest{
   library(ggplot2)
   library(ggsc)
   sceSubPbmc <- sceSubPbmc |> 
@@ -228,7 +228,7 @@ sceSubPbmc |> gsvaExp("CellCycle") |> assay() |> t() |> head()
                      add.summary = TRUE
                   )
   cellcycle.test.res$B
-}
+#}
 }
 \references{
 \enumerate{

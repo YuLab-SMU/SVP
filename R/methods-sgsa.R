@@ -123,7 +123,7 @@
 #' # Then you can use the ggsc or other package to visulize
 #' # and you can try to use the findMarkers of scran or other packages to identify
 #' # the different gene sets.   
-#' \donttest{
+#' #\donttest{
 #'   library(ggplot2)
 #'   library(ggsc)
 #'   sceSubPbmc <- sceSubPbmc |> 
@@ -147,7 +147,7 @@
 #'                      add.summary = TRUE
 #'                   )
 #'   cellcycle.test.res$B
-#' }
+#' #}
 setGeneric('runSGSA', 
   function(
     data, 
