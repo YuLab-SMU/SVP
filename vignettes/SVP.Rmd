@@ -48,7 +48,7 @@ Understanding the spatial distribution and interplay of cell states in tissue is
 
 After quantifying cell functions, analyzing their spatial distribution and co-distribution with other features can provide deeper insights into related biological questions. We focus on three aspects: the spatial variability of cell functions, regions where these functions cluster, and their co-distribution patterns with other features. Although existing tools such as `SPARK-X`[@SPARKX], `nnSVG`[@nnSVG], `SpatialDE`[@SpatialDE], `SpaGFT`[@SpaGFT], `Seurat`[@Seurat], and `Squidpy`[@Squidpy] facilitate the exploration of spatially variable genes, they are primarily designed for gene-level analysis and lack the capability to investigate the spatial co-distribution of features. Additionally, many of these tools, including `SpatialDE`[@SpatialDE], `SPARK`[@SPARK], `MERINGUE`[@MERINGUE], and `nnSVG`[@nnSVG], face challenges in handling large-scale spatial transcriptome data due to high memory consumption and low computational efficiency. 
 
-To fill the gaps, we developed `SVP` to accurately predict cell states, explore their spatial distribution, and assess their spatial relationship with other features. 
+To fill the gaps, we developed `SVP` to accurately predict cell states, explore their spatial distribution, and assess their spatial relationship with other features. SVP is developed based on `SingleCellExperiment` class, which can be interoperable with the existing computing ecosystem of `Bioconductor`.
 
 # Overview of SVP
 
@@ -58,6 +58,24 @@ To identify spatially variable cell functions, we first established a cell neigh
 
 ```{r echo=FALSE, fig.width = 12, dpi=400, fig.align="center", fig.cap= "Overview of SVP.", overview}
 knitr::include_graphics("./SVP_Framework.png") 
+```
+
+# Install
+
+You can use the following commands to install it
+
+```{r, eval=FALSE, INSTALL}
+# for devel
+if(!requireNamespace("remotes", quietly=TRUE)){
+    install.packages("remotes")
+}
+remotes::install_github("YuLab-SMU/SVP")
+
+# for release
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("SVP")
 ```
 
 # Quantification of cell states using SVP
