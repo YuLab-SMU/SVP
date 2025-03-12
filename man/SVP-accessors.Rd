@@ -11,7 +11,7 @@
 \alias{imgData<-,SVPExperiment,NULL-method}
 \alias{spatialCoords<-,SVPExperiment,matrix_Or_NULL-method}
 \alias{spatialCoords<-,SVPExperiment}
-\title{Some accessor funtions to get the internal slots of SVPExperiment}
+\title{Some accessor functions to get the internal slots of SVPExperiment}
 \usage{
 \S4method{spatialCoords}{SVPExperiment}(x)
 
@@ -42,7 +42,7 @@ matrix or character or print the information of object
 or a \linkS4class{SVPExperiment} object.
 }
 \description{
-Some accessor funtions to get the internal slots of SVPExperiment
+Some accessor functions to get the internal slots of SVPExperiment
 }
 \examples{
 library(SpatialExperiment) |> suppressPackageStartupMessages()

@@ -112,6 +112,8 @@ names(unamekeys) <- c(.gsva_key, .fscore_key, .sv_key)
 
 SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
 
+# refer to the internal function (.set_internal_character) of SingleCellExperiment 
+# just copied and modified it, since the function is not be exported in SingleCellExperiment
 .set_internal_character <- function (x, type, value, getfun, setfun, key, convertfun, xdimfun,
     vdimfun, funstr, xdimstr, vdimstr, substr){
     x <- updateObject(x)
@@ -129,6 +131,8 @@ SCEByColumn <- function(sce)new('SCEByColumn', sce = sce)
     setfun(x, internals)
 }
 
+# refer to the internal function (.set_internal_numeric) of SingleCellExperiment
+# just copied and modified it, since the function is not be exported in SingleCellExperiment
 .set_internal_numeric <- function (x, type, value, getfun, setfun, key, convertfun, xdimfun, vdimfun, funstr, xdimstr, vdimstr, substr){
     x <- updateObject(x)
     if (!is.null(value)){

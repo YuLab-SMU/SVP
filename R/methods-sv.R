@@ -42,18 +42,18 @@
 #' @section Other setter:
 #' \describe{
 #' \item{\code{svDfs(x) <- value}:}{
-#' Replaces all features sv result matrixs in \code{x} with those in \code{value}.
+#' Replaces all features sv result matrices in \code{x} with those in \code{value}.
 #' The latter should be a list-like object containing any number of \linkS4class{DataFrame} objects
 #' with number of row equal to \code{nrow(x)}.
 #'
-#' If \code{value} is named, those names will be used to name the SV matrixs in \code{x}.
+#' If \code{value} is named, those names will be used to name the SV matrices in \code{x}.
 #' Otherwise, unnamed results are assigned default names prefixed with \code{"unnamed.sv"}.
 #'
-#' If \code{value} is \code{NULL}, all SV matrixs in \code{x} are removed.
+#' If \code{value} is \code{NULL}, all SV matrices in \code{x} are removed.
 #' }
 #'
 #' \item{\code{svDfNames(x) <- value}:}{
-#' Replaces all names for SV matrixs in \code{x} with a character vector \code{value}.
+#' Replaces all names for SV matrices in \code{x} with a character vector \code{value}.
 #' This should be of length equal to the number of results currently in \code{x}.
 #'}
 #'}

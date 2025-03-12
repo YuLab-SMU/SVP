@@ -104,7 +104,7 @@ features to features, cells to features respectively to build graph.}
 \item{rwr.normalize.adj.method}{character the method to normalize the adjacency matrix of the input graph,
 default is \code{laplacian}.}
 
-\item{rwr.normalize.affinity}{logical whether normalize the activity (affinity) result score using quantile normalisation,
+\item{rwr.normalize.affinity}{logical whether normalize the activity (affinity) result score using quantile normalization,
 default is FALSE.}
 
 \item{rwr.prop.normalize}{logical whether divide the specific activity score by total activity score for a sample,
@@ -117,23 +117,23 @@ number of threads, you can also set this using \code{RcppParallel::setThreadOpti
 "none", default is "Hypergeometric".}
 
 \item{hyper.test.by.expr}{logical whether using the expression matrix to find the nearest genes of cells, default is TRUE,
-if it is FALSE, meaning using the result of reduction to find the nearest genes of cells to perfrom the \code{hyper.test.weighted}.}
+if it is FALSE, meaning using the result of reduction to find the nearest genes of cells to perform the \code{hyper.test.weighted}.}
 
 \item{prop.score}{logical whether to normalize each feature for each sample, default is FALSE.}
 
 \item{add.weighted.metric}{logical whether return the weight activity score of cell using the corresponding \code{hyper.test.weighted},
 default is FALSE.}
 
-\item{add.cor.features}{logical whether calculate the corrlelation between the new features and orginal featuers (genes), default
-is FALSE. If it is TRUE the corrleation result will be kept in fscoreDf which can be extracted using \code{fscoreDf()} function.}
+\item{add.cor.features}{logical whether calculate the correlation between the new features and original features (genes), default
+is FALSE. If it is TRUE the correlation result will be kept in fscoreDf which can be extracted using \code{fscoreDf()} function.}
 
-\item{cells}{Vector specifying the subset of cells to be used for the calculation of the activaty score or identification
+\item{cells}{Vector specifying the subset of cells to be used for the calculation of the active score or identification
 of SV features. This can be a character vector of cell names, an integer vector of column indices or a logical vector,
-default is NULL, meaning all cells to be used for the calculation of the activaty score or identification of SV features.}
+default is NULL, meaning all cells to be used for the calculation of the activity score or identification of SV features.}
 
-\item{features}{Vector specifying the subset of features to be used for the calculation of the activaty score or identification
+\item{features}{Vector specifying the subset of features to be used for the calculation of the activity score or identification
 of SV features. This can be a character vector of features names, an integer vector of row indices or a logical vector,
-default is NULL, meaning all features to be used for the calculation of the activaty score or identification of SV features.}
+default is NULL, meaning all features to be used for the calculation of the activity score or identification of SV features.}
 
 \item{verbose}{logical whether print the intermediate message when running the program, default is TRUE.}
 
@@ -159,7 +159,7 @@ test result from the original expression matrix controlled by \code{hyper.test.w
 if input is a \linkS4class{SVPExperiment}, output will be also a \linkS4class{SVPExperiment}, the activity score of gene sets
 was stored in \code{assay} slot of the specified \code{gsvaexp}, and the spatially variable gene sets result is stored in \code{svDfs}
 of the specified \code{gsvaexp}, which is a \linkS4class{SingleCellExperiment}. If input is a \linkS4class{SingleCellExperiment}
-(which is extracted from \linkS4class{SVPExperiment} using \code{gsvaExp()} funtion), output will be also a
+(which is extracted from \linkS4class{SVPExperiment} using \code{gsvaExp()} function), output will be also a
 \linkS4class{SingleCellExperiment}, the activity score of gene sets result can be extracted using \code{assay()} function. The
 spatially variable gene sets result can be extracted using \code{svDf()} function.
 The affinity score is calculated in the following way (refer to the second article):
@@ -204,7 +204,7 @@ sceSubPbmc |> gsvaExp("CellCycle") |> assay() |> t() |> head()
 # Then you can use the ggsc or other package to visulize
 # and you can try to use the findMarkers of scran or other packages to identify
 # the different gene sets.   
-\dontrun{
+\donttest{
   library(ggplot2)
   library(ggsc)
   sceSubPbmc <- sceSubPbmc |> 

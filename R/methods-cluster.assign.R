@@ -1,4 +1,4 @@
-#' @title clusting and assign the label for each feature(especifily the gene sets).
+#' @title clusting and assign the label for each feature(specify the gene sets).
 #' @rdname cluster.assign-method
 #' @param data A \linkS4class{SVPExperiment}, which has run \code{runSGSA} or \code{detect.svp}, or 
 #' a \linkS4class{SingleCellExperiment} which was extracted from \linkS4class{SVPExperiment} using
@@ -11,7 +11,7 @@
 #' @param ... dot parameters
 #' @return if input is a \linkS4class{SVPExperiment}, output will be also a \linkS4class{SVPExperiment}, and the result assay 
 #' was stored in assay of the specified \code{gsvaexp}, which is a \linkS4class{SingleCellExperiment}. If input is a
-#' \linkS4class{SingleCellExperiment} (which is extracted from \linkS4class{SVPExperiment} using \code{gsvaExp()} funtion), 
+#' \linkS4class{SingleCellExperiment} (which is extracted from \linkS4class{SVPExperiment} using \code{gsvaExp()} function), 
 #' output will be a \linkS4class{SingleCellExperiment}, the result can be extracted using \code{assay()} function.
 #' @details 
 #' when use \code{runSGSA} to calculated the gene set activity of cell, if \code{assign = TRUE} we will assign the max affinity of
@@ -81,7 +81,7 @@ setMethod(
     ){
     
     if (!is.null(gsvaexp)){
-       cli::cli_inform("The {.var gsvaexp} was specified, the specified {.var gsvaExp} will be used to clusting and assign.")
+       cli::cli_inform("The {.var gsvaexp} was specified, the specified {.var gsvaExp} will be used to assign.")
        da2 <- gsvaExp(data, gsvaexp, withColData = FALSE, withSpatialCoords=FALSE, withImageData = FALSE)
        da2 <- cluster.assign(da2, assay.type = gsvaexp.assay.type, assign, ...)
        gsvaExp(data, gsvaexp) <- da2

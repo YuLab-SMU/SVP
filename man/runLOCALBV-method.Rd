@@ -115,13 +115,13 @@ default is \code{"all"}.}
 This only work when \code{bv.method = 'localmoran_bv'}.}
 
 \item{weight}{object, which can be \code{nb}, \code{listw} or \code{Graph} object, default is NULL,
-meaning the spatail neighbours weights will be calculated using the \code{weight.method}.
+meaning the spatial neighbours weights will be calculated using the \code{weight.method}.
 if the \code{data} contains multiple samples, and the \code{sample_id} is specified, it should be
 provided as a list object with names (using \code{sample_id}).}
 
 \item{weight.method}{character the method to build the spatial neighbours weights, default
 is \code{voronoi} (Voronoi tessellation). Other method, which requires coord matrix as input and returns
-\code{nb}, \code{listw} or \code{Graph} object, also is avaiable, such as \code{"knearneigh"},
+\code{nb}, \code{listw} or \code{Graph} object, also is available, such as \code{"knearneigh"},
 \code{'dnearneigh'}, \code{"gabrielneigh"}, \code{"relativeneigh"}, which are from \code{spdep} package.
 default is \code{knn}, if it is \code{"none"}, meaning the distance weight of each spot is used to
 the weight.}
@@ -150,7 +150,7 @@ default is 100L.}
 
 \item{random.seed}{numeric random seed number to repeatability, default is 1024.}
 
-\item{BPPARAM}{A BiocParallelParam object specifying whether perform the analysis parallelly using
+\item{BPPARAM}{A BiocParallelParam object specifying whether perform the analysis in parallel using
 \code{BiocParallel} default is \code{SerialParam()}, meaning no parallel.
 You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=TRUE)} to parallel it,
 the \code{workers} of \code{MulticoreParam} is the number of cores used, see also
@@ -207,7 +207,7 @@ hpda_spe_cell_dec <- LISAsce(hpda_spe_cell_dec, res1, 'LOCALBV')
 hpda_spe_cell_dec
 gsvaExp(hpda_spe_cell_dec, 'LOCALBV')
 # Then using ggsc to visualize the result
-\dontrun{
+\donttest{
   library(ggplot2)
   library(ggsc)
   gsvaExp(hpda_spe_cell_dec, 'LOCALBV') |>

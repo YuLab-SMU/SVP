@@ -1,4 +1,4 @@
-#' Detecting the spatially or single cell variable features with kullback–leibler divergence of 
+#' Detecting the spatially or single cell variable features with Kullback–Leibler divergence of 
 #' 2D weighted kernel density estimation
 #' @description
 #' To resolve the sparsity of single cell or spatial omics data, we use kernel function smoothing cell 
@@ -22,7 +22,7 @@
 #' @param grid.n numeric number of grid points in the two directions to estimate 2D weighted kernel 
 #' density, default is 100.
 #' @param permutation numeric the number of permutation for each single feature to detect the 
-#' signicantly spatially or single cell variable features, default is 100.
+#' significantly spatially or single cell variable features, default is 100.
 #' @param p.adjust.method character the method to adjust the pvalue of the result, default is \code{BY}.
 #' @param verbose logical whether print the intermediate message when running the program, default is TRUE.
 #' @param action character control the type of output, if \code{action='add'}, the result of identification
@@ -38,7 +38,7 @@
 #' @details
 #' if input is a \linkS4class{SVPExperiment}, output will be also a \linkS4class{SVPExperiment}, the spatially variable gene sets 
 #' result is stored in \code{svDfs} of the specified \code{gsvaexp}, which is a \linkS4class{SingleCellExperiment}. If input is 
-#' a \linkS4class{SingleCellExperiment} (which is extracted from \linkS4class{SVPExperiment} using \code{gsvaExp()} funtion), output
+#' a \linkS4class{SingleCellExperiment} (which is extracted from \linkS4class{SVPExperiment} using \code{gsvaExp()} function), output
 #' will be also a \linkS4class{SingleCellExperiment}, the spatial variable gene sets result can be extracted using \code{svDf} function.
 #' The result of \code{svDf} will return a matrix which has \code{sp.kld}, \code{boot.sp.kld.mean}, \code{boot.sp.kld.sd}, \code{pvalue},
 #' \code{padj} and \code{rank}.
@@ -50,7 +50,7 @@
 #'      each features.
 #'   \item \code{pvalue} the pvalue is calculated using the real \code{sp.kld} and the permutation \code{boot.sp.kld.mean} and
 #'      \code{boot.sp.kld.sd} based on the normal distribution.
-#'   \item \code{padj} the adjusted pvalue based on the speficied \code{p.adjust.method}, default is \code{BY}.
+#'   \item \code{padj} the adjusted pvalue based on the specified \code{p.adjust.method}, default is \code{BY}.
 #'   \item \code{rank} the order of significant spatial variable features based on \code{padj} and \code{sp.kld}.
 #' }
 #' 
@@ -59,8 +59,8 @@
 #'   \eqn{f_{h}(x) = 1/n \sum_{i=1}^n W_{i} * K_{h}(x - X_{i})}
 #'
 #' Where \eqn{W_{i}} is the value of feature (such as gene expression or gene set score). \eqn{X_{i}} is the embeddings (two 
-#' dimenstion coordinates of \code{UMAP} or \code{TSNE} or the physical space for spatial omics data) of the cell \eqn{i}.
-#' \eqn{h} is a smoothing parameter corresponding to the bandwidth matrix, default is the implemention of \code{ks} package.
+#' dimension coordinates of \code{UMAP} or \code{TSNE} or the physical space for spatial omics data) of the cell \eqn{i}.
+#' \eqn{h} is a smoothing parameter corresponding to the bandwidth matrix, default is the implementation of \code{ks} package.
 #' \eqn{K(x)} is a gaussian kernel function. \eqn{x} is the a reference point in the embedding space defined by the grid size 
 #' used for the computation to weight the distances of nearby cells. \eqn{K_{h}(x—X_{i})}works as a weight for \eqn{W_{i}} to 
 #' smooth the feature value based on neighbouring cells at a \code{UMAP} or \code{TSNE} or physical space.
@@ -70,8 +70,8 @@
 #'   \eqn{D_{KL}(G) = \sum_{x \in X} P(x) * \log(P(x) / Q(x))}
 #' 
 #'  Where \eqn{P(x)} is the kernel density value of a feature at the space \eqn{X}. and \eqn{Q(x)} is the kernel density value of no spatially
-#'  variabilty reference feature at the space \eqn{X}. The smaller kullback-leibler divergence (\eqn{D_{KL}(G)}) show that the distribution of 
-#'  features is more like the no spatially variabilty reference feature at th space \eqn{X}. So we randomly shuffle the position of each feature 
+#'  variability reference feature at the space \eqn{X}. The smaller kullback-leibler divergence (\eqn{D_{KL}(G)}) show that the distribution of 
+#'  features is more like the no spatially variability reference feature at th space \eqn{X}. So we randomly shuffle the position of each feature 
 #'  and calculate Kullback-Leibler divergence, next we use the normal distribution to calculate the pvalue with the actual Kullback-Leibler 
 #'  divergence, and the average value and standard deviation value of random Kullback-Leibler divergence, since the random Kullback-Leibler 
 #'  divergence for each feature is normally distributed in the following:
@@ -276,12 +276,12 @@ setMethod('runKldSVG', 'SVPExperiment',
 #' @param method character the method of spatial autocorrelation using a spatial weights to detect spatial
 #' variable features, one of \code{'moransi'}, \code{"gearysc"} or \code{"getisord"}, default is \code{'moransi'}.
 #' @param weight object, which can be \code{nb}, \code{listw} or \code{Graph} object, default is NULL,
-#' meaning the spatail neighbours weights will be calculated using the \code{weight.method}.
+#' meaning the spatial neighbours weights will be calculated using the \code{weight.method}.
 #' if the \code{data} contains multiple samples, and the \code{sample_id} is specified, it should be 
 #' provided as a list object with names (using \code{sample_id}).
 #' @param weight.method character the method to build the spatial neighbours weights, default 
 #' is \code{voronoi} (Voronoi tessellation). Other method, which requires coord matrix as input and returns
-#' \code{nb}, \code{listw} or \code{Graph} object, also is avaiable, such as \code{"knearneigh"},
+#' \code{nb}, \code{listw} or \code{Graph} object, also is available, such as \code{"knearneigh"},
 #' \code{'dnearneigh'}, \code{"gabrielneigh"}, \code{"relativeneigh"}, which are from \code{spdep} package.
 #' default is \code{knn}, if it is \code{"none"}, meaning the distance weight of each spot is used to
 #' the weight.

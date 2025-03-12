@@ -36,7 +36,7 @@ default is \code{"all"}.}
 
 \item{weight.method}{character the method to build the spatial neighbours weights, default
 is \code{voronoi} (Voronoi tessellation). Other method, which requires coord matrix as input and returns
-\code{nb}, \code{listw} or \code{Graph} object, also is avaiable, such as \code{"knearneigh"},
+\code{nb}, \code{listw} or \code{Graph} object, also is available, such as \code{"knearneigh"},
 \code{'dnearneigh'}, \code{"gabrielneigh"}, \code{"relativeneigh"}, which are from \code{spdep} package.
 default is \code{knn}, if it is \code{"none"}, meaning the distance weight of each spot is used to
 the weight.}
@@ -51,7 +51,7 @@ that spots or cells in the same category are adjacent, default is NULL.}
 
 \item{cells}{the cell name or index of data object, default is NULL.}
 
-\item{...}{addtional parameters, when \code{weight.method='knn'}, you can specified \code{k=10}.}
+\item{...}{additional parameters, when \code{weight.method='knn'}, you can specified \code{k=10}.}
 }
 \value{
 a dgCMatrix object

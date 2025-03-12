@@ -6,7 +6,7 @@
 \alias{cluster.assign,SingleCellExperiment}
 \alias{cluster.assign,SVPExperiment-method}
 \alias{cluster.assign,SVPExperiment}
-\title{clusting and assign the label for each feature(especifily the gene sets).}
+\title{clusting and assign the label for each feature(specify the gene sets).}
 \usage{
 cluster.assign(
   data,
@@ -54,11 +54,11 @@ a \linkS4class{SingleCellExperiment} which was extracted from \linkS4class{SVPEx
 \value{
 if input is a \linkS4class{SVPExperiment}, output will be also a \linkS4class{SVPExperiment}, and the result assay
 was stored in assay of the specified \code{gsvaexp}, which is a \linkS4class{SingleCellExperiment}. If input is a
-\linkS4class{SingleCellExperiment} (which is extracted from \linkS4class{SVPExperiment} using \code{gsvaExp()} funtion),
+\linkS4class{SingleCellExperiment} (which is extracted from \linkS4class{SVPExperiment} using \code{gsvaExp()} function),
 output will be a \linkS4class{SingleCellExperiment}, the result can be extracted using \code{assay()} function.
 }
 \description{
-clusting and assign the label for each feature(especifily the gene sets).
+clusting and assign the label for each feature(specify the gene sets).
 }
 \details{
 when use \code{runSGSA} to calculated the gene set activity of cell, if \code{assign = TRUE} we will assign the max affinity of

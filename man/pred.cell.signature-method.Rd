@@ -61,7 +61,7 @@ signature will be consider as 'unassigned', default is NULL, meaning will be cal
 if input is a \linkS4class{SVPExperiment}, output will be also a \linkS4class{SVPExperiment}, and the result
 was stored at the \code{pred.col.name} column of \code{colData} in the specified \code{gsvaexp}, which is a
 \linkS4class{SingleCellExperiment}. If input is a \linkS4class{SingleCellExperiment} (which is extracted from
-\linkS4class{SVPExperiment} using \code{gsvaExp()} funtion), output will be a \linkS4class{SingleCellExperiment},
+\linkS4class{SVPExperiment} using \code{gsvaExp()} function), output will be a \linkS4class{SingleCellExperiment},
 the result can be extracted using \code{colData()} function with specified column in default is \code{pred.cell.sign}.
 }
 \description{

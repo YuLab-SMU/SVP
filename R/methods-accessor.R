@@ -1,4 +1,4 @@
-#' Some accessor funtions to get the internal slots of SVPExperiment
+#' Some accessor functions to get the internal slots of SVPExperiment
 #' @name SVP-accessors
 #' @param x a \linkS4class{SVPExperiment} class.
 #' @param object a \linkS4class{SVPExperiment} class.

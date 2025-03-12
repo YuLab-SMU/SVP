@@ -1,13 +1,13 @@
 #' @title plot_heatmap_globalbv
 #'
 #' @description
-#' visulize the result of global bivariate spatial analysis with heatmap
+#' visualize the result of global bivariate spatial analysis with heatmap
 #'
 #' @param globalbv the result of \code{runGLOBALBV} with \code{action = 'get'}.
 #' @param moran.t the result of global spatial variable features for one type features
 #' default is NULL. or \code{runDetectSVG} and then using \code{svDf} to extract the 
 #' result.
-#' @param moran.l the result of global spatial variable features for anothor type features
+#' @param moran.l the result of global spatial variable features for another type features
 #' default is NULL.
 #' @param lisa.l the result of \code{cal_lisa_f1} for one type features
 #' @param lisa.t the result of \code{cal_lisa_f1} for another type features.

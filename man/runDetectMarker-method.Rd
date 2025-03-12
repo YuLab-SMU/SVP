@@ -51,12 +51,12 @@ default is 200.}
 
 \item{present.prop.in.group}{numeric the appearance proportion of groups which have the marker
 default is .1, smaller value represent the marker will have higher specificity, but the number of
-marker for each group might also decrease, the mininum value is \code{1/length(unique(data[[group.by]]))}.}
+marker for each group might also decrease, the minimum value is \code{1/length(unique(data[[group.by]]))}.}
 
 \item{present.prop.in.sample}{numeric the appearance proportion of samples which have the marker in
 the corresponding group by specific \code{group.by}, default is 0.2.}
 
-\item{BPPARAM}{A BiocParallelParam object specifying whether perform the analysis parallelly using
+\item{BPPARAM}{A BiocParallelParam object specifying whether perform the analysis in parallel using
 \code{BiocParallel} default is \code{SerialParam()}, meaning no parallel.
 You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=TRUE)} to parallel it,
 the \code{workers} of \code{MulticoreParam} is the number of cores used, see also

@@ -76,13 +76,13 @@ or a \linkS4class{SpatialExperiment} object, or a \linkS4class{SVPExperiment} ob
 variable features, one of \code{'moransi'}, \code{"gearysc"} or \code{"getisord"}, default is \code{'moransi'}.}
 
 \item{weight}{object, which can be \code{nb}, \code{listw} or \code{Graph} object, default is NULL,
-meaning the spatail neighbours weights will be calculated using the \code{weight.method}.
+meaning the spatial neighbours weights will be calculated using the \code{weight.method}.
 if the \code{data} contains multiple samples, and the \code{sample_id} is specified, it should be
 provided as a list object with names (using \code{sample_id}).}
 
 \item{weight.method}{character the method to build the spatial neighbours weights, default
 is \code{voronoi} (Voronoi tessellation). Other method, which requires coord matrix as input and returns
-\code{nb}, \code{listw} or \code{Graph} object, also is avaiable, such as \code{"knearneigh"},
+\code{nb}, \code{listw} or \code{Graph} object, also is available, such as \code{"knearneigh"},
 \code{'dnearneigh'}, \code{"gabrielneigh"}, \code{"relativeneigh"}, which are from \code{spdep} package.
 default is \code{knn}, if it is \code{"none"}, meaning the distance weight of each spot is used to
 the weight.}

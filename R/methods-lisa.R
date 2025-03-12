@@ -17,12 +17,12 @@
 #' @param method character the method for the local spatial statistic, one of \code{'localG'}, \code{"localmoran"}, 
 #' default is \code{'localG'}.
 #' @param weight object, which can be \code{nb}, \code{listw} or \code{Graph} object, default is NULL,
-#' meaning the spatail neighbours weights will be calculated using the \code{weight.method}.
+#' meaning the spatial neighbours weights will be calculated using the \code{weight.method}.
 #' if the \code{data} contains multiple samples, and the \code{sample_id} is specified, it should be
 #' provided as a list object with names (using \code{sample_id}).
 #' @param weight.method character the method to build the spatial neighbours weights, default
 #' is \code{voronoi} (Voronoi tessellation). Other method, which requires coord matrix as input and returns
-#' \code{nb}, \code{listw} or \code{Graph} object, also is avaiable, such as \code{"knearneigh"},
+#' \code{nb}, \code{listw} or \code{Graph} object, also is available, such as \code{"knearneigh"},
 #' \code{'dnearneigh'}, \code{"gabrielneigh"}, \code{"relativeneigh"}, which are from \code{spdep} package.
 #' default is \code{knn}, if it is \code{"none"}, meaning the distance weight of each spot is used to
 #' the weight.
@@ -39,7 +39,7 @@
 #' @param alternative a character string specifying the alternative hypothesis, default is \code{two.sided}.
 #' @param flag.method a character string specifying the method to calculate the threshold for the cluster 
 #' type, default is \code{"mean"}. Other option is \code{"median"}. 
-#' @param BPPARAM A BiocParallelParam object specifying whether perform the analysis parallelly using
+#' @param BPPARAM A BiocParallelParam object specifying whether perform the analysis in parallel using
 #' \code{BiocParallel} default is \code{SerialParam()}, meaning no parallel.
 #' You can use \code{BiocParallel::MulticoreParam(workers=4, progressbar=TRUE)} to parallel it,
 #' the \code{workers} of \code{MulticoreParam} is the number of cores used, see also
@@ -92,7 +92,7 @@
 #' hpda_spe_cell_dec
 #' gsvaExp(hpda_spe_cell_dec, 'LISA')
 #' # Then using ggsc to visualize the result
-#' \dontrun{
+#' \donttest{
 #'   library(ggplot2)
 #'   library(ggsc)
 #'   p1 <- plot_lisa_feature(hpda_spe_cell_dec, lisa.res12, assay.type=1)
@@ -331,7 +331,7 @@ setMethod("runLISA", "SVPExperiment", function(
 #' default is \code{"all"}.
 #' @param weight.method character the method to build the spatial neighbours weights, default
 #' is \code{voronoi} (Voronoi tessellation). Other method, which requires coord matrix as input and returns
-#' \code{nb}, \code{listw} or \code{Graph} object, also is avaiable, such as \code{"knearneigh"},
+#' \code{nb}, \code{listw} or \code{Graph} object, also is available, such as \code{"knearneigh"},
 #' \code{'dnearneigh'}, \code{"gabrielneigh"}, \code{"relativeneigh"}, which are from \code{spdep} package.
 #' default is \code{knn}, if it is \code{"none"}, meaning the distance weight of each spot is used to
 #' the weight.
@@ -342,7 +342,7 @@ setMethod("runLISA", "SVPExperiment", function(
 #' \code{colData(data)}, if it was specified, the adjacency weighted matrix will be built based on the principle
 #' that spots or cells in the same category are adjacent, default is NULL.
 #' @param cells the cell name or index of data object, default is NULL.
-#' @param ... addtional parameters, when \code{weight.method='knn'}, you can specified \code{k=10}.
+#' @param ... additional parameters, when \code{weight.method='knn'}, you can specified \code{k=10}.
 #' @return a dgCMatrix object 
 #' @examples
 #' data(hpda_spe_cell_dec)

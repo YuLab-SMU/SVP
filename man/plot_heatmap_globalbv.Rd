@@ -26,7 +26,7 @@ plot_heatmap_globalbv(
 default is NULL. or \code{runDetectSVG} and then using \code{svDf} to extract the
 result.}
 
-\item{moran.l}{the result of global spatial variable features for anothor type features
+\item{moran.l}{the result of global spatial variable features for another type features
 default is NULL.}
 
 \item{lisa.t}{the result of \code{cal_lisa_f1} for another type features.}
@@ -56,7 +56,7 @@ default is 0.05.}
 a ggplot2 or aplot object
 }
 \description{
-visulize the result of global bivariate spatial analysis with heatmap
+visualize the result of global bivariate spatial analysis with heatmap
 }
 \examples{
 data(hpda_spe_cell_dec)

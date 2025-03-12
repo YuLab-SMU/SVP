@@ -88,7 +88,7 @@ hpda_spe_cell_dec <- hpda_spe_cell_dec |> runWKDE(assay.type = 'affi.score')
 # which can be extracted using assay and visualized using ggsc or
 # other packages
 assays(hpda_spe_cell_dec)
-\dontrun{
+\donttest{
     library(ggsc)
     
     f1 <- sc_spatial(hpda_spe_cell_dec, features="Cancer clone A",

@@ -38,7 +38,7 @@
 #' @param rwr.restart the restart probability used for restart walk with restart, should be between 0 and 1, default is 0.75.
 #' @param rwr.normalize.adj.method character the method to normalize the adjacency matrix of the input graph,
 #' default is \code{laplacian}.
-#' @param rwr.normalize.affinity logical whether normalize the activity (affinity) result score using quantile normalisation,
+#' @param rwr.normalize.affinity logical whether normalize the activity (affinity) result score using quantile normalization,
 #' default is FALSE.
 #' @param rwr.prop.normalize logical whether divide the specific activity score by total activity score for a sample,
 #' default is FALSE. 
@@ -47,18 +47,18 @@
 #' @param hyper.test.weighted character which method to weight the activity score of cell, should is one of "Hypergeometric", "Wallenius", 
 #' "none", default is "Hypergeometric".
 #' @param hyper.test.by.expr logical whether using the expression matrix to find the nearest genes of cells, default is TRUE,
-#' if it is FALSE, meaning using the result of reduction to find the nearest genes of cells to perfrom the \code{hyper.test.weighted}.
+#' if it is FALSE, meaning using the result of reduction to find the nearest genes of cells to perform the \code{hyper.test.weighted}.
 #' @param prop.score logical whether to normalize each feature for each sample, default is FALSE.
 #' @param add.weighted.metric logical whether return the weight activity score of cell using the corresponding \code{hyper.test.weighted},
 #' default is FALSE.
-#' @param add.cor.features logical whether calculate the corrlelation between the new features and orginal featuers (genes), default
-#' is FALSE. If it is TRUE the corrleation result will be kept in fscoreDf which can be extracted using \code{fscoreDf()} function.
-#' @param cells Vector specifying the subset of cells to be used for the calculation of the activaty score or identification 
+#' @param add.cor.features logical whether calculate the correlation between the new features and original features (genes), default
+#' is FALSE. If it is TRUE the correlation result will be kept in fscoreDf which can be extracted using \code{fscoreDf()} function.
+#' @param cells Vector specifying the subset of cells to be used for the calculation of the active score or identification 
 #' of SV features. This can be a character vector of cell names, an integer vector of column indices or a logical vector, 
-#' default is NULL, meaning all cells to be used for the calculation of the activaty score or identification of SV features. 
-#' @param features Vector specifying the subset of features to be used for the calculation of the activaty score or identification
+#' default is NULL, meaning all cells to be used for the calculation of the activity score or identification of SV features. 
+#' @param features Vector specifying the subset of features to be used for the calculation of the activity score or identification
 #' of SV features. This can be a character vector of features names, an integer vector of row indices or a logical vector,
-#' default is NULL, meaning all features to be used for the calculation of the activaty score or identification of SV features.
+#' default is NULL, meaning all features to be used for the calculation of the activity score or identification of SV features.
 #' @param verbose logical whether print the intermediate message when running the program, default is TRUE.
 #' @param ... additional parameters
 #' @return a \linkS4class{SVPExperiment} or a \linkS4class{SingleCellExperiment}, see details.
@@ -67,7 +67,7 @@
 #' if input is a \linkS4class{SVPExperiment}, output will be also a \linkS4class{SVPExperiment}, the activity score of gene sets
 #' was stored in \code{assay} slot of the specified \code{gsvaexp}, and the spatially variable gene sets result is stored in \code{svDfs}
 #' of the specified \code{gsvaexp}, which is a \linkS4class{SingleCellExperiment}. If input is a \linkS4class{SingleCellExperiment}
-#' (which is extracted from \linkS4class{SVPExperiment} using \code{gsvaExp()} funtion), output will be also a
+#' (which is extracted from \linkS4class{SVPExperiment} using \code{gsvaExp()} function), output will be also a
 #' \linkS4class{SingleCellExperiment}, the activity score of gene sets result can be extracted using \code{assay()} function. The 
 #' spatially variable gene sets result can be extracted using \code{svDf()} function.
 #' The affinity score is calculated in the following way (refer to the second article):
@@ -123,7 +123,7 @@
 #' # Then you can use the ggsc or other package to visulize
 #' # and you can try to use the findMarkers of scran or other packages to identify
 #' # the different gene sets.   
-#' \dontrun{
+#' \donttest{
 #'   library(ggplot2)
 #'   library(ggsc)
 #'   sceSubPbmc <- sceSubPbmc |> 

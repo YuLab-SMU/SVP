@@ -44,18 +44,18 @@
 #' @section Other setter:
 #' \describe{
 #' \item{\code{fscoreDfs(x) <- value}:}{
-#' Replaces all features score matrixs in \code{x} with those in \code{value}.
+#' Replaces all features score matrices in \code{x} with those in \code{value}.
 #' The latter should be a list-like object containing any number of \linkS4class{DataFrame} objects
 #' with number of row equal to \code{nrow(x)}.
 #'
-#' If \code{value} is named, those names will be used to name the features score matrixs in \code{x}.
+#' If \code{value} is named, those names will be used to name the features score matrices in \code{x}.
 #' Otherwise, unnamed results are assigned default names prefixed with \code{"unnamed.fscore"}.
 #'
-#' If \code{value} is \code{NULL}, all features score matrixs in \code{x} are removed.
+#' If \code{value} is \code{NULL}, all features score matrices in \code{x} are removed.
 #' }
 #'
 #' \item{\code{fscoreDfNames(x) <- value}:}{
-#' Replaces all names for features score matrixs in \code{x} with a character vector \code{value}.
+#' Replaces all names for features score matrices in \code{x} with a character vector \code{value}.
 #' This should be of length equal to the number of results currently in \code{x}.
 #'}
 #'}
