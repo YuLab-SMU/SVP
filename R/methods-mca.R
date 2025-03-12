@@ -80,7 +80,6 @@ setMethod('runMCA', 'SingleCellExperiment',
   if (!is.null(subset.col)){
       x <- x[,subset.col]
   }  
-  #x <- x[DelayedMatrixStats::rowVars(x) != 0,]
 
   flag.coords <- .check_element_obj(data, key = 'spatialCoords', basefun = int_colData, namefun = names)
   if (flag.coords && consider.spcoord){

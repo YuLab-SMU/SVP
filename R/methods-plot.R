@@ -151,8 +151,6 @@ plot_heatmap_globalbv <- function(globalbv,
                            limits.colour, 
                            threshold
    ){
-   #ggstar <- "ggstar"
-   #require(ggstar, quietly=TRUE, character.only=TRUE)
    p <- ggplot(da,
                 mapping = aes(x = !!rlang::sym("x"), 
                     y = !!rlang::sym("y"), 

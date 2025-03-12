@@ -45,7 +45,6 @@ setGeneric('runDetectMarker',
     ntop = 200,
     present.prop.in.group = 0.1,
     present.prop.in.sample = .2,
-    #type = c('positive', 'all', 'negative'),
     BPPARAM = SerialParam(),
     ...
   )
@@ -68,12 +67,10 @@ setMethod(
     ntop = 200,
     present.prop.in.group = .1,
     present.prop.in.sample = .2,
-    #type = c('positive', 'all', 'negative'),
     BPPARAM = SerialParam(),
     ...
   ){
   
-    #type <- match.arg(type)
     rd <- reducedDim(data, reduction)
     if (grepl("MCA", reduction, ignore.case=TRUE)){
         rd.f.nm <- "genesCoordinates"
@@ -103,9 +100,7 @@ setMethod(
         cell.rd <- .calGroupCenter(cell.rd, group.vec, fun = "mean", BPPARAM)
     }
 
-    #cell2features.dist <- t(pairDist(f.rd, cell.rd))
     
-    #dt <- .obtain.nn.genes(cell2features.dist, type, ntop)
     dt <- .build_pair_knn(cell.rd, f.rd, ntop, FALSE)
 
     if (present.prop.in.sample > 1){

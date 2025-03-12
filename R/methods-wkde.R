@@ -154,7 +154,6 @@ setMethod('runWKDE', 'SVPExperiment',
 })
 
 .internal_runWKDE <- function(x, coords, bandwidths = NULL, adjust = 1, grid.n = 100){
-  #coords <- .normalize.coords(coords)
 
   lims <- c(range(coords[,1]), range(coords[,2]))
 

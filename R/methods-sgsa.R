@@ -158,9 +158,6 @@ setGeneric('runSGSA',
     max.sz = Inf,
     gene.occurrence.rate = .2,
     assay.type = 'logcounts',
-    #knn.consider.spcoord = FALSE,
-    #sp.alpha.add.weight = .2,
-    #sp.beta.add.mp.weight = .1,
     knn.used.reduction.dims = 30,
     knn.combined.cell.feature = FALSE,
     knn.graph.weighted = TRUE,
@@ -200,9 +197,6 @@ setMethod('runSGSA',
     max.sz = Inf,
     gene.occurrence.rate = .2,
     assay.type = 'logcounts',
-    #knn.consider.spcoord = FALSE,
-    #sp.alpha.add.weight = .2,
-    #sp.beta.add.mp.weight = .1,    
     knn.used.reduction.dims = 30,
     knn.combined.cell.feature = FALSE,
     knn.graph.weighted = TRUE,
@@ -229,7 +223,6 @@ setMethod('runSGSA',
       data <- runMCA(data, 
                      assay.type = assay.type, 
                      ncomponents = knn.used.reduction.dims, 
-                     #consider.spcoord = knn.consider.spcoord, 
                      subset.row = cells, 
                      subset.col = features)
   }
@@ -247,13 +240,6 @@ setMethod('runSGSA',
   gset.num <- .filter.gset.gene(features, gset.idx.list, min.sz, max.sz, gene.occurrence.rate)
   gset.idx.list <- gset.idx.list[match(rownames(gset.num), names(gset.idx.list))]
 
-  #flag1 <- .check_element_obj(data, key='spatialCoords', basefun=int_colData, namefun = names)
-  #if (flag1){
-  #  coords <- .extract_element_object(data, key = 'spatialCoords', basefun=int_colData, namefun = names)
-  #  coords <- .normalize.coords(coords)
-  #}else{
-  #  coords <- NULL
-  #}  
   
   tic()
   cli::cli_inform(c("Building the nearest neighbor graph with the distance between 
@@ -262,10 +248,6 @@ setMethod('runSGSA',
   rd.knn.gh <- .build.nndist.graph(
                        cells.rd,
                        features.rd,
-                       #coords,
-                       #knn.consider.spcoord,
-                       #sp.alpha.add.weight,
-                       #sp.beta.add.mp.weight,
                        top.n = knn.k.use,
                        combined.cell.feature = knn.combined.cell.feature,
                        weighted.distance = knn.graph.weighted

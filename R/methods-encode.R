@@ -116,7 +116,6 @@ setMethod("cal_lisa_f1", "SingleCellExperiment",
   group.by, 
   rm.group.nm = NULL, 
   ...){
-  #action <- match.arg(action)
 
   if (missing(lisa.res)){
     if (is.null(data@int_colData$localResults)){

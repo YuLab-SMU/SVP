@@ -10,7 +10,6 @@
      cli::cli_abort(c('The length of variables is', ncol(x), ', which is too few to runMCA().'))
   }
   ncomponents <- min(ncol(x) - 2, ncomponents)
-  #x <- as.matrix(x)
   message("Computing Fuzzy Matrix")
   MCAPrepRes <- MCAStep1(x)
   message("Computing SVD")
@@ -91,8 +90,6 @@ pairDist <- function(x, y){
    }else{
      res <- res$distance
      res@x <- .normalize_dist(res@x)
-     #x@x <- rep(1, length(x@x))
-     #res <- SVP:::SpMatElemMultiSpMat(res, x)
    }
    rownames(res) <- rownames(x)
    colnames(res) <- colnames(x)
@@ -225,10 +222,6 @@ pairDist <- function(x, y){
 .build.nndist.graph <- function(
                             cells.rd, 
                             features.rd,
-                            #cells.sp.coord = NULL,
-                            #knn.consider.spcoord = FALSE,
-                            #sp.alpha.add.weight = .2,
-                            #sp.beta.add.mp.weight = .1,
                             top.n = 600,
                             combined.cell.feature = FALSE, 
                             weighted.distance = FALSE,
@@ -238,18 +231,6 @@ pairDist <- function(x, y){
                        ){
     if (!combined.cell.feature){
         # This is split the cells and features to build knn
-        #x <- pairDist(cells.rd, features.rd)
-        
-        #cell.dist <- pairDist(cells.rd, cells.rd)
-        #cell.dist <- .fusion.sc.sp.dist(
-        #               cells.rd, 
-        #               cells.sp.coord, 
-        #               knn.consider.spcoord, 
-        #               sp.alpha.add.weight, 
-        #               sp.beta.add.mp.weight
-        #)
-        
-        #fs.dist <- pairDist(features.rd, features.rd)
         
         top.n <- min(top.n, nrow(features.rd))
         top.n.cell <- min(max(50, round(top.n/10)), nrow(cells.rd)) 
@@ -259,24 +240,15 @@ pairDist <- function(x, y){
         adj.m.list[[1]] <- .build_pair_knn(cells.rd, features.rd, top.n, weighted.distance)
         adj.m.list[[2]] <- .build.knn.adj(cells.rd, top.n.cell, weighted.distance = weighted.distance)
         adj.m.list[[3]] <- .build.knn.adj(features.rd, top.n.fs, weighted.distance = weighted.distance)
-        #adj.m.list <- BiocParallel::bpmapply(.build.adj.m, list(x, cell.dist, fs.dist), 
-        #                                     list(top.n, top.n.cell, top.n.fs), 
-        #                                     MoreArgs=list(weighted.distance),
-        #                                     BPPARAM = BPPARAM
-        #) 
         adj.m <- do.call(.join.adj.m, adj.m.list)
-        #Matrix::diag(adj.m) <- 0
     }else{
         # build knn by merge the MCA space of cells and features 
         total.rd <- rbind(cells.rd, features.rd)
-        #total.dist <- pairDist(total.rd, total.rd)
         top.n <- min(top.n, nrow(total.rd)) 
         adj.m <- .build.knn.adj(total.rd, top.n, 
                                   fun.nm = findKNN, 
                                   weighted.distance = weighted.distance
                                   ) 
-        #adj.m <- .extract.adj.m(knn.graph, edge.attr = 'weight') 
-        #adj.m <- .build.adj.m(total.dist, top.n, weighted.distance)
     }
     if (weighted.distance){
        if (normalize.dist){
@@ -468,11 +440,8 @@ pairDist <- function(x, y){
 #' @importFrom S4Vectors DataFrame List
 .extract.features.rank <- function(x, y, features, gset.idx.list){
   y <- y[features %in% rownames(y), ,drop=FALSE]
-  #keep.gset <- corCpp(Matrix::t(x), Matrix::t(y))
   keep.gset <- fast_cor(x, y, method='spearman')
   keep.gset <- keep.gset$r
-  #rownames(keep.gset) <- rownames(x)
-  #colnames(keep.gset) <- rownames(y)
   keep.gset.list <- gset.idx.list[names(gset.idx.list) %in% rownames(keep.gset)]
   res <- ExtractFeatureScoreCpp(keep.gset, rownames(keep.gset), colnames(keep.gset), keep.gset.list)
   res <- DataFrame(features.score = List(res))

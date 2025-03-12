@@ -74,7 +74,6 @@
     pt.m <- broman::normalize(pt.m)
     pt.m[is.na(pt.m)] <- 0
   }
-  #pt.m <- Matrix::Matrix(t(pt.m), sparse = TRUE)
   pt.m <- t(pt.m)
   toc()
   return(pt.m)
@@ -139,7 +138,6 @@
     }
     ind <- !is.na(match(rownames(seeds), nm))
     x <- Matrix::Matrix(0, nrow=nrow, ncol = ncol(seeds), sparse = TRUE)
-    #x <- matrix(0, nrow = nrow, ncol = ncol(seeds))
     x[ind,] <- seeds[ind,]
     if (ncol(x) > 1){
        x <- x %*% diag(1/Matrix::colSums(x))
@@ -153,20 +151,4 @@
   return(x)
 }
 
-#calRWR <- function(x,
-#                     v,
-#                     restart = .75,
-#                    delta = 1,
-#                    step = 0,
-#                     stop_delta = 1e-6, 
-#                     stop_step = 50){
-#    pt <- v
-#    while(delta > stop_delta && step <= stop_step){
-#      px <- (1 - restart) * x %*% pt + restart * v 
-#      delta <- sum(abs(px - pt))
-#      pt <- px
-#      step <- step + 1
-#    }
-#    return(as.matrix(pt))
-#}
 

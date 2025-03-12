@@ -41,7 +41,6 @@ fast_cor <- function(
     }
     method <- match.arg(method)
     ia <- match.arg(alternative)
-    #indx <- !is.na(x)
     np <- NULL
     if (!is.null(y)){
         if (ncol(x) != ncol(y)){
@@ -54,16 +53,12 @@ fast_cor <- function(
             x <- Matrix::rbind2(x, y)
         }else{
             if (add.pvalue){
-                #indy <- !is.na(y)
-                #np <- indx %*% Matrix::t(indy) |> as.matrix()
                 np <- .mat_mult(x, y)
             }
         }
     }
         
     if (is.null(np) && add.pvalue){
-        #indx <- !is.na(x)
-        #np <- indx %*% Matrix::t(indx) |> as.matrix()
         np <- .mat_mult(x)
     }
 
