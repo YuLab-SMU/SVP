@@ -67,6 +67,22 @@ the result can be extracted using \code{colData()} function with specified colum
 \description{
 predict the cell signature according the gene sets or pathway activity score.
 }
+\examples{
+data(hpda_spe_cell_dec)
+hpda_spe_cell_dec <- hpda_spe_cell_dec |>
+  pred.cell.signature(assay.type = 1)
+hpda_spe_cell_dec$pred.cell.sign |> table()
+#\donttest{
+  library(ggsc)
+  library(ggplot2)
+  hpda_spe_cell_dec |> 
+    sc_spatial(
+      mapping = aes(x, y, colour = pred.cell.sign),
+      geom = geom_bgpoint,
+      pointsize = 2
+    )
+#}
+}
 \seealso{
 to calculate the activity score of gene sets or pathway: \code{\link{runSGSA}},
 to keep the max gene set or pathway activity score of cell: \code{\link{cluster.assign}}.

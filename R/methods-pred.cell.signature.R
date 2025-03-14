@@ -19,6 +19,21 @@
 #' @seealso to calculate the activity score of gene sets or pathway: [`runSGSA`], 
 #' to keep the max gene set or pathway activity score of cell: [`cluster.assign`].
 #' @export
+#' @examples
+#' data(hpda_spe_cell_dec)
+#' hpda_spe_cell_dec <- hpda_spe_cell_dec |>
+#'   pred.cell.signature(assay.type = 1)
+#' hpda_spe_cell_dec$pred.cell.sign |> table()
+#' #\donttest{
+#'   library(ggsc)
+#'   library(ggplot2)
+#'   hpda_spe_cell_dec |> 
+#'     sc_spatial(
+#'       mapping = aes(x, y, colour = pred.cell.sign),
+#'       geom = geom_bgpoint,
+#'       pointsize = 2
+#'     )
+#' #}
 setGeneric('pred.cell.signature', 
   function(
     data, 
