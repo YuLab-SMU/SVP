@@ -18,21 +18,25 @@ method to identify the spatial variable features. SVP is developed based
 on SingleCellExperiment class, which can be interoperable with the
 existing computing ecosystem.
 
-## :writing_hand: Author
+## :writing\_hand: Author
 
 [Shuangbin Xu](https://github.com/xiangpin) and [Guangchuang
 Yu](https://guangchuangyu.github.io)
 
 School of Basic Medical Sciences, Southern Medical University
 
-## :arrow_double_down: Installation
-
-The development version from `github`:
+## :arrow\_double\_down: Installation
 
 ``` r
+#It can be installed via GitHub.
 if (!requireNamespace("remotes", quietly=TRUE))
     install.packages("remotes")
-remotes::install_github("xiangpin/SVP")
+remotes::install_github("YuLab-SMU/SVP")
+
+#Once Bioconductor 3.21 is released, it can be installed as follows.
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install("SVP")
 ```
 
 To enhance performance, it is **strongly recommended** to connect your R
@@ -41,12 +45,12 @@ BLAS library with the
 calculations. This can be accomplished using the
 [ropenblas](https://prdm0.github.io/ropenblas/) package. Or you can
 install [OpenBLAS](https://github.com/OpenMathLib/OpenBLAS) and link the
-library to R BLAS library by
-`ln -s your_openblas_installed_path_libopenblas.so your_R_install_path_libRblas.so`
-manually.
+library to R BLAS library by `ln -s
+your_openblas_installed_path_libopenblas.so
+your_R_install_path_libRblas.so` manually.
 
-## :sparkling_heart: Contributing
+## :sparkling\_heart: Contributing
 
-We welcome any contributions! By participating in this project you agree
-to abide by the terms outlined in the [Contributor Code of
+We welcome any contributions\! By participating in this project you
+agree to abide by the terms outlined in the [Contributor Code of
 Conduct](CONDUCT.md).

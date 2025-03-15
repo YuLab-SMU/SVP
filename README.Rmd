@@ -27,12 +27,16 @@ School of Basic Medical Sciences, Southern Medical University
 
 ## :arrow_double_down: Installation
 
-The development version from `github`:
-
 ```r
+#It can be installed via GitHub.
 if (!requireNamespace("remotes", quietly=TRUE))
     install.packages("remotes")
-remotes::install_github("xiangpin/SVP")
+remotes::install_github("YuLab-SMU/SVP")
+
+#Once Bioconductor 3.21 is released, it can be installed as follows.
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install("SVP")
 ```
 
 To enhance performance, it is **strongly recommended** to connect your R BLAS library with the 

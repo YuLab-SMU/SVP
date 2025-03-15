@@ -65,10 +65,16 @@ knitr::include_graphics("./SVP_Framework.png")
 You can use the following commands to install it
 
 ```{r, eval=FALSE, INSTALL}
+#Once Bioconductor 3.21 is released, you can install it as follows.
 if (!requireNamespace("BiocManager", quietly=TRUE))
     install.packages("BiocManager")
 
 BiocManager::install("SVP")
+
+#Or you can install it via github
+if (!requireNamespace("remotes", quietly=TRUE))
+    install.packages("remotes")
+remotes::install_github("YuLab-SMU/SVP")
 ```
 
 # Quantification of cell states using SVP
