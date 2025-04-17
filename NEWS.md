@@ -1,3 +1,7 @@
+# SVP 1.0.0
+
++ Bioconductor 3.21 release, and Bioconductor 3.22 bump. (2025-04-17, Thu)
+
 # SVP 0.99.2
 
 + remove unused code. (2025-03-12, Wen)
