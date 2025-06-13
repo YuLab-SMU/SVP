@@ -19,7 +19,7 @@ runSGSA(
   knn.used.reduction.dims = 30,
   knn.combined.cell.feature = FALSE,
   knn.graph.weighted = TRUE,
-  knn.k.use = 600,
+  knn.k.use = round(0.06 * nrow(data)),
   rwr.restart = 0.75,
   rwr.normalize.adj.method = c("laplacian", "row", "column", "none"),
   rwr.normalize.affinity = FALSE,
@@ -48,7 +48,7 @@ runSGSA(
   knn.used.reduction.dims = 30,
   knn.combined.cell.feature = FALSE,
   knn.graph.weighted = TRUE,
-  knn.k.use = 600,
+  knn.k.use = round(0.06 * nrow(data)),
   rwr.restart = 0.75,
   rwr.normalize.adj.method = c("laplacian", "row", "column", "none"),
   rwr.normalize.affinity = FALSE,
@@ -97,7 +97,7 @@ features to features, cells to features respectively to build graph.}
 
 \item{knn.graph.weighted}{logical whether consider the distance of nodes in the Nearest Neighbors, default is TRUE.}
 
-\item{knn.k.use}{numeric the number of the Nearest Neighbors nodes, default is 600.}
+\item{knn.k.use}{numeric the number of the Nearest Neighbors nodes, default is 0.06 * number of gene in \code{data}.}
 
 \item{rwr.restart}{the restart probability used for restart walk with restart, should be between 0 and 1, default is 0.75.}
 
@@ -108,7 +108,7 @@ default is \code{laplacian}.}
 default is FALSE.}
 
 \item{rwr.prop.normalize}{logical whether divide the specific activity score by total activity score for a sample,
-default is FALSE.}
+default is FALSE. if \code{gset.idx.list} is celltype gene set, we recommend using TRUE.}
 
 \item{rwr.threads}{the threads to run Random Walk With Restart (RWR), default is NULL, which will initialize with the default
 number of threads, you can also set this using \code{RcppParallel::setThreadOptions(numThreads=10)}.}
