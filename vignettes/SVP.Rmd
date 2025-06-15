@@ -393,7 +393,8 @@ gsvaExp(mob_spe, 'CellTypeFree') |>
     pointsize = 2,
     gap_line_width = .18,
     hlpointsize= 1.8
-  )
+  ) +
+  facet_wrap(~features, nrow=1)
 
 ```
 
@@ -499,7 +500,10 @@ lbv.res <- mob_spe |>
 # The result can be added to gsvaExp, then visualized by ggsc.
 LISAsce(mob_spe, lisa.res=lbv.res, gsvaexp.name='LBV.res') |> 
   gsvaExp("LBV.res") %>% 
-  plot_lisa_feature(lisa.res = lbv.res, assay.type = 1)
+  plot_lisa_feature(lisa.res = lbv.res, assay.type = 1) +
+  facet_wrap(~features, nrow=1)
+
+  
 ```
 
 The highlighted area denotes the region where the two variables significantly co-aggregate in space.
