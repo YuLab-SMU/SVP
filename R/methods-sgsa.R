@@ -34,14 +34,14 @@
 #' neighbor and build graph, default is FALSE, meaning the nearest neighbor will be found in cells to cells, 
 #' features to features, cells to features respectively to build graph.
 #' @param knn.graph.weighted logical whether consider the distance of nodes in the Nearest Neighbors, default is TRUE.
-#' @param knn.k.use numeric the number of the Nearest Neighbors nodes, default is 600.
+#' @param knn.k.use numeric the number of the Nearest Neighbors nodes, default is 0.06 * number of gene in \code{data}.
 #' @param rwr.restart the restart probability used for restart walk with restart, should be between 0 and 1, default is 0.75.
 #' @param rwr.normalize.adj.method character the method to normalize the adjacency matrix of the input graph,
 #' default is \code{laplacian}.
 #' @param rwr.normalize.affinity logical whether normalize the activity (affinity) result score using quantile normalization,
 #' default is FALSE.
 #' @param rwr.prop.normalize logical whether divide the specific activity score by total activity score for a sample,
-#' default is FALSE. 
+#' default is FALSE. if \code{gset.idx.list} is celltype gene set, we recommend using TRUE.
 #' @param rwr.threads the threads to run Random Walk With Restart (RWR), default is NULL, which will initialize with the default 
 #' number of threads, you can also set this using \code{RcppParallel::setThreadOptions(numThreads=10)}.
 #' @param hyper.test.weighted character which method to weight the activity score of cell, should is one of "Hypergeometric", "Wallenius", 
@@ -161,7 +161,7 @@ setGeneric('runSGSA',
     knn.used.reduction.dims = 30,
     knn.combined.cell.feature = FALSE,
     knn.graph.weighted = TRUE,
-    knn.k.use = 600,
+    knn.k.use = round(0.06 * nrow(data)),
     rwr.restart = .75,
     rwr.normalize.adj.method = c("laplacian", "row", "column", "none"),
     rwr.normalize.affinity = FALSE,
@@ -200,7 +200,7 @@ setMethod('runSGSA',
     knn.used.reduction.dims = 30,
     knn.combined.cell.feature = FALSE,
     knn.graph.weighted = TRUE,
-    knn.k.use = 600,
+    knn.k.use = round(0.06 * nrow(data)),
     rwr.restart = .75,
     rwr.normalize.adj.method = c("laplacian", "row", "column", "none"),
     rwr.normalize.affinity = FALSE,

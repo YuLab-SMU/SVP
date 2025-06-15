@@ -1,6 +1,8 @@
 PKGNAME := $(shell sed -n "s/Package: *\([^ ]*\)/\1/p" DESCRIPTION)
 PKGVERS := $(shell sed -n "s/Version: *\([^ ]*\)/\1/p" DESCRIPTION)
 PKGSRC  := $(shell basename `pwd`)
+BIOCVER := RELEASE_3_21
+
 all: rd check clean
 
 crd:
@@ -39,3 +41,16 @@ bioccheck:
 clean:
 	cd ..;\
 	rm -rf $(PKGNAME).Rcheck
+
+release:
+	git checkout $(BIOCVER);\
+	git fetch --all
+
+update:
+	git fetch --all
+	git merge upstream/devel
+	git merge origin/main
+
+submit:
+	git push upstream devel
+	git push origin
