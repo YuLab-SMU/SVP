@@ -296,7 +296,6 @@ setMethod('runSGSA',
                            method = hyper.test.weighted
                   ))
       gset.score.cells2 <- .weighted_by_hgt(gset.score.cells, gset.hgt)
-      gset.score.cells2 <- .normalize_score(gset.score.cells2, prop.score)
       assay.res <- list(affi.score = as(gset.score.cells2, 'dgCMatrix'))
       if (add.weighted.metric){
           assay.res <- c(assay.res, 
@@ -304,8 +303,11 @@ setMethod('runSGSA',
                             hyper.weighted = as(gset.hgt,'dgCMatrix')))
       }
   }else{
-      gset.score.cells <- .normalize_score(gset.score.cells, prop.score)
       assay.res <- list(affi.score = as(gset.score.cells, 'dgCMatrix'))
+  }
+
+  if (prop.score){
+      assay.res[['prop']] <- .normalize_score(assay.res[[1]], prop.score)
   }
   
   x <- SingleCellExperiment(assays = assay.res)

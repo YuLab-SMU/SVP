@@ -708,6 +708,7 @@ pairDist <- function(x, y){
    if (!flag){
      return(x)
    }
-   x <- prop.table(x, 2) 
+   x <- as.matrix(x) |> prop.table(2) 
+   x <- as(x, "dgCMatrix")
    return(x)
 }
