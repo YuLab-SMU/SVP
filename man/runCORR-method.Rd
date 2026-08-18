@@ -16,6 +16,7 @@ runCORR(
   method = c("spearman", "pearson", "bicorr"),
   alternative = c("greater", "two.sided", "less"),
   add.pvalue = FALSE,
+  p.adjust.method = "BH",
   action = c("get", "only"),
   verbose = TRUE,
   gsvaexp = NULL,
@@ -33,6 +34,7 @@ runCORR(
   method = c("spearman", "pearson", "bicorr"),
   alternative = c("greater", "two.sided", "less"),
   add.pvalue = FALSE,
+  p.adjust.method = "BH",
   action = c("get", "only"),
   verbose = TRUE,
   gsvaexp = NULL,
@@ -50,6 +52,7 @@ runCORR(
   method = c("spearman", "pearson", "bicorr"),
   alternative = c("greater", "two.sided", "less"),
   add.pvalue = FALSE,
+  p.adjust.method = "BH",
   action = c("get", "only"),
   verbose = TRUE,
   gsvaexp = NULL,
@@ -84,6 +87,8 @@ default is \code{NULL}.}
 
 \item{add.pvalue}{logical whether calculate the pvalue, which is calculated with permutation test. So it might
 be slow, default is \code{FALSE}, which the pvalue of result will be NULL.}
+
+\item{p.adjust.method}{character the method to adjust the pvalue of the result, default is \code{BH}.}
 
 \item{action}{character, which should be one of \code{'only'} and \code{'get'}, default is \code{"get"}.
 If \code{action='only'}, it will return a long tidy table contains the correlation for each feature pairs.

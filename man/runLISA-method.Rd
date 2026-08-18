@@ -21,6 +21,7 @@ runLISA(
   cells = NULL,
   action = c("get", "add", "only"),
   alternative = "two.sided",
+  p.adjust.method = "BH",
   flag.method = c("mean", "median"),
   BPPARAM = SerialParam(),
   verbose = TRUE,
@@ -43,6 +44,7 @@ runLISA(
   cells = NULL,
   action = c("get", "add", "only"),
   alternative = "two.sided",
+  p.adjust.method = "BH",
   flag.method = c("mean", "median"),
   BPPARAM = SerialParam(),
   verbose = TRUE,
@@ -65,6 +67,7 @@ runLISA(
   cells = NULL,
   action = c("get", "add", "only"),
   alternative = "two.sided",
+  p.adjust.method = "BH",
   flag.method = c("mean", "median"),
   BPPARAM = SerialParam(),
   verbose = TRUE,
@@ -119,6 +122,8 @@ spots or cells in the same category are adjacent, default is NULL.}
 a \linkS4class{SimpleList}.}
 
 \item{alternative}{a character string specifying the alternative hypothesis, default is \code{two.sided}.}
+
+\item{p.adjust.method}{a character string specifying the method to adjust p-value, default is \code{BH}.}
 
 \item{flag.method}{a character string specifying the method to calculate the threshold for the cluster
 type, default is \code{"mean"}. Other option is \code{"median"}.}

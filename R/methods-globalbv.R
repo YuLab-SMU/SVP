@@ -45,6 +45,7 @@
 #' \code{add.pvalue = TRUE}, default is \code{two.sided}.
 #' @param add.pvalue logical whether calculate the pvalue, which is calculated with permutation test. So it might
 #' be slow, default is \code{FALSE}, which the pvalue of result will be NULL.
+#' @param p.adjust.method character the method to adjust the pvalue of the result, default is \code{BH}.
 #' @param random.seed numeric random seed number to repeatability, default is 1024.
 #' @param action character, which should be one of \code{'only'} and \code{'get'}, default is \code{"only"}.
 #' This will return a long tidy table (when the sample number of \code{data} is one) or a \code{SimpleList} which
@@ -120,6 +121,7 @@ setGeneric('runGLOBALBV',
     permutation = 100,
     alternative = c('two.sided', 'greater', 'less'),
     add.pvalue = FALSE,
+    p.adjust.method = "BH",
     random.seed = 1024,
     action = c("get", "only"),
     verbose = TRUE,
@@ -149,6 +151,7 @@ setMethod("runGLOBALBV", "SingleCellExperiment", function(
     permutation = 100,
     alternative = c('two.sided', "greater", 'less'),
     add.pvalue = FALSE,
+    p.adjust.method = "BH",
     random.seed = 1024,
     action = c("get", "only"),
     verbose = TRUE,
@@ -194,7 +197,7 @@ setMethod("runGLOBALBV", "SingleCellExperiment", function(
                       cli::cli_warn("no-neighbour observations found in the spatial neighborhoods graph.")
                   }
                   res <- .internal.runGLOBALBV(xi, wm, features1, features2, 
-                                               permutation, alternative, add.pvalue, 
+                                               permutation, alternative, add.pvalue, p.adjust.method,
                                                NULL, across.gsvaexp, random.seed)
                   return(res)
          })
@@ -227,6 +230,7 @@ setMethod("runGLOBALBV", "SVPExperiment", function(
     permutation = 100,
     alternative = c('two.sided', 'greater', 'less'),
     add.pvalue = FALSE,
+    p.adjust.method = "BH",
     random.seed = 1024,
     action = c("get", "only"),
     verbose = TRUE,
@@ -296,7 +300,7 @@ setMethod("runGLOBALBV", "SVPExperiment", function(
                        }
                        res <- .internal.runGLOBALBV(xi, wm, features1, features2,
                                                     permutation, alternative,
-                                                    add.pvalue, listn, across.gsvaexp, 
+                                                    add.pvalue, p.adjust.method, listn, across.gsvaexp, 
                                                     random.seed)
                        return(res)
               })

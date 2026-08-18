@@ -21,6 +21,7 @@
 #' \code{"less"} to negative association, default is \code{"two.sided"}.
 #' @param add.pvalue logical whether calculate the pvalue, which is calculated with permutation test. So it might
 #' be slow, default is \code{FALSE}, which the pvalue of result will be NULL.
+#' @param p.adjust.method character the method to adjust the pvalue of the result, default is \code{BH}. 
 #' @param action character, which should be one of \code{'only'} and \code{'get'}, default is \code{"get"}.
 #' If \code{action='only'}, it will return a long tidy table contains the correlation for each feature pairs.
 #' If \code{action='get'}, it will return a list containing the correlation matrix and pvalue matrix (if \code{add.pvalue=TRUE}).
@@ -72,6 +73,7 @@ setGeneric('runCORR',
     method = c("spearman", "pearson", "bicorr"),
     alternative = c('greater', 'two.sided', 'less'),
     add.pvalue = FALSE,
+    p.adjust.method = 'BH',
     action = c("get", "only"),
     verbose = TRUE,
     gsvaexp = NULL,
@@ -94,6 +96,7 @@ setMethod("runCORR", "SingleCellExperiment", function(
     method = c("spearman", "pearson", "bicorr"),
     alternative = c("greater", "two.sided", "less"),
     add.pvalue = FALSE,
+    p.adjust.method = 'BH',
     action = c("get", "only"),
     verbose = TRUE,
     gsvaexp = NULL,
@@ -119,7 +122,8 @@ setMethod("runCORR", "SingleCellExperiment", function(
   }
   
   res <- .internal.runCORR(x, features1, features2, method,
-                           alternative, add.pvalue, NULL, across.gsvaexp)
+                           alternative, add.pvalue, p.adjust.method, 
+                           NULL, across.gsvaexp)
   if (action == 'only'){
       res <- as_tbl_df(res)
   }
@@ -138,6 +142,7 @@ setMethod("runCORR", "SVPExperiment", function(
     method = c("spearman", "pearson", "bicorr"),
     alternative = c('greater', 'two.sided', 'less'),
     add.pvalue = FALSE,
+    p.adjust.method = 'BH',
     action = c("get", "only"),
     verbose = TRUE,
     gsvaexp = NULL,
@@ -188,7 +193,8 @@ setMethod("runCORR", "SVPExperiment", function(
 
        listn <- .generate_feature_listn(data, features1, features2, gsvaexp)
        res <- .internal.runCORR(x, features1, features2, method,
-                                alternative, add.pvalue, listn, across.gsvaexp)
+                                alternative, add.pvalue, p.adjust.method, 
+                                listn, across.gsvaexp)
        if (action == 'only'){
            res <- as_tbl_df(res, listn)
        }

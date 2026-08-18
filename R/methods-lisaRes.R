@@ -210,9 +210,10 @@ as_tbl_df <- function(x,
                       dist.method = 'euclidean',
                       hclust.method = 'average'
                      ){
-    if (inherits(x, 'list') && length(x)==2){
+    if (inherits(x, 'list') && length(x)==3){
         rmat <- x[[1]]
         pval <- x[[2]]
+        padj <- x[[3]]
         nm <- names(x) 
     }else{
         rmat <- x
@@ -227,6 +228,12 @@ as_tbl_df <- function(x,
         pval <- .internal.as_tbl_df(pval, diag = diag, rmrd = rmrd)
         colnames(pval) <- c("x", "y", nm[2])
         rmat <- dplyr::left_join(rmat, pval, by=c("x", "y"))
+	if (!is.null(padj)){
+            padj <- padj[levels(rmat$x), levels(rmat$y), drop=FALSE]
+            padj <- .internal.as_tbl_df(padj, diag = diag, rmrd = rmrd)
+            colnames(padj) <- c("x", "y", nm[3])
+            rmat <- dplyr::left_join(rmat, padj, by=c("x", "y"))
+	}
     }
     if (!is.null(listn)){
         if (inherits(listn, "list") && !is.null(names(listn))){

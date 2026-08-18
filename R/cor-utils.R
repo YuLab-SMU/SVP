@@ -12,6 +12,7 @@
 #' association, default is \code{"two.sided"}.
 #' @param add.pvalue logical whether calculate the pvalue of correlation using t 
 #' test, default is FALSE.
+#' @param p.adjust.method a character string specifying the method to adjust pvalue.
 #' @return a list containing the matrix of correlation and matrix of pvalue (if 
 #' \code{add.pvalue} is FALSE (default), the matrix of pvalue will be NULL).
 #' @importFrom stats pt
@@ -34,7 +35,8 @@ fast_cor <- function(
     combine = FALSE,
     method = c('pearson', 'spearman', 'bicorr'), 
     alternative = c("two.sided", "less", "greater"),
-    add.pvalue = FALSE
+    add.pvalue = FALSE,
+    p.adjust.method = 'BH'
 ){
     if (!inherits(x, 'dgCMatrix')){
         x <- Matrix::Matrix(as.matrix(x), sparse=TRUE)
@@ -90,14 +92,20 @@ fast_cor <- function(
             rownames(mc) <- colnames(mc) <- rownames(x)
         }
     }
-
+    
     if (add.pvalue){
         p <- .cal_cor_p(mc, ia, np)
+        if (p.adjust.method != "none" && !is.null(p.adjust.method)){
+            padj <- p.adjust(p, method = p.adjust.method)
+	}else{
+            padj <- NULL
+	}
     }else{
         p <- NULL
+        padj <- NULL
     }
     
-    return(list(r=mc, pval=p))
+    return(list(r=mc, pval=p, padj = padj))
 }
 
 .cal_cor_p <- function(mc, ia, np){
@@ -142,6 +150,7 @@ fast_cor <- function(
     method = "spearman",
     alternative = 'two.sided',
     add.pvalue = FALSE,
+    p.adjust.method = "BH",    
     listn = NULL,
     across.gsvaexp = TRUE
 ){
@@ -167,7 +176,8 @@ fast_cor <- function(
                   y = y, 
                   method = method, 
                   alternative = alternative, 
-                  add.pvalue = add.pvalue
+                  add.pvalue = add.pvalue,
+                  p.adjust.method = p.adjust.method
   )
   return(res)
 }

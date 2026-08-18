@@ -23,7 +23,7 @@
 #' density, default is 100.
 #' @param permutation numeric the number of permutation for each single feature to detect the 
 #' significantly spatially or single cell variable features, default is 100.
-#' @param p.adjust.method character the method to adjust the pvalue of the result, default is \code{BY}.
+#' @param p.adjust.method character the method to adjust the pvalue of the result, default is \code{BH}.
 #' @param verbose logical whether print the intermediate message when running the program, default is TRUE.
 #' @param action character control the type of output, if \code{action='add'}, the result of identification
 #' will add the original object, if \code{action = 'get'}, the result will return a \linkS4class{SimpleList},
@@ -50,7 +50,7 @@
 #'      each features.
 #'   \item \code{pvalue} the pvalue is calculated using the real \code{sp.kld} and the permutation \code{boot.sp.kld.mean} and
 #'      \code{boot.sp.kld.sd} based on the normal distribution.
-#'   \item \code{padj} the adjusted pvalue based on the specified \code{p.adjust.method}, default is \code{BY}.
+#'   \item \code{padj} the adjusted pvalue based on the specified \code{p.adjust.method}, default is \code{BH}.
 #'   \item \code{rank} the order of significant spatial variable features based on \code{padj} and \code{sp.kld}.
 #' }
 #' 
@@ -119,7 +119,7 @@ setGeneric('runKldSVG',
     sample_id = 'all',
     grid.n = 100,
     permutation = 100,
-    p.adjust.method = "BY",
+    p.adjust.method = "BH",
     verbose = TRUE,
     action = c('add', 'only', 'get'),
     random.seed = 1024,
@@ -142,7 +142,7 @@ setMethod('runKldSVG', 'SingleCellExperiment',
     sample_id = 'all',
     grid.n = 100,
     permutation = 100,
-    p.adjust.method = "BY",
+    p.adjust.method = "BH",
     verbose = TRUE,
     action = c('add', 'only', 'get'),
     random.seed = 1024,
@@ -229,7 +229,7 @@ setMethod('runKldSVG', 'SVPExperiment',
     sample_id = 'all',
     grid.n = 100,
     permutation = 100,
-    p.adjust.method = "BY",
+    p.adjust.method = "BH",
     verbose = TRUE,
     action = c('add', 'only', 'get'),
     random.seed = 1024,

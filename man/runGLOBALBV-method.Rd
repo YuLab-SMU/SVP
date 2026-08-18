@@ -22,6 +22,7 @@ runGLOBALBV(
   permutation = 100,
   alternative = c("two.sided", "greater", "less"),
   add.pvalue = FALSE,
+  p.adjust.method = "BH",
   random.seed = 1024,
   action = c("get", "only"),
   verbose = TRUE,
@@ -46,6 +47,7 @@ runGLOBALBV(
   permutation = 100,
   alternative = c("two.sided", "greater", "less"),
   add.pvalue = FALSE,
+  p.adjust.method = "BH",
   random.seed = 1024,
   action = c("get", "only"),
   verbose = TRUE,
@@ -70,6 +72,7 @@ runGLOBALBV(
   permutation = 100,
   alternative = c("two.sided", "greater", "less"),
   add.pvalue = FALSE,
+  p.adjust.method = "BH",
   random.seed = 1024,
   action = c("get", "only"),
   verbose = TRUE,
@@ -132,6 +135,8 @@ or NULL, which will use mantel test to calculate the pvalue.}
 
 \item{add.pvalue}{logical whether calculate the pvalue, which is calculated with permutation test. So it might
 be slow, default is \code{FALSE}, which the pvalue of result will be NULL.}
+
+\item{p.adjust.method}{character the method to adjust the pvalue of the result, default is \code{BH}.}
 
 \item{random.seed}{numeric random seed number to repeatability, default is 1024.}
 

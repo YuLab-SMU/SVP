@@ -6,6 +6,7 @@
   permutation = 100L,
   alternative = c('greater', 'two.sided', 'less'),
   add.pvalue = FALSE,
+  p.adjust.method = "BH",
   listn = NULL,
   across.gsvaexp = TRUE,
   random.seed = 1024
@@ -39,9 +40,17 @@
   if (add.pvalue){
       rownames(res$pvalue) <- allf[f1]
       colnames(res$pvalue) <- allf[f2]
+      if (p.adjust.method != "none" && !is.null(p.adjust.method)){
+          res$padj <- p.adjust(res$pvalue, method = p.adjust.method)
+          res$padj <- matrix(res$padj, nrow=length(f1), ncol=length(f2))
+          rownames(res$padj) <- allf[f1]
+          colnames(res$padj) <- allf[f2]
+      }else{
+          res <- c(res, list(padj = NULL))
+      }
   }else{
       res$pvalue <- NULL
-      res <- c(res, list(pvalue=NULL))
+      res <- c(res, list(pvalue=NULL), list(padj = NULL))
   }
   return(res)
 }

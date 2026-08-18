@@ -5,6 +5,7 @@
     method = c("localG", "localmoran"),
     flag.method = c("mean", "median"),
     alternative = c("two.sided", "greater", "less"),
+    p.adjust.method = "BH",
     BPPARAM = SerialParam()
   ){
   if (!inherits(x, 'dgCMatrix')){
@@ -27,17 +28,20 @@
       res <- CalLocalMoranParallel(x, weight) 
   }
 
-  res <- .add_localisa_pvalue(res, pnm, nm, colnames(x), method, flag.method, alternative, BPPARAM)
+  res <- .add_localisa_pvalue(res, pnm, nm, colnames(x), method, flag.method, alternative, p.adjust.method, BPPARAM)
   names(res) <- rownames(x)
   return(res)
 }
 
-.add_localisa_pvalue <- function(res, pnm, nm, cellnm, method, flag.method, alternative, BPPARAM){
+.add_localisa_pvalue <- function(res, pnm, nm, cellnm, method, flag.method, alternative, p.adjust.method, BPPARAM){
   res <- BiocParallel::bplapply(res, function(x){
             x <- data.frame(x)
             x <- .cal_pvalue(x, alternative, pnm)
             colnames(x) <- nm
             rownames(x) <- cellnm
+            if (!is.null(p.adjust.method) && p.adjust.method != "none"){
+              x$padj <- p.adjust(x[[pnm]], method = p.adjust.method)
+	    }
             x <- .add_cluster(x, method, flag.method)
             return(x)
          }, BPPARAM = BPPARAM)
@@ -75,7 +79,12 @@
         x$lz <- NULL
     }
     if (!all(is.na(x[[5]]))){
-        x$`cluster.test`<- ifelse(x[[5]] <= 0.05, as.character(x[["cluster.no.test"]]), "NoSign")
+        if (!"padj" %in% colnames(x)){
+            indp <- 5 
+	}else{
+  	    indp <- 6
+	}
+        x$`cluster.test`<- ifelse(x[[indp]] <= 0.05, as.character(x[["cluster.no.test"]]), "NoSign")
     }
     return(x)
 }

@@ -10,7 +10,8 @@ fast_cor(
   combine = FALSE,
   method = c("pearson", "spearman", "bicorr"),
   alternative = c("two.sided", "less", "greater"),
-  add.pvalue = FALSE
+  add.pvalue = FALSE,
+  p.adjust.method = "BH"
 )
 }
 \arguments{
@@ -32,6 +33,8 @@ association, default is \code{"two.sided"}.}
 
 \item{add.pvalue}{logical whether calculate the pvalue of correlation using t
 test, default is FALSE.}
+
+\item{p.adjust.method}{a character string specifying the method to adjust pvalue.}
 }
 \value{
 a list containing the matrix of correlation and matrix of pvalue (if

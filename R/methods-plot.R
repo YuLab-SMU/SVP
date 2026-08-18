@@ -58,10 +58,14 @@ plot_heatmap_globalbv <- function(globalbv,
    p1 <- f1 <- p.lisa.l <- p.lisa.t <- p.moran.l <- p.moran.t <- NULL
    flag.square <- FALSE
    pvalnm <- NULL
-   if (length(globalbv) == 2 && inherits(globalbv, 'list')){
+   if (length(globalbv) == 3 && inherits(globalbv, 'list')){
      index <- names(globalbv)[[1]]
      if (!is.null(globalbv[[2]])){
-       pvalnm <- names(globalbv)[[2]]
+       if (!is.null(names(globalbv)[[3]])){
+          pvalnm <- names(globalbv)[[3]]
+       }else{
+          pvalnm <- names(globalbv)[[2]]
+       }
      }
      flag.square <- identical(rownames(globalbv[[1]]), colnames(globalbv[[1]]))
      globalbv |> as_tbl_df(diag=TRUE, flag.clust=TRUE, dist.method = dist.method, hclust.method=hclust.method) -> da

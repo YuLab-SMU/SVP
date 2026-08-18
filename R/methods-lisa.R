@@ -37,6 +37,7 @@
 #' @param action character, which control the type of return result, default is \code{get}, which will return
 #' a \linkS4class{SimpleList}.
 #' @param alternative a character string specifying the alternative hypothesis, default is \code{two.sided}.
+#' @param p.adjust.method a character string specifying the method to adjust p-value, default is \code{BH}.
 #' @param flag.method a character string specifying the method to calculate the threshold for the cluster 
 #' type, default is \code{"mean"}. Other option is \code{"median"}. 
 #' @param BPPARAM A BiocParallelParam object specifying whether perform the analysis in parallel using
@@ -114,6 +115,7 @@ setGeneric('runLISA',
     cells = NULL,
     action = c("get", "add", "only"),
     alternative = 'two.sided',
+    p.adjust.method = 'BH',
     flag.method = c("mean","median"),
     BPPARAM = SerialParam(),
     verbose = TRUE,
@@ -141,6 +143,7 @@ setMethod("runLISA", "SingleCellExperiment", function(
     cells = NULL,
     action = c("get", "add", "only"),
     alternative = 'two.sided',
+    p.adjust.method = 'BH',
     flag.method = c('mean', "median"),
     BPPARAM = SerialParam(),
     verbose = TRUE,
@@ -180,7 +183,7 @@ setMethod("runLISA", "SingleCellExperiment", function(
                   weighti <- if(inherits(weight, 'list')){weight[names(weight) == sid]}else{weight}
                   xi <- x[, ind, drop=FALSE]
                   wm <- .obtain.weight(coordsi, weight = weighti, weight.method = weight.method, ...)
-                  res <- .internal.runLISA(xi, wm, method, flag.method, alternative, BPPARAM)
+                  res <- .internal.runLISA(xi, wm, method, flag.method, alternative, p.adjust.method, BPPARAM)
                   return(res)
          })
   res <- .tidy_lisa_res(res)
@@ -220,6 +223,7 @@ setMethod("runLISA", "SVPExperiment", function(
     cells = NULL,
     action = c("get", "add", "only"),
     alternative = 'two.sided',
+    p.adjust.method = 'BH',
     flag.method = c("mean", "median"),
     BPPARAM = SerialParam(),
     verbose = TRUE,
@@ -256,6 +260,7 @@ setMethod("runLISA", "SVPExperiment", function(
                        cells,
                        action,
                        alternative,
+                       p.adjust.method,
                        flag.method,
                        BPPARAM,       
                        verbose,
