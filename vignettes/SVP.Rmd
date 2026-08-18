@@ -116,8 +116,9 @@ SVP accepts `SingleCellExperiment` or `SpatialExperiment` object as input. The g
 ```{r, fig.width = 11, fig.height = 7, fig.align = 'center', fig.cap="The heatmap of spatially variable biocarta pathway", Biocarta}
 #Note: the gset.idx.list supports the named gene list, gson object or
 # locate gmt file or html url of gmt.
+biocarta_gmt_file <- system.file("extdata", "m2.cp.biocarta.v2024.1.Mm.symbols.gmt", package="SVP")
 mob_spe <- runSGSA(mob_spe, 
-             gset.idx.list = "https://data.broadinstitute.org/gsea-msigdb/msigdb/release/2024.1.Mm/m2.cp.biocarta.v2024.1.Mm.symbols.gmt", # The target gene set gmt file
+             gset.idx.list = biocarta_gmt_file, # The target gene set gmt file
              assay.type = 'logcounts', # The name of assays of gene profiler
              gsvaExp.name = 'Biocarta' # The name of result to save to gsvaExps slot
            )
