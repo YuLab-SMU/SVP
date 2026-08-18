@@ -16,10 +16,12 @@ runLOCALBV(
   sample_id = "all",
   bv.method = c("locallee", "localmoran_bv"),
   bv.alternative = "two.sided",
+  bv.p.adjust.method = "BH",
   weight = NULL,
   weight.method = c("voronoi", "knn", "none"),
   lisa.method = c("localG", "localmoran"),
   lisa.alternative = "greater",
+  lisa.p.adjust.method = "BH",
   lisa.flag.method = c("mean", "median"),
   reduction.used = NULL,
   group.by = NULL,
@@ -43,10 +45,12 @@ runLOCALBV(
   sample_id = "all",
   bv.method = c("locallee", "localmoran"),
   bv.alternative = "two.sided",
+  bv.p.adjust.method = "BH",
   weight = NULL,
   weight.method = c("voronoi", "knn", "none"),
   lisa.method = c("localG", "localmoran"),
   lisa.alternative = "greater",
+  lisa.p.adjust.method = "BH",
   lisa.flag.method = c("mean", "median"),
   reduction.used = NULL,
   group.by = NULL,
@@ -70,10 +74,12 @@ runLOCALBV(
   sample_id = "all",
   bv.method = c("locallee", "localmoran_bv"),
   bv.alternative = "two.sided",
+  bv.p.adjust.method = "BH",
   weight = NULL,
   weight.method = c("voronoi", "knn", "none"),
   lisa.method = c("localG", "localmoran"),
   lisa.alternative = "greater",
+  lisa.p.adjust.method = "BH",
   lisa.flag.method = c("mean", "median"),
   reduction.used = NULL,
   group.by = NULL,
@@ -114,6 +120,8 @@ default is \code{"all"}.}
 \item{bv.alternative}{a character string specifying the alternative hypothesis, default is \code{tow.sided}.
 This only work when \code{bv.method = 'localmoran_bv'}.}
 
+\item{bv.p.adjust.method}{character the method to adjust p-value for local bivariate analysis, default is \code{BH}.}
+
 \item{weight}{object, which can be \code{nb}, \code{listw} or \code{Graph} object, default is NULL,
 meaning the spatial neighbours weights will be calculated using the \code{weight.method}.
 if the \code{data} contains multiple samples, and the \code{sample_id} is specified, it should be
@@ -132,6 +140,8 @@ analysis result, default is \code{'localG'}.}
 
 \item{lisa.alternative}{a character string specifying the alternative hypothesis, which works with
 \code{lisa.method}, default is \code{greater}.}
+
+\item{lisa.p.adjust.method}{a character string specifying the method to adjust p-value of \code{LISA}, default is \code{BH}.}
 
 \item{lisa.flag.method}{a character string specifying the method to calculate the threshold for the cluster
 type, default is \code{"mean"}. Other option is \code{"median"}.}

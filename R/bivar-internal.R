@@ -81,11 +81,13 @@
   permutation = 200, 
   bv.method = c('locallee', 'localmoran_bv'),
   bv.alternative = c("two.sided", "greater", "less"),
+  bv.p.adjust.method = "BH",
   seed = 123,
   wi,
   wi2,
   lisa.method = c("localG", "localmoran"),
   lisa.alternative = c("greater", "two.sided", "less"),
+  lisa.p.adjust.method = "BH",
   lisa.flag.method = c("mean", "median"),
   BPPARAM = SerialParam() 
 ){
@@ -107,21 +109,21 @@
   }
   if (bv.method == 'localmoran_bv'){
       res <- bplapply(seq(nrow(allpair)), function(i){
-               .internal.runLocalMoranBv(x[allpair[i, 1],], x[allpair[i, 2],], weight, n, permutation, bv.alternative, 
-                                      seed, wi, wi2, lisa.method, lisa.flag.method, lisa.alternative)
+               .internal.runLocalMoranBv(x[allpair[i, 1],], x[allpair[i, 2],], weight, n, permutation, bv.alternative, bv.p.adjust.method, 
+                                      seed, wi, wi2, lisa.method, lisa.flag.method, lisa.alternative, lisa.p.adjust.method)
                }, BPPARAM = BPPARAM)
   }else{
       res <- bplapply(seq(nrow(allpair)), function(i){
                .internal.runLocalLeeBv(x[allpair[i,1], ], x[allpair[i,2], ], weight, n, 
-                                      wi, wi2, lisa.method, lisa.flag.method, lisa.alternative)
+                                      wi, wi2, lisa.method, lisa.flag.method, lisa.alternative, lisa.p.adjust.method)
                }, BPPARAM = BPPARAM)
   }
   names(res) <- paste(allpair[,1], allpair[,2], sep="_VS_")
   return(res)
 }
 
-.internal.runLocalMoranBv <- function(x, y, weight, n, permutation, bv.alternative, seed, 
-                                      wi, wi2, lisa.method, lisa.flag.method, lisa.alternative){
+.internal.runLocalMoranBv <- function(x, y, weight, n, permutation, bv.alternative, bv.p.adjust.method, seed, 
+                                      wi, wi2, lisa.method, lisa.flag.method, lisa.alternative, lisa.p.adjust.method){
   res <- withr::with_seed(seed, RunLocalMoranBvPerm(x, y, weight, n, permutation)) |> 
          data.frame()
   prefix <- switch(bv.alternative, two.sided = "!=", greater = ">", less = "<")
@@ -129,16 +131,19 @@
   pnm <- gettextf("Pr (z %s E(%s))", prefix, "Ibvi")
   res <- .cal_pvalue(res, bv.alternative)
   colnames(res) <- c(nm, pnm)
-  lisa.res <- .internal.runLISA(t(res[, 1, drop=FALSE]), weight, lisa.method, lisa.flag.method, lisa.alternative)
+  if (!is.null(bv.p.adjust.method) && bv.p.adjust.method != "none"){
+     res$bv.padj <- p.adjust(res[[pnm]], method = bv.p.adjust.method)
+  }
+  lisa.res <- .internal.runLISA(t(res[, 1, drop=FALSE]), weight, lisa.method, lisa.flag.method, lisa.alternative, lisa.p.adjust.method)
   res <- cbind(res, lisa.res[[1]])
   rownames(res) <- names(x)
   return(res)
 }
 
-.internal.runLocalLeeBv <- function(x, y, weight, n, wi, wi2, lisa.method, lisa.flag.method, lisa.alternative){
+.internal.runLocalLeeBv <- function(x, y, weight, n, wi, wi2, lisa.method, lisa.flag.method, lisa.alternative, lisa.p.adjust.method){	
   res <- RunLocalLee(x, y, weight, n) |> data.frame()
   colnames(res) <- "LocalLee"
-  lisa.res <- .internal.runLISA(t(res[, 1, drop=FALSE]), weight, lisa.method, lisa.flag.method, lisa.alternative)
+  lisa.res <- .internal.runLISA(t(res[, 1, drop=FALSE]), weight, lisa.method, lisa.flag.method, lisa.alternative, lisa.p.adjust.method)
   res <- cbind(res, lisa.res[[1]])
   rownames(res) <- names(x)
   return(res)

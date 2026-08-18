@@ -19,6 +19,6 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{SpatialExperiment}{\code{\link[SpatialExperiment:SpatialExperiment-methods]{imgData}}, \code{\link[SpatialExperiment:SpatialExperiment-methods]{imgData<-}}, \code{\link[SpatialExperiment:SpatialExperiment-methods]{spatialCoords}}, \code{\link[SpatialExperiment:SpatialExperiment-methods]{spatialCoords<-}}, \code{\link[SpatialExperiment:SpatialExperiment-methods]{spatialCoordsNames}}, \code{\link[SpatialExperiment:SpatialExperiment-methods]{spatialCoordsNames<-}}}
+  \item{SpatialExperiment}{\code{\link[SpatialExperiment:imgData]{imgData()}}, \code{\link[SpatialExperiment:imgData<-]{imgData<-()}}, \code{\link[SpatialExperiment:spatialCoords]{spatialCoords()}}, \code{\link[SpatialExperiment:spatialCoords<-]{spatialCoords<-()}}, \code{\link[SpatialExperiment:spatialCoordsNames]{spatialCoordsNames()}}, \code{\link[SpatialExperiment:spatialCoordsNames<-]{spatialCoordsNames<-()}}}
 }}
 
